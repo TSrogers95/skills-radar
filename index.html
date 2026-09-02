@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skills Radar — Apprenticeship &amp; T-Level Policy Tracker</title>
+<meta name="description" content="A running feed of changes to apprenticeship funding, compliance, standards and T-Level policy.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+
+  :root{
+    --navy:#152238;
+    --navy-soft:#2a3a56;
+    --paper:#f6f4ee;
+    --panel:#ffffff;
+    --ink:#1c2333;
+    --ink-soft:#5b6478;
+    --rule:#dcd7c9;
+
+    --red:#a83232;
+    --red-bg:#f7e3e1;
+    --amber:#b9791f;
+    --amber-bg:#f7ead3;
+    --green:#2f6f62;
+    --green-bg:#e2eeea;
+
+    --slate:#6b7280;
+    --slate-bg:#eceef1;
+  }
+
+  *{ box-sizing:border-box; }
+
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    line-height:1.5;
+  }
+
+  h1,h2,h3{ font-family:'IBM Plex Serif', serif; font-weight:600; margin:0; }
+
+  .wrap{ max-width:900px; margin:0 auto; padding:0 24px; }
+
+  /* ---------- Header ---------- */
+
+  header{ background:var(--navy); color:#f0efe9; padding:44px 0 40px; }
+  header .eyebrow{ color:#9fb0cc; font-size:0.95rem; margin-bottom:10px; }
+  header h1{ font-size:2.1rem; letter-spacing:-0.01em; }
+  header p.lede{ max-width:56ch; color:#c6cede; margin-top:14px; font-size:1.02rem; }
+  header .updated{
+    margin-top:22px; font-size:0.85rem; color:#8393b0;
+    border-top:1px solid var(--navy-soft); padding-top:16px;
+  }
+
+  /* ---------- Stats ---------- */
+
+  .stats{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin:-28px 0 32px; }
+  .stat{ background:var(--panel); border:1px solid var(--rule); border-radius:4px; padding:18px 16px; }
+  .stat .num{ font-family:'IBM Plex Serif', serif; font-size:2rem; font-weight:600; line-height:1; }
+  .stat .label{ margin-top:8px; font-size:0.85rem; color:var(--ink-soft); }
+  .stat.amber .num{ color:var(--amber); }
+  .stat.green .num{ color:var(--green); }
+
+  /* ---------- Controls ---------- */
+
+  .controls{ border-bottom:1px solid var(--rule); padding-bottom:20px; margin-bottom:6px; }
+
+  .filters{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
+
+  .filters button{
+    font-family:'IBM Plex Sans', sans-serif; font-size:0.9rem;
+    padding:8px 14px; border-radius:20px;
+    border:1px solid var(--rule); background:var(--panel);
+    color:var(--ink-soft); cursor:pointer;
+  }
+  .filters button.active{ background:var(--navy); border-color:var(--navy); color:#fff; }
+  .filters button:focus-visible{ outline:2px solid var(--navy); outline-offset:2px; }
+
+  .searchrow{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+
+  .searchrow input{
+    flex:1; min-width:240px;
+    font-family:'IBM Plex Sans', sans-serif; font-size:0.95rem;
+    padding:10px 14px; border:1px solid var(--rule); border-radius:4px;
+    background:var(--panel); color:var(--ink);
+  }
+  .searchrow input:focus-visible{ outline:2px solid var(--navy); outline-offset:1px; }
+
+  .searchrow button.clear{
+    font-family:'IBM Plex Sans', sans-serif; font-size:0.88rem;
+    padding:10px 14px; border:1px solid var(--rule); border-radius:4px;
+    background:var(--panel); color:var(--ink-soft); cursor:pointer;
+  }
+
+  .legend{
+    display:flex; gap:18px; flex-wrap:wrap;
+    font-size:0.8rem; color:var(--ink-soft);
+    padding:16px 0 20px;
+  }
+  .legend span{ display:flex; align-items:center; gap:7px; }
+  .dot{ width:9px; height:9px; border-radius:50%; display:inline-block; }
+  .dot.high{ background:var(--red); }
+  .dot.medium{ background:var(--amber); }
+  .dot.low{ background:var(--green); }
+
+  .count{ font-size:0.85rem; color:var(--ink-soft); padding-bottom:14px; }
+
+  /* ---------- Feed ---------- */
+
+  .feed-item{
+    display:grid; grid-template-columns:100px 1fr; gap:20px;
+    padding:20px 20px 20px 16px;
+    border-bottom:1px solid var(--rule);
+    border-left:4px solid var(--rule);
+    background:var(--panel);
+    margin-bottom:8px;
+    border-radius:0 4px 4px 0;
+  }
+
+  .feed-item.high{ border-left-color:var(--red); }
+  .feed-item.medium{ border-left-color:var(--amber); }
+  .feed-item.low{ border-left-color:var(--green); }
+
+  .feed-item .date{ font-size:0.82rem; color:var(--ink-soft); padding-top:3px; }
+
+  .feed-item .tags{ display:flex; gap:8px; margin-bottom:8px; flex-wrap:wrap; align-items:center; }
+
+  .tag{ font-size:0.76rem; padding:3px 9px; border-radius:3px; }
+  .tag.cat{ background:var(--slate-bg); color:var(--slate); }
+  .tag.upcoming{ background:var(--amber-bg); color:var(--amber); }
+  .tag.updated{ background:var(--green-bg); color:var(--green); }
+  .tag.in-review{ background:var(--slate-bg); color:var(--slate); }
+
+  .pinned-flag{
+    font-size:0.76rem; color:var(--red);
+    background:var(--red-bg); padding:3px 9px; border-radius:3px;
+  }
+
+  .feed-item h3{ font-size:1.08rem; margin-bottom:8px; }
+  .feed-item p{ margin:0 0 10px; color:var(--ink-soft); font-size:0.95rem; max-width:64ch; }
+  .feed-item .source{ font-size:0.85rem; color:inherit; text-decoration:underline; text-decoration-color:var(--rule); }
+
+  .empty{ padding:36px 0; color:var(--ink-soft); font-size:0.95rem; }
+
+  footer{
+    padding:30px 0 60px; color:var(--ink-soft); font-size:0.82rem;
+    border-top:1px solid var(--rule); margin-top:26px;
+  }
+
+  @media (max-width:640px){
+    .stats{ grid-template-columns:repeat(2,1fr); }
+    .feed-item{ grid-template-columns:1fr; gap:10px; }
+    .feed-item .date{ padding-top:0; }
+  }
+
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="eyebrow">Skills Radar</div>
+    <h1>Apprenticeship &amp; T-Level policy, tracked</h1>
+    <p class="lede">A running feed of changes to apprenticeship funding rules, compliance requirements, standards and T-Level policy — filtered by what matters to you.</p>
+    <div class="updated" id="last-updated"></div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="stats">
+    <div class="stat">
+      <div class="num" id="stat-changes">–</div>
+      <div class="label">Changes in the last month</div>
+    </div>
+    <div class="stat amber">
+      <div class="num" id="stat-upcoming">–</div>
+      <div class="label">Upcoming changes</div>
+    </div>
+    <div class="stat">
+      <div class="num" id="stat-review">–</div>
+      <div class="label">Standards in review</div>
+    </div>
+    <div class="stat green">
+      <div class="num" id="stat-updated">–</div>
+      <div class="label">Standards updated (last month)</div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="filters">
+      <button data-filter="all" class="active">All updates</button>
+      <button data-filter="funding-rules">Funding rules</button>
+      <button data-filter="levy">Levy</button>
+      <button data-filter="t-levels">T-Levels</button>
+      <button data-filter="standard">By standard</button>
+    </div>
+    <div class="searchrow">
+      <input type="search" id="search" placeholder="Search a standard or keyword — try &ldquo;admin&rdquo; or &ldquo;engineering&rdquo;" aria-label="Search updates">
+      <button class="clear" id="clear">Clear</button>
+    </div>
+  </div>
+
+  <div class="legend">
+    <span><i class="dot high"></i> Act now — affects live delivery or compliance</span>
+    <span><i class="dot medium"></i> Plan ahead — confirmed but not yet in force</span>
+    <span><i class="dot low"></i> For information — no action needed</span>
+  </div>
+
+  <div class="count" id="count"></div>
+
+  <div id="feed"></div>
+
+</div>
+
+<footer>
+  <div class="wrap">
+    Skills Radar is maintained by hand, drawing on the Skills England apprenticeship standards register and GOV.UK apprenticeship funding and T-Level guidance. Every entry links back to its original source — always check the source before acting on a compliance deadline.
+  </div>
+</footer>
+
+<script>
+
+/* =========================================================================
+   EDIT THIS LIST TO ADD, CHANGE OR REMOVE AN UPDATE.
+
+   Copy one { ... } block, paste it in the list, change the values.
+   Keep the commas between entries. Dates are "YYYY-MM-DD".
+
+   category : "funding-rules"  — changes to the apprenticeship funding rules
+              "levy"           — levy payments, transfers, co-investment
+              "t-levels"       — anything T-Level related
+              "standard"       — changes to an individual standard
+
+   status   : "updated"    — already changed
+              "upcoming"   — confirmed for a future date
+              "in-review"  — under review, no confirmed outcome yet
+
+   urgency  : "high"    — red    — act now, affects live delivery/compliance
+              "medium"  — amber  — plan ahead, confirmed but not yet in force
+              "low"     — green  — for information only
+
+   pinned   : true to keep it at the top of the list, false otherwise.
+
+   standard : the standard's name, only for category "standard".
+              Leave as "" for everything else.
+   ========================================================================= */
+
+const UPDATES = [
+  {
+    date: "2025-02-11",
+    title: "English and maths exit requirement made optional for apprentices aged 19+",
+    category: "funding-rules",
+    standard: "",
+    status: "updated",
+    urgency: "high",
+    pinned: true,
+    summary: "Apprentices aged 19 or over at the start of their training no longer have to pass English and maths to complete their apprenticeship, except where it forms an essential part of a mandatory qualification within the standard.",
+    url: "https://skillsengland.education.gov.uk/apprenticeships/"
+  },
+  {
+    date: "2025-08-28",
+    title: "Minimum apprenticeship duration cut from 12 months to 8 months",
+    category: "funding-rules",
+    standard: "",
+    status: "updated",
+    urgency: "high",
+    pinned: true,
+    summary: "For new starts from 1 August 2025 the minimum programme duration fell to 8 months. Apprentices who started before that date remain on the 12-month minimum, and this supersedes 12-month references in existing end-point assessment plans.",
+    url: "https://skillsengland.education.gov.uk/apprenticeships/"
+  },
+  {
+    date: "2027-04-01",
+    title: "Transition to reformed end-point assessment plans completes",
+    category: "funding-rules",
+    standard: "",
+    status: "upcoming",
+    urgency: "medium",
+    pinned: true,
+    summary: "Revisions to apprenticeship assessment plans are being introduced in phases from October 2025, with a 12 to 18 month transition. Current EPA rules continue to apply to each standard until its revised plan is approved and available for starts.",
+    url: "https://assets.publishing.service.gov.uk/media/6936acd76a167b6884b7360e/Funding_Rules_2025_to_2026.pdf"
+  },
+  {
+    date: "2026-09-01",
+    title: "Low Carbon Heating Engineering specialism added to Building Services T Level",
+    category: "t-levels",
+    standard: "",
+    status: "updated",
+    urgency: "medium",
+    pinned: false,
+    summary: "A new occupational specialism in low carbon heating engineering has been added to the T Level in Building Services Engineering for Construction, ready for delivery this September.",
+    url: "https://support.tlevels.gov.uk/hc/en-gb/articles/33892267278994-T-Levels-update-10-March-2026"
+  },
+  {
+    date: "2026-08-05",
+    title: "Bus, coach and HGV maintenance standard updated to version 2.0",
+    category: "standard",
+    standard: "Bus, Coach and HGV Service and Maintenance Technician (Level 2)",
+    status: "updated",
+    urgency: "medium",
+    pinned: false,
+    summary: "A revised version of this Level 2 standard has been approved for delivery, covering servicing and maintenance of buses, coaches and heavy goods vehicles. Maximum funding is £14,000 over 24 months.",
+    url: "https://skillsengland.education.gov.uk/apprenticeships/"
+  },
+  {
+    date: "2026-08-01",
+    title: "Administration Assistant standard updated to version 2.0",
+    category: "standard",
+    standard: "Administration Assistant (Level 2) — business administration",
+    status: "updated",
+    urgency: "medium",
+    pinned: false,
+    summary: "A new version of the Administration Assistant standard has been approved for delivery, supporting organisational functions and processes. Maximum funding is £4,000 over 12 months.",
+    url: "https://skillsengland.education.gov.uk/apprenticeships/"
+  },
+  {
+    date: "2026-06-15",
+    title: "New delivery framework for T Level industry placements",
+    category: "t-levels",
+    standard: "",
+    status: "updated",
+    urgency: "high",
+    pinned: false,
+    summary: "Updated provider guidance gives more scope to structure placements around local context and student needs. A set of core principles for industry placements has been added and the previous annex A on delivery approaches removed.",
+    url: "https://www.gov.uk/government/publications/t-level-industry-placements-guidance-for-providers"
+  },
+  {
+    date: "2026-08-15",
+    title: "Applications Support Lead standard in development",
+    category: "standard",
+    standard: "Applications Support Lead (Level 4) — digital",
+    status: "in-review",
+    urgency: "low",
+    pinned: false,
+    summary: "The Skills England register shows this standard moving through the proposal, standard, assessment plan and funding stages rather than being approved for delivery.",
+    url: "https://skillsengland.education.gov.uk/apprenticeships/"
+  },
+  {
+    date: "2026-08-15",
+    title: "Data Engineer standard revision underway",
+    category: "standard",
+    standard: "Data Engineer (Level 5) — digital",
+    status: "in-review",
+    urgency: "low",
+    pinned: false,
+    summary: "An approved version of this standard sits alongside a new version currently in development on the Skills England register, meaning a revision is in progress.",
+    url: "https://skillsengland.education.gov.uk/apprenticeships/"
+  },
+  {
+    date: "2026-04-22",
+    title: "2026 to 2027 apprenticeship funding rules published",
+    category: "funding-rules",
+    standard: "",
+    status: "updated",
+    urgency: "high",
+    pinned: false,
+    summary: "The next funding year's rules are now published as a separate document from the 2025 to 2026 rules. Which rules apply depends on each apprentice's start date, so both sets remain live.",
+    url: "https://www.gov.uk/guidance/apprenticeship-funding-rules"
+  },
+  {
+    date: "2026-01-01",
+    title: "2025 to 2026 funding rules updated to version 3",
+    category: "funding-rules",
+    standard: "",
+    status: "updated",
+    urgency: "medium",
+    pinned: false,
+    summary: "References to the former Education and Skills Funding Agency have been removed throughout following the move of its functions into the Department for Education. A new annex sets out minimum off-the-job training requirements for each standard.",
+    url: "https://assets.publishing.service.gov.uk/media/6936acd76a167b6884b7360e/Funding_Rules_2025_to_2026.pdf"
+  },
+  {
+    date: "2026-04-21",
+    title: "Three AI leadership apprenticeship units approved for delivery",
+    category: "standard",
+    standard: "AI Leadership units (Level 5) — digital",
+    status: "updated",
+    urgency: "low",
+    pinned: false,
+    summary: "New Level 5 units covering AI strategy and opportunity, AI adoption, procurement and governance, and AI delivery and organisational transformation. Maximum funding is £750 per unit.",
+    url: "https://skillsengland.education.gov.uk/apprenticeships/"
+  },
+  {
+    date: "2026-05-21",
+    title: "Interior Designer standard updated to version 2.0",
+    category: "standard",
+    standard: "Interior Designer (Level 6) — creative and design",
+    status: "updated",
+    urgency: "low",
+    pinned: false,
+    summary: "A revised version of the Level 6 Interior Designer standard has been approved for delivery. Maximum funding is £26,000 over 36 months.",
+    url: "https://skillsengland.education.gov.uk/apprenticeships/"
+  },
+  {
+    date: "2027-09-01",
+    title: "T Level Foundation Year to be renamed 'Foundation Year'",
+    category: "t-levels",
+    standard: "",
+    status: "upcoming",
+    urgency: "medium",
+    pinned: false,
+    summary: "From 2027 the T Level Foundation Year will be renamed to reflect its broader role feeding into Level 3 study. New Further Study and Occupational pathways will be introduced alongside it and will gradually replace it. It remains unchanged for 2026.",
+    url: "https://support.tlevels.gov.uk/hc/en-gb/articles/33892267278994-T-Levels-update-10-March-2026"
+  },
+  {
+    date: "2026-03-10",
+    title: "Employer Support Fund continues into 2026/27",
+    category: "levy",
+    standard: "",
+    status: "updated",
+    urgency: "low",
+    pinned: false,
+    summary: "The fund continues for the 2026/27 financial year, helping employers delivering the Health T Level and small and medium employers delivering all T Levels to meet the essential costs of offering industry placements.",
+    url: "https://support.tlevels.gov.uk/hc/en-gb/articles/33892267278994-T-Levels-update-10-March-2026"
+  },
+  {
+    date: "2024-08-01",
+    title: "Non-levy employers pay 5% co-investment, government pays 95%",
+    category: "levy",
+    standard: "",
+    status: "updated",
+    urgency: "low",
+    pinned: false,
+    summary: "Under the 2024 to 2025 rules, employers who do not pay the levy contribute 5% of training costs up to the funding band maximum, with government covering the rest. Training for under-21s at employers with fewer than 50 staff is fully funded.",
+    url: "https://www.gov.uk/government/publications/apprenticeship-funding-rules-2024-to-2025"
+  }
+];
+
+/* ========================================================================= */
+
+const CATEGORY_LABELS = {
+  "funding-rules": "Funding rules",
+  "levy": "Levy",
+  "t-levels": "T-Levels",
+  "standard": "Standard"
+};
+
+function daysAgo(dateStr){
+  return (new Date() - new Date(dateStr)) / (1000 * 60 * 60 * 24);
+}
+
+function isFuture(dateStr){
+  return new Date(dateStr) > new Date();
+}
+
+function formatDate(dateStr){
+  return new Date(dateStr).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+}
+
+function statusLabel(status){
+  if(status === 'upcoming') return 'Upcoming';
+  if(status === 'updated') return 'Updated';
+  if(status === 'in-review') return 'In review';
+  return status;
+}
+
+/* ---------- Counters ---------- */
+
+function renderStats(items){
+  const changes = items.filter(i => i.status !== 'in-review' && daysAgo(i.date) >= 0 && daysAgo(i.date) <= 30).length;
+  const upcoming = items.filter(i => i.status === 'upcoming' && isFuture(i.date)).length;
+  const review = items.filter(i => i.category === 'standard' && i.status === 'in-review').length;
+  const updated = items.filter(i => i.category === 'standard' && i.status === 'updated' && daysAgo(i.date) >= 0 && daysAgo(i.date) <= 30).length;
+
+  document.getElementById('stat-changes').textContent = changes;
+  document.getElementById('stat-upcoming').textContent = upcoming;
+  document.getElementById('stat-review').textContent = review;
+  document.getElementById('stat-updated').textContent = updated;
+}
+
+/* ---------- Search ---------- */
+
+function matchesSearch(item, query){
+  if(!query) return true;
+  const haystack = (item.title + ' ' + item.standard + ' ' + item.summary + ' ' + CATEGORY_LABELS[item.category]).toLowerCase();
+  const words = query.toLowerCase().split(/\s+/).filter(w => w.length > 1);
+  if(words.length === 0) return true;
+  // show an item if any of the typed words appears
+  return words.some(w => haystack.includes(w));
+}
+
+/* ---------- Feed ---------- */
+
+function renderFeed(items, filter, query){
+  const feed = document.getElementById('feed');
+  const countEl = document.getElementById('count');
+  feed.innerHTML = '';
+
+  let list = [...items];
+
+  if(filter !== 'all'){
+    list = list.filter(i => i.category === filter);
+  }
+
+  list = list.filter(i => matchesSearch(i, query));
+
+  // pinned items first, then newest first
+  list.sort((a, b) => {
+    if(a.pinned !== b.pinned) return a.pinned ? -1 : 1;
+    return new Date(b.date) - new Date(a.date);
+  });
+
+  countEl.textContent = list.length === 1
+    ? 'Showing 1 update'
+    : 'Showing ' + list.length + ' updates';
+
+  if(list.length === 0){
+    countEl.textContent = '';
+    feed.innerHTML = '<div class="empty">Nothing matches that. Try a shorter word, or clear the search to see everything.</div>';
+    return;
+  }
+
+  list.forEach(item => {
+    const row = document.createElement('div');
+    row.className = 'feed-item ' + item.urgency;
+
+    const catLabel = item.category === 'standard' && item.standard
+      ? item.standard
+      : CATEGORY_LABELS[item.category];
+
+    const pinnedFlag = item.pinned ? '<span class="pinned-flag">Pinned</span>' : '';
+
+    row.innerHTML =
+      '<div class="date">' + formatDate(item.date) + '</div>' +
+      '<div>' +
+        '<div class="tags">' +
+          pinnedFlag +
+          '<span class="tag cat">' + catLabel + '</span>' +
+          '<span class="tag ' + item.status + '">' + statusLabel(item.status) + '</span>' +
+        '</div>' +
+        '<h3>' + item.title + '</h3>' +
+        '<p>' + item.summary + '</p>' +
+        '<a class="source" href="' + item.url + '" target="_blank" rel="noopener">Read the source</a>' +
+      '</div>';
+
+    feed.appendChild(row);
+  });
+}
+
+/* ---------- Wiring ---------- */
+
+let currentFilter = 'all';
+let currentQuery = '';
+
+function refresh(){
+  renderFeed(UPDATES, currentFilter, currentQuery);
+}
+
+function init(){
+  renderStats(UPDATES);
+  refresh();
+
+  document.getElementById('last-updated').textContent =
+    'Data last reviewed ' + new Date().toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
+
+  document.querySelectorAll('.filters button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filters button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentFilter = btn.dataset.filter;
+      refresh();
+    });
+  });
+
+  const search = document.getElementById('search');
+  search.addEventListener('input', () => {
+    currentQuery = search.value.trim();
+    refresh();
+  });
+
+  document.getElementById('clear').addEventListener('click', () => {
+    search.value = '';
+    currentQuery = '';
+    refresh();
+    search.focus();
+  });
+}
+
+init();
+
+</script>
+</body>
+</html>
