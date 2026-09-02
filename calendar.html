@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calendar and horizon — Skills Radar</title>
+<meta name="description" content="Compliance deadlines to plan against, and a forward look at what is coming and what could bite.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="masthead">
+  <div class="wrap">
+    <h1 class="wordmark"><a href="index.html">Skills Radar</a></h1>
+    <p class="hero">The intelligence platform for early careers professionals — spend less time interpreting guidance and more time building great programmes.</p>
+    <nav class="nav">
+      <a href="index.html">Feed</a>
+      <a href="articles.html">Articles</a>
+      <a href="standards.html">Standards</a>
+      <a href="calendar.html" class="on">Calendar</a>
+      <a href="newsletter.html">Newsletter</a>
+    </nav>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="pagehead">
+    <h1>Calendar and horizon</h1>
+    <p>Dated deadlines you can plan a year around, followed by a forward look at what is coming, how confident we are in it, and where the risk sits.</p>
+  </div>
+
+  <div class="key">
+    <span><i class="h"></i> Hard deadline or high risk</span>
+    <span><i class="m"></i> Confirmed change, plan for it</span>
+    <span><i class="l"></i> For awareness</span>
+  </div>
+
+  <div id="cal"></div>
+
+  <div class="pagehead" style="margin-top:52px">
+    <h1>The horizon</h1>
+    <p>What is coming next, drawn from Skills England, DfE and Apprenticeship Service guidance alongside sector reporting from FE Week, the CIPD, the CBI and provider commentary. Confidence is marked so you can tell a confirmed date from a signalled direction.</p>
+  </div>
+
+  <div id="horizon"></div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <p>Horizon entries marked “signalled” reflect direction of travel reported by sector bodies and trade press, not confirmed policy. Treat them as planning assumptions to test, not facts to act on. Confirmed entries are traceable to the sources linked in the articles.</p>
+  </div>
+</footer>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+
+function mileHTML(m){
+  const past = daysAgo(m.date) > 0;
+  const d = new Date(m.date);
+  const article = m.article
+    ? '<div class="links"><a class="read" href="articles.html#' + m.article + '">Read the full analysis</a></div>'
+    : '';
+
+  return '<div class="mile ' + m.urgency + (past ? ' past' : '') + '">' +
+    '<div class="d">' + d.getDate() + ' ' + d.toLocaleDateString('en-GB',{month:'short'}) +
+      '<small>' + d.getFullYear() + (past ? ' · passed' : '') + '</small></div>' +
+    '<div>' +
+      '<div class="who">' + m.who + '</div>' +
+      '<h3>' + m.title + '</h3>' +
+      '<p>' + m.action + '</p>' + article +
+    '</div></div>';
+}
+
+function renderCalendar(){
+  const el = document.getElementById('cal');
+  const list = MILESTONES.slice().sort((a,b) => new Date(a.date) - new Date(b.date));
+
+  const groups = {};
+  list.forEach(m => {
+    const key = fmtMonthYear(m.date);
+    (groups[key] = groups[key] || []).push(m);
+  });
+
+  el.innerHTML = Object.keys(groups).map(k =>
+    '<section class="month"><h2>' + k + '</h2>' + groups[k].map(mileHTML).join('') + '</section>'
+  ).join('');
+}
+
+function horizonHTML(h){
+  return '<div class="horizon ' + h.risk + '">' +
+    '<div class="win">' + h.window + '</div>' +
+    '<h3>' + h.title + '</h3>' +
+    '<div class="meta"><span class="conf ' + h.confidence + '">' +
+      (h.confidence === 'confirmed' ? 'Confirmed' : h.confidence === 'signalled' ? 'Signalled, not confirmed' : 'Speculative') +
+    '</span></div>' +
+    '<p>' + h.detail + '</p>' +
+    '<div class="watch"><b>What to watch:</b> ' + h.watch + '</div>' +
+  '</div>';
+}
+
+function renderHorizon(){
+  document.getElementById('horizon').innerHTML = HORIZON.map(horizonHTML).join('');
+}
+
+renderCalendar();
+renderHorizon();
+
+</script>
+</body>
+</html>

@@ -3,265 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Skills Radar — apprenticeship, funding and T-Level policy tracking</title>
-<meta name="description" content="A monitored feed of changes to apprenticeship funding rules, compliance, standards and T-Levels, grouped by occupational route.">
+<title>Skills Radar — the intelligence platform for early careers professionals</title>
+<meta name="description" content="Changes to apprenticeship funding, compliance, standards and T-Levels, tracked and rated for urgency.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-
-  :root{
-    --ink:#0D1B1E;
-    --ink-2:#16302F;
-    --ink-3:#24463F;
-
-    --paper:#FAF9F6;
-    --surface:#FFFFFF;
-    --line:#E4E0D6;
-    --line-strong:#CBC5B6;
-
-    --text:#152023;
-    --text-2:#57676A;
-    --text-3:#8A9698;
-
-    --high:#B3261E;
-    --high-bg:#FBEAE8;
-    --med:#A96A06;
-    --med-bg:#FBF0DC;
-    --low:#10796A;
-    --low-bg:#E4F1EE;
-
-    --display:'Bricolage Grotesque', Georgia, serif;
-    --sans:'Instrument Sans', system-ui, sans-serif;
-  }
-
-  *{ box-sizing:border-box; }
-
-  html{ scroll-behavior:smooth; }
-
-  body{
-    margin:0;
-    background:var(--paper);
-    color:var(--text);
-    font-family:var(--sans);
-    font-size:16px;
-    line-height:1.55;
-    -webkit-font-smoothing:antialiased;
-  }
-
-  .wrap{ max-width:940px; margin:0 auto; padding:0 28px; }
-
-  /* ================= Masthead ================= */
-
-  .masthead{ background:var(--ink); color:#EDEBE4; padding:30px 0 0; }
-
-  .brandrow{
-    display:flex; align-items:flex-start; justify-content:space-between;
-    gap:28px; flex-wrap:wrap;
-  }
-
-  .brand{ display:flex; align-items:center; gap:13px; }
-
-  .wordmark{
-    font-family:var(--display);
-    font-size:29px; font-weight:600; letter-spacing:-0.025em;
-    line-height:1; color:#FFFFFF;
-  }
-
-  .tagline{
-    max-width:44ch; margin:14px 0 0;
-    color:#9DB0AD; font-size:15px; line-height:1.5;
-  }
-
-  .stamp{
-    text-align:right; font-size:12.5px; color:#7D918E;
-    line-height:1.7; padding-top:4px;
-  }
-  .stamp strong{ color:#C6D3D0; font-weight:500; display:block; }
-
-  /* ---------- Readings strip ---------- */
-
-  .readings{
-    display:grid; grid-template-columns:repeat(4,1fr);
-    margin-top:28px;
-    border-top:1px solid var(--ink-3);
-  }
-
-  .reading{
-    padding:20px 22px 24px 0;
-    border-right:1px solid var(--ink-3);
-  }
-  .reading:last-child{ border-right:none; }
-  .reading:not(:first-child){ padding-left:22px; }
-
-  .reading .n{
-    font-family:var(--display);
-    font-size:34px; font-weight:500; line-height:1;
-    letter-spacing:-0.02em; color:#FFFFFF;
-  }
-  .reading .l{
-    margin-top:9px; font-size:12.5px; line-height:1.4; color:#8FA4A1;
-  }
-  .reading.warm .n{ color:#F2B858; }
-  .reading.cool .n{ color:#6ED0B6; }
-
-  /* ================= Controls ================= */
-
-  .controls{
-    position:sticky; top:0; z-index:20;
-    background:var(--paper);
-    border-bottom:1px solid var(--line);
-    padding:14px 0 13px;
-  }
-  .controls::after{
-    content:''; position:absolute; left:0; right:0; bottom:-14px; height:14px;
-    background:linear-gradient(var(--paper), rgba(250,249,246,0));
-    pointer-events:none;
-  }
-
-  .controlgrid{ display:flex; gap:14px; align-items:center; flex-wrap:wrap; }
-
-  .tabs{ display:flex; gap:4px; flex-wrap:wrap; }
-
-  .tabs button{
-    font-family:var(--sans); font-size:13.5px; font-weight:500;
-    padding:7px 13px; cursor:pointer;
-    border:1px solid transparent; background:transparent;
-    color:var(--text-2); border-radius:2px;
-  }
-  .tabs button:hover{ background:#F0EEE7; color:var(--text); }
-  .tabs button.active{ background:var(--ink); color:#fff; }
-  .tabs button:focus-visible{ outline:2px solid var(--ink); outline-offset:1px; }
-
-  .searchbox{ position:relative; flex:1; min-width:250px; }
-
-  .searchbox input{
-    width:100%; font-family:var(--sans); font-size:14px;
-    padding:9px 34px 9px 13px;
-    border:1px solid var(--line-strong); background:var(--surface);
-    color:var(--text); border-radius:2px;
-  }
-  .searchbox input::placeholder{ color:var(--text-3); }
-  .searchbox input:focus{ outline:none; border-color:var(--ink-3); box-shadow:0 0 0 3px rgba(22,48,47,0.08); }
-
-  .searchbox .x{
-    position:absolute; right:4px; top:50%; transform:translateY(-50%);
-    border:none; background:none; cursor:pointer;
-    color:var(--text-3); font-size:17px; line-height:1; padding:6px 8px;
-  }
-  .searchbox .x:hover{ color:var(--text); }
-
-  /* ================= Route context ================= */
-
-  .routecard{
-    margin:22px 0 0; padding:17px 20px;
-    background:var(--surface); border:1px solid var(--line);
-    border-left:3px solid var(--ink-3);
-  }
-  .routecard h2{
-    font-family:var(--display); font-size:16.5px; font-weight:600;
-    margin:0 0 5px; letter-spacing:-0.01em;
-  }
-  .routecard p{ margin:0; font-size:13.5px; color:var(--text-2); line-height:1.6; }
-  .routecard .chips{ margin-top:11px; display:flex; gap:6px; flex-wrap:wrap; }
-  .routecard .chip{
-    font-size:12px; padding:3px 9px; border:1px solid var(--line);
-    color:var(--text-2); background:var(--paper);
-  }
-
-  /* ================= Feed ================= */
-
-  .grouphead{
-    display:flex; align-items:center; gap:14px;
-    margin:30px 0 2px;
-  }
-  .grouphead h2{
-    font-family:var(--display); font-size:13px; font-weight:600;
-    letter-spacing:0.02em; margin:0; color:var(--text-2);
-    white-space:nowrap;
-  }
-  .grouphead .rule{ flex:1; height:1px; background:var(--line); }
-
-  .tally{ font-size:13px; color:var(--text-3); margin:20px 0 0; }
-
-  .item{
-    display:grid; grid-template-columns:88px 1fr; gap:22px;
-    padding:20px 20px 20px 17px;
-    background:var(--surface);
-    border:1px solid var(--line);
-    border-left:3px solid var(--line-strong);
-    border-top:none;
-  }
-  .item:first-of-type{ border-top:1px solid var(--line); }
-  .item + .item{ border-top:none; }
-
-  .item.high{ border-left-color:var(--high); }
-  .item.medium{ border-left-color:var(--med); }
-  .item.low{ border-left-color:var(--low); }
-
-  .item .when{ font-size:12.5px; color:var(--text-3); line-height:1.45; padding-top:2px; }
-  .item .when b{ display:block; color:var(--text-2); font-weight:500; }
-
-  .meta{ display:flex; gap:7px; flex-wrap:wrap; align-items:center; margin-bottom:9px; }
-
-  .pill{ font-size:11.5px; padding:2.5px 8px; letter-spacing:0.01em; }
-  .pill.route{ background:var(--paper); border:1px solid var(--line); color:var(--text-2); }
-  .pill.updated{ background:var(--low-bg); color:var(--low); }
-  .pill.upcoming{ background:var(--med-bg); color:var(--med); }
-  .pill.in-review{ background:#EEECE5; color:var(--text-2); }
-  .pill.flag{ background:var(--high-bg); color:var(--high); font-weight:500; }
-
-  .item h3{
-    font-family:var(--display); font-size:17px; font-weight:500;
-    letter-spacing:-0.012em; line-height:1.32; margin:0 0 7px;
-  }
-  .item p{ margin:0 0 11px; color:var(--text-2); font-size:14.5px; line-height:1.6; max-width:66ch; }
-
-  .item .std{ font-size:13px; color:var(--text-2); margin:0 0 9px; }
-  .item .std b{ font-weight:500; color:var(--text); }
-
-  .item a.src{
-    font-size:13px; color:var(--text); text-decoration:none;
-    border-bottom:1px solid var(--line-strong); padding-bottom:1px;
-  }
-  .item a.src:hover{ border-bottom-color:var(--text); }
-
-  .empty{
-    padding:40px 22px; background:var(--surface); border:1px solid var(--line);
-    color:var(--text-2); font-size:14.5px; margin-top:22px;
-  }
-  .empty b{ display:block; font-weight:500; color:var(--text); margin-bottom:5px; font-family:var(--display); }
-
-  /* ================= Key + footer ================= */
-
-  .key{
-    display:flex; gap:22px; flex-wrap:wrap;
-    font-size:12.5px; color:var(--text-2);
-    padding:16px 0 0;
-  }
-  .key span{ display:flex; align-items:center; gap:8px; }
-  .key i{ width:14px; height:3px; display:inline-block; }
-  .key i.h{ background:var(--high); }
-  .key i.m{ background:var(--med); }
-  .key i.l{ background:var(--low); }
-
-  footer{
-    margin-top:46px; background:var(--ink); color:#8FA4A1;
-    font-size:13px; padding:26px 0 34px; line-height:1.65;
-  }
-  footer p{ margin:0; max-width:72ch; }
-
-  @media (max-width:720px){
-    .readings{ grid-template-columns:repeat(2,1fr); }
-    .reading{ border-right:none; border-bottom:1px solid var(--ink-3); padding:16px 0; }
-    .reading:not(:first-child){ padding-left:0; }
-    .reading:nth-child(odd){ border-right:1px solid var(--ink-3); padding-right:18px; }
-    .reading:nth-child(even){ padding-left:18px; }
-    .item{ grid-template-columns:1fr; gap:11px; }
-    .stamp{ text-align:left; }
-  }
-
-</style>
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
@@ -269,24 +16,22 @@
   <div class="wrap">
     <div class="brandrow">
       <div>
-        <div class="brand">
-          <svg width="30" height="30" viewBox="0 0 30 30" fill="none" aria-hidden="true">
-            <circle cx="15" cy="15" r="13.2" stroke="#3E635C" stroke-width="1"/>
-            <circle cx="15" cy="15" r="8.4" stroke="#3E635C" stroke-width="1"/>
-            <circle cx="15" cy="15" r="3.6" stroke="#3E635C" stroke-width="1"/>
-            <path d="M15 15 L15 1.8 A13.2 13.2 0 0 1 26.4 8.4 Z" fill="#6ED0B6" fill-opacity="0.22"/>
-            <line x1="15" y1="15" x2="15" y2="1.8" stroke="#6ED0B6" stroke-width="1.3"/>
-            <circle cx="21.5" cy="9.5" r="1.9" fill="#F2B858"/>
-          </svg>
-          <div class="wordmark">Skills Radar</div>
-        </div>
-        <p class="tagline">Changes to apprenticeship funding, compliance, standards and T-Levels — tracked, rated for urgency, and grouped by occupational route.</p>
+        <h1 class="wordmark">Skills Radar</h1>
+        <p class="hero">The intelligence platform for early careers professionals — spend less time interpreting guidance and more time building great programmes.</p>
       </div>
       <div class="stamp">
         <strong id="stamp-date">—</strong>
         <span id="stamp-count">—</span>
       </div>
     </div>
+
+    <nav class="nav">
+      <a href="index.html" class="on">Feed</a>
+      <a href="articles.html">Articles</a>
+      <a href="standards.html">Standards</a>
+      <a href="calendar.html">Calendar</a>
+      <a href="newsletter.html">Newsletter</a>
+    </nav>
 
     <div class="readings">
       <div class="reading">
@@ -320,6 +65,14 @@
     </div>
     <div class="searchbox">
       <input type="search" id="search" placeholder="Search a route, standard or job — try &ldquo;business admin&rdquo;, &ldquo;heat pump&rdquo;, &ldquo;nursing&rdquo;" aria-label="Search updates">
+      <svg class="radar" id="radar" viewBox="0 0 20 20" aria-hidden="true">
+        <circle cx="10" cy="10" r="8.6" fill="none" stroke="#CBC5B6" stroke-width="1"/>
+        <circle cx="10" cy="10" r="4.6" fill="none" stroke="#CBC5B6" stroke-width="1"/>
+        <g class="sweep">
+          <path d="M10 10 L10 1.4 A8.6 8.6 0 0 1 17.4 5.7 Z" fill="#10796A" fill-opacity="0.3"/>
+          <line x1="10" y1="10" x2="10" y2="1.4" stroke="#10796A" stroke-width="1.4"/>
+        </g>
+      </svg>
       <button class="x" id="clear" aria-label="Clear search" title="Clear search">&times;</button>
     </div>
   </div>
@@ -343,357 +96,20 @@
   </div>
 </footer>
 
+<script src="data.js"></script>
+<script src="app.js"></script>
 <script>
-
-/* =========================================================================
-   PART 1 — OCCUPATIONAL ROUTES
-
-   These are the 15 Skills England occupational routes. Each one lists the
-   words people actually type when they mean that route, plus the T-Levels
-   that feed into it. This is what makes the search clever: type "business
-   admin" and you'll get every standard AND every T-Level on that pathway,
-   even if none of them contain the words "business admin".
-
-   To make a search term work, just add it to the "terms" list for a route.
-   ========================================================================= */
-
-const ROUTES = {
-  "agriculture": {
-    label: "Agriculture, environmental and animal care",
-    terms: ["agriculture","farming","farm","horticulture","landscaping","forestry","arboriculture","trees","animal","animal care","veterinary","vet","equine","dog","land","environmental","conservation","countryside","gamekeeping","floristry","fishing","agri"],
-    tlevels: ["Agriculture, Land Management and Production (in development)"]
-  },
-  "business-administration": {
-    label: "Business and administration",
-    terms: ["business","business admin","business administration","admin","administration","administrator","office","pa","personal assistant","executive assistant","hr","human resources","people","payroll","governance","team leader","operations","operations manager","business improvement","project management","secretarial","clerical","reception"],
-    tlevels: ["Management and Administration"]
-  },
-  "care-services": {
-    label: "Care services",
-    terms: ["care","adult care","social care","care worker","support worker","children","childrens","young people","youth","residential","domiciliary","housing","community","safeguarding","family","probation support"],
-    tlevels: ["Social Care (from September 2028)","Care Services (announced)"]
-  },
-  "catering-hospitality": {
-    label: "Catering and hospitality",
-    terms: ["catering","hospitality","chef","cook","kitchen","food","beverage","bakery","baker","pastry","hotel","restaurant","bar","barista","events","food and beverage"],
-    tlevels: []
-  },
-  "construction": {
-    label: "Construction and the built environment",
-    terms: ["construction","building","built environment","bricklaying","bricklayer","carpentry","carpenter","joiner","plastering","plasterer","plumbing","plumber","electrician","electrical install","heating","heat pump","low carbon heating","retrofit","insulation","roofing","roofer","scaffolding","surveying","surveyor","quantity surveyor","civil engineering","groundwork","painter","decorator","flooring","floorlayer","steeplejack","stonemason","thatcher","site","architecture","building services"],
-    tlevels: ["Design, Surveying and Planning for Construction","Building Services Engineering for Construction","Onsite Construction"]
-  },
-  "creative-design": {
-    label: "Creative and design",
-    terms: ["creative","design","designer","media","broadcast","production","film","tv","television","games","vfx","visual effects","animation","fashion","textiles","furniture","craft","jewellery","interior","interior design","journalism","journalist","publishing","photography","photographer","advertising","scenic","costume","theatre","music","print"],
-    tlevels: ["Craft and Design","Media, Broadcast and Production"]
-  },
-  "digital": {
-    label: "Digital",
-    terms: ["digital","it","tech","technology","software","developer","development","coding","programmer","data","data analyst","data engineer","database","cyber","cyber security","security","network","networking","infrastructure","support technician","service desk","ai","artificial intelligence","machine learning","automation","cloud","devops","product manager","ux","accessibility","forensics"],
-    tlevels: ["Digital Data Analytics","Digital Software Development","Digital Support and Security"]
-  },
-  "education-early-years": {
-    label: "Education and early years",
-    terms: ["education","teaching","teacher","teaching assistant","ta","classroom","school","early years","childcare","nursery","eyfs","learning","learning support","skills mentor","assessor","tutor","trainer","further education","fe","sen","send","learning designer","playworker"],
-    tlevels: ["Education and Early Years"]
-  },
-  "engineering-manufacturing": {
-    label: "Engineering and manufacturing",
-    terms: ["engineering","engineer","manufacturing","mechanical","electrical engineering","maintenance","maintenance technician","fitter","welding","welder","fabrication","machining","machinist","cnc","aerospace","aircraft","automotive","marine","maritime","rail engineering","nuclear","battery","polymer","robotics","mechatronics","toolmaking","metrology","process","production","quality","lean","assembly","technician"],
-    tlevels: ["Design and Development for Engineering and Manufacturing","Maintenance, Installation and Repair for Engineering and Manufacturing","Engineering, Manufacturing, Processing and Control"]
-  },
-  "hair-beauty": {
-    label: "Hair and beauty",
-    terms: ["hair","hairdressing","hairdresser","barbering","barber","beauty","beautician","salon","nails","aesthetics","spa","holistic","wellbeing therapy","make-up","makeup"],
-    tlevels: []
-  },
-  "health-science": {
-    label: "Health and science",
-    terms: ["health","healthcare","nhs","nursing","nurse","nursing associate","midwife","midwifery","doctor","dental","dentist","dental nurse","hygienist","pharmacy","pharmacist","paramedic","ambulance","therapy","physiotherapy","occupational therapy","optical","optician","orthoptist","science","laboratory","lab","biomedical","clinical","mortuary","psychology","psychotherapy","allied health","public health"],
-    tlevels: ["Health","Science","Healthcare Science (enrolments ceased)"]
-  },
-  "legal-finance-accounting": {
-    label: "Legal, finance and accounting",
-    terms: ["legal","law","solicitor","barrister","paralegal","conveyancing","probate","costs lawyer","finance","financial","accounting","accountant","accountancy","aat","tax","taxation","audit","auditor","insurance","banking","actuarial","compliance officer","payroll manager","credit","investment","financial planner"],
-    tlevels: ["Accounting","Finance (last enrolments September 2026)","Legal Services"]
-  },
-  "protective-services": {
-    label: "Protective services",
-    terms: ["police","policing","fire","firefighter","security","protective security","armed forces","military","prison","custody","probation","emergency","resilience","anti-social behaviour","community safety","intelligence","border"],
-    tlevels: []
-  },
-  "sales-marketing-procurement": {
-    label: "Sales, marketing and procurement",
-    terms: ["sales","selling","marketing","marketer","multi-channel marketer","digital marketing","procurement","buying","buyer","supply chain","purchasing","retail","customer service","advertising","communications","pr","market research","merchandising","estate agent"],
-    tlevels: ["Marketing"]
-  },
-  "transport-logistics": {
-    label: "Transport and logistics",
-    terms: ["transport","logistics","driving","driver","hgv","lgv","bus","coach","van","urban driver","warehouse","warehousing","distribution","supply chain","rail","railway","train","aviation","airport","flight","maritime","port","shipping","traffic","removals","delivery","fleet"],
-    tlevels: []
-  }
-};
-
-/* =========================================================================
-   PART 2 — THE FEED
-
-   Copy one { ... } block, paste it in, change the values. Keep the commas.
-   Dates are "YYYY-MM-DD".
-
-   category : "funding-rules" | "levy" | "t-levels" | "standard"
-   status   : "updated" | "upcoming" | "in-review"
-   urgency  : "high" (red) | "medium" (amber) | "low" (green)
-   pinned   : true keeps it in the Priority group at the top
-   route    : a key from ROUTES above, or "" if it applies across all routes
-   standard : the standard's full name, or "" if not about one standard
-   ========================================================================= */
-
-const UPDATES = [
-  {
-    date: "2025-02-11",
-    title: "English and maths exit requirement made optional for apprentices aged 19+",
-    category: "funding-rules", route: "", standard: "",
-    status: "updated", urgency: "high", pinned: true,
-    summary: "Apprentices aged 19 or over at the start of their training no longer have to pass English and maths to complete, except where it forms an essential part of a mandatory qualification within the standard. Check with the awarding organisation before removing it from a training plan.",
-    url: "https://skillsengland.education.gov.uk/apprenticeships/"
-  },
-  {
-    date: "2025-08-28",
-    title: "Minimum apprenticeship duration cut from 12 months to 8 months",
-    category: "funding-rules", route: "", standard: "",
-    status: "updated", urgency: "high", pinned: true,
-    summary: "For new starts from 1 August 2025 the minimum programme duration fell to 8 months. Apprentices who started before that date stay on the 12-month minimum. This supersedes 12-month references in existing end-point assessment plans.",
-    url: "https://skillsengland.education.gov.uk/apprenticeships/"
-  },
-  {
-    date: "2027-04-01",
-    title: "Transition to reformed end-point assessment plans completes",
-    category: "funding-rules", route: "", standard: "",
-    status: "upcoming", urgency: "medium", pinned: true,
-    summary: "Revisions to assessment plans are being introduced in phases from October 2025 across a 12 to 18 month transition. Current EPA rules keep applying to each standard until its revised plan is approved and available for starts.",
-    url: "https://assets.publishing.service.gov.uk/media/6936acd76a167b6884b7360e/Funding_Rules_2025_to_2026.pdf"
-  },
-  {
-    date: "2026-06-15",
-    title: "New delivery framework for T-Level industry placements",
-    category: "t-levels", route: "", standard: "",
-    status: "updated", urgency: "high", pinned: false,
-    summary: "Updated provider guidance gives more scope to structure placements around local context and student needs. A set of core principles has been added and the previous annex A on delivery approaches removed.",
-    url: "https://www.gov.uk/government/publications/t-level-industry-placements-guidance-for-providers"
-  },
-  {
-    date: "2026-09-01",
-    title: "Low Carbon Heating Engineering specialism added to Building Services T-Level",
-    category: "t-levels", route: "construction", standard: "",
-    status: "updated", urgency: "medium", pinned: false,
-    summary: "A new occupational specialism in low carbon heating engineering joins the T-Level in Building Services Engineering for Construction, ready for delivery this September. It sits alongside the Low Carbon Heating Technician apprenticeship on the same pathway.",
-    url: "https://support.tlevels.gov.uk/hc/en-gb/articles/33892267278994-T-Levels-update-10-March-2026"
-  },
-  {
-    date: "2026-04-22",
-    title: "2026 to 2027 apprenticeship funding rules published",
-    category: "funding-rules", route: "", standard: "",
-    status: "updated", urgency: "high", pinned: false,
-    summary: "The next funding year's rules are published separately from the 2025 to 2026 rules. Which set applies depends on each apprentice's start date, so both remain live alongside the 2024 to 2025 rules for earlier starters.",
-    url: "https://www.gov.uk/guidance/apprenticeship-funding-rules"
-  },
-  {
-    date: "2026-08-05",
-    title: "Bus, coach and HGV maintenance standard updated to version 2.0",
-    category: "standard", route: "transport-logistics",
-    standard: "Bus, Coach and HGV Service and Maintenance Technician, Level 2 (ST1422)",
-    status: "updated", urgency: "medium", pinned: false,
-    summary: "A revised version is approved for delivery from August 2026, covering servicing and maintenance of buses, coaches and heavy goods vehicles. 24 months, maximum funding £14,000.",
-    url: "https://skillsengland.education.gov.uk/apprenticeships/"
-  },
-  {
-    date: "2026-08-01",
-    title: "Administration Assistant standard updated to version 2.0",
-    category: "standard", route: "business-administration",
-    standard: "Administration Assistant, Level 2 (ST1472)",
-    status: "updated", urgency: "medium", pinned: false,
-    summary: "A new version is approved for delivery, supporting organisational functions and processes. 12 months, maximum funding £4,000. This is the entry point on the business and administration route below the Management and Administration T-Level.",
-    url: "https://skillsengland.education.gov.uk/apprenticeships/"
-  },
-  {
-    date: "2026-08-15",
-    title: "Applications Support Lead standard in development",
-    category: "standard", route: "digital",
-    standard: "Applications Support Lead, Level 4 (ST0949)",
-    status: "in-review", urgency: "low", pinned: false,
-    summary: "The register shows this standard moving through the proposal, standard, assessment plan and funding stages rather than being approved for delivery. 24 months, maximum funding £17,000.",
-    url: "https://skillsengland.education.gov.uk/apprenticeships/"
-  },
-  {
-    date: "2026-08-15",
-    title: "Data Engineer standard revision underway",
-    category: "standard", route: "digital",
-    standard: "Data Engineer, Level 5 (ST1386)",
-    status: "in-review", urgency: "low", pinned: false,
-    summary: "An approved version sits alongside a new version in development, meaning a revision is in progress. Learners progressing from the Digital Data Analytics T-Level commonly feed into this standard.",
-    url: "https://skillsengland.education.gov.uk/apprenticeships/"
-  },
-  {
-    date: "2026-04-21",
-    title: "Three AI leadership apprenticeship units approved for delivery",
-    category: "standard", route: "digital",
-    standard: "AI Leadership units, Level 5 (AU0009, AU0010, AU0011)",
-    status: "updated", urgency: "low", pinned: false,
-    summary: "New Level 5 units covering AI strategy and opportunity, AI adoption, procurement and governance, and AI delivery and organisational transformation. Maximum funding £750 per unit.",
-    url: "https://skillsengland.education.gov.uk/apprenticeships/"
-  },
-  {
-    date: "2026-01-01",
-    title: "2025 to 2026 funding rules updated to version 3",
-    category: "funding-rules", route: "", standard: "",
-    status: "updated", urgency: "medium", pinned: false,
-    summary: "References to the former Education and Skills Funding Agency are removed throughout, following the move of its functions into the Department for Education. A new annex sets out minimum off-the-job training requirements for each standard.",
-    url: "https://assets.publishing.service.gov.uk/media/6936acd76a167b6884b7360e/Funding_Rules_2025_to_2026.pdf"
-  },
-  {
-    date: "2026-05-21",
-    title: "Interior Designer standard updated to version 2.0",
-    category: "standard", route: "creative-design",
-    standard: "Interior Designer, Level 6 (ST1361)",
-    status: "updated", urgency: "low", pinned: false,
-    summary: "A revised version is approved for delivery from May 2026. 36 months, maximum funding £26,000.",
-    url: "https://skillsengland.education.gov.uk/apprenticeships/"
-  },
-  {
-    date: "2026-04-14",
-    title: "Journalist and Junior Journalist standards restructured",
-    category: "standard", route: "creative-design",
-    standard: "Journalist, Level 6 (ST1490) and Junior Journalist, Level 5 (ST1516)",
-    status: "updated", urgency: "low", pinned: false,
-    summary: "The Level 5 Journalist standard has been retired and replaced by a Level 6 Journalist and a new Level 5 Junior Journalist, changing the progression ladder on this pathway. Both are approved for delivery from April 2026.",
-    url: "https://skillsengland.education.gov.uk/apprenticeships/"
-  },
-  {
-    date: "2027-09-01",
-    title: "T-Level Foundation Year to be renamed 'Foundation Year'",
-    category: "t-levels", route: "", standard: "",
-    status: "upcoming", urgency: "medium", pinned: false,
-    summary: "From 2027 the Foundation Year is renamed to reflect a broader role feeding into Level 3 study generally, not only T-Levels. New Further Study and Occupational pathways will be introduced alongside it and gradually replace it. Unchanged for 2026.",
-    url: "https://support.tlevels.gov.uk/hc/en-gb/articles/33892267278994-T-Levels-update-10-March-2026"
-  },
-  {
-    date: "2026-03-10",
-    title: "Employer Support Fund continues into 2026/27",
-    category: "levy", route: "", standard: "",
-    status: "updated", urgency: "low", pinned: false,
-    summary: "The fund continues for the 2026/27 financial year, helping employers delivering the Health T-Level, and small and medium employers delivering all T-Levels, to meet the essential costs of offering industry placements.",
-    url: "https://support.tlevels.gov.uk/hc/en-gb/articles/33892267278994-T-Levels-update-10-March-2026"
-  },
-  {
-    date: "2026-04-29",
-    title: "Non-levy employers pay 5% co-investment, government pays 95%",
-    category: "levy", route: "", standard: "",
-    status: "updated", urgency: "low", pinned: false,
-    summary: "Employers who do not pay the levy contribute 5% of training costs up to the funding band maximum, with government covering the rest. Training is fully funded for apprentices under 21 at employers with fewer than 50 staff.",
-    url: "https://www.gov.uk/guidance/apprenticeship-funding-rules"
-  },
-  {
-    date: "2026-08-01",
-    title: "Levy transfer guidance updated",
-    category: "levy", route: "", standard: "",
-    status: "updated", urgency: "medium", pinned: false,
-    summary: "GOV.UK guidance on transferring apprenticeship levy funds to another business was refreshed in August 2026. Levy-paying employers have been given greater flexibility to use transfers and fund training for receiving employers.",
-    url: "https://www.gov.uk/government/collections/funding-rules-for-apprenticeships"
-  },
-  {
-    date: "2026-04-01",
-    title: "Two new foundation apprenticeships approved for delivery",
-    category: "standard", route: "catering-hospitality",
-    standard: "Catering and Hospitality (FA0008) and Retail Service, Supply and Administration (FA0009), Level 2",
-    status: "updated", urgency: "medium", pinned: false,
-    summary: "Both are 8-month Level 2 foundation apprenticeships, funded at £3,500. They give an entry route into hospitality and retail for learners not yet ready for a full apprenticeship standard.",
-    url: "https://skillsengland.education.gov.uk/apprenticeships/"
-  }
-];
-
-/* ========================================================================= */
-
-const CATEGORY_LABELS = {
-  "funding-rules": "Funding rules",
-  "levy": "Levy",
-  "t-levels": "T-Levels",
-  "standard": "Standard"
-};
-
-const STATUS_LABELS = {
-  "updated": "Updated",
-  "upcoming": "Upcoming",
-  "in-review": "In review"
-};
-
-function daysAgo(d){ return (new Date() - new Date(d)) / 86400000; }
-function isFuture(d){ return new Date(d) > new Date(); }
-function fmt(d){ return new Date(d).toLocaleDateString('en-GB', { day:'numeric', month:'short' }); }
-function fmtYear(d){ return new Date(d).getFullYear(); }
-
-/* ---------- Readings ---------- */
 
 function renderReadings(items){
   const changes  = items.filter(i => i.status !== 'in-review' && daysAgo(i.date) >= 0 && daysAgo(i.date) <= 30).length;
   const upcoming = items.filter(i => i.status === 'upcoming' && isFuture(i.date)).length;
   const review   = items.filter(i => i.category === 'standard' && i.status === 'in-review').length;
   const updated  = items.filter(i => i.category === 'standard' && i.status === 'updated' && daysAgo(i.date) >= 0 && daysAgo(i.date) <= 30).length;
-
   document.getElementById('r-changes').textContent  = changes;
   document.getElementById('r-upcoming').textContent = upcoming;
   document.getElementById('r-review').textContent   = review;
   document.getElementById('r-updated').textContent  = updated;
 }
-
-/* ---------- Route matching ---------- */
-
-/* Work out which route (if any) the person is searching for, by checking
-   their words against every route's term list. */
-function detectRoute(query){
-  if(!query) return null;
-  const q = query.toLowerCase().trim();
-  let best = null, bestLen = 0;
-
-  for(const key in ROUTES){
-    const r = ROUTES[key];
-    const candidates = [r.label.toLowerCase()].concat(r.terms, r.tlevels.map(t => t.toLowerCase()));
-    for(const term of candidates){
-      const t = term.toLowerCase();
-      // the person's query contains the term, or the term contains the query
-      const hit = (q.includes(t) && t.length > 2) || (t.includes(q) && q.length > 2);
-      if(hit && t.length > bestLen){ best = key; bestLen = t.length; }
-    }
-  }
-  return best;
-}
-
-function itemText(item){
-  const route = item.route ? ROUTES[item.route] : null;
-  return [
-    item.title,
-    item.standard,
-    item.summary,
-    CATEGORY_LABELS[item.category],
-    STATUS_LABELS[item.status],
-    route ? route.label : '',
-    route ? route.terms.join(' ') : '',
-    route ? route.tlevels.join(' ') : ''
-  ].join(' ').toLowerCase();
-}
-
-function matches(item, query, routeKey){
-  if(!query) return true;
-  // anything on the detected route counts as a match
-  if(routeKey && item.route === routeKey) return true;
-
-  const hay = itemText(item);
-  const words = query.toLowerCase().split(/\s+/).filter(w => w.length > 2);
-  if(words.length === 0) return hay.includes(query.toLowerCase());
-  return words.some(w => hay.includes(w));
-}
-
-/* ---------- Route context panel ---------- */
 
 function renderRouteContext(routeKey, query, results){
   const el = document.getElementById('routecontext');
@@ -702,13 +118,12 @@ function renderRouteContext(routeKey, query, results){
 
   const r = ROUTES[routeKey];
   const standards = results.filter(i => i.category === 'standard').length;
-  const tlevelItems = results.filter(i => i.category === 't-levels').length;
+  const tl = results.filter(i => i.category === 't-levels').length;
 
   const chips = r.tlevels.length
     ? '<div class="chips">' + r.tlevels.map(t => '<span class="chip">' + t + '</span>').join('') + '</div>'
     : '';
-
-  const tlevelLine = r.tlevels.length
+  const line = r.tlevels.length
     ? 'T-Levels feeding this route:'
     : 'There is no T-Level on this route yet, so learners arrive from foundation apprenticeships or employment.';
 
@@ -716,45 +131,40 @@ function renderRouteContext(routeKey, query, results){
     '<div class="routecard">' +
       '<h2>' + r.label + '</h2>' +
       '<p>Showing ' + results.length + ' update' + (results.length === 1 ? '' : 's') +
-        ' on this route — ' + standards + ' affecting standards, ' + tlevelItems + ' affecting T-Levels. ' +
+        ' on this route — ' + standards + ' affecting standards, ' + tl + ' affecting T-Levels. ' +
         'Funding rule and levy changes apply across every route and are shown too.</p>' +
-      '<p style="margin-top:9px">' + tlevelLine + '</p>' +
-      chips +
+      '<p style="margin-top:9px">' + line + '</p>' + chips +
+      '<p style="margin-top:11px"><a href="standards.html#' + routeKey + '" style="color:var(--text)">See every standard on this route &rarr;</a></p>' +
     '</div>';
 }
-
-/* ---------- Feed ---------- */
 
 function itemHTML(item){
   const route = item.route ? ROUTES[item.route] : null;
   const routeLabel = route ? route.label : CATEGORY_LABELS[item.category];
-
-  const stdLine = item.standard
-    ? '<p class="std"><b>Standard:</b> ' + item.standard + '</p>'
+  const stdLine = item.standard ? '<p class="std"><b>Standard:</b> ' + item.standard + '</p>' : '';
+  const flag = item.pinned ? '<span class="pill flag">Priority</span>' : '';
+  const article = item.article
+    ? '<a class="read" href="articles.html#' + item.article + '">Read the full analysis</a>'
     : '';
 
-  const flag = item.pinned ? '<span class="pill flag">Priority</span>' : '';
-
-  return '' +
-    '<article class="item ' + item.urgency + '">' +
-      '<div class="when"><b>' + fmt(item.date) + '</b>' + fmtYear(item.date) + '</div>' +
-      '<div>' +
-        '<div class="meta">' + flag +
-          '<span class="pill route">' + routeLabel + '</span>' +
-          '<span class="pill ' + item.status + '">' + STATUS_LABELS[item.status] + '</span>' +
-        '</div>' +
-        '<h3>' + item.title + '</h3>' +
-        stdLine +
-        '<p>' + item.summary + '</p>' +
-        '<a class="src" href="' + item.url + '" target="_blank" rel="noopener">Read the source</a>' +
+  return '<article class="item ' + item.urgency + '">' +
+    '<div class="when"><b>' + fmtShort(item.date) + '</b>' + fmtYear(item.date) + '</div>' +
+    '<div>' +
+      '<div class="meta">' + flag +
+        '<span class="pill route">' + routeLabel + '</span>' +
+        '<span class="pill ' + item.status + '">' + STATUS_LABELS[item.status] + '</span>' +
       '</div>' +
-    '</article>';
+      '<h3>' + item.title + '</h3>' + stdLine +
+      '<p>' + item.summary + '</p>' +
+      '<div class="links">' + article +
+        '<a href="' + item.url + '" target="_blank" rel="noopener">Source</a>' +
+      '</div>' +
+    '</div></article>';
 }
 
 function renderFeed(filter, query){
   const feed = document.getElementById('feed');
   const tally = document.getElementById('tally');
-
   const routeKey = detectRoute(query);
 
   let list = UPDATES.slice();
@@ -766,8 +176,7 @@ function renderFeed(filter, query){
 
   if(list.length === 0){
     tally.textContent = '';
-    feed.innerHTML =
-      '<div class="empty"><b>Nothing matches that yet.</b>' +
+    feed.innerHTML = '<div class="empty"><b>Nothing matches that yet.</b>' +
       'Try a broader word — a route like “construction”, a job like “nursing”, or clear the search to see everything.</div>';
     return;
   }
@@ -780,58 +189,37 @@ function renderFeed(filter, query){
 
   let html = '';
   if(pinned.length){
-    html += '<div class="grouphead"><h2>Priority</h2><div class="rule"></div></div>';
-    html += pinned.map(itemHTML).join('');
+    html += '<div class="grouphead"><h2>Priority</h2><div class="rule"></div></div>' + pinned.map(itemHTML).join('');
   }
   if(rest.length){
-    html += '<div class="grouphead"><h2>' + (pinned.length ? 'Everything else' : 'Latest') + '</h2><div class="rule"></div></div>';
-    html += rest.map(itemHTML).join('');
+    html += '<div class="grouphead"><h2>' + (pinned.length ? 'Everything else' : 'Latest') + '</h2><div class="rule"></div></div>' + rest.map(itemHTML).join('');
   }
   feed.innerHTML = html;
 }
 
-/* ---------- Wiring ---------- */
+let currentFilter = 'all', currentQuery = '';
 
-let currentFilter = 'all';
-let currentQuery = '';
+renderReadings(UPDATES);
+renderFeed(currentFilter, currentQuery);
 
-function init(){
-  renderReadings(UPDATES);
-  renderFeed(currentFilter, currentQuery);
+document.getElementById('stamp-date').textContent =
+  'Reviewed ' + new Date().toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
+document.getElementById('stamp-count').textContent =
+  UPDATES.length + ' updates tracked across 15 routes';
 
-  document.getElementById('stamp-date').textContent =
-    'Reviewed ' + new Date().toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
-  document.getElementById('stamp-count').textContent =
-    UPDATES.length + ' updates tracked across 15 routes';
-
-  document.querySelectorAll('.tabs button').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      currentFilter = btn.dataset.filter;
-      renderFeed(currentFilter, currentQuery);
-    });
-  });
-
-  const search = document.getElementById('search');
-  let timer;
-  search.addEventListener('input', () => {
-    clearTimeout(timer);
-    timer = setTimeout(() => {
-      currentQuery = search.value.trim();
-      renderFeed(currentFilter, currentQuery);
-    }, 120);
-  });
-
-  document.getElementById('clear').addEventListener('click', () => {
-    search.value = '';
-    currentQuery = '';
+document.querySelectorAll('.tabs button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.filter;
     renderFeed(currentFilter, currentQuery);
-    search.focus();
   });
-}
+});
 
-init();
+wireSearch('search', 'clear', 'radar', q => {
+  currentQuery = q;
+  renderFeed(currentFilter, currentQuery);
+});
 
 </script>
 </body>

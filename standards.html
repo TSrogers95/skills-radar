@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Standards — Skills Radar</title>
+<meta name="description" content="Every tracked apprenticeship standard grouped by occupational route, with funding, duration, level and change status.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="masthead">
+  <div class="wrap">
+    <h1 class="wordmark"><a href="index.html">Skills Radar</a></h1>
+    <p class="hero">The intelligence platform for early careers professionals — spend less time interpreting guidance and more time building great programmes.</p>
+    <nav class="nav">
+      <a href="index.html">Feed</a>
+      <a href="articles.html">Articles</a>
+      <a href="standards.html" class="on">Standards</a>
+      <a href="calendar.html">Calendar</a>
+      <a href="newsletter.html">Newsletter</a>
+    </nav>
+    <div class="readings">
+      <div class="reading">
+        <div class="n" id="s-total">–</div>
+        <div class="l">Standards tracked</div>
+      </div>
+      <div class="reading warm">
+        <div class="n" id="s-changed">–</div>
+        <div class="l">Changed in the last year</div>
+      </div>
+      <div class="reading">
+        <div class="n" id="s-dev">–</div>
+        <div class="l">In development or paused</div>
+      </div>
+      <div class="reading cool">
+        <div class="n" id="s-defunded">–</div>
+        <div class="l">Losing funding</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="controls">
+  <div class="wrap controlgrid">
+    <div class="tabs" id="tabs">
+      <button data-filter="all" class="active">All</button>
+      <button data-filter="changed">Changed</button>
+      <button data-filter="stable">No change</button>
+      <button data-filter="dev">In development</button>
+      <button data-filter="defunded">Losing funding</button>
+    </div>
+    <div class="searchbox">
+      <input type="search" id="search" placeholder="Search a standard, code or route — try &ldquo;ST1472&rdquo;, &ldquo;dental&rdquo;, &ldquo;digital&rdquo;" aria-label="Search standards">
+      <svg class="radar" id="radar" viewBox="0 0 20 20" aria-hidden="true">
+        <circle cx="10" cy="10" r="8.6" fill="none" stroke="#CBC5B6" stroke-width="1"/>
+        <circle cx="10" cy="10" r="4.6" fill="none" stroke="#CBC5B6" stroke-width="1"/>
+        <g class="sweep">
+          <path d="M10 10 L10 1.4 A8.6 8.6 0 0 1 17.4 5.7 Z" fill="#10796A" fill-opacity="0.3"/>
+          <line x1="10" y1="10" x2="10" y2="1.4" stroke="#10796A" stroke-width="1.4"/>
+        </g>
+      </svg>
+      <button class="x" id="clear" aria-label="Clear search" title="Clear search">&times;</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="pagehead" style="border-bottom:none;padding-bottom:0">
+    <p>Grouped by the 15 Skills England occupational routes. Rows shaded cream have changed; rows shaded pink are losing funding. Where nothing has changed, the date of the last recorded change is shown so you know the entry is current rather than missing.</p>
+  </div>
+  <div class="tally" id="tally"></div>
+  <div id="blocks"></div>
+
+  <div class="notice" style="margin:36px 0 0">
+    <strong>This is a tracked subset, not the full register.</strong> The Skills England register holds around 1,958 apprenticeships. Skills Radar tracks the standards most affected by current policy change plus a representative spread across every route. For the complete list, download the CSV from the <a href="https://skillsengland.education.gov.uk/apprenticeships/" target="_blank" rel="noopener">Skills England apprenticeship finder</a> or use the <a href="https://occupational-maps.skillsengland.education.gov.uk/public-api/" target="_blank" rel="noopener">occupational maps public API</a>.
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <p>Funding bands, durations and versions are recorded from the Skills England apprenticeship register at the review date. Always confirm against the register before contracting or costing a programme.</p>
+  </div>
+</footer>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+
+function isDev(s){
+  return /development|paused|retirement|notice/i.test(s.status);
+}
+function isDefunded(s){
+  return /defunded/i.test(s.status);
+}
+function changedRecently(s){
+  return s.changed !== '' && daysAgo(s.since) <= 365 && daysAgo(s.since) >= -400;
+}
+
+function renderReadings(){
+  document.getElementById('s-total').textContent    = STANDARDS.length;
+  document.getElementById('s-changed').textContent  = STANDARDS.filter(changedRecently).length;
+  document.getElementById('s-dev').textContent      = STANDARDS.filter(isDev).length;
+  document.getElementById('s-defunded').textContent = STANDARDS.filter(isDefunded).length;
+}
+
+function changeCell(s){
+  if(isDefunded(s)){
+    const link = s.article ? ' <a href="articles.html#' + s.article + '">Why</a>' : '';
+    return '<span class="chg stop">' + s.changed + '</span>' + link;
+  }
+  if(s.changed){
+    const link = s.article ? ' <a href="articles.html#' + s.article + '">Why</a>' : '';
+    return '<span class="chg yes">' + s.changed + '</span><br><span class="chg none">' + fmtLong(s.since) + '</span>' + link;
+  }
+  return '<span class="chg none">No change since ' + fmtLong(s.since) + '</span>';
+}
+
+function rowHTML(s){
+  const cls = isDefunded(s) ? 'defunded' : (changedRecently(s) ? 'changed' : '');
+  const dur = s.months === 0 ? 'Unit' : s.months + ' mo';
+  return '<tr class="' + cls + '">' +
+    '<td class="nm">' + s.name + '<small>' + s.code + ' &middot; v' + s.version + '</small></td>' +
+    '<td class="num">Level ' + s.level + '</td>' +
+    '<td class="num hidecol">' + dur + '</td>' +
+    '<td class="num">' + money(s.funding) + '</td>' +
+    '<td class="hidecol">' + s.status + '</td>' +
+    '<td>' + changeCell(s) + '</td>' +
+  '</tr>';
+}
+
+function blockHTML(routeKey, rows){
+  const r = ROUTES[routeKey];
+  if(!r) return '';
+  const changed = rows.filter(changedRecently).length;
+  const defunded = rows.filter(isDefunded).length;
+
+  let sub = rows.length + ' tracked';
+  sub += changed ? ' &middot; ' + changed + ' changed in the last year' : ' &middot; no changes in the last year';
+  if(defunded) sub += ' &middot; ' + defunded + ' losing funding';
+  if(r.tlevels.length) sub += ' &middot; T-Levels: ' + r.tlevels.join(', ');
+
+  return '<section class="routeblock" id="' + routeKey + '">' +
+    '<h2>' + r.label + '</h2>' +
+    '<p class="sub">' + sub + '</p>' +
+    '<table class="std"><thead><tr>' +
+      '<th>Standard</th><th>Level</th><th class="hidecol">Duration</th>' +
+      '<th>Max funding</th><th class="hidecol">Status</th><th>Change</th>' +
+    '</tr></thead><tbody>' +
+    rows.sort((a,b) => a.level - b.level || a.name.localeCompare(b.name)).map(rowHTML).join('') +
+    '</tbody></table></section>';
+}
+
+function render(filter, query){
+  const blocks = document.getElementById('blocks');
+  const tally = document.getElementById('tally');
+  const routeKey = detectRoute(query);
+
+  let list = STANDARDS.slice();
+
+  if(filter === 'changed')  list = list.filter(changedRecently);
+  if(filter === 'stable')   list = list.filter(s => s.changed === '');
+  if(filter === 'dev')      list = list.filter(isDev);
+  if(filter === 'defunded') list = list.filter(isDefunded);
+
+  if(query){
+    const q = query.toLowerCase();
+    const words = q.split(/\s+/).filter(w => w.length > 2);
+    list = list.filter(s => {
+      if(routeKey && s.route === routeKey) return true;
+      const hay = (s.name + ' ' + s.code + ' ' + s.status + ' ' + s.changed + ' ' + routeText(s.route)).toLowerCase();
+      return words.length ? words.some(w => hay.includes(w)) : hay.includes(q);
+    });
+  }
+
+  if(list.length === 0){
+    tally.textContent = '';
+    blocks.innerHTML = '<div class="empty"><b>No standards match that.</b>' +
+      'Try a route like “construction”, a job like “dental”, or a code like ST1472.</div>';
+    return;
+  }
+
+  tally.textContent = list.length + (list.length === 1 ? ' standard' : ' standards') +
+    (query ? ' matching “' + query + '”' : '');
+
+  const grouped = {};
+  list.forEach(s => { (grouped[s.route] = grouped[s.route] || []).push(s); });
+
+  blocks.innerHTML = Object.keys(ROUTES)
+    .filter(k => grouped[k])
+    .map(k => blockHTML(k, grouped[k]))
+    .join('');
+
+  if(location.hash){
+    const t = document.getElementById(location.hash.slice(1));
+    if(t) setTimeout(() => t.scrollIntoView({ block:'start' }), 60);
+  }
+}
+
+let currentFilter = 'all', currentQuery = '';
+renderReadings();
+render(currentFilter, currentQuery);
+
+document.querySelectorAll('#tabs button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#tabs button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.filter;
+    render(currentFilter, currentQuery);
+  });
+});
+
+wireSearch('search', 'clear', 'radar', q => {
+  currentQuery = q;
+  render(currentFilter, currentQuery);
+});
+
+</script>
+</body>
+</html>
