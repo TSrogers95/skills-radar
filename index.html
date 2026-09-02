@@ -14,41 +14,25 @@
 
 <div class="masthead">
   <div class="wrap">
-    <div class="brandrow">
-      <div>
-        <h1 class="wordmark">Skills Radar</h1>
-        <p class="hero">The intelligence platform for early careers professionals — spend less time interpreting guidance and more time building great programmes.</p>
-      </div>
-      <div class="stamp">
-        <strong id="stamp-date">—</strong>
-        <span id="stamp-count">—</span>
-      </div>
-    </div>
+    <div class="collapsing" id="heroblock"></div>
+  </div>
+</div>
 
-    <nav class="nav">
-      <a href="index.html" class="on">Feed</a>
-      <a href="articles.html">Articles</a>
-      <a href="standards.html">Standards</a>
-      <a href="calendar.html">Calendar</a>
-      <a href="newsletter.html">Newsletter</a>
-    </nav>
+<div class="stickybar">
+  <div class="wrap inner">
+    <a class="mini" href="index.html">Skills Radar</a>
+    <div id="navslot"></div>
+  </div>
+</div>
 
-    <div class="readings">
-      <div class="reading">
-        <div class="n" id="r-changes">–</div>
-        <div class="l">Changes in the last month</div>
-      </div>
-      <div class="reading warm">
-        <div class="n" id="r-upcoming">–</div>
-        <div class="l">Upcoming changes</div>
-      </div>
-      <div class="reading">
-        <div class="n" id="r-review">–</div>
-        <div class="l">Standards in review</div>
-      </div>
-      <div class="reading cool">
-        <div class="n" id="r-updated">–</div>
-        <div class="l">Standards updated this month</div>
+<div class="masthead">
+  <div class="wrap">
+    <div class="collapsing" id="readingsblock">
+      <div class="readings">
+        <div class="reading"><div class="n" id="r-changes">–</div><div class="l">Changes in the last month</div></div>
+        <div class="reading warm"><div class="n" id="r-upcoming">–</div><div class="l">Upcoming changes</div></div>
+        <div class="reading"><div class="n" id="r-review">–</div><div class="l">Standards in review</div></div>
+        <div class="reading cool"><div class="n" id="r-updated">–</div><div class="l">Standards updated this month</div></div>
       </div>
     </div>
   </div>
@@ -84,10 +68,8 @@
     <span><i class="m"></i> Plan ahead — confirmed, not yet in force</span>
     <span><i class="l"></i> For information</span>
   </div>
-
   <div id="routecontext"></div>
-  <div class="tally" id="tally"></div>
-  <div id="feed"></div>
+  <div class="kanban" id="board"></div>
 </div>
 
 <footer>
@@ -98,128 +80,106 @@
 
 <script src="data.js"></script>
 <script src="app.js"></script>
+<script src="ui.js"></script>
 <script>
 
+document.getElementById('heroblock').innerHTML = titleBlockHTML(
+  '<strong>Reviewed ' + new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}) + '</strong>' +
+  '<span>' + UPDATES.length + ' updates tracked across 15 routes</span>'
+);
+document.getElementById('navslot').innerHTML = navHTML('index.html');
+
 function renderReadings(items){
-  const changes  = items.filter(i => i.status !== 'in-review' && daysAgo(i.date) >= 0 && daysAgo(i.date) <= 30).length;
-  const upcoming = items.filter(i => i.status === 'upcoming' && isFuture(i.date)).length;
-  const review   = items.filter(i => i.category === 'standard' && i.status === 'in-review').length;
-  const updated  = items.filter(i => i.category === 'standard' && i.status === 'updated' && daysAgo(i.date) >= 0 && daysAgo(i.date) <= 30).length;
-  document.getElementById('r-changes').textContent  = changes;
-  document.getElementById('r-upcoming').textContent = upcoming;
-  document.getElementById('r-review').textContent   = review;
-  document.getElementById('r-updated').textContent  = updated;
+  document.getElementById('r-changes').textContent  = items.filter(i => i.status !== 'in-review' && daysAgo(i.date) >= 0 && daysAgo(i.date) <= 30).length;
+  document.getElementById('r-upcoming').textContent = items.filter(i => i.status === 'upcoming' && isFuture(i.date)).length;
+  document.getElementById('r-review').textContent   = items.filter(i => i.category === 'standard' && i.status === 'in-review').length;
+  document.getElementById('r-updated').textContent  = items.filter(i => i.category === 'standard' && i.status === 'updated' && daysAgo(i.date) >= 0 && daysAgo(i.date) <= 30).length;
 }
 
 function renderRouteContext(routeKey, query, results){
   const el = document.getElementById('routecontext');
   el.innerHTML = '';
   if(!routeKey || !query) return;
-
   const r = ROUTES[routeKey];
-  const standards = results.filter(i => i.category === 'standard').length;
-  const tl = results.filter(i => i.category === 't-levels').length;
-
   const chips = r.tlevels.length
-    ? '<div class="chips">' + r.tlevels.map(t => '<span class="chip">' + t + '</span>').join('') + '</div>'
-    : '';
+    ? '<div class="chips">' + r.tlevels.map(t => '<span class="chip">' + t + '</span>').join('') + '</div>' : '';
   const line = r.tlevels.length
     ? 'T-Levels feeding this route:'
     : 'There is no T-Level on this route yet, so learners arrive from foundation apprenticeships or employment.';
-
-  el.innerHTML =
-    '<div class="routecard">' +
-      '<h2>' + r.label + '</h2>' +
-      '<p>Showing ' + results.length + ' update' + (results.length === 1 ? '' : 's') +
-        ' on this route — ' + standards + ' affecting standards, ' + tl + ' affecting T-Levels. ' +
-        'Funding rule and levy changes apply across every route and are shown too.</p>' +
-      '<p style="margin-top:9px">' + line + '</p>' + chips +
-      '<p style="margin-top:11px"><a href="standards.html#' + routeKey + '" style="color:var(--text)">See every standard on this route &rarr;</a></p>' +
-    '</div>';
+  el.innerHTML = '<div class="routecard"><h2>' + r.label + '</h2>' +
+    '<p>' + results.length + ' update' + (results.length === 1 ? '' : 's') + ' on this route. ' +
+    'Funding rule and levy changes apply across every route and are shown too.</p>' +
+    '<p style="margin-top:9px">' + line + '</p>' + chips +
+    '<p style="margin-top:11px"><a href="standards.html#' + routeKey + '" style="color:var(--text)">See every standard on this route &rarr;</a></p></div>';
 }
 
-function itemHTML(item){
+function cardHTML(item){
   const route = item.route ? ROUTES[item.route] : null;
-  const routeLabel = route ? route.label : CATEGORY_LABELS[item.category];
-  const stdLine = item.standard ? '<p class="std"><b>Standard:</b> ' + item.standard + '</p>' : '';
+  const label = route ? route.label : CATEGORY_LABELS[item.category];
   const flag = item.pinned ? '<span class="pill flag">Priority</span>' : '';
-  const article = item.article
-    ? '<a class="read" href="articles.html#' + item.article + '">Read the full analysis</a>'
-    : '';
-
-  return '<article class="item ' + item.urgency + '">' +
-    '<div class="when"><b>' + fmtShort(item.date) + '</b>' + fmtYear(item.date) + '</div>' +
-    '<div>' +
-      '<div class="meta">' + flag +
-        '<span class="pill route">' + routeLabel + '</span>' +
-        '<span class="pill ' + item.status + '">' + STATUS_LABELS[item.status] + '</span>' +
-      '</div>' +
-      '<h3>' + item.title + '</h3>' + stdLine +
-      '<p>' + item.summary + '</p>' +
-      '<div class="links">' + article +
-        '<a href="' + item.url + '" target="_blank" rel="noopener">Source</a>' +
-      '</div>' +
-    '</div></article>';
+  const article = item.article ? '<a class="read" href="articles.html#' + item.article + '">Full analysis</a>' : '';
+  return '<article class="card ' + item.urgency + '">' +
+    '<div class="cdate">' + fmtShort(item.date) + ' ' + fmtYear(item.date) + '</div>' +
+    '<div class="meta">' + flag + '<span class="pill route">' + label + '</span></div>' +
+    '<h3>' + item.title + '</h3><p>' + item.summary + '</p>' +
+    '<div class="links">' + article + '<a href="' + item.url + '" target="_blank" rel="noopener">Source</a></div>' +
+    '</article>';
 }
 
-function renderFeed(filter, query){
-  const feed = document.getElementById('feed');
-  const tally = document.getElementById('tally');
-  const routeKey = detectRoute(query);
+const COLUMNS = [
+  { key:'upcoming', title:'Upcoming', blurb:'Confirmed for a future date. Plan and prepare.',
+    test: i => i.status === 'upcoming' || isFuture(i.date),
+    sort: (a,b) => new Date(a.date) - new Date(b.date) },
+  { key:'review', title:'In review', blurb:'Under review or in development. No confirmed outcome yet.',
+    test: i => i.status === 'in-review',
+    sort: (a,b) => new Date(b.date) - new Date(a.date) },
+  { key:'recent', title:'Recent changes', blurb:'Already in force. Check you are compliant.',
+    test: i => i.status === 'updated' && !isFuture(i.date),
+    sort: (a,b) => new Date(b.date) - new Date(a.date) }
+];
 
+function renderBoard(filter, query){
+  const routeKey = detectRoute(query);
   let list = UPDATES.slice();
   if(filter !== 'all') list = list.filter(i => i.category === filter);
   list = list.filter(i => matches(i, query, routeKey));
-  list.sort((a, b) => new Date(b.date) - new Date(a.date));
 
   renderRouteContext(routeKey, query, list);
 
-  if(list.length === 0){
-    tally.textContent = '';
-    feed.innerHTML = '<div class="empty"><b>Nothing matches that yet.</b>' +
-      'Try a broader word — a route like “construction”, a job like “nursing”, or clear the search to see everything.</div>';
-    return;
-  }
+  const used = new Set();
+  const board = COLUMNS.map(col => {
+    const rows = list.filter(i => !used.has(i) && col.test(i));
+    rows.forEach(r => used.add(r));
+    rows.sort((a,b) => (a.pinned === b.pinned) ? col.sort(a,b) : (a.pinned ? -1 : 1));
 
-  const pinned = list.filter(i => i.pinned);
-  const rest   = list.filter(i => !i.pinned);
+    const body = rows.length
+      ? rows.map(cardHTML).join('')
+      : '<div class="colempty">Nothing here' + (query ? ' for that search' : '') + '.</div>';
 
-  tally.textContent = list.length + (list.length === 1 ? ' update' : ' updates') +
-    (query ? ' matching “' + query + '”' : '');
+    return '<section class="col"><div class="colhead">' +
+      '<h2>' + col.title + ' <em>' + rows.length + '</em></h2>' +
+      '<p>' + col.blurb + '</p></div>' +
+      '<div class="colbody">' + body + '</div></section>';
+  }).join('');
 
-  let html = '';
-  if(pinned.length){
-    html += '<div class="grouphead"><h2>Priority</h2><div class="rule"></div></div>' + pinned.map(itemHTML).join('');
-  }
-  if(rest.length){
-    html += '<div class="grouphead"><h2>' + (pinned.length ? 'Everything else' : 'Latest') + '</h2><div class="rule"></div></div>' + rest.map(itemHTML).join('');
-  }
-  feed.innerHTML = html;
+  document.getElementById('board').innerHTML = board;
 }
 
 let currentFilter = 'all', currentQuery = '';
-
 renderReadings(UPDATES);
-renderFeed(currentFilter, currentQuery);
-
-document.getElementById('stamp-date').textContent =
-  'Reviewed ' + new Date().toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
-document.getElementById('stamp-count').textContent =
-  UPDATES.length + ' updates tracked across 15 routes';
+renderBoard(currentFilter, currentQuery);
+wireCollapse();
 
 document.querySelectorAll('.tabs button').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     currentFilter = btn.dataset.filter;
-    renderFeed(currentFilter, currentQuery);
+    renderBoard(currentFilter, currentQuery);
   });
 });
 
-wireSearch('search', 'clear', 'radar', q => {
-  currentQuery = q;
-  renderFeed(currentFilter, currentQuery);
-});
+wireSearch('search', 'clear', 'radar', q => { currentQuery = q; renderBoard(currentFilter, currentQuery); });
 
 </script>
 </body>

@@ -13,16 +13,18 @@
 <body>
 
 <div class="masthead">
+  <div class="wrap"><div id="heroblock"></div></div>
+</div>
+
+<div class="stickybar">
+  <div class="wrap inner">
+    <a class="mini" href="index.html">Skills Radar</a>
+    <div id="navslot"></div>
+  </div>
+</div>
+
+<div class="masthead">
   <div class="wrap">
-    <h1 class="wordmark"><a href="index.html">Skills Radar</a></h1>
-    <p class="hero">The intelligence platform for early careers professionals — spend less time interpreting guidance and more time building great programmes.</p>
-    <nav class="nav">
-      <a href="index.html">Feed</a>
-      <a href="articles.html">Articles</a>
-      <a href="standards.html" class="on">Standards</a>
-      <a href="calendar.html">Calendar</a>
-      <a href="newsletter.html">Newsletter</a>
-    </nav>
     <div class="readings">
       <div class="reading">
         <div class="n" id="s-total">–</div>
@@ -37,8 +39,8 @@
         <div class="l">In development or paused</div>
       </div>
       <div class="reading cool">
-        <div class="n" id="s-defunded">–</div>
-        <div class="l">Losing funding</div>
+        <div class="n" id="s-noepa">–</div>
+        <div class="l">Awaiting an EPA</div>
       </div>
     </div>
   </div>
@@ -52,6 +54,7 @@
       <button data-filter="stable">No change</button>
       <button data-filter="dev">In development</button>
       <button data-filter="defunded">Losing funding</button>
+      <button data-filter="noepa">No EPA assigned</button>
     </div>
     <div class="searchbox">
       <input type="search" id="search" placeholder="Search a standard, code or route — try &ldquo;ST1472&rdquo;, &ldquo;dental&rdquo;, &ldquo;digital&rdquo;" aria-label="Search standards">
@@ -88,8 +91,21 @@
 
 <script src="data.js"></script>
 <script src="app.js"></script>
+<script src="ui.js"></script>
 <script>
 
+document.getElementById('heroblock').innerHTML = titleBlockHTML('');
+document.getElementById('navslot').innerHTML = navHTML('standards.html');
+
+function noEPA(s){
+  return /pending|waiting|not assigned/i.test(s.epa || '');
+}
+function epaCell(s){
+  const e = s.epa || 'Assigned';
+  if(/not applicable/i.test(e)) return '<span class="chg none">' + e + '</span>';
+  if(noEPA(s)) return '<span class="chg yes">' + e + '</span>';
+  return '<span class="chg none">' + e + '</span>';
+}
 function isDev(s){
   return /development|paused|retirement|notice/i.test(s.status);
 }
@@ -104,7 +120,7 @@ function renderReadings(){
   document.getElementById('s-total').textContent    = STANDARDS.length;
   document.getElementById('s-changed').textContent  = STANDARDS.filter(changedRecently).length;
   document.getElementById('s-dev').textContent      = STANDARDS.filter(isDev).length;
-  document.getElementById('s-defunded').textContent = STANDARDS.filter(isDefunded).length;
+  document.getElementById('s-noepa').textContent = STANDARDS.filter(noEPA).length;
 }
 
 function changeCell(s){
@@ -127,6 +143,7 @@ function rowHTML(s){
     '<td class="num">Level ' + s.level + '</td>' +
     '<td class="num hidecol">' + dur + '</td>' +
     '<td class="num">' + money(s.funding) + '</td>' +
+    '<td class="hidecol">' + epaCell(s) + '</td>' +
     '<td class="hidecol">' + s.status + '</td>' +
     '<td>' + changeCell(s) + '</td>' +
   '</tr>';
@@ -148,7 +165,7 @@ function blockHTML(routeKey, rows){
     '<p class="sub">' + sub + '</p>' +
     '<table class="std"><thead><tr>' +
       '<th>Standard</th><th>Level</th><th class="hidecol">Duration</th>' +
-      '<th>Max funding</th><th class="hidecol">Status</th><th>Change</th>' +
+      '<th>Max funding</th><th class="hidecol">EPA</th><th class="hidecol">Status</th><th>Change</th>' +
     '</tr></thead><tbody>' +
     rows.sort((a,b) => a.level - b.level || a.name.localeCompare(b.name)).map(rowHTML).join('') +
     '</tbody></table></section>';
@@ -165,13 +182,14 @@ function render(filter, query){
   if(filter === 'stable')   list = list.filter(s => s.changed === '');
   if(filter === 'dev')      list = list.filter(isDev);
   if(filter === 'defunded') list = list.filter(isDefunded);
+  if(filter === 'noepa')    list = list.filter(noEPA);
 
   if(query){
     const q = query.toLowerCase();
     const words = q.split(/\s+/).filter(w => w.length > 2);
     list = list.filter(s => {
       if(routeKey && s.route === routeKey) return true;
-      const hay = (s.name + ' ' + s.code + ' ' + s.status + ' ' + s.changed + ' ' + routeText(s.route)).toLowerCase();
+      const hay = (s.name + ' ' + s.code + ' ' + s.status + ' ' + (s.epa||'') + ' ' + s.changed + ' ' + routeText(s.route)).toLowerCase();
       return words.length ? words.some(w => hay.includes(w)) : hay.includes(q);
     });
   }

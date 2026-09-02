@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Calendar and horizon — Skills Radar</title>
-<meta name="description" content="Compliance deadlines to plan against, and a forward look at what is coming and what could bite.">
+<meta name="description" content="Twelve months of compliance deadlines, plus a forward look at what is coming.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -13,101 +13,227 @@
 <body>
 
 <div class="masthead">
-  <div class="wrap">
-    <h1 class="wordmark"><a href="index.html">Skills Radar</a></h1>
-    <p class="hero">The intelligence platform for early careers professionals — spend less time interpreting guidance and more time building great programmes.</p>
-    <nav class="nav">
-      <a href="index.html">Feed</a>
-      <a href="articles.html">Articles</a>
-      <a href="standards.html">Standards</a>
-      <a href="calendar.html" class="on">Calendar</a>
-      <a href="newsletter.html">Newsletter</a>
-    </nav>
+  <div class="wrap"><div id="heroblock"></div></div>
+</div>
+
+<div class="stickybar">
+  <div class="wrap inner">
+    <a class="mini" href="index.html">Skills Radar</a>
+    <div id="navslot"></div>
   </div>
 </div>
 
 <div class="wrap">
-  <div class="pagehead">
-    <h1>Calendar and horizon</h1>
-    <p>Dated deadlines you can plan a year around, followed by a forward look at what is coming, how confident we are in it, and where the risk sits.</p>
+
+  <div id="gate">
+    <form class="gate" id="loginform">
+      <h2>Members only</h2>
+      <p>The compliance calendar is for Skills Radar members. Sign in to see the next twelve months of deadlines.</p>
+      <div class="field">
+        <label for="u">Username</label>
+        <input type="text" id="u" autocomplete="username">
+      </div>
+      <div class="field">
+        <label for="p">Password</label>
+        <input type="text" id="p" autocomplete="current-password">
+      </div>
+      <button class="btn" type="submit">Sign in</button>
+      <div class="err" id="loginerr" hidden>That username and password combination is not recognised.</div>
+      <p style="margin:20px 0 0;font-size:13px;color:var(--text-3)">Test access: username <b>test</b>, password <b>test</b></p>
+    </form>
   </div>
 
-  <div class="key">
-    <span><i class="h"></i> Hard deadline or high risk</span>
-    <span><i class="m"></i> Confirmed change, plan for it</span>
-    <span><i class="l"></i> For awareness</span>
+  <div id="protected" hidden>
+
+    <div class="pagehead">
+      <h1>Compliance calendar</h1>
+      <p>The next twelve months of dated deadlines. Coloured days carry a milestone — hover or tap one to see what it is and what you need to do.</p>
+    </div>
+
+    <div class="key">
+      <span><i class="h"></i> Hard deadline or high risk</span>
+      <span><i class="m"></i> Confirmed change, plan for it</span>
+      <span><i class="l"></i> For awareness</span>
+    </div>
+
+    <div class="calgrid" id="calgrid"></div>
+
+    <div class="callist">
+      <div class="grouphead"><h2>Every milestone in full</h2><div class="rule"></div></div>
+      <div id="cal"></div>
+    </div>
+
+    <div class="pagehead" style="margin-top:52px">
+      <h1>On the horizon</h1>
+      <p>What is coming next, drawn from Skills England, DfE and Apprenticeship Service guidance alongside sector reporting from FE Week, the CIPD, the CBI and provider commentary. Confidence is marked so you can tell a confirmed date from a signalled direction.</p>
+    </div>
+
+    <div id="horizon"></div>
   </div>
-
-  <div id="cal"></div>
-
-  <div class="pagehead" style="margin-top:52px">
-    <h1>The horizon</h1>
-    <p>What is coming next, drawn from Skills England, DfE and Apprenticeship Service guidance alongside sector reporting from FE Week, the CIPD, the CBI and provider commentary. Confidence is marked so you can tell a confirmed date from a signalled direction.</p>
-  </div>
-
-  <div id="horizon"></div>
 </div>
+
+<div class="cpop" id="pop" role="dialog" aria-live="polite"></div>
 
 <footer>
   <div class="wrap">
-    <p>Horizon entries marked “signalled” reflect direction of travel reported by sector bodies and trade press, not confirmed policy. Treat them as planning assumptions to test, not facts to act on. Confirmed entries are traceable to the sources linked in the articles.</p>
+    <p>Horizon entries marked “signalled” reflect direction of travel reported by sector bodies and trade press, not confirmed policy. Treat them as planning assumptions to test, not facts to act on.</p>
   </div>
 </footer>
 
 <script src="data.js"></script>
 <script src="app.js"></script>
+<script src="ui.js"></script>
 <script>
+
+document.getElementById('heroblock').innerHTML = titleBlockHTML('');
+document.getElementById('navslot').innerHTML = navHTML('calendar.html');
+
+/* ---------- Sign-in gate ----------
+   NOTE: this is a front-of-house gate, not real security. The check runs in
+   the browser, so anyone who views the page source can read the credentials.
+   Fine for a demo. Replace with server-side auth before putting anything
+   confidential behind it. */
+
+const DEMO_USER = "test";
+const DEMO_PASS = "test";
+
+function unlock(){
+  document.getElementById('gate').hidden = true;
+  document.getElementById('protected').hidden = false;
+  buildCalendar();
+  renderList();
+  renderHorizon();
+}
+
+document.getElementById('loginform').addEventListener('submit', e => {
+  e.preventDefault();
+  const u = document.getElementById('u').value.trim().toLowerCase();
+  const p = document.getElementById('p').value.trim();
+  if(u === DEMO_USER && p === DEMO_PASS){
+    try { sessionStorage.setItem('sr-in','1'); } catch(err){}
+    unlock();
+  } else {
+    document.getElementById('loginerr').hidden = false;
+  }
+});
+
+try { if(sessionStorage.getItem('sr-in') === '1') unlock(); } catch(err){}
+
+/* ---------- Twelve month grid ---------- */
+
+const DOW = ['M','T','W','T','F','S','S'];
+
+function monthGrid(year, month, byDate){
+  const first = new Date(year, month, 1);
+  const startDow = (first.getDay() + 6) % 7;   // Monday = 0
+  const days = new Date(year, month + 1, 0).getDate();
+  const today = new Date();
+  const isThisMonth = today.getFullYear() === year && today.getMonth() === month;
+
+  let cells = '';
+  for(let i = 0; i < startDow; i++) cells += '<div class="cday out">0</div>';
+
+  for(let d = 1; d <= days; d++){
+    const key = year + '-' + String(month+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+    const evs = byDate[key];
+    let cls = 'cday';
+    let bang = '';
+    if(evs){
+      const worst = evs.some(e => e.urgency === 'high') ? 'high'
+                  : evs.some(e => e.urgency === 'medium') ? 'medium' : 'low';
+      cls += ' has ' + worst;
+      if(worst === 'high') bang = '<span class="bang">!</span>';
+    }
+    if(isThisMonth && d === today.getDate()) cls += ' today';
+    const attr = evs ? ' tabindex="0" data-key="' + key + '" role="button" aria-label="' + evs.length + ' milestone on ' + d + ' ' + first.toLocaleDateString('en-GB',{month:'long'}) + '"' : '';
+    cells += '<div class="' + cls + '"' + attr + '>' + d + bang + '</div>';
+  }
+
+  return '<div class="cmonth"><h3>' + first.toLocaleDateString('en-GB',{month:'long', year:'numeric'}) + '</h3>' +
+    '<div class="cdays">' + DOW.map(d => '<div class="cdow">' + d + '</div>').join('') + cells + '</div></div>';
+}
+
+function buildCalendar(){
+  const byDate = {};
+  MILESTONES.forEach(m => { (byDate[m.date] = byDate[m.date] || []).push(m); });
+
+  const start = new Date();
+  start.setDate(1);
+  let html = '';
+  for(let i = 0; i < 12; i++){
+    const d = new Date(start.getFullYear(), start.getMonth() + i, 1);
+    html += monthGrid(d.getFullYear(), d.getMonth(), byDate);
+  }
+  document.getElementById('calgrid').innerHTML = html;
+
+  const pop = document.getElementById('pop');
+
+  function showPop(cell){
+    const evs = byDate[cell.dataset.key];
+    if(!evs) return;
+    pop.innerHTML = evs.map(m =>
+      '<div class="pd">' + fmtLong(m.date) + '</div>' +
+      '<div class="who">' + m.who + '</div>' +
+      '<h4>' + m.title + '</h4>' +
+      '<p>' + m.action + '</p>' +
+      (m.article ? '<a href="articles.html#' + m.article + '">Read the full analysis &rarr;</a>' : '')
+    ).join('<hr style="border:none;border-top:1px solid var(--line);margin:13px 0">');
+
+    pop.classList.add('on');
+    const r = cell.getBoundingClientRect();
+    const w = 340;
+    let left = r.left + r.width/2 - w/2;
+    left = Math.max(12, Math.min(left, window.innerWidth - w - 12));
+    let top = r.bottom + 8;
+    if(top + pop.offsetHeight > window.innerHeight - 12) top = r.top - pop.offsetHeight - 8;
+    pop.style.left = left + 'px';
+    pop.style.top = Math.max(12, top) + 'px';
+  }
+  function hidePop(){ pop.classList.remove('on'); }
+
+  document.querySelectorAll('.cday.has').forEach(cell => {
+    cell.addEventListener('mouseenter', () => showPop(cell));
+    cell.addEventListener('focus', () => showPop(cell));
+    cell.addEventListener('mouseleave', hidePop);
+    cell.addEventListener('blur', hidePop);
+    cell.addEventListener('click', e => { e.stopPropagation(); showPop(cell); });
+  });
+  document.addEventListener('click', hidePop);
+  window.addEventListener('scroll', hidePop, { passive:true });
+}
+
+/* ---------- Full list ---------- */
 
 function mileHTML(m){
   const past = daysAgo(m.date) > 0;
   const d = new Date(m.date);
-  const article = m.article
-    ? '<div class="links"><a class="read" href="articles.html#' + m.article + '">Read the full analysis</a></div>'
-    : '';
-
+  const article = m.article ? '<div class="links"><a class="read" href="articles.html#' + m.article + '">Read the full analysis</a></div>' : '';
   return '<div class="mile ' + m.urgency + (past ? ' past' : '') + '">' +
     '<div class="d">' + d.getDate() + ' ' + d.toLocaleDateString('en-GB',{month:'short'}) +
       '<small>' + d.getFullYear() + (past ? ' · passed' : '') + '</small></div>' +
-    '<div>' +
-      '<div class="who">' + m.who + '</div>' +
-      '<h3>' + m.title + '</h3>' +
-      '<p>' + m.action + '</p>' + article +
-    '</div></div>';
+    '<div><div class="who">' + m.who + '</div><h3>' + m.title + '</h3><p>' + m.action + '</p>' + article + '</div></div>';
 }
 
-function renderCalendar(){
-  const el = document.getElementById('cal');
+function renderList(){
   const list = MILESTONES.slice().sort((a,b) => new Date(a.date) - new Date(b.date));
-
   const groups = {};
-  list.forEach(m => {
-    const key = fmtMonthYear(m.date);
-    (groups[key] = groups[key] || []).push(m);
-  });
-
-  el.innerHTML = Object.keys(groups).map(k =>
-    '<section class="month"><h2>' + k + '</h2>' + groups[k].map(mileHTML).join('') + '</section>'
-  ).join('');
-}
-
-function horizonHTML(h){
-  return '<div class="horizon ' + h.risk + '">' +
-    '<div class="win">' + h.window + '</div>' +
-    '<h3>' + h.title + '</h3>' +
-    '<div class="meta"><span class="conf ' + h.confidence + '">' +
-      (h.confidence === 'confirmed' ? 'Confirmed' : h.confidence === 'signalled' ? 'Signalled, not confirmed' : 'Speculative') +
-    '</span></div>' +
-    '<p>' + h.detail + '</p>' +
-    '<div class="watch"><b>What to watch:</b> ' + h.watch + '</div>' +
-  '</div>';
+  list.forEach(m => { const k = fmtMonthYear(m.date); (groups[k] = groups[k] || []).push(m); });
+  document.getElementById('cal').innerHTML = Object.keys(groups).map(k =>
+    '<section class="month"><h2>' + k + '</h2>' + groups[k].map(mileHTML).join('') + '</section>').join('');
 }
 
 function renderHorizon(){
-  document.getElementById('horizon').innerHTML = HORIZON.map(horizonHTML).join('');
+  document.getElementById('horizon').innerHTML = HORIZON.map(h =>
+    '<div class="horizon ' + h.risk + '">' +
+      '<div class="win">' + h.window + '</div>' +
+      '<h3>' + h.title + '</h3>' +
+      '<div class="meta"><span class="conf ' + h.confidence + '">' +
+        (h.confidence === 'confirmed' ? 'Confirmed' : h.confidence === 'signalled' ? 'Signalled, not confirmed' : 'Speculative') +
+      '</span></div>' +
+      '<p>' + h.detail + '</p>' +
+      '<div class="watch"><b>What to watch:</b> ' + h.watch + '</div>' +
+    '</div>').join('');
 }
-
-renderCalendar();
-renderHorizon();
 
 </script>
 </body>

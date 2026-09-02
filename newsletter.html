@@ -13,26 +13,23 @@
 <body>
 
 <div class="masthead">
-  <div class="wrap">
-    <h1 class="wordmark"><a href="index.html">Skills Radar</a></h1>
-    <p class="hero">The intelligence platform for early careers professionals — spend less time interpreting guidance and more time building great programmes.</p>
-    <nav class="nav">
-      <a href="index.html">Feed</a>
-      <a href="articles.html">Articles</a>
-      <a href="standards.html">Standards</a>
-      <a href="calendar.html">Calendar</a>
-      <a href="newsletter.html" class="on">Newsletter</a>
-    </nav>
+  <div class="wrap"><div id="heroblock"></div></div>
+</div>
+
+<div class="stickybar">
+  <div class="wrap inner">
+    <a class="mini" href="index.html">Skills Radar</a>
+    <div id="navslot"></div>
   </div>
 </div>
 
 <div class="wrap">
-  <div class="pagehead">
+  <div class="pagehead centred">
     <h1>Get it in your inbox</h1>
     <p>Policy changes that affect your programmes, summarised and rated for urgency. Tell us what you deliver and we will only send you what is relevant.</p>
   </div>
 
-  <form class="form" id="signup" novalidate>
+  <form class="form centred" id="signup" novalidate>
 
     <div class="field">
       <label for="email">Email address</label>
@@ -82,7 +79,7 @@
     <div class="ok" id="done" hidden></div>
   </form>
 
-  <div class="notice">
+  <div class="notice centred">
     <strong>Before this can send anything, it needs connecting to an email service.</strong>
     This form collects the answers correctly, but a static site cannot send email on its own. Connect it to a free mailing service — Buttondown, MailerLite, Kit or Mailchimp all work — by pasting their form endpoint into the <code>FORM_ENDPOINT</code> setting at the top of the script in this page. Until you do, the form shows what it captured so you can test it, and nothing is sent or stored anywhere.
   </div>
@@ -96,12 +93,16 @@
 
 <script src="data.js"></script>
 <script src="app.js"></script>
+<script src="ui.js"></script>
 <script>
 
 /* =========================================================================
    Paste your mailing service's form endpoint between the quotes below.
    Leave it empty and the form runs in test mode instead of sending.
    ========================================================================= */
+
+document.getElementById('heroblock').innerHTML = titleBlockHTML('');
+document.getElementById('navslot').innerHTML = navHTML('newsletter.html');
 
 const FORM_ENDPOINT = "";
 

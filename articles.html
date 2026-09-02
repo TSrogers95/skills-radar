@@ -13,23 +13,20 @@
 <body>
 
 <div class="masthead">
-  <div class="wrap">
-    <h1 class="wordmark"><a href="index.html">Skills Radar</a></h1>
-    <p class="hero">The intelligence platform for early careers professionals — spend less time interpreting guidance and more time building great programmes.</p>
-    <nav class="nav">
-      <a href="index.html">Feed</a>
-      <a href="articles.html" class="on">Articles</a>
-      <a href="standards.html">Standards</a>
-      <a href="calendar.html">Calendar</a>
-      <a href="newsletter.html">Newsletter</a>
-    </nav>
+  <div class="wrap"><div id="heroblock"></div></div>
+</div>
+
+<div class="stickybar">
+  <div class="wrap inner">
+    <a class="mini" href="index.html">Skills Radar</a>
+    <div id="navslot"></div>
   </div>
 </div>
 
 <div class="wrap">
   <div class="pagehead">
     <h1>Articles</h1>
-    <p>Each change explained properly: what it changed from, what it changed to, and what actually follows from it for providers and employers.</p>
+    <p>Each change explained properly: what it changed from, what it changed to, and what actually follows. Click any headline to read the full piece.</p>
   </div>
 </div>
 
@@ -41,6 +38,7 @@
       <button data-filter="Levy">Levy</button>
       <button data-filter="T-Levels">T-Levels</button>
       <button data-filter="Standard">Standards</button>
+      <button data-filter="urgent">Act now</button>
     </div>
     <div class="searchbox">
       <input type="search" id="search" placeholder="Search the articles" aria-label="Search articles">
@@ -59,39 +57,62 @@
 
 <div class="wrap">
   <div class="tally" id="tally"></div>
-  <div id="list"></div>
+  <div class="alist" id="list"></div>
+
+  <section class="reading">
+    <div class="grouphead"><h2>Where else to follow this</h2><div class="rule"></div></div>
+    <p style="font-size:14.5px;color:var(--text-2);max-width:66ch;margin:14px 0 0">
+      Skills Radar summarises. These are the places that report, consult and set the rules — worth following directly if this is your day job.
+    </p>
+    <div class="readgrid" id="readgrid"></div>
+  </section>
 </div>
 
 <footer>
   <div class="wrap">
-    <p>Analysis is written from the linked sources and reflects the position at the review date shown on each article. Skills Radar is not a substitute for the funding rules themselves — check the source before acting on a compliance deadline.</p>
+    <p>Analysis is written from the linked sources and reflects the position at the date shown on each article. Skills Radar is not a substitute for the funding rules themselves. Onward links are to independent organisations and are not endorsements or paid placements.</p>
   </div>
 </footer>
 
 <script src="data.js"></script>
 <script src="app.js"></script>
+<script src="ui.js"></script>
 <script>
 
-function articleHTML(a){
-  const routeChip = a.route && ROUTES[a.route]
-    ? '<span class="pill route">' + ROUTES[a.route].label + '</span>' : '';
+document.getElementById('heroblock').innerHTML = titleBlockHTML('');
+document.getElementById('navslot').innerHTML = navHTML('articles.html');
 
+let openId = null;
+
+function rowHTML(a){
+  return '<button class="arow" data-id="' + a.id + '" aria-expanded="' + (openId === a.id) + '">' +
+      iconHTML(a.icon) +
+      '<div>' +
+        '<h3>' + a.title + '</h3>' +
+        '<p>' + a.summary + '</p>' +
+        '<div class="tagrow">' +
+          '<span class="tag ' + tagClass(a.tag) + '">' + a.tag + '</span>' +
+          urgencyTag(a.urgency) +
+          (a.route && ROUTES[a.route] ? '<span class="tag t-standard">' + ROUTES[a.route].label + '</span>' : '') +
+        '</div>' +
+      '</div>' +
+      '<div class="when">' + fmtLong(a.date) + '</div>' +
+    '</button>' +
+    (openId === a.id ? bodyHTML(a) : '');
+}
+
+function bodyHTML(a){
   const sources = a.sources.map(s =>
     '<a href="' + s.url + '" target="_blank" rel="noopener">' + s.label + ' &rarr;</a>').join('');
+  const related = READING.filter(r => r.tags.indexOf(a.tag) > -1).slice(0,3).map(r =>
+    '<a href="' + r.url + '" target="_blank" rel="noopener">' + r.name + ' &rarr;</a>').join('');
 
-  return '<article class="article ' + a.urgency + '" id="' + a.id + '">' +
-    '<div class="meta">' +
-      '<span class="pill route">' + a.tag + '</span>' + routeChip +
-      '<span class="pill ' + (a.urgency === 'high' ? 'flag' : a.urgency === 'medium' ? 'upcoming' : 'updated') + '">' +
-        (a.urgency === 'high' ? 'Act now' : a.urgency === 'medium' ? 'Plan ahead' : 'For information') +
-      '</span>' +
-      '<span class="pill route">' + fmtLong(a.date) + '</span>' +
-    '</div>' +
-    '<h2>' + a.title + '</h2>' +
+  return '<div class="abody" id="' + a.id + '">' +
     '<p class="standfirst">' + a.standfirst + '</p>' +
     a.body.map(p => '<p>' + p + '</p>').join('') +
     '<div class="sources"><h4>Sources</h4>' + sources + '</div>' +
-    '</article>';
+    (related ? '<div class="sources"><h4>Related reading</h4>' + related + '</div>' : '') +
+    '</div>';
 }
 
 function render(filter, query){
@@ -100,19 +121,20 @@ function render(filter, query){
   const routeKey = detectRoute(query);
 
   let items = ARTICLES.slice();
-  if(filter !== 'all') items = items.filter(a => a.tag === filter);
+  if(filter === 'urgent') items = items.filter(a => a.urgency === 'high');
+  else if(filter !== 'all') items = items.filter(a => a.tag === filter);
 
   if(query){
     const q = query.toLowerCase();
     const words = q.split(/\s+/).filter(w => w.length > 2);
     items = items.filter(a => {
       if(routeKey && a.route === routeKey) return true;
-      const hay = (a.title + ' ' + a.standfirst + ' ' + a.body.join(' ') + ' ' + a.tag + ' ' + routeText(a.route)).toLowerCase();
+      const hay = (a.title + ' ' + a.summary + ' ' + a.standfirst + ' ' + a.body.join(' ') + ' ' + a.tag + ' ' + routeText(a.route)).toLowerCase();
       return words.length ? words.some(w => hay.includes(w)) : hay.includes(q);
     });
   }
 
-  items.sort((a, b) => new Date(b.date) - new Date(a.date));
+  items.sort((a,b) => new Date(b.date) - new Date(a.date));
 
   if(items.length === 0){
     tally.textContent = '';
@@ -120,19 +142,37 @@ function render(filter, query){
     return;
   }
 
-  tally.textContent = items.length + (items.length === 1 ? ' article' : ' articles') +
-    (query ? ' matching “' + query + '”' : '');
-  list.innerHTML = items.map(articleHTML).join('');
+  tally.textContent = items.length + (items.length === 1 ? ' article' : ' articles') + (query ? ' matching \u201c' + query + '\u201d' : '');
+  list.innerHTML = items.map(rowHTML).join('');
 
-  // if the page was opened with an anchor, scroll to it
-  if(location.hash){
-    const target = document.getElementById(location.hash.slice(1));
-    if(target) setTimeout(() => target.scrollIntoView({ block:'start' }), 60);
-  }
+  list.querySelectorAll('.arow').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.id;
+      openId = (openId === id) ? null : id;
+      render(currentFilter, currentQuery);
+      if(openId){
+        const el = document.querySelector('[data-id="' + openId + '"]');
+        if(el) el.scrollIntoView({ block:'nearest' });
+      }
+    });
+  });
 }
 
+document.getElementById('readgrid').innerHTML = READING.map(r =>
+  '<div class="readcard">' +
+    '<a href="' + r.url + '" target="_blank" rel="noopener">' + r.name + '</a>' +
+    '<p>' + r.note + '</p>' +
+    '<div class="host">' + r.url.replace(/^https?:\/\//,'').replace(/\/$/,'') + '</div>' +
+  '</div>').join('');
+
 let currentFilter = 'all', currentQuery = '';
+
+if(location.hash) openId = location.hash.slice(1);
 render(currentFilter, currentQuery);
+if(openId){
+  const el = document.getElementById(openId);
+  if(el) setTimeout(() => el.scrollIntoView({ block:'center' }), 80);
+}
 
 document.querySelectorAll('#tabs button').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -143,10 +183,7 @@ document.querySelectorAll('#tabs button').forEach(btn => {
   });
 });
 
-wireSearch('search', 'clear', 'radar', q => {
-  currentQuery = q;
-  render(currentFilter, currentQuery);
-});
+wireSearch('search', 'clear', 'radar', q => { currentQuery = q; render(currentFilter, currentQuery); });
 
 </script>
 </body>
