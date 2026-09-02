@@ -140,3 +140,63 @@ function artIcon(id){
   const body = ART_ICONS[id] || '<circle cx="24" cy="24" r="13" fill="none"/><line x1="24" y1="17" x2="24" y2="26"/><circle cx="24" cy="31" r="1.6"/>';
   return '<svg class="sym" viewBox="0 0 48 48" aria-hidden="true">' + body + '</svg>';
 }
+
+/* =========================================================================
+   DERIVED UPDATES
+   Every standard carrying a recorded change is a real change, so the feed
+   should show it. This turns those register entries into feed items and
+   merges them with the hand-written UPDATES above.
+   ========================================================================= */
+
+function deriveUpdates(){
+  return STANDARDS
+    .filter(s => s.changed && s.changed.trim() !== '')
+    .map(s => {
+      const defunded = /Defunded/i.test(s.status);
+      const dev = /development|paused|retirement|notice/i.test(s.status);
+
+      let status = 'updated';
+      if(defunded || isFuture(s.since)) status = 'upcoming';
+      else if(dev) status = 'in-review';
+
+      let urgency = 'low';
+      if(defunded) urgency = 'high';
+      else if(/funding band|age restriction|retired|replaces/i.test(s.changed)) urgency = 'medium';
+
+      const dur = s.months === 0 ? 'delivered as a unit' : s.months + ' months';
+      const summary = s.changed + '. Level ' + s.level + ', ' + dur +
+        ', maximum funding ' + money(s.funding) + '.' +
+        (/pending|waiting/i.test(s.epa || '') ? ' No assessment organisation assigned yet.' : '');
+
+      return {
+        date: s.since,
+        title: s.name + ' — ' + (defunded ? 'funding withdrawn' : dev ? 'under revision' : 'updated'),
+        category: 'standard',
+        route: s.route,
+        standard: s.name + (s.code ? ', Level ' + s.level + ' (' + s.code + ')' : ', Level ' + s.level),
+        article: s.article || '',
+        status: status,
+        urgency: urgency,
+        pinned: false,
+        derived: true,
+        summary: summary,
+        url: standardURL(s)
+      };
+    });
+}
+
+/* Skills England does not publish a stable per-standard permalink, so this
+   opens their register pre-filtered by the standard's name or code. */
+function standardURL(s){
+  const q = encodeURIComponent(s.code || s.name);
+  return 'https://skillsengland.education.gov.uk/apprenticeships/?keywords=' + q;
+}
+
+/* The full feed: hand-written policy updates plus every recorded register
+   change, with the curated version winning if both cover the same standard. */
+function allUpdates(){
+  const curated = UPDATES.slice();
+  const seen = new Set(curated.map(u => (u.standard || '').split(',')[0].trim()).filter(Boolean));
+  const derived = deriveUpdates().filter(d => !seen.has(d.standard.split(',')[0].trim()));
+  return curated.concat(derived);
+}

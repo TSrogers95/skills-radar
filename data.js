@@ -1263,3 +1263,230 @@ const READING = [
   { name:"NCFE apprenticeship reform updates", url:"https://www.ncfe.org.uk/", tags:["Funding rules","Standard"],
     note:"An awarding organisation tracking reformed assessment plan progress standard by standard." }
 ];
+
+/* ---------- 8. 2024/25 FUNDING RULES INDEX ------------------------------
+   A searchable index of the August 2024 to July 2025 apprenticeship funding
+   rules. Paragraph numbers are the real ones from the published document.
+   "related" lists other sections a reader should check at the same time —
+   this drives the "you should also review" suggestions.
+   ----------------------------------------------------------------------- */
+
+const RULES_DOC = {
+  title: "Apprenticeship funding rules: August 2024 to July 2025",
+  version: "Version 2, February 2025",
+  pages: 147,
+  applies: "Apprenticeships starting between 1 August 2024 and 31 July 2025",
+  pdf: "https://assets.publishing.service.gov.uk/media/67b322eb4e79a175a4c2fd5d/Apprenticeship_funding_rules_2024_to_2025.pdf",
+  changesPdf: "https://assets.publishing.service.gov.uk/media/67b32312b56d8b0856c2fd60/Apprenticeship_funding_rules_2024_to_2025_summary_of_changes.pdf",
+  landing: "https://www.gov.uk/government/publications/apprenticeship-funding-rules-2024-to-2025",
+  licence: "Crown copyright, licensed under the Open Government Licence v3.0"
+};
+
+const RULES_SECTIONS = [
+  { id:"intro", name:"Introduction and purpose", paras:"6, 14",
+    terms:["introduction","purpose","scope","minimum requirements","ofsted","subcontractor definition","de-minimis"],
+    gist:"Sets out that the rules are the minimum requirements an organisation must meet to receive funding. Other bodies such as Ofsted may require more. Includes the definition of a subcontractor and the new de-minimis exemption.",
+    related:["subcontracting"] },
+
+  { id:"eligibility", name:"Learner eligibility", paras:"19.2, 20.1, 20.5, Annex A",
+    terms:["eligibility","eligible","learner eligibility","age","ilr","start date","residency","50% in England","remote","hybrid","visa","immigration","prisoner"],
+    gist:"The learning start date in the ILR determines age-related eligibility. Academic year here means September to August, unlike the funding year which is August to July. The 50% in England rule also applies to remote and hybrid workers. Residency rules sit in Annex A.",
+    related:["english-maths","co-investment","prisoners"] },
+
+  { id:"learning-support", name:"Apprentices who need learning support", paras:"32.1.2, 33.3.1, 33.5",
+    terms:["learning support","support","additional needs","ehc","disability","learning difficulty","claims","review frequency"],
+    gist:"A detailed assessment can happen at any point in the apprenticeship. One-off claims above £150 can be claimed as they occur. Learning support reviews must take place at least every 3 calendar months.",
+    related:["english-maths","progress-reviews","initial-assessment"] },
+
+  { id:"english-maths", name:"Support for English and maths training", paras:"36 to 59, 49.1.1, 52, 56, 57.1, 58",
+    terms:["english","maths","functional skills","gcse","level 2","level 1","entry level 3","equivalent","meaningful progress","adult skills fund","multiply","sen","exemption","optional"],
+    gist:"From 11 February 2025, only apprentices who began training aged 16 to 18 must study and achieve English and maths. Those who began aged 19 or over are no longer subject to the mandatory requirement, though they and their employer may still choose it and it stays funded. GCSE grades D to G / 3 to 1 count as level 1. Providers can assess a learning difficulty or disability themselves to apply flexibilities, including Entry Level 3 functional skills.",
+    related:["initial-assessment","training-plan","learning-support","eligibility"] },
+
+  { id:"initial-assessment", name:"The outcome of initial assessment", paras:"61.1, 62",
+    terms:["initial assessment","prior learning","rpl","outcome","embedded","training plan"],
+    gist:"The outcome of the initial assessment can be embedded into the signed training plan, reducing what the employer has to sign separately. Where an apprentice aged 19 or over and their employer want English or maths included, that must be agreed as part of the initial assessment for new starts.",
+    related:["training-plan","english-maths"] },
+
+  { id:"wages", name:"Apprentice wages", paras:"74.3",
+    terms:["wages","pay","salary","minimum wage","hmpps","prisoner wage"],
+    gist:"For prisoner apprentices in the closed estate, the wage paid must comply with HMPPS policy.",
+    related:["prisoners","ineligible-costs"] },
+
+  { id:"duration", name:"Minimum duration and employment hours", paras:"76.3, 77.1 to 77.2",
+    terms:["duration","minimum duration","planned duration","12 months","part-time","hours","employment hours","transfer between providers","30 hours","zero hours"],
+    gist:"Under these rules the statutory minimum duration is 12 months. Where a programme is extended for part-time apprentices this is the new planned duration, distinct from the statutory minimum. Apprentice transfers between providers can involve employer-providers, not only main providers.",
+    related:["off-the-job","breaks"] },
+
+  { id:"off-the-job", name:"Off-the-job training", paras:"84.2, 85.3, 92 to 93",
+    terms:["off the job","otj","off-the-job","active learning","block release","front-loaded","day release","delivery model","hours","calculation","early completion"],
+    gist:"Any apprentice can complete earlier than their planned end date provided both the minimum duration and off-the-job training policies are met. For front-loaded and block release models, some active learning must take place at least every 3 calendar months. For all other delivery models the requirement remains at least every calendar month.",
+    related:["duration","training-plan","breaks"] },
+
+  { id:"training-plan", name:"The training plan", paras:"100.5, 100.7",
+    terms:["training plan","plan","commitment statement","delivery model","sign","signature","re-sign"],
+    gist:"The training plan must include a brief description of the delivery model, such as day release, block release or front-loaded. It must also be clear whether English or maths is included in the planned delivery.",
+    related:["initial-assessment","english-maths","off-the-job","progress-reviews"] },
+
+  { id:"progress-reviews", name:"Progress reviews", paras:"101, 101.2.2, 101.3",
+    terms:["progress review","review","tripartite","frequency","signature","employer signature","12 weeks"],
+    gist:"Progress reviews must take place every 3 calendar months, aligned with learning support reviews. A summary must be recorded and shared with all parties, signed as a minimum by the provider and the apprentice. An employer signature is no longer required. The review and the learning support funding check can be combined.",
+    related:["learning-support","training-plan"] },
+
+  { id:"ineligible-costs", name:"Ineligible costs", paras:"108.2.1, 108.2.12, 108.3",
+    terms:["ineligible","ineligible costs","cannot claim","wages","backfill","naric","overseas qualifications","re-sit","resit","non-mandatory"],
+    gist:"Apprentice wages, including the cost of backfill arrangements, are ineligible. The cost of assessing overseas qualifications such as NARIC is ineligible. Re-sit costs for non-mandatory qualifications are ineligible.",
+    related:["wages","epa"] },
+
+  { id:"epa", name:"End-point assessments", paras:"124.2.1, 127, 128.1, 128.2",
+    terms:["epa","end-point assessment","end point","gateway","completion payment","epao","independence","integrated degree","hei","change of employer"],
+    gist:"Covers how providers report and claim the completion payment where an apprentice changes employer after gateway. There must be independence within the training provider between assessment and delivery. Validation arrangements for integrated degrees may be assessed within external quality assurance, and arrangements are clarified for HEIs outside England.",
+    related:["ineligible-costs","duration"] },
+
+  { id:"reservations", name:"Reservations of funds by non-levy employers", paras:"150",
+    terms:["reservation","reserve funds","non-levy","apprenticeship service record","ilr","restart"],
+    gist:"Providers cannot submit an ILR where funds have not been reserved for a start or re-start and an apprenticeship service record has not been added or approved with matching details.",
+    related:["co-investment","transfers"] },
+
+  { id:"co-investment", name:"Employer co-investment", paras:"157, 159, 159.1, 161",
+    terms:["co-investment","coinvestment","5%","95%","non-levy","waiver","levy payer","full funding","ehc plan","care leaver","change of employer"],
+    gist:"Government funds all training costs up to the band maximum for apprentices aged 22 to 24 who have an EHC plan or have been in local authority care. Where an employer shows as a levy payer but has not declared or paid levy in the last 2 years, they must contact the Apprenticeship Service Support Desk to waive co-investment. Status changes are not backdated. Where there is a change of employer and the apprenticeship started before 1 April 2024, the waiver does not apply to the new employer.",
+    related:["reservations","transfers","subsidy"] },
+
+  { id:"apprentice-contributions", name:"Financial contributions by an apprentice", paras:"164",
+    terms:["apprentice contribution","apprentice pays","charge","fees","left employer"],
+    gist:"Covers when an apprentice may or may not be asked to contribute, including where the apprentice has left their employer.",
+    related:["ineligible-costs","wages"] },
+
+  { id:"subsidy", name:"Subsidy control", paras:"172 to 175",
+    terms:["subsidy","subsidy control","state aid","employer contribution waiver"],
+    gist:"References to waiving the employer contribution for eligible employers have been removed, as this no longer applies following changes to co-investment policy.",
+    related:["co-investment","transfers"] },
+
+  { id:"transfers", name:"Apprenticeships funded by transfers of levy funds", paras:"185, 186, 188, 194",
+    terms:["transfer","levy transfer","sending employer","receiving employer","gifting","6 weeks","3 months","subsidy control"],
+    gist:"Once a transfer is approved by the sending employer, the receiving employer has 6 weeks to accept the funds or they lapse. Once accepted, they have 3 months to link the funds to an approved apprenticeship record. Providers can now deliver training to apprentices they are funding through a transfer. Transfer funds may be subject to subsidy control rules.",
+    related:["co-investment","subsidy","reservations"] },
+
+  { id:"subcontracting", name:"Subcontracting", paras:"205.4, 224",
+    terms:["subcontract","subcontracting","subcontractor","de-minimis","deminimis","£100,000","£30,000","apar","ukprn","declaration"],
+    gist:"A de-minimis allows a provider to use a subcontractor not on the published APAR delivering under £100,000 of training and on-programme assessment across all providers between 1 August and 31 July. Only providers with written confirmation they have fully achieved the subcontracting standard can use it. The subcontractor must have a UKPRN and cannot deliver full apprenticeship standards. Subcontractor declarations must be returned by set dates.",
+    related:["intro","ineligible-costs"] },
+
+  { id:"fjaa", name:"Flexi-Job Apprenticeship Agencies", paras:"237",
+    terms:["fjaa","flexi-job","flexi job","agency","apar","employer-provider","ofs"],
+    gist:"FJAAs on APAR as a registered provider must act as an employer-provider when delivering training to their FJAA apprentices, meaning they can only claim actual training costs. The same applies where an FJAA is an OfS registered provider with degree awarding powers.",
+    related:["subcontracting","eligibility"] },
+
+  { id:"prisoners", name:"Prisoner apprenticeships", paras:"238 to 239",
+    terms:["prisoner","prison","custody","closed estate","hmpps","release on temporary licence","rotl"],
+    gist:"Prisoner apprenticeships now sit in their own section, with their own evidence requirements. The rule on funding English and maths qualifications for prisoner apprentices proposed in the draft rules was removed.",
+    related:["wages","eligibility","english-maths"] },
+
+  { id:"breaks", name:"Breaks in learning", paras:"247, 250.1",
+    terms:["break in learning","bil","pause","withdrawal","restart","provider-led","apprentice-led","end date"],
+    gist:"The section is split into provider-led and apprentice-led breaks. The text reflects the active learning changes for front-loaded and block release models. The last date of evidenced learning activity before the break must be used as the learning actual end date.",
+    related:["off-the-job","duration","reservations"] },
+
+  { id:"annex-a", name:"Annex A — residency and immigration", paras:"299 to 310",
+    terms:["annex a","residency","eea","switzerland","eu national","northern ireland","immigration status","family members","visa"],
+    gist:"Residency rules are consolidated here. Information on UK nationals in the EEA and Switzerland, family members of EEA or Swiss nationals, family members of an eligible person of Northern Ireland, and individuals with certain immigration statuses has been updated. The separate Immigration Status section was removed as it is covered in learner eligibility.",
+    related:["eligibility"] }
+];
+
+/* Material changes carried in the 2024/25 rules.
+   from : what the rule was previously
+   to   : what it became
+   when : "v1" = from 1 August 2024, "v2" = from 11 February 2025 */
+
+const RULES_CHANGES = [
+  { section:"english-maths", when:"v2", paras:"36 to 55, 62, 100.7", impact:"high",
+    title:"English and maths made optional for apprentices aged 19 and over",
+    from:"Every apprentice had to study towards and achieve English and maths at the required level in order to complete.",
+    to:"Only those who began training aged 16 to 18 remain subject to the mandatory requirement. Apprentices who began aged 19 or over may still choose to study it, and it remains funded. Applies to new starts and existing learners from 11 February 2025." },
+
+  { section:"english-maths", when:"v1", paras:"49.1.1", impact:"medium",
+    title:"GCSE grades D to G recognised as level 1",
+    from:"Equivalence gradings did not clearly recognise legacy GCSE grades at level 1.",
+    to:"GCSE grade D to G, or 3 to 1, is equivalent to a level 1 qualification, so apprentices holding these grades have met the level 1 requirement. Applies to new starts and those on programme." },
+
+  { section:"english-maths", when:"v1", paras:"56 to 59, 57.1", impact:"medium",
+    title:"English and maths flexibilities widened for learning difficulties and disabilities",
+    from:"Flexibilities were tied to holding an EHC plan, following a pilot.",
+    to:"Providers can determine eligibility through a thorough, evidence-based assessment of a learning difficulty or disability, whether or not an EHC plan exists, including offering Entry Level 3 functional skills in the adjusted subject." },
+
+  { section:"subcontracting", when:"v1", paras:"205.4", impact:"high",
+    title:"Subcontracting de-minimis raised to £100,000",
+    from:"Any subcontractor had to be on the published APAR. A £30,000 de-minimis was proposed in the draft rules.",
+    to:"Providers with written confirmation that they have fully achieved the subcontracting standard can use a subcontractor not on APAR delivering under £100,000 across all providers in the year. The subcontractor needs a UKPRN and cannot deliver full standards." },
+
+  { section:"progress-reviews", when:"v1", paras:"101, 101.2.2", impact:"medium",
+    title:"Progress reviews moved to every 3 months and employer signature dropped",
+    from:"Reviews were expressed as four times a year or every 12 weeks, and required an employer signature.",
+    to:"Reviews take place every 3 calendar months, aligned with learning support reviews. The summary must be signed as a minimum by the provider and the apprentice. Providers may still collect an employer signature if they wish." },
+
+  { section:"off-the-job", when:"v1", paras:"92 to 93", impact:"medium",
+    title:"Active learning requirement relaxed for front-loaded and block release",
+    from:"Active learning had to take place at least every calendar month for all delivery models.",
+    to:"For front-loaded and block release models, active learning must take place at least every 3 calendar months of the practical period. All other delivery models remain monthly." },
+
+  { section:"learning-support", when:"v1", paras:"33.5, 32.1.2", impact:"medium",
+    title:"Learning support reviews moved from monthly to quarterly",
+    from:"Learning support reviews were required monthly.",
+    to:"Reviews must take place at least every 3 calendar months, and a detailed assessment can happen at any point during the apprenticeship." },
+
+  { section:"transfers", when:"v2", paras:"185, 186", impact:"high",
+    title:"Hard time limits introduced on accepting and using transferred levy funds",
+    from:"There was no stated window for a receiving employer to accept or use transferred funds.",
+    to:"Receiving employers have 6 weeks to accept an approved transfer, then 3 months to link the funds to an approved apprenticeship record. Miss either and the funds are no longer available and a fresh transfer must be applied for." },
+
+  { section:"transfers", when:"v1", paras:"194", impact:"medium",
+    title:"Providers can now deliver training they are funding through a transfer",
+    from:"Providers were restricted from delivering training to apprentices they were funding via a levy transfer.",
+    to:"Levy-paying providers have greater flexibility to use transfers and deliver the training to receiving employers." },
+
+  { section:"co-investment", when:"v1", paras:"157", impact:"high",
+    title:"Full funding extended to 22 to 24 year olds with an EHC plan or care experience",
+    from:"Non-levy employers co-invested 5% for this group.",
+    to:"Government funds all training costs up to the band maximum for apprentices aged 22 to 24 who have an EHC plan or have been in the care of their local authority." },
+
+  { section:"co-investment", when:"v2", paras:"159, 159.1, 161", impact:"medium",
+    title:"Co-investment waiver tightened for dormant levy payers and employer changes",
+    from:"Levy payer status in the Apprenticeship Service account was taken at face value.",
+    to:"An employer showing as a levy payer who has not declared or paid levy in the last 2 years must contact the Support Desk to update their account. Changes are not backdated. Where an apprenticeship started before 1 April 2024 and the employer changes, the waiver does not carry to the new employer." },
+
+  { section:"initial-assessment", when:"v1", paras:"61.1", impact:"medium",
+    title:"Initial assessment outcome can be embedded in the training plan",
+    from:"Initial assessment and the training plan were separate documents for the employer to review and sign.",
+    to:"The outcome of the initial assessment can be embedded into the signed training plan, cutting the number of documents requiring sign-off." },
+
+  { section:"training-plan", when:"v1", paras:"100.5", impact:"low",
+    title:"Training plan must state the delivery model",
+    from:"The delivery model was not a required element of the training plan.",
+    to:"The plan must contain a brief description of the delivery model, such as day release, block release or front-loaded, to support the active learning policy." },
+
+  { section:"ineligible-costs", when:"v1", paras:"108.2.12, 108.3", impact:"low",
+    title:"Overseas qualification assessment and non-mandatory re-sits added to ineligible costs",
+    from:"Neither was explicitly listed.",
+    to:"The cost of assessing overseas qualifications such as NARIC is ineligible, as are re-sit costs for non-mandatory qualifications." },
+
+  { section:"duration", when:"v1", paras:"77.1 to 77.2", impact:"low",
+    title:"Extended part-time programmes renamed the planned duration",
+    from:"Extending a programme for part-time apprentices risked confusion with the statutory minimum.",
+    to:"The extension is called the planned duration, distinct from the 12-month statutory minimum, so part-time apprentices can complete earlier than the extended date." },
+
+  { section:"fjaa", when:"v2", paras:"237", impact:"medium",
+    title:"Flexi-Job Apprenticeship Agencies must act as employer-providers",
+    from:"FJAAs on APAR could operate as registered providers when training their own FJAA apprentices.",
+    to:"FJAAs on APAR must act as an employer-provider when delivering training to their FJAA apprentices, meaning they can only claim actual training costs." },
+
+  { section:"eligibility", when:"v2", paras:"19.2.1, 20.5", impact:"medium",
+    title:"Restart age rule and the 50% in England rule clarified",
+    from:"It was unclear which age applied on a restart, and whether remote workers met the 50% in England test.",
+    to:"For English and maths, the age at which the apprentice originally started training determines whether it is mandatory. The 50% in England rule applies to remote and hybrid workers as well." },
+
+  { section:"reservations", when:"v2", paras:"150", impact:"medium",
+    title:"ILR cannot be submitted without a reservation and matching service record",
+    from:"Terminology around reservations and service records was inconsistent.",
+    to:"Providers cannot submit an ILR where funds have not been reserved for a start or re-start and an apprenticeship service record has not been added or approved with matching details." }
+];

@@ -26,22 +26,22 @@
 <div class="masthead">
   <div class="wrap">
     <div class="readings">
-      <div class="reading">
+      <button class="reading track" data-filter="all">
         <div class="n" id="s-total">–</div>
         <div class="l">Standards tracked</div>
-      </div>
-      <div class="reading warm">
+      </button>
+      <button class="reading warm track" data-filter="changed">
         <div class="n" id="s-changed">–</div>
         <div class="l">Changed in the last year</div>
-      </div>
-      <div class="reading">
+      </button>
+      <button class="reading track" data-filter="dev">
         <div class="n" id="s-dev">–</div>
         <div class="l">In development or paused</div>
-      </div>
-      <div class="reading cool">
+      </button>
+      <button class="reading cool track" data-filter="noepa">
         <div class="n" id="s-noepa">–</div>
         <div class="l">Awaiting an EPA</div>
-      </div>
+      </button>
     </div>
   </div>
 </div>
@@ -50,11 +50,8 @@
   <div class="wrap controlgrid">
     <div class="tabs" id="tabs">
       <button data-filter="all" class="active">All</button>
-      <button data-filter="changed">Changed</button>
-      <button data-filter="stable">No change</button>
-      <button data-filter="dev">In development</button>
+      <button data-filter="stable">No change recorded</button>
       <button data-filter="defunded">Losing funding</button>
-      <button data-filter="noepa">No EPA assigned</button>
     </div>
     <div class="searchbox">
       <input type="search" id="search" placeholder="Search a standard, code or route — try &ldquo;ST1472&rdquo;, &ldquo;dental&rdquo;, &ldquo;digital&rdquo;" aria-label="Search standards">
@@ -73,7 +70,7 @@
 
 <div class="wrap">
   <div class="pagehead" style="border-bottom:none;padding-bottom:0">
-    <p>Grouped by the 15 Skills England occupational routes. Rows shaded cream have changed; rows shaded pink are losing funding. Where nothing has changed, the date of the last recorded change is shown so you know the entry is current rather than missing.</p>
+    <p>Tap any figure above to filter the list. Grouped by the 15 Skills England occupational routes. Rows shaded cream have changed; rows shaded pink are losing funding. Where nothing has changed, the date of the last recorded change is shown so you know the entry is current rather than missing.</p>
   </div>
   <div class="tally" id="tally"></div>
   <div id="blocks"></div>
@@ -222,14 +219,19 @@ let currentFilter = 'all', currentQuery = '';
 renderReadings();
 render(currentFilter, currentQuery);
 
-document.querySelectorAll('#tabs button').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('#tabs button').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    currentFilter = btn.dataset.filter;
-    render(currentFilter, currentQuery);
-  });
+function setFilter(f){
+  currentFilter = f;
+  document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('active', b.dataset.filter === f));
+  document.querySelectorAll('.track').forEach(b => b.classList.toggle('on', b.dataset.filter === f));
+  render(currentFilter, currentQuery);
+  const c = document.querySelector('.controls');
+  if(c && window.scrollY > c.offsetTop) c.scrollIntoView({ block:'start' });
+}
+
+document.querySelectorAll('#tabs button, .track').forEach(btn => {
+  btn.addEventListener('click', () => setFilter(btn.dataset.filter));
 });
+document.querySelector('.track[data-filter=all]').classList.add('on');
 
 wireSearch('search', 'clear', 'radar', q => {
   currentQuery = q;

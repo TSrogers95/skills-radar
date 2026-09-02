@@ -140,7 +140,7 @@ const COLUMNS = [
 
 function renderBoard(filter, query){
   const routeKey = detectRoute(query);
-  let list = UPDATES.slice();
+  let list = FEED.slice();
   if(filter !== 'all') list = list.filter(i => i.category === filter);
   list = list.filter(i => matches(i, query, routeKey));
 
@@ -166,7 +166,8 @@ function renderBoard(filter, query){
 }
 
 let currentFilter = 'all', currentQuery = '';
-renderReadings(UPDATES);
+const FEED = allUpdates();
+renderReadings(FEED);
 renderBoard(currentFilter, currentQuery);
 wireCollapse();
 

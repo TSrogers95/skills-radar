@@ -26,28 +26,57 @@
 <div class="wrap">
 
   <div id="gate">
-    <form class="gate" id="loginform">
-      <h2>Members only</h2>
-      <p>The compliance calendar is for Skills Radar members. Sign in to see the next twelve months of deadlines.</p>
-      <div class="field">
-        <label for="u">Username</label>
-        <input type="text" id="u" autocomplete="username">
+    <div class="signin">
+      <div class="signin-panel">
+        <div class="markrule" style="margin-bottom:22px">
+          <span class="tick" aria-hidden="true"><b></b><b></b><b></b></span>
+          <span class="lbl" style="color:var(--text-3)">Members</span>
+          <span class="line" style="background:var(--line)"></span>
+        </div>
+
+        <h2>Sign in to the compliance calendar</h2>
+        <p>Twelve months of dated deadlines, each with the action it requires and who it applies to. Members only.</p>
+
+        <form id="loginform" novalidate>
+          <div class="field">
+            <label for="u">Username</label>
+            <input type="text" id="u" autocomplete="username" autocapitalize="off" spellcheck="false" placeholder="Your username">
+          </div>
+          <div class="field">
+            <label for="p">Password</label>
+            <div class="pwwrap">
+              <input type="password" id="p" autocomplete="current-password" placeholder="Your password">
+              <button type="button" class="peek" id="peek" aria-label="Show password">Show</button>
+            </div>
+          </div>
+          <div class="err" id="loginerr" hidden>That username and password combination is not recognised.</div>
+          <button class="btn" type="submit" id="signinbtn">Sign in</button>
+        </form>
+
+        <div class="demo">
+          <b>Demo access</b>
+          <span>Username <code>test</code> &nbsp;·&nbsp; Password <code>test</code></span>
+          <button type="button" class="fill" id="fill">Fill it in for me</button>
+        </div>
       </div>
-      <div class="field">
-        <label for="p">Password</label>
-        <input type="text" id="p" autocomplete="current-password">
-      </div>
-      <button class="btn" type="submit">Sign in</button>
-      <div class="err" id="loginerr" hidden>That username and password combination is not recognised.</div>
-      <p style="margin:20px 0 0;font-size:13px;color:var(--text-3)">Test access: username <b>test</b>, password <b>test</b></p>
-    </form>
+
+      <aside class="signin-side">
+        <h3>What is behind this</h3>
+        <ul>
+          <li>A twelve-month grid with every deadline marked and colour-coded by urgency</li>
+          <li>The specific action each date requires, and whether it lands on providers or employers</li>
+          <li>A horizon view separating confirmed dates from signalled direction of travel</li>
+        </ul>
+        <p class="note">This is a demonstration gate. It checks credentials in your browser, so it is not real security — anyone can read the page source. Replace it with server-side authentication before putting anything confidential behind it.</p>
+      </aside>
+    </div>
   </div>
 
   <div id="protected" hidden>
 
     <div class="pagehead">
       <h1>Compliance calendar</h1>
-      <p>The next twelve months of dated deadlines. Coloured days carry a milestone — hover or tap one to see what it is and what you need to do.</p>
+      <p>The next twelve months of dated deadlines. Coloured days carry a milestone — hover or tap one to see what it is and what you need to do. <button id="signout" class="linkbtn">Sign out</button></p>
     </div>
 
     <div class="key">
@@ -100,6 +129,11 @@ const DEMO_PASS = "test";
 function unlock(){
   document.getElementById('gate').hidden = true;
   document.getElementById('protected').hidden = false;
+  const out = document.getElementById('signout');
+  if(out) out.addEventListener('click', () => {
+    try { sessionStorage.removeItem('sr-in'); } catch(e){}
+    location.reload();
+  });
   buildCalendar();
   renderList();
   renderHorizon();
@@ -116,6 +150,25 @@ document.getElementById('loginform').addEventListener('submit', e => {
     document.getElementById('loginerr').hidden = false;
   }
 });
+
+document.getElementById('peek').addEventListener('click', () => {
+  const p = document.getElementById('p');
+  const shown = p.type === 'text';
+  p.type = shown ? 'password' : 'text';
+  document.getElementById('peek').textContent = shown ? 'Show' : 'Hide';
+  p.focus();
+});
+
+document.getElementById('fill').addEventListener('click', () => {
+  document.getElementById('u').value = DEMO_USER;
+  document.getElementById('p').value = DEMO_PASS;
+  document.getElementById('loginerr').hidden = true;
+  document.getElementById('signinbtn').focus();
+});
+
+['u','p'].forEach(id => document.getElementById(id).addEventListener('input', () => {
+  document.getElementById('loginerr').hidden = true;
+}));
 
 try { if(sessionStorage.getItem('sr-in') === '1') unlock(); } catch(err){}
 

@@ -9,6 +9,7 @@ const PAGES = [
   { file: "index.html",      label: "Feed" },
   { file: "articles.html",   label: "Articles" },
   { file: "standards.html",  label: "Standards" },
+  { file: "rules.html",      label: "24/25 rules" },
   { file: "calendar.html",   label: "Calendar" },
   { file: "newsletter.html", label: "Newsletter" }
 ];
@@ -88,13 +89,34 @@ function urgencyTag(u){
 function wireCollapse(){
   const els = document.querySelectorAll('.collapsing');
   if(!els.length) return;
-  els.forEach(el => { el.style.maxHeight = el.scrollHeight + 'px'; });
 
-  let hidden = false;
-  window.addEventListener('scroll', () => {
-    const should = window.scrollY > 90;
+  function measure(){
+    els.forEach(el => {
+      if(el.classList.contains('hid')) return;
+      el.style.maxHeight = el.scrollHeight + 'px';
+    });
+  }
+  measure();
+  window.addEventListener('resize', measure);
+  // re-measure once webfonts land, or the height is wrong and it jumps
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+
+  // Hysteresis: collapse at 120px, only reopen below 40px. Without the gap
+  // the header flickers open and shut when you hover around the threshold.
+  let hidden = false, ticking = false;
+
+  function update(){
+    ticking = false;
+    const y = window.scrollY;
+    const should = hidden ? y > 40 : y > 120;
     if(should === hidden) return;
     hidden = should;
     els.forEach(el => el.classList.toggle('hid', should));
+  }
+
+  window.addEventListener('scroll', () => {
+    if(ticking) return;
+    ticking = true;
+    requestAnimationFrame(update);
   }, { passive: true });
 }
