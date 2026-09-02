@@ -72,6 +72,12 @@
   <div class="kanban" id="board"></div>
 </div>
 
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Update detail">
+  <button class="drawerclose" id="drawerclose" aria-label="Close">&times;</button>
+  <div id="drawerbody"></div>
+</aside>
+
 <footer>
   <div class="wrap">
     <p>Skills Radar is maintained by hand from the Skills England apprenticeship register, the Skills England occupational maps, and GOV.UK apprenticeship funding and T-Level guidance. Every entry links to its source. Always check the source before acting on a compliance deadline.</p>
@@ -84,8 +90,7 @@
 <script>
 
 document.getElementById('heroblock').innerHTML = titleBlockHTML(
-  '<strong>Reviewed ' + new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}) + '</strong>' +
-  '<span>' + UPDATES.length + ' updates tracked across 15 routes</span>'
+  '<strong>Reviewed ' + new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}) + '</strong>'
 );
 document.getElementById('navslot').innerHTML = navHTML('index.html');
 
@@ -113,17 +118,61 @@ function renderRouteContext(routeKey, query, results){
     '<p style="margin-top:11px"><a href="standards.html#' + routeKey + '" style="color:var(--text)">See every standard on this route &rarr;</a></p></div>';
 }
 
-function cardHTML(item){
+/* Cards are deliberately minimal: headline and one line. Everything else
+   lives in the detail drawer, opened by clicking the card. */
+
+let FEEDINDEX = [];
+
+function cardHTML(item, i){
+  const flag = item.pinned ? '<span class="dotflag" title="Priority"></span>' : '';
+  const line = item.short || firstClause(item.summary);
+  return '<button class="card ' + item.urgency + '" data-i="' + i + '">' +
+    flag + '<h3>' + item.title + '</h3><p>' + line + '</p>' +
+    '<span class="cdate">' + fmtShort(item.date) + ' ' + fmtYear(item.date) + '</span>' +
+  '</button>';
+}
+
+function openDetail(item){
   const route = item.route ? ROUTES[item.route] : null;
   const label = route ? route.label : CATEGORY_LABELS[item.category];
-  const flag = item.pinned ? '<span class="pill flag">Priority</span>' : '';
-  const article = item.article ? '<a class="read" href="articles.html#' + item.article + '">Full analysis</a>' : '';
-  return '<article class="card ' + item.urgency + '">' +
-    '<div class="cdate">' + fmtShort(item.date) + ' ' + fmtYear(item.date) + '</div>' +
-    '<div class="meta">' + flag + '<span class="pill route">' + label + '</span></div>' +
-    '<h3>' + item.title + '</h3><p>' + item.summary + '</p>' +
-    '<div class="links">' + article + '<a href="' + item.url + '" target="_blank" rel="noopener">Source</a></div>' +
-    '</article>';
+
+  const facts = [];
+  if(item.level)   facts.push(['Level', item.level]);
+  if(item.months)  facts.push(['Duration', item.months + ' months']);
+  if(item.funding) facts.push(['Max funding', money(item.funding)]);
+  if(item.code)    facts.push(['Reference', item.code]);
+  if(item.epa)     facts.push(['Assessment', item.epa]);
+  facts.push(['Status', STATUS_LABELS[item.status]]);
+  facts.push(['Date', fmtLong(item.date)]);
+
+  const factHTML = facts.map(f =>
+    '<div class="fact"><dt>' + f[0] + '</dt><dd>' + f[1] + '</dd></div>').join('');
+
+  document.getElementById('drawerbody').innerHTML =
+    '<div class="meta">' +
+      (item.pinned ? '<span class="pill flag">Priority</span>' : '') +
+      '<span class="pill route">' + label + '</span>' +
+      '<span class="pill ' + item.status + '">' + STATUS_LABELS[item.status] + '</span>' +
+    '</div>' +
+    '<h2>' + item.title + '</h2>' +
+    (item.standard ? '<p class="stdname">' + item.standard + '</p>' : '') +
+    '<p class="dsum">' + item.summary + '</p>' +
+    '<dl class="facts">' + factHTML + '</dl>' +
+    '<div class="links">' +
+      (item.article ? '<a class="read" href="articles.html#' + item.article + '">Read the full analysis</a>' : '') +
+      '<a href="' + item.url + '" target="_blank" rel="noopener">' +
+        (item.derived ? 'View on Skills England' : 'Read the source') + '</a>' +
+      (item.route ? '<a href="standards.html#' + item.route + '">All standards on this route</a>' : '') +
+    '</div>';
+
+  document.getElementById('drawer').classList.add('on');
+  document.getElementById('scrim').classList.add('on');
+  document.getElementById('drawerclose').focus();
+}
+
+function closeDetail(){
+  document.getElementById('drawer').classList.remove('on');
+  document.getElementById('scrim').classList.remove('on');
 }
 
 const COLUMNS = [
@@ -140,6 +189,7 @@ const COLUMNS = [
 
 function renderBoard(filter, query){
   const routeKey = detectRoute(query);
+  FEEDINDEX = [];
   let list = FEED.slice();
   if(filter !== 'all') list = list.filter(i => i.category === filter);
   list = list.filter(i => matches(i, query, routeKey));
@@ -153,7 +203,7 @@ function renderBoard(filter, query){
     rows.sort((a,b) => (a.pinned === b.pinned) ? col.sort(a,b) : (a.pinned ? -1 : 1));
 
     const body = rows.length
-      ? rows.map(cardHTML).join('')
+      ? rows.map(r => cardHTML(r, FEEDINDEX.push(r) - 1)).join('')
       : '<div class="colempty">Nothing here' + (query ? ' for that search' : '') + '.</div>';
 
     return '<section class="col"><div class="colhead">' +
@@ -163,6 +213,10 @@ function renderBoard(filter, query){
   }).join('');
 
   document.getElementById('board').innerHTML = board;
+
+  document.querySelectorAll('.card').forEach(c => {
+    c.addEventListener('click', () => openDetail(FEEDINDEX[+c.dataset.i]));
+  });
 }
 
 let currentFilter = 'all', currentQuery = '';
@@ -181,6 +235,10 @@ document.querySelectorAll('.tabs button').forEach(btn => {
 });
 
 wireSearch('search', 'clear', 'radar', q => { currentQuery = q; renderBoard(currentFilter, currentQuery); });
+
+document.getElementById('drawerclose').addEventListener('click', closeDetail);
+document.getElementById('scrim').addEventListener('click', closeDetail);
+document.addEventListener('keydown', e => { if(e.key === 'Escape') closeDetail(); });
 
 </script>
 </body>

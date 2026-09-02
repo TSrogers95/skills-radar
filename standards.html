@@ -50,6 +50,7 @@
   <div class="wrap controlgrid">
     <div class="tabs" id="tabs">
       <button data-filter="all" class="active">All</button>
+      <button data-filter="common">Commonly delivered</button>
       <button data-filter="stable">No change recorded</button>
       <button data-filter="defunded">Losing funding</button>
     </div>
@@ -176,6 +177,7 @@ function render(filter, query){
   let list = STANDARDS.slice();
 
   if(filter === 'changed')  list = list.filter(changedRecently);
+  if(filter === 'common')   list = list.filter(s => s.common);
   if(filter === 'stable')   list = list.filter(s => s.changed === '');
   if(filter === 'dev')      list = list.filter(isDev);
   if(filter === 'defunded') list = list.filter(isDefunded);
@@ -204,10 +206,34 @@ function render(filter, query){
   const grouped = {};
   list.forEach(s => { (grouped[s.route] = grouped[s.route] || []).push(s); });
 
-  blocks.innerHTML = Object.keys(ROUTES)
+  let html = '';
+
+  // Commonly delivered standards get their own block at the top, so the
+  // programmes people actually run are one glance away rather than buried
+  // inside whichever route they happen to sit on.
+  if(filter !== 'common' && !query){
+    const common = STANDARDS.filter(s => s.common);
+    if(common.length){
+      html += '<section class="routeblock common" id="commonly-delivered">' +
+        '<h2>Commonly delivered</h2>' +
+        '<p class="sub">' + common.length + ' of the highest-volume programmes across the sector, pulled out of their routes for quick access &middot; ' +
+        common.filter(isDefunded).length + ' losing funding &middot; ' +
+        common.filter(changedRecently).length + ' changed in the last year</p>' +
+        '<table class="std"><thead><tr>' +
+          '<th>Standard</th><th>Level</th><th class="hidecol">Duration</th>' +
+          '<th>Max funding</th><th class="hidecol">EPA</th><th class="hidecol">Status</th><th>Change</th>' +
+        '</tr></thead><tbody>' +
+        common.slice().sort((a,b) => a.name.localeCompare(b.name)).map(rowHTML).join('') +
+        '</tbody></table></section>';
+    }
+  }
+
+  html += Object.keys(ROUTES)
     .filter(k => grouped[k])
     .map(k => blockHTML(k, grouped[k]))
     .join('');
+
+  blocks.innerHTML = html;
 
   if(location.hash){
     const t = document.getElementById(location.hash.slice(1));

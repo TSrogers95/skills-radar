@@ -168,9 +168,17 @@ function deriveUpdates(){
         ', maximum funding ' + money(s.funding) + '.' +
         (/pending|waiting/i.test(s.epa || '') ? ' No assessment organisation assigned yet.' : '');
 
+      const verb = defunded ? 'Funding withdrawn' : dev ? 'In review' : 'Updated';
+
       return {
         date: s.since,
-        title: s.name + ' — ' + (defunded ? 'funding withdrawn' : dev ? 'under revision' : 'updated'),
+        title: s.name + ' L' + s.level + ' — ' + verb,
+        short: shortLine(s, defunded, dev),
+        level: s.level,
+        months: s.months,
+        funding: s.funding,
+        epa: s.epa,
+        code: s.code,
         category: 'standard',
         route: s.route,
         standard: s.name + (s.code ? ', Level ' + s.level + ' (' + s.code + ')' : ', Level ' + s.level),
@@ -183,6 +191,26 @@ function deriveUpdates(){
         url: standardURL(s)
       };
     });
+}
+
+/* A very short status line for the board — one glanceable phrase, no more. */
+function shortLine(s, defunded, dev){
+  if(defunded) return 'No new starts after 1 September 2026';
+  if(dev)      return /retirement/i.test(s.status) ? 'Retirement consultation open' : 'New version in development';
+  if(/funding band/i.test(s.changed))      return 'Funding band changed to ' + money(s.funding);
+  if(/age restriction/i.test(s.changed))   return 'New age restriction applies';
+  if(/replaces|retired/i.test(s.changed))  return 'Version ' + s.version + ' now current';
+  if(/new unit|new standard|new foundation/i.test(s.changed)) return 'Newly approved for delivery';
+  return 'Version ' + s.version + ' approved for delivery';
+}
+
+/* Trim a summary down to its first clause, for the board cards. */
+function firstClause(text, max){
+  max = max || 76;
+  const stop = text.search(/[.;]\s/);
+  let out = stop > 12 ? text.slice(0, stop) : text;
+  if(out.length > max) out = out.slice(0, max).replace(/\s+\S*$/, '') + '…';
+  return out;
 }
 
 /* Skills England does not publish a stable per-standard permalink, so this
