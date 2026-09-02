@@ -37,15 +37,28 @@
     color:var(--ink);
     font-family:'IBM Plex Sans', sans-serif;
     line-height:1.5;
+
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
   }
 
   h1,h2,h3{ font-family:'IBM Plex Serif', serif; font-weight:600; margin:0; }
 
-  .wrap{ max-width:900px; margin:0 auto; padding:0 24px; }
+  .wrap{ max-width:900px; margin:0 auto; padding:0 24px; width:100%; }
+
+  .main{
+    flex:1;
+    min-height:0;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
 
   /* ---------- Header ---------- */
 
-  header{ background:var(--navy); color:#f0efe9; padding:44px 0 40px; }
+  header{ background:var(--navy); color:#f0efe9; padding:36px 0 32px; flex:none; }
   header .eyebrow{ color:#9fb0cc; font-size:0.95rem; margin-bottom:10px; }
   header h1{ font-size:2.1rem; letter-spacing:-0.01em; }
   header p.lede{ max-width:56ch; color:#c6cede; margin-top:14px; font-size:1.02rem; }
@@ -109,6 +122,18 @@
 
   /* ---------- Feed ---------- */
 
+  #feed{
+    flex:1;
+    min-height:0;
+    overflow-y:auto;
+    padding-right:10px;
+    scrollbar-width:thin;
+  }
+
+  #feed::-webkit-scrollbar{ width:9px; }
+  #feed::-webkit-scrollbar-thumb{ background:var(--rule); border-radius:5px; }
+  #feed::-webkit-scrollbar-track{ background:transparent; }
+
   .feed-item{
     display:grid; grid-template-columns:100px 1fr; gap:20px;
     padding:20px 20px 20px 16px;
@@ -145,14 +170,24 @@
   .empty{ padding:36px 0; color:var(--ink-soft); font-size:0.95rem; }
 
   footer{
-    padding:30px 0 60px; color:var(--ink-soft); font-size:0.82rem;
-    border-top:1px solid var(--rule); margin-top:26px;
+    padding:16px 0; color:var(--ink-soft); font-size:0.78rem;
+    border-top:1px solid var(--rule); background:var(--paper); flex:none;
   }
 
   @media (max-width:640px){
     .stats{ grid-template-columns:repeat(2,1fr); }
     .feed-item{ grid-template-columns:1fr; gap:10px; }
     .feed-item .date{ padding-top:0; }
+  }
+
+  /* On short or small screens, go back to scrolling the whole page —
+     a fixed shell leaves too little room for the feed. */
+  @media (max-width:640px), (max-height:700px){
+    body{ height:auto; overflow:visible; display:block; }
+    .main{ display:block; overflow:visible; }
+    #feed{ overflow:visible; padding-right:0; }
+    header{ padding:36px 0 32px; }
+    footer{ padding:24px 0 48px; }
   }
 
 </style>
@@ -168,7 +203,7 @@
   </div>
 </header>
 
-<div class="wrap">
+<div class="main wrap">
 
   <div class="stats">
     <div class="stat">
