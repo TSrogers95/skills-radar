@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2024/25 funding rules — Skills Radar</title>
+<meta name="description" content="A searchable index of the August 2024 to July 2025 apprenticeship funding rules, with the material changes from previous years.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="masthead">
+  <div class="wrap"><div id="heroblock"></div></div>
+</div>
+
+<div class="stickybar">
+  <div class="wrap inner">
+    <a class="mini" href="index.html">Skills Radar</a>
+    <div id="navslot"></div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="pagehead">
+    <h1>2024/25 apprenticeship funding rules</h1>
+    <p id="docmeta"></p>
+  </div>
+</div>
+
+<div class="controls">
+  <div class="wrap controlgrid">
+    <div class="tabs" id="tabs">
+      <button data-view="search" class="active">Find a rule</button>
+      <button data-view="changes">What changed</button>
+      <button data-view="doc">The document</button>
+    </div>
+    <div class="searchbox">
+      <input type="search" id="search" placeholder="Search the rules — try &ldquo;off the job&rdquo;, &ldquo;subcontracting&rdquo;, &ldquo;levy transfer&rdquo;" aria-label="Search the funding rules">
+      <svg class="radar" id="radar" viewBox="0 0 20 20" aria-hidden="true">
+        <circle cx="10" cy="10" r="8.6" fill="none" stroke="#CBC5B6" stroke-width="1"/>
+        <circle cx="10" cy="10" r="4.6" fill="none" stroke="#CBC5B6" stroke-width="1"/>
+        <g class="sweep">
+          <path d="M10 10 L10 1.4 A8.6 8.6 0 0 1 17.4 5.7 Z" fill="#10796A" fill-opacity="0.3"/>
+          <line x1="10" y1="10" x2="10" y2="1.4" stroke="#10796A" stroke-width="1.4"/>
+        </g>
+      </svg>
+      <button class="x" id="clear" aria-label="Clear search" title="Clear search">&times;</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div id="contents"></div>
+  <div class="tally" id="tally"></div>
+  <div id="panel"></div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <p id="licence"></p>
+  </div>
+</footer>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script src="ui.js"></script>
+<script>
+
+document.getElementById('heroblock').innerHTML = titleBlockHTML('');
+document.getElementById('navslot').innerHTML = navHTML('rules.html');
+
+document.getElementById('docmeta').innerHTML =
+  RULES_DOC.version + ' · ' + RULES_DOC.pages + ' pages · applies to ' +
+  RULES_DOC.applies.charAt(0).toLowerCase() + RULES_DOC.applies.slice(1) +
+  '. Search below to find the right section and paragraph numbers, then open the official PDF at that point.';
+
+document.getElementById('licence').innerHTML =
+  'The funding rules are ' + RULES_DOC.licence + '. Skills Radar provides an index and summaries only — it is not the document itself and does not replace it. ' +
+  'Always read the rule as published before acting on it. <a href="' + RULES_DOC.landing + '" target="_blank" rel="noopener" style="color:#C6D3D0">Official page on GOV.UK</a>';
+
+/* ---------- Search across sections ---------- */
+
+/* Deep-linking into a PDF is not reliable — browsers disagree on whether
+   they honour #page= and none of them support anchoring to a phrase. So
+   rather than pretend, each section gives the exact paragraph numbers to
+   search for and a button that copies them, alongside the PDF link. */
+/* A compact contents strip: collapsed to one row by default, expands on
+   click. Keeps the list of 22 sections from pushing the content off screen. */
+function contentsHTML(title, items, extra){
+  return '<nav class="contents" id="contentsnav">' +
+    '<button class="ctoggle" id="ctoggle" aria-expanded="false">' +
+      '<span class="ctitle">' + title + '</span>' +
+      '<span class="ccount">' + items.length + '</span>' +
+      '<span class="cchev" aria-hidden="true">&#9662;</span>' +
+    '</button>' +
+    '<div class="clist" id="clist">' +
+      items.map(i =>
+        '<a href="' + i.href + '"' + (/^https?:/.test(i.href) ? ' target="_blank" rel="noopener"' : '') + '>' +
+          (i.dot ? '<i class="cdot ' + i.dot + '"></i>' : '') +
+          '<b>' + i.label + '</b>' +
+          '<span>' + i.meta + (i.tally ? ' · ' + i.tally + ' change' + (i.tally === 1 ? '' : 's') : '') + '</span>' +
+        '</a>').join('') +
+      (extra ? '<div class="cextra">' + extra + '</div>' : '') +
+    '</div>' +
+  '</nav>';
+}
+
+function wireContents(){
+  const t = document.getElementById('ctoggle');
+  const l = document.getElementById('clist');
+  if(!t || !l) return;
+  t.addEventListener('click', () => {
+    const open = l.classList.toggle('open');
+    t.setAttribute('aria-expanded', open);
+    t.classList.toggle('open', open);
+  });
+  l.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+    if(a.getAttribute('href').charAt(0) === '#'){
+      l.classList.remove('open');
+      t.classList.remove('open');
+      t.setAttribute('aria-expanded', false);
+    }
+  }));
+}
+
+function locatorHTML(s){
+  const first = s.paras.split(/[,\s]/)[0];
+  return '<div class="locator">' +
+    '<a class="read" href="' + RULES_DOC.pdf + '" target="_blank" rel="noopener">Open the rules (PDF)</a>' +
+    '<span class="find">then search the document for <code>' + first + '</code></span>' +
+    '<button class="copybtn" data-copy="' + first + '">Copy</button>' +
+  '</div>';
+}
+
+function wireCopy(root){
+  root.querySelectorAll('.copybtn').forEach(b => {
+    b.addEventListener('click', () => {
+      const t = b.dataset.copy;
+      if(navigator.clipboard) navigator.clipboard.writeText(t);
+      const was = b.textContent;
+      b.textContent = 'Copied';
+      setTimeout(() => { b.textContent = was; }, 1400);
+    });
+  });
+}
+
+function scoreSection(s, query){
+  const q = query.toLowerCase().trim();
+  if(!q) return 0;
+  const words = q.split(/\s+/).filter(w => w.length > 2);
+  let score = 0;
+
+  s.terms.forEach(t => {
+    if(t === q) score += 10;
+    else if(t.includes(q) || q.includes(t)) score += 6;
+    else if(words.some(w => t.includes(w))) score += 3;
+  });
+  if(s.name.toLowerCase().includes(q)) score += 8;
+  if(words.some(w => s.gist.toLowerCase().includes(w))) score += 2;
+  if(words.some(w => s.paras.includes(w))) score += 4;
+  return score;
+}
+
+function sectionHTML(s, changes){
+  const related = s.related
+    .map(id => RULES_SECTIONS.find(x => x.id === id))
+    .filter(Boolean);
+
+  const relHTML = related.length
+    ? '<div class="watch" style="margin-top:13px"><b>You should also review:</b> ' +
+        related.map(r => '<a href="#" class="jump" data-id="' + r.id + '">' + r.name + '</a>').join(', ') +
+        '</div>'
+    : '';
+
+  const chg = changes.filter(c => c.section === s.id);
+  const chgHTML = chg.length
+    ? '<div style="margin-top:13px;font-size:13px;color:var(--med)">' +
+        chg.length + ' material change' + (chg.length === 1 ? '' : 's') +
+        ' in this section — see the What changed tab.</div>'
+    : '';
+
+  return '<div class="horizon" id="sec-' + s.id + '">' +
+    '<div class="win">Paragraphs ' + s.paras + '</div>' +
+    '<h3>' + s.name + '</h3>' +
+    '<p>' + s.gist + '</p>' +
+    locatorHTML(s) +
+    chgHTML + relHTML +
+  '</div>';
+}
+
+function renderSearch(query){
+  const panel = document.getElementById('panel');
+  const tally = document.getElementById('tally');
+
+  let list = RULES_SECTIONS.slice();
+
+  if(query){
+    list = list.map(s => ({ s: s, score: scoreSection(s, query) }))
+               .filter(x => x.score > 0)
+               .sort((a,b) => b.score - a.score)
+               .map(x => x.s);
+  }
+
+  if(list.length === 0){
+    tally.textContent = '';
+    document.getElementById('contents').innerHTML = '';
+    panel.innerHTML = '<div class="empty"><b>No section matches that.</b>' +
+      'Try a plainer word — &ldquo;transfer&rdquo;, &ldquo;duration&rdquo;, &ldquo;wages&rdquo;, &ldquo;eligibility&rdquo; — or clear the search to browse all ' +
+      RULES_SECTIONS.length + ' sections.</div>';
+    return;
+  }
+
+  tally.textContent = query
+    ? list.length + ' section' + (list.length === 1 ? '' : 's') + ' matching \u201c' + query + '\u201d, best first'
+    : 'All ' + list.length + ' sections of the 2024/25 rules';
+
+  document.getElementById('contents').innerHTML = contentsHTML(
+    'Jump to a section',
+    list.map(s => ({
+      href: '#sec-' + s.id,
+      label: s.name,
+      meta: 'Para ' + s.paras,
+      tally: RULES_CHANGES.filter(c => c.section === s.id).length
+    })),
+    ''
+  );
+  wireContents();
+
+  panel.innerHTML = list.map(s => sectionHTML(s, RULES_CHANGES)).join('');
+  wireCopy(panel);
+
+  panel.querySelectorAll('.jump').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      const el = document.getElementById('sec-' + a.dataset.id);
+      if(el){ el.scrollIntoView({ block:'center' }); el.style.borderLeftColor = 'var(--ink-3)'; }
+      else { document.getElementById('search').value = ''; renderSearch(''); setTimeout(() => {
+        const t = document.getElementById('sec-' + a.dataset.id);
+        if(t) t.scrollIntoView({ block:'center' });
+      }, 60); }
+    });
+  });
+}
+
+/* ---------- Material changes ---------- */
+
+function changeID(c){ return 'chg-' + c.section + '-' + c.paras.replace(/[^\w]/g,''); }
+
+function changeHTML(c){
+  const sec = RULES_SECTIONS.find(s => s.id === c.section);
+  const when = c.when === 'v2'
+    ? 'From 11 February 2025 (version 2)'
+    : 'From 1 August 2024 (version 1)';
+
+  const first = c.paras.split(/[,\s]/)[0];
+  return '<div class="horizon ' + c.impact + '" id="' + changeID(c) + '">' +
+    '<div class="win">' + when + ' · paragraphs ' + c.paras + ' · ' + (sec ? sec.name : '') + '</div>' +
+    '<h3>' + c.title + '</h3>' +
+    '<p><b style="color:var(--text)">Previously:</b> ' + c.from + '</p>' +
+    '<p><b style="color:var(--text)">Now:</b> ' + c.to + '</p>' +
+    '<div class="locator">' +
+      '<a class="read" href="' + RULES_DOC.pdf + '" target="_blank" rel="noopener">Open the rules (PDF)</a>' +
+      '<a href="' + RULES_DOC.changesPdf + '" target="_blank" rel="noopener">Summary of changes</a>' +
+      '<span class="find">search for <code>' + first + '</code></span>' +
+      '<button class="copybtn" data-copy="' + first + '">Copy</button>' +
+    '</div>' +
+  '</div>';
+}
+
+function renderChanges(query){
+  const panel = document.getElementById('panel');
+  const tally = document.getElementById('tally');
+
+  let list = RULES_CHANGES.slice();
+
+  if(query){
+    const q = query.toLowerCase();
+    const words = q.split(/\s+/).filter(w => w.length > 2);
+    list = list.filter(c => {
+      const sec = RULES_SECTIONS.find(s => s.id === c.section);
+      const hay = (c.title + ' ' + c.from + ' ' + c.to + ' ' + c.paras + ' ' +
+        (sec ? sec.name + ' ' + sec.terms.join(' ') : '')).toLowerCase();
+      return words.length ? words.some(w => hay.includes(w)) : hay.includes(q);
+    });
+  }
+
+  const order = { high:0, medium:1, low:2 };
+  list.sort((a,b) => order[a.impact] - order[b.impact]);
+
+  if(list.length === 0){
+    tally.textContent = '';
+    document.getElementById('contents').innerHTML = '';
+    panel.innerHTML = '<div class="empty"><b>No change matches that.</b>Clear the search to see all ' + RULES_CHANGES.length + ' material changes.</div>';
+    return;
+  }
+
+  tally.textContent = list.length + ' material change' + (list.length === 1 ? '' : 's') +
+    (query ? ' matching \u201c' + query + '\u201d' : ' from the 2023/24 rules and within the year');
+
+  document.getElementById('contents').innerHTML = contentsHTML(
+    'Jump to a change',
+    list.map(c => ({
+      href: '#' + changeID(c),
+      label: c.title,
+      meta: (c.impact === 'high' ? 'High impact' : c.impact === 'medium' ? 'Medium impact' : 'Low impact') + ' · para ' + c.paras,
+      dot: c.impact
+    })),
+    ''
+  );
+  wireContents();
+
+  panel.innerHTML =
+    '<div class="notice" style="margin:20px 0 4px">These are the changes the Department itself flagged as differences from the 2023/24 rules, plus those introduced mid-year in version 2. Paragraph numbers refer to the 2024/25 document.</div>' +
+    list.map(changeHTML).join('');
+  wireCopy(panel);
+}
+
+/* ---------- The document ---------- */
+
+function renderDoc(){
+  document.getElementById('tally').textContent = '';
+  document.getElementById('contents').innerHTML = contentsHTML(
+    'Find a section',
+    RULES_SECTIONS.map(s => ({
+      href: RULES_DOC.pdf,
+      label: s.name,
+      meta: 'Search for para ' + s.paras
+    })),
+    ''
+  );
+  wireContents();
+  document.getElementById('panel').innerHTML =
+    '<div class="notice" style="margin-top:20px">' +
+      '<strong>This is the official document, served from GOV.UK.</strong> ' +
+      'Skills Radar does not host its own copy, so what you see below is always the current published version rather than a snapshot that could drift out of date. ' +
+      'If the viewer does not load in your browser, use the download link underneath.' +
+    '</div>' +
+    '<div style="margin-top:16px;background:var(--surface);border:1px solid var(--line);padding:10px">' +
+      '<iframe src="' + RULES_DOC.pdf + '" title="Apprenticeship funding rules 2024 to 2025" ' +
+      'style="width:100%;height:78vh;border:1px solid var(--line)"></iframe>' +
+    '</div>' +
+    '<div class="readgrid" style="margin-top:16px">' +
+      '<div class="readcard"><a href="' + RULES_DOC.pdf + '" target="_blank" rel="noopener">The full rules (PDF, ' + RULES_DOC.pages + ' pages)</a>' +
+        '<p>' + RULES_DOC.title + ', ' + RULES_DOC.version + '. The wording that actually binds you.</p>' +
+        '<div class="host">assets.publishing.service.gov.uk</div></div>' +
+      '<div class="readcard"><a href="' + RULES_DOC.changesPdf + '" target="_blank" rel="noopener">Summary of changes (PDF, 22 pages)</a>' +
+        '<p>The Department\'s own list of what changed from 2023/24, and what changed again in version 2. Every change on the tab beside this one comes from here.</p>' +
+        '<div class="host">assets.publishing.service.gov.uk</div></div>' +
+      '<div class="readcard"><a href="' + RULES_DOC.landing + '" target="_blank" rel="noopener">GOV.UK publication page</a>' +
+        '<p>The official landing page. Check here for newer versions, and to request an accessible format if you need one.</p>' +
+        '<div class="host">gov.uk</div></div>' +
+    '</div>' +
+
+    '<div class="grouphead" style="margin-top:38px"><h2>Other years, and related guidance</h2><div class="rule"></div></div>' +
+    '<p style="font-size:14.5px;color:var(--text-2);max-width:66ch;margin:14px 0 0">' +
+    'Which rules apply depends on each apprentice\'s start date, so more than one year is usually live at once. ' +
+    'These are the other documents you are likely to need.</p>' +
+    '<div class="readgrid" style="margin-top:16px">' +
+      OTHER_DOCS.map(d => '<div class="readcard">' +
+        '<a href="' + d.url + '" target="_blank" rel="noopener">' + d.name + '</a>' +
+        '<p>' + d.note + '</p>' +
+        '<div class="host">' + d.url.replace(/^https?:\/\//,'').split('/')[0] + '</div></div>').join('') +
+    '</div>';
+}
+
+/* ---------- Wiring ---------- */
+
+let currentView = 'search', currentQuery = '';
+
+function render(){
+  if(currentView === 'search')  renderSearch(currentQuery);
+  if(currentView === 'changes') renderChanges(currentQuery);
+  if(currentView === 'doc')     renderDoc();
+}
+render();
+
+document.querySelectorAll('#tabs button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#tabs button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentView = btn.dataset.view;
+    render();
+  });
+});
+
+wireSearch('search', 'clear', 'radar', q => {
+  currentQuery = q;
+  if(currentView === 'doc' && q){
+    currentView = 'search';
+    document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('active', b.dataset.view === 'search'));
+  }
+  render();
+});
+
+</script>
+</body>
+</html>
