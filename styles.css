@@ -1376,3 +1376,18 @@ button.card p{ overflow-wrap:break-word; }
 
 /* Give the two bands clear separation */
 .band + .band{ margin-top:44px; }
+
+/* ---------- Wordmark appears in the bar only once scrolled ---------- */
+
+.stickybar .mini{
+  opacity:0; transform:translateY(4px);
+  transition:opacity .26s ease, transform .26s ease;
+  pointer-events:none;
+}
+.stickybar.scrolled .mini{ opacity:1; transform:none; pointer-events:auto; }
+
+/* keep the nav where it is while the wordmark fades in beside it */
+.stickybar .inner{ min-height:46px; }
+
+.kanban.one{ grid-template-columns:1fr; }
+.kanban.one .colbody{ max-height:56vh; }

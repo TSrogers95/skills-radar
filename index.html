@@ -96,11 +96,19 @@ document.getElementById('navslot').innerHTML = navHTML('index.html');
 
 /* The counters are computed from exactly the same tests the board uses,
    so the number at the top always equals the number in the column. */
-function renderReadings(counts){
-  document.getElementById('r-rs').textContent = counts['recent-0'] || 0;
-  document.getElementById('r-rg').textContent = counts['recent-1'] || 0;
-  document.getElementById('r-us').textContent = counts['upcoming-0'] || 0;
-  document.getElementById('r-ug').textContent = counts['upcoming-1'] || 0;
+function renderReadings(counts, single){
+  // When a tab shows only one column, the second counter would always read
+  // zero, so relabel the pair to recent and upcoming totals instead.
+  document.querySelectorAll('.readings .reading').forEach((el, i) => {
+    el.style.display = (single && (i === 1 || i === 3)) ? 'none' : '';
+  });
+  document.getElementById('r-rs').textContent = counts.recent   || 0;
+  document.getElementById('r-rg').textContent = counts.recentG  || 0;
+  document.getElementById('r-us').textContent = counts.upcoming  || 0;
+  document.getElementById('r-ug').textContent = counts.upcomingG || 0;
+
+  document.querySelector('#r-rs + .l').textContent = single ? 'Recent changes' : 'Recent changes to standards';
+  document.querySelector('#r-us + .l').textContent = single ? 'Upcoming changes' : 'Upcoming, standards';
 }
 
 function renderRouteContext(routeKey, query, results){
@@ -180,6 +188,19 @@ function closeDetail(){
 const isStandard = i => i.category === 'standard';
 const isGeneral  = i => i.category !== 'standard';
 
+/* Which columns make sense for the tab you are on.
+   On All you want both. Once you have filtered to standards, a general
+   funding rules column would always be empty, and vice versa — so drop it.
+   T-Levels has no standard-level entries at all, so it is general only. */
+function columnsFor(filter, band){
+  const std = { title:'To standards',            blurb: band.stdBlurb,  test: isStandard };
+  const gen = { title:'To general funding rules', blurb: band.genBlurb, test: isGeneral };
+
+  if(filter === 'standard')   return [std];
+  if(filter === 'funding-rules' || filter === 'levy' || filter === 't-levels') return [gen];
+  return [std, gen];
+}
+
 const BANDS = [
   {
     key: 'recent', title: 'Recent changes',
@@ -187,10 +208,8 @@ const BANDS = [
     lead: true,
     test: i => i.status === 'updated' && !isFuture(i.date),
     sort: (a,b) => new Date(b.date) - new Date(a.date),
-    cols: [
-      { title: 'To standards',          blurb: 'Version changes, funding bands and new approvals.', test: isStandard },
-      { title: 'To general funding rules', blurb: 'Rules, levy and T-Level policy affecting everyone.', test: isGeneral }
-    ]
+    stdBlurb: 'Version changes, funding bands and new approvals.',
+    genBlurb: 'Rules, levy and T-Level policy affecting everyone.'
   },
   {
     key: 'upcoming', title: 'Upcoming changes',
@@ -202,10 +221,8 @@ const BANDS = [
       if(ar !== br) return ar ? 1 : -1;
       return new Date(a.date) - new Date(b.date);
     },
-    cols: [
-      { title: 'To standards',          blurb: 'Defunding, revisions and standards in review.', test: isStandard },
-      { title: 'To general funding rules', blurb: 'Rule changes and levy reform still to land.', test: isGeneral }
-    ]
+    stdBlurb: 'Defunding, revisions and standards in review.',
+    genBlurb: 'Rule changes and levy reform still to land.'
   }
 ];
 
@@ -227,10 +244,16 @@ function renderBoard(filter, query){
     const inBand = list.filter(i => !used.has(i) && band.test(i));
     inBand.forEach(i => used.add(i));
 
-    const cols = band.cols.map((col, ci) => {
+    const colDefs = columnsFor(filter, band);
+
+    const cols = colDefs.map((col, ci) => {
       const rows = inBand.filter(col.test).sort((a,b) =>
         (a.pinned === b.pinned) ? band.sort(a,b) : (a.pinned ? -1 : 1));
-      counts[band.key + '-' + ci] = rows.length;
+      if(colDefs.length === 1){
+        counts[band.key] = rows.length;
+      } else {
+        counts[band.key + (ci === 0 ? '' : 'G')] = rows.length;
+      }
 
       const body = rows.length
         ? rows.map(r => cardHTML(r, FEEDINDEX.push(r) - 1)).join('')
@@ -247,7 +270,7 @@ function renderBoard(filter, query){
         '<div class="bandtitle"><h2>' + band.title + '</h2><em>' + inBand.length + '</em></div>' +
         '<p>' + band.blurb + '</p>' +
       '</div>' +
-      '<div class="kanban two">' + cols + '</div></section>';
+      '<div class="kanban ' + (colDefs.length === 1 ? 'one' : 'two') + '">' + cols + '</div></section>';
   });
 
   document.getElementById('board').innerHTML = html;
@@ -256,7 +279,7 @@ function renderBoard(filter, query){
     c.addEventListener('click', () => openDetail(FEEDINDEX[+c.dataset.i]));
   });
 
-  renderReadings(counts);
+  renderReadings(counts, columnsFor(filter, BANDS[0]).length === 1);
 }
 
 let currentFilter = 'all', currentQuery = '';

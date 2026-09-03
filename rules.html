@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>2024/25 funding rules — Skills Radar</title>
-<meta name="description" content="A searchable index of the August 2024 to July 2025 apprenticeship funding rules, with the material changes from previous years.">
+<title>2026/27 funding rules — Skills Radar</title>
+<meta name="description" content="A searchable index of the August 2026 to July 2027 apprenticeship funding rules, with every material change from the 2025/26 rules.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -25,7 +25,7 @@
 
 <div class="wrap">
   <div class="pagehead">
-    <h1>2024/25 apprenticeship funding rules</h1>
+    <h1>2026/27 apprenticeship funding rules</h1>
     <p id="docmeta"></p>
   </div>
 </div>
@@ -35,7 +35,7 @@
     <div class="tabs" id="tabs">
       <button data-view="search" class="active">Find a rule</button>
       <button data-view="changes">What changed</button>
-      <button data-view="doc">The document</button>
+      <button data-view="doc">Links</button>
     </div>
     <div class="searchbox">
       <input type="search" id="search" placeholder="Search the rules — try &ldquo;off the job&rdquo;, &ldquo;subcontracting&rdquo;, &ldquo;levy transfer&rdquo;" aria-label="Search the funding rules">
@@ -73,12 +73,13 @@ document.getElementById('heroblock').innerHTML = titleBlockHTML('');
 document.getElementById('navslot').innerHTML = navHTML('rules.html');
 
 document.getElementById('docmeta').innerHTML =
-  RULES_DOC.version + ' · ' + RULES_DOC.pages + ' pages · applies to ' +
+  RULES_DOC.version + ' · published by the ' + RULES_DOC.owner + ' · applies to ' +
   RULES_DOC.applies.charAt(0).toLowerCase() + RULES_DOC.applies.slice(1) +
-  '. Search below to find the right section and paragraph numbers, then open the official PDF at that point.';
+  '. Search to find the right section and paragraph numbers, then open the official rules at that point.';
 
 document.getElementById('licence').innerHTML =
-  'The funding rules are ' + RULES_DOC.licence + '. Skills Radar provides an index and summaries only — it is not the document itself and does not replace it. ' +
+  'The funding rules are ' + RULES_DOC.licence + '. Responsibility for apprenticeships transferred from the Department for Education to the ' +
+  RULES_DOC.owner + ' on 1 April 2026. Skills Radar provides an index and summaries only — it is not the document and does not replace it. ' +
   'Always read the rule as published before acting on it. <a href="' + RULES_DOC.landing + '" target="_blank" rel="noopener" style="color:#C6D3D0">Official page on GOV.UK</a>';
 
 /* ---------- Search across sections ---------- */
@@ -128,10 +129,13 @@ function wireContents(){
 
 function locatorHTML(s){
   const first = s.paras.split(/[,\s]/)[0];
+  const anchor = RULES_DOC.changes + '#' + s.name.toLowerCase()
+    .replace(/[^\w\s-]/g,'').replace(/\s+/g,'-');
   return '<div class="locator">' +
-    '<a class="read" href="' + RULES_DOC.pdf + '" target="_blank" rel="noopener">Open the rules (PDF)</a>' +
-    '<span class="find">then search the document for <code>' + first + '</code></span>' +
-    '<button class="copybtn" data-copy="' + first + '">Copy</button>' +
+    '<a class="read" href="' + RULES_DOC.landing + '" target="_blank" rel="noopener">Open the rules</a>' +
+    '<a href="' + anchor + '" target="_blank" rel="noopener">This section in the change log</a>' +
+    (first !== '—' ? '<span class="find">para <code>' + first + '</code></span>' +
+      '<button class="copybtn" data-copy="' + first + '">Copy</button>' : '') +
   '</div>';
 }
 
@@ -251,9 +255,11 @@ function changeID(c){ return 'chg-' + c.section + '-' + c.paras.replace(/[^\w]/g
 
 function changeHTML(c){
   const sec = RULES_SECTIONS.find(s => s.id === c.section);
-  const when = c.when === 'v2'
-    ? 'From 11 February 2025 (version 2)'
-    : 'From 1 August 2024 (version 1)';
+  const when =
+    c.when === 'v3'    ? 'New in version 3, 29 July 2026' :
+    c.when === 'v2'    ? 'New in version 2, 15 July 2026' :
+    c.when === 'v1'    ? 'New in version 1, 15 June 2026' :
+                         'In the rules from 1 August 2026';
 
   const first = c.paras.split(/[,\s]/)[0];
   return '<div class="horizon ' + c.impact + '" id="' + changeID(c) + '">' +
@@ -262,10 +268,10 @@ function changeHTML(c){
     '<p><b style="color:var(--text)">Previously:</b> ' + c.from + '</p>' +
     '<p><b style="color:var(--text)">Now:</b> ' + c.to + '</p>' +
     '<div class="locator">' +
-      '<a class="read" href="' + RULES_DOC.pdf + '" target="_blank" rel="noopener">Open the rules (PDF)</a>' +
-      '<a href="' + RULES_DOC.changesPdf + '" target="_blank" rel="noopener">Summary of changes</a>' +
-      '<span class="find">search for <code>' + first + '</code></span>' +
-      '<button class="copybtn" data-copy="' + first + '">Copy</button>' +
+      '<a class="read" href="' + RULES_DOC.landing + '" target="_blank" rel="noopener">Open the rules</a>' +
+      '<a href="' + RULES_DOC.changes + '" target="_blank" rel="noopener">Full change log</a>' +
+      (first !== '—' ? '<span class="find">para <code>' + first + '</code></span>' +
+        '<button class="copybtn" data-copy="' + first + '">Copy</button>' : '') +
     '</div>' +
   '</div>';
 }
@@ -313,7 +319,7 @@ function renderChanges(query){
   wireContents();
 
   panel.innerHTML =
-    '<div class="notice" style="margin:20px 0 4px">These are the changes the Department itself flagged as differences from the 2023/24 rules, plus those introduced mid-year in version 2. Paragraph numbers refer to the 2024/25 document.</div>' +
+    '<div class="notice" style="margin:20px 0 4px">These are the changes flagged as differences from the 2025/26 rules, drawn from the official summary of changes. The rules went through a draft in April 2026 then three versions — 15 June, 15 July and 29 July 2026 — and each entry says which version it arrived in. Paragraph numbers refer to the 2026/27 document.</div>' +
     list.map(changeHTML).join('');
   wireCopy(panel);
 }
@@ -322,47 +328,49 @@ function renderChanges(query){
 
 function renderDoc(){
   document.getElementById('tally').textContent = '';
-  document.getElementById('contents').innerHTML = contentsHTML(
-    'Find a section',
-    RULES_SECTIONS.map(s => ({
-      href: RULES_DOC.pdf,
-      label: s.name,
-      meta: 'Search for para ' + s.paras
-    })),
-    ''
-  );
-  wireContents();
+  document.getElementById('contents').innerHTML = '';
+
+  const primary = [
+    { name:'The 2026/27 funding rules', url:RULES_DOC.landing,
+      note:'The rules themselves, version 3 published 29 July 2026. The wording that actually binds you. Check here for newer versions.' },
+    { name:'Summary of changes (version 3)', url:RULES_DOC.changes,
+      note:'Published as a web page rather than a PDF, so you can link straight to a section. Everything on the What changed tab comes from here.' },
+    { name:'All apprenticeship funding rules', url:RULES_DOC.guidance,
+      note:'Every year in one place. Which set applies depends on each apprentice\'s start date, so more than one is always live.' }
+  ];
+
   document.getElementById('panel').innerHTML =
     '<div class="notice" style="margin-top:20px">' +
-      '<strong>This is the official document, served from GOV.UK.</strong> ' +
-      'Skills Radar does not host its own copy, so what you see below is always the current published version rather than a snapshot that could drift out of date. ' +
-      'If the viewer does not load in your browser, use the download link underneath.' +
+      '<strong>Skills Radar does not host copies of these documents.</strong> ' +
+      'Every link goes to GOV.UK, so you always get the current published version rather than a snapshot that could quietly drift out of date. ' +
+      'On a compliance tool that matters more than convenience.' +
     '</div>' +
-    '<div style="margin-top:16px;background:var(--surface);border:1px solid var(--line);padding:10px">' +
-      '<iframe src="' + RULES_DOC.pdf + '" title="Apprenticeship funding rules 2024 to 2025" ' +
-      'style="width:100%;height:78vh;border:1px solid var(--line)"></iframe>' +
-    '</div>' +
+
+    '<div class="grouphead" style="margin-top:30px"><h2>Start here</h2><div class="rule"></div></div>' +
     '<div class="readgrid" style="margin-top:16px">' +
-      '<div class="readcard"><a href="' + RULES_DOC.pdf + '" target="_blank" rel="noopener">The full rules (PDF, ' + RULES_DOC.pages + ' pages)</a>' +
-        '<p>' + RULES_DOC.title + ', ' + RULES_DOC.version + '. The wording that actually binds you.</p>' +
-        '<div class="host">assets.publishing.service.gov.uk</div></div>' +
-      '<div class="readcard"><a href="' + RULES_DOC.changesPdf + '" target="_blank" rel="noopener">Summary of changes (PDF, 22 pages)</a>' +
-        '<p>The Department\'s own list of what changed from 2023/24, and what changed again in version 2. Every change on the tab beside this one comes from here.</p>' +
-        '<div class="host">assets.publishing.service.gov.uk</div></div>' +
-      '<div class="readcard"><a href="' + RULES_DOC.landing + '" target="_blank" rel="noopener">GOV.UK publication page</a>' +
-        '<p>The official landing page. Check here for newer versions, and to request an accessible format if you need one.</p>' +
-        '<div class="host">gov.uk</div></div>' +
+      primary.map(d => '<div class="readcard">' +
+        '<a href="' + d.url + '" target="_blank" rel="noopener">' + d.name + '</a>' +
+        '<p>' + d.note + '</p>' +
+        '<div class="host">' + d.url.replace(/^https?:\/\//,'').split('/')[0] + '</div></div>').join('') +
     '</div>' +
 
     '<div class="grouphead" style="margin-top:38px"><h2>Other years, and related guidance</h2><div class="rule"></div></div>' +
     '<p style="font-size:14.5px;color:var(--text-2);max-width:66ch;margin:14px 0 0">' +
-    'Which rules apply depends on each apprentice\'s start date, so more than one year is usually live at once. ' +
-    'These are the other documents you are likely to need.</p>' +
+    'The rules that apply to an apprentice are the ones in force on their start date, so you will often need more than one of these open at once.</p>' +
     '<div class="readgrid" style="margin-top:16px">' +
       OTHER_DOCS.map(d => '<div class="readcard">' +
         '<a href="' + d.url + '" target="_blank" rel="noopener">' + d.name + '</a>' +
         '<p>' + d.note + '</p>' +
         '<div class="host">' + d.url.replace(/^https?:\/\//,'').split('/')[0] + '</div></div>').join('') +
+    '</div>' +
+
+    '<div class="grouphead" style="margin-top:38px"><h2>Where to follow changes as they happen</h2><div class="rule"></div></div>' +
+    '<div class="readgrid" style="margin-top:16px">' +
+      READING.filter(r => r.tags.indexOf('Funding rules') > -1 || r.tags.indexOf('Levy') > -1)
+        .map(r => '<div class="readcard">' +
+        '<a href="' + r.url + '" target="_blank" rel="noopener">' + r.name + '</a>' +
+        '<p>' + r.note + '</p>' +
+        '<div class="host">' + r.url.replace(/^https?:\/\//,'').replace(/\/$/,'') + '</div></div>').join('') +
     '</div>';
 }
 

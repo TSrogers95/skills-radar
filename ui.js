@@ -9,7 +9,7 @@ const PAGES = [
   { file: "index.html",      label: "Feed" },
   { file: "articles.html",   label: "Articles" },
   { file: "standards.html",  label: "Standards" },
-  { file: "rules.html",      label: "24/25 rules" },
+  { file: "rules.html",      label: "26/27 rules" },
   { file: "members.html",    label: "Members" }
 ];
 
@@ -102,6 +102,7 @@ function wireCollapse(){
 
   // Hysteresis: collapse at 120px, only reopen below 40px. Without the gap
   // the header flickers open and shut when you hover around the threshold.
+  const bar = document.querySelector('.stickybar');
   let hidden = false, ticking = false;
 
   function update(){
@@ -111,7 +112,12 @@ function wireCollapse(){
     if(should === hidden) return;
     hidden = should;
     els.forEach(el => el.classList.toggle('hid', should));
+    // The wordmark only appears in the bar once the big one has scrolled away,
+    // so the title is never on screen twice.
+    if(bar) bar.classList.toggle('scrolled', should);
   }
+
+  if(bar) bar.classList.remove('scrolled');
 
   window.addEventListener('scroll', () => {
     if(ticking) return;
