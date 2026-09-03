@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2024/25 funding rules, navigable version — Skills Radar</title>
+<meta name="description" content="A linkable HTML companion to the 2024 to 2025 apprenticeship funding rules, with an anchor for every section.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="masthead">
+  <div class="wrap"><div id="heroblock"></div></div>
+</div>
+
+<div class="stickybar">
+  <div class="wrap inner">
+    <a class="mini" href="index.html">Skills Radar</a>
+    <div id="navslot"></div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="pagehead">
+    <h1>2024/25 funding rules — navigable version</h1>
+    <p>Every section has its own web address, so you can link a colleague straight to the rule rather than sending them a 147-page PDF and a page number.</p>
+  </div>
+
+  <div class="notice" style="margin-top:0">
+    <strong>Read this first: this is a companion, not the document.</strong>
+    Each section below summarises what the rule covers and gives the exact paragraph numbers, so you can find it in seconds. It does <em>not</em> reproduce the rule text. That is deliberate — a hand-copied version of a compliance document would drift out of date the moment the Department issued a new version, and you would have no way of knowing. For the wording that actually binds you, open the official PDF, which is linked from every section.
+  </div>
+</div>
+
+<div class="docwrap wrap">
+  <aside class="doctoc">
+    <div class="tocinner">
+      <h2>Contents</h2>
+      <div id="toc"></div>
+      <a class="tocpdf" id="tocpdf" target="_blank" rel="noopener">Official PDF &nearr;</a>
+    </div>
+  </aside>
+
+  <main class="docbody" id="doc"></main>
+</div>
+
+<footer>
+  <div class="wrap">
+    <p id="licence"></p>
+  </div>
+</footer>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script src="ui.js"></script>
+<script>
+
+document.getElementById('heroblock').innerHTML = titleBlockHTML('');
+document.getElementById('navslot').innerHTML = navHTML('rules.html');
+document.getElementById('tocpdf').href = RULES_DOC.pdf;
+
+document.getElementById('licence').innerHTML =
+  'The funding rules are ' + RULES_DOC.licence + '. This page indexes and summarises them; it is not the document. ' +
+  '<a href="' + RULES_DOC.landing + '" target="_blank" rel="noopener" style="color:#C6D3D0">Official page on GOV.UK</a>';
+
+/* Group the sections into the order they appear in the document */
+const GROUPS = [
+  { name:"Getting started", ids:["intro","eligibility"] },
+  { name:"Supporting the apprentice", ids:["learning-support","english-maths","initial-assessment","wages"] },
+  { name:"Delivering the apprenticeship", ids:["duration","off-the-job","training-plan","progress-reviews","breaks"] },
+  { name:"Money", ids:["ineligible-costs","reservations","co-investment","apprentice-contributions","subsidy","transfers"] },
+  { name:"Assessment", ids:["epa"] },
+  { name:"Working with others", ids:["subcontracting","fjaa","prisoners"] },
+  { name:"Annexes", ids:["annex-a"] }
+];
+
+function sec(id){ return RULES_SECTIONS.find(s => s.id === id); }
+
+/* ---------- Contents ---------- */
+
+document.getElementById('toc').innerHTML = GROUPS.map(g =>
+  '<div class="tocgroup"><h3>' + g.name + '</h3>' +
+  g.ids.map(id => {
+    const s = sec(id);
+    if(!s) return '';
+    const n = RULES_CHANGES.filter(c => c.section === id).length;
+    return '<a href="#' + id + '" data-id="' + id + '">' + s.name +
+      (n ? '<em>' + n + '</em>' : '') + '</a>';
+  }).join('') + '</div>').join('');
+
+/* ---------- Body ---------- */
+
+function sectionBlock(s){
+  const changes = RULES_CHANGES.filter(c => c.section === s.id);
+  const related = s.related.map(sec).filter(Boolean);
+  const first = s.paras.split(/[,\s]/)[0];
+
+  const changeHTML = changes.length
+    ? '<div class="docchanges"><h4>What changed in this section</h4>' +
+      changes.map(c =>
+        '<div class="docchange ' + c.impact + '">' +
+          '<div class="cwhen">' + (c.when === 'v2' ? 'From 11 February 2025' : 'From 1 August 2024') +
+          ' · paragraphs ' + c.paras + '</div>' +
+          '<b>' + c.title + '</b>' +
+          '<p><span>Previously</span> ' + c.from + '</p>' +
+          '<p><span>Now</span> ' + c.to + '</p>' +
+        '</div>').join('') +
+      '</div>'
+    : '';
+
+  const relHTML = related.length
+    ? '<div class="docrelated"><b>Read alongside:</b> ' +
+      related.map(r => '<a href="#' + r.id + '">' + r.name + '</a>').join(' · ') + '</div>'
+    : '';
+
+  return '<section class="docsec" id="' + s.id + '">' +
+    '<div class="docmeta">Paragraphs ' + s.paras +
+      '<button class="copybtn" data-copy="' + location.href.split('#')[0] + '#' + s.id + '">Copy link</button>' +
+    '</div>' +
+    '<h2>' + s.name + '</h2>' +
+    '<p class="docgist">' + s.gist + '</p>' +
+    '<div class="locator">' +
+      '<a class="read" href="' + RULES_DOC.pdf + '" target="_blank" rel="noopener">Open the official PDF</a>' +
+      '<span class="find">search for <code>' + first + '</code></span>' +
+      '<button class="copybtn" data-copy="' + first + '">Copy</button>' +
+    '</div>' +
+    changeHTML + relHTML +
+  '</section>';
+}
+
+document.getElementById('doc').innerHTML = GROUPS.map(g =>
+  '<div class="docgroup" id="group-' + g.name.toLowerCase().replace(/\s+/g,'-') + '">' +
+    '<div class="grouphead"><h2>' + g.name + '</h2><div class="rule"></div></div>' +
+    g.ids.map(id => { const s = sec(id); return s ? sectionBlock(s) : ''; }).join('') +
+  '</div>').join('');
+
+/* ---------- Copy buttons ---------- */
+
+document.querySelectorAll('.copybtn').forEach(b => {
+  b.addEventListener('click', () => {
+    if(navigator.clipboard) navigator.clipboard.writeText(b.dataset.copy);
+    const was = b.textContent;
+    b.textContent = 'Copied';
+    setTimeout(() => { b.textContent = was; }, 1400);
+  });
+});
+
+/* ---------- Highlight the section you are reading ---------- */
+
+const links = Array.from(document.querySelectorAll('#toc a'));
+const secs = RULES_SECTIONS.map(s => document.getElementById(s.id)).filter(Boolean);
+
+if('IntersectionObserver' in window){
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if(!e.isIntersecting) return;
+      links.forEach(a => a.classList.toggle('on', a.dataset.id === e.target.id));
+    });
+  }, { rootMargin: '-90px 0px -70% 0px' });
+  secs.forEach(s => obs.observe(s));
+}
+
+if(location.hash){
+  const t = document.getElementById(location.hash.slice(1));
+  if(t) setTimeout(() => t.scrollIntoView({ block:'start' }), 80);
+}
+
+</script>
+</body>
+</html>

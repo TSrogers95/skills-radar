@@ -87,6 +87,45 @@ document.getElementById('licence').innerHTML =
    they honour #page= and none of them support anchoring to a phrase. So
    rather than pretend, each section gives the exact paragraph numbers to
    search for and a button that copies them, alongside the PDF link. */
+/* A compact contents strip: collapsed to one row by default, expands on
+   click. Keeps the list of 22 sections from pushing the content off screen. */
+function contentsHTML(title, items, extra){
+  return '<nav class="contents" id="contentsnav">' +
+    '<button class="ctoggle" id="ctoggle" aria-expanded="false">' +
+      '<span class="ctitle">' + title + '</span>' +
+      '<span class="ccount">' + items.length + '</span>' +
+      '<span class="cchev" aria-hidden="true">&#9662;</span>' +
+    '</button>' +
+    '<div class="clist" id="clist">' +
+      items.map(i =>
+        '<a href="' + i.href + '"' + (/^https?:|^rules-document/.test(i.href) ? '' : '') + '>' +
+          (i.dot ? '<i class="cdot ' + i.dot + '"></i>' : '') +
+          '<b>' + i.label + '</b>' +
+          '<span>' + i.meta + (i.tally ? ' · ' + i.tally + ' change' + (i.tally === 1 ? '' : 's') : '') + '</span>' +
+        '</a>').join('') +
+      (extra ? '<div class="cextra">' + extra + '</div>' : '') +
+    '</div>' +
+  '</nav>';
+}
+
+function wireContents(){
+  const t = document.getElementById('ctoggle');
+  const l = document.getElementById('clist');
+  if(!t || !l) return;
+  t.addEventListener('click', () => {
+    const open = l.classList.toggle('open');
+    t.setAttribute('aria-expanded', open);
+    t.classList.toggle('open', open);
+  });
+  l.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+    if(a.getAttribute('href').charAt(0) === '#'){
+      l.classList.remove('open');
+      t.classList.remove('open');
+      t.setAttribute('aria-expanded', false);
+    }
+  }));
+}
+
 function locatorHTML(s){
   const first = s.paras.split(/[,\s]/)[0];
   return '<div class="locator">' +
@@ -178,10 +217,17 @@ function renderSearch(query){
     ? list.length + ' section' + (list.length === 1 ? '' : 's') + ' matching \u201c' + query + '\u201d, best first'
     : 'All ' + list.length + ' sections of the 2024/25 rules';
 
-  document.getElementById('contents').innerHTML =
-    '<nav class="contents"><h2>Jump to a section</h2><div class="clist">' +
-    list.map(s => '<a href="#sec-' + s.id + '"><b>' + s.name + '</b><span>Para ' + s.paras + '</span></a>').join('') +
-    '</div></nav>';
+  document.getElementById('contents').innerHTML = contentsHTML(
+    'Jump to a section',
+    list.map(s => ({
+      href: '#sec-' + s.id,
+      label: s.name,
+      meta: 'Para ' + s.paras,
+      tally: RULES_CHANGES.filter(c => c.section === s.id).length
+    })),
+    '<a class="cdoc" href="rules-document.html">Open the linkable version &rarr;</a>'
+  );
+  wireContents();
 
   panel.innerHTML = list.map(s => sectionHTML(s, RULES_CHANGES)).join('');
   wireCopy(panel);
@@ -254,12 +300,17 @@ function renderChanges(query){
   tally.textContent = list.length + ' material change' + (list.length === 1 ? '' : 's') +
     (query ? ' matching \u201c' + query + '\u201d' : ' from the 2023/24 rules and within the year');
 
-  document.getElementById('contents').innerHTML =
-    '<nav class="contents"><h2>Jump to a change</h2><div class="clist">' +
-    list.map(c => '<a href="#' + changeID(c) + '"><b>' + c.title + '</b><span>' +
-      (c.impact === 'high' ? 'High impact' : c.impact === 'medium' ? 'Medium' : 'Low') +
-      ' · para ' + c.paras + '</span></a>').join('') +
-    '</div></nav>';
+  document.getElementById('contents').innerHTML = contentsHTML(
+    'Jump to a change',
+    list.map(c => ({
+      href: '#' + changeID(c),
+      label: c.title,
+      meta: (c.impact === 'high' ? 'High impact' : c.impact === 'medium' ? 'Medium impact' : 'Low impact') + ' · para ' + c.paras,
+      dot: c.impact
+    })),
+    ''
+  );
+  wireContents();
 
   panel.innerHTML =
     '<div class="notice" style="margin:20px 0 4px">These are the changes the Department itself flagged as differences from the 2023/24 rules, plus those introduced mid-year in version 2. Paragraph numbers refer to the 2024/25 document.</div>' +
@@ -271,11 +322,16 @@ function renderChanges(query){
 
 function renderDoc(){
   document.getElementById('tally').textContent = '';
-  document.getElementById('contents').innerHTML =
-    '<nav class="contents"><h2>Find a section in the document</h2><div class="clist">' +
-    RULES_SECTIONS.map(s => '<a href="' + RULES_DOC.pdf + '" target="_blank" rel="noopener">' +
-      '<b>' + s.name + '</b><span>Search for para ' + s.paras + '</span></a>').join('') +
-    '</div></nav>';
+  document.getElementById('contents').innerHTML = contentsHTML(
+    'Find a section',
+    RULES_SECTIONS.map(s => ({
+      href: 'rules-document.html#' + s.id,
+      label: s.name,
+      meta: 'Para ' + s.paras
+    })),
+    '<a class="cdoc" href="rules-document.html">Open the linkable version &rarr;</a>'
+  );
+  wireContents();
   document.getElementById('panel').innerHTML =
     '<div class="notice" style="margin-top:20px">' +
       '<strong>This is the official document, served from GOV.UK.</strong> ' +

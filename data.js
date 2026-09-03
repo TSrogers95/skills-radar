@@ -649,6 +649,7 @@ const MILESTONES = [
   {
     date: "2026-09-01",
     title: "Funding withdrawn from 16 standards",
+    scope:"standards", standards:["Team Leader","Operations Manager","Coaching Professional","Improvement Practitioner","Improvement Leader","Chartered Manager (degree)","Cleaning Hygiene Operative","Custody and Detention Professional","Facilities Management Supervisor","Lead Practitioner in Adult Care","Learning and Skills Assessor","Learning and Skills Mentor","Outdoor Learning Specialist","Professional Security Operative","Public Sector Compliance Investigator and Officer","Security First Line Manager"], routes:[],
     type: "deadline", urgency: "high",
     who: "Providers and employers",
     action: "No new funded starts on the 16 standards after this date. Confirm every intended learner is enrolled and on-programme. Existing learners are unaffected and remain funded to completion.",
@@ -657,6 +658,7 @@ const MILESTONES = [
   {
     date: "2026-09-01",
     title: "Low Carbon Heating specialism available",
+    scope:"route", standards:[], routes:["construction"],
     type: "change", urgency: "medium",
     who: "Construction providers",
     action: "First delivery of the new occupational specialism in the Building Services Engineering T-Level. Confirm placement capacity with local heating and renewables employers.",
@@ -665,6 +667,7 @@ const MILESTONES = [
   {
     date: "2026-09-01",
     title: "Last enrolments for the Finance T-Level",
+    scope:"route", standards:[], routes:["legal-finance-accounting"],
     type: "deadline", urgency: "medium",
     who: "Providers",
     action: "New enrolments on the Finance T-Level cease after September 2026. Plan an alternative offer for prospective students in this subject, such as Accounting.",
@@ -673,6 +676,7 @@ const MILESTONES = [
   {
     date: "2026-10-01",
     title: "T-Levels Week",
+    scope:"all", standards:[], routes:[],
     type: "window", urgency: "low",
     who: "Providers and employers",
     action: "Annual T-Levels Week takes place in October. A practical window for employer engagement and placement recruitment for the following year.",
@@ -681,6 +685,7 @@ const MILESTONES = [
   {
     date: "2026-12-31",
     title: "Review levy balance against the new 12-month expiry",
+    scope:"all", standards:[], routes:[],
     type: "watch", urgency: "high",
     who: "Levy-paying employers",
     action: "Funds paid in from August 2026 expire 12 months later. Run a forecast before the calendar year ends to identify what would lapse and commit it, including to units and foundation apprenticeships.",
@@ -689,6 +694,7 @@ const MILESTONES = [
   {
     date: "2027-01-01",
     title: "Level 7 restriction fully embedded",
+    scope:"all", standards:[], routes:[],
     type: "change", urgency: "medium",
     who: "Employers",
     action: "One year on from the restriction. Any remaining pre-2026 Level 7 apprentices should be tracked to completion; no new over-22 starts are fundable.",
@@ -697,6 +703,7 @@ const MILESTONES = [
   {
     date: "2027-04-01",
     title: "Assessment plan transition completes",
+    scope:"all", standards:[], routes:[],
     type: "deadline", urgency: "medium",
     who: "Providers and assessment organisations",
     action: "End of the 12 to 18 month transition window. Audit which of your standards have moved to reformed assessment plans and which have not, and align internal quality processes to each.",
@@ -705,6 +712,7 @@ const MILESTONES = [
   {
     date: "2027-08-01",
     title: "2027 to 2028 funding rules take effect",
+    scope:"all", standards:[], routes:[],
     type: "change", urgency: "medium",
     who: "Providers",
     action: "New rules apply to starts from this date. Three or four rulebooks will be live at once. Confirm your MIS applies the correct rule set per apprentice start date.",
@@ -713,6 +721,7 @@ const MILESTONES = [
   {
     date: "2027-09-01",
     title: "Foundation Year renamed; Further Study pathways begin",
+    scope:"all", standards:[], routes:[],
     type: "change", urgency: "medium",
     who: "Providers",
     action: "The T-Level Foundation Year becomes the Foundation Year, and Further Study and Occupational pathways start being introduced subject by subject, gradually replacing it.",
@@ -721,12 +730,36 @@ const MILESTONES = [
   {
     date: "2028-09-01",
     title: "Social Care T-Level first delivery",
+    scope:"route", standards:[], routes:["care-services"],
     type: "change", urgency: "low",
     who: "Care services providers",
     action: "The Social Care T-Level becomes available. Begin employer placement conversations well ahead — care placements need safeguarding clearance and lead time.",
     article: ""
   }
 ];
+
+MILESTONES.push(
+  { date:"2026-09-30", title:"Confirm every 2026/27 start is on the correct rulebook",
+    scope:"all", standards:[], routes:[],
+    type:"watch", urgency:"medium", who:"Providers",
+    action:"Three rulebooks are live at once. Audit your MIS to confirm each apprentice is being funded under the rules that applied on their start date, not the current year's.",
+    article:"rules-2627" },
+  { date:"2026-11-30", title:"Plan replacement provision for defunded management standards",
+    scope:"standards", standards:["Team Leader","Operations Manager","Coaching Professional"], routes:[],
+    type:"watch", urgency:"high", who:"Providers and employers",
+    action:"With no announced replacement for most of the 16, decide now whether to move learners to an adjacent standard, use apprenticeship units, or fund development outside the levy.",
+    article:"defunding-16" },
+  { date:"2027-01-31", title:"Review off-the-job hours against the new annex",
+    scope:"all", standards:[], routes:[],
+    type:"watch", urgency:"medium", who:"Providers",
+    action:"Version 3 of the 2025/26 rules added an annex setting minimum off-the-job training by standard. Check your planned hours per programme against it.",
+    article:"" },
+  { date:"2027-07-31", title:"2026/27 funding year ends",
+    scope:"all", standards:[], routes:[],
+    type:"deadline", urgency:"medium", who:"Providers and employers",
+    action:"Final date for starts under the 2026/27 rules. Reservations, ILR records and subcontractor declarations should be reconciled before year end.",
+    article:"" }
+);
 
 /* ---------- 6. STANDARDS REGISTER --------------------------------------
    A working subset of the Skills England register, grouped by route.

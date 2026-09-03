@@ -31,28 +31,28 @@
       <p>The public feed tells you what changed. Membership tells you what it means <em>for you</em> — filtered to the standards you actually deliver, with the dates in your own calendar and the funding modelled against your own payroll.</p>
     </div>
 
-    <div class="benefits">
-      <div class="benefit">
-        <h3>Your own compliance calendar</h3>
-        <p>Twelve months of deadlines, but only the ones that touch your standards. Each date carries the action it requires and who it lands on, so preparation starts weeks before the deadline rather than the week of it.</p>
+    <div class="joinlayout">
+      <div class="benefits">
+        <div class="benefit">
+          <h3>Your own compliance calendar</h3>
+          <p>Twelve months of deadlines, filtered to the standards you deliver. Each date carries the action it requires and who it lands on, so preparation starts weeks ahead rather than the week of.</p>
+        </div>
+        <div class="benefit">
+          <h3>A feed built around your provision</h3>
+          <p>Select every standard you deliver and the feed splits in two: changes to your programmes on one side, the funding rules that apply to everyone on the other.</p>
+        </div>
+        <div class="benefit">
+          <h3>Levy modelling against your payroll</h3>
+          <p>Enter your pay bill and cohort. See annual funds in, what your apprentices commit you to, and the point you tip into 25% co-investment — before it lands on an invoice.</p>
+        </div>
+        <div class="benefit">
+          <h3>A newsletter that is actually yours</h3>
+          <p>Weekly or monthly, built around your routes and standards. If something changes on a programme you run, it leads the email.</p>
+        </div>
       </div>
-      <div class="benefit">
-        <h3>A feed built around your provision</h3>
-        <p>Select every standard you deliver and the feed reorders itself. Changes to your programmes come first and are flagged; everything else drops back. No more reading 180 updates to find the four that matter.</p>
-      </div>
-      <div class="benefit">
-        <h3>Levy modelling against your payroll</h3>
-        <p>Enter your pay bill and your cohort. See annual funds in, what your current apprentices commit you to, and the point at which you tip into 25% co-investment — before it arrives on an invoice.</p>
-      </div>
-      <div class="benefit">
-        <h3>A newsletter that is actually yours</h3>
-        <p>Weekly or monthly, written around your routes and your standards. If something changes on a programme you run, it leads the email rather than sitting on page three.</p>
-      </div>
-    </div>
 
-    <div class="signin" style="margin-top:44px">
-      <div class="signin-panel">
-        <div class="markrule" style="margin-bottom:22px">
+      <div class="signin-panel joinpanel">
+        <div class="markrule" style="margin-bottom:20px">
           <span class="tick" aria-hidden="true"><b></b><b></b><b></b></span>
           <span class="lbl" style="color:var(--text-3)">Sign in</span>
           <span class="line" style="background:var(--line)"></span>
@@ -79,15 +79,9 @@
         <div class="demo">
           <b>Demo access</b>
           <span>Username <code>test</code> &nbsp;·&nbsp; Password <code>test</code></span>
-          <button type="button" class="fill" id="fill">Fill it in for me</button>
+          <button type="button" class="fill" id="fill">Fill it in</button>
         </div>
       </div>
-
-      <aside class="signin-side">
-        <h3>The demo account</h3>
-        <p style="font-size:13px;color:var(--text-2);line-height:1.55;margin:0 0 14px">Signing in with <code>test</code> loads a worked example: a levy-paying provider with 45 apprentices across four standards and a £4.5m pay bill.</p>
-        <p class="note">This is a demonstration gate. It checks credentials in your browser, so it is not real security — anyone can read the page source. Replace it with server-side authentication and a real account system before this holds anyone's data.</p>
-      </aside>
     </div>
   </div>
 </div>
@@ -203,6 +197,31 @@ function isMyStandardOnly(item){
   return mine.some(n => hay.includes(n));
 }
 
+/* ---------- Which milestones actually apply to this member ---------- */
+
+function myMilestones(){
+  const mine = MEMBER.standards.map(s => s.name.toLowerCase());
+  return MILESTONES.filter(m => {
+    if(m.scope === 'all') return true;
+    if(m.scope === 'route')     return (m.routes || []).some(r => MEMBER.routes.indexOf(r) > -1);
+    if(m.scope === 'standards') return (m.standards || []).some(n => mine.indexOf(n.toLowerCase()) > -1);
+    return true;
+  });
+}
+
+function milestoneReason(m){
+  const mine = MEMBER.standards.map(s => s.name.toLowerCase());
+  if(m.scope === 'standards'){
+    const hit = (m.standards || []).filter(n => mine.indexOf(n.toLowerCase()) > -1);
+    return hit.length ? 'Affects your ' + hit.join(' and ') : '';
+  }
+  if(m.scope === 'route'){
+    const hit = (m.routes || []).filter(r => MEMBER.routes.indexOf(r) > -1);
+    return hit.length ? 'On your ' + ROUTES[hit[0]].label + ' route' : '';
+  }
+  return 'Applies to everyone';
+}
+
 /* ---------- Levy maths ---------- */
 
 function levyFigures(payroll, standards){
@@ -239,7 +258,7 @@ function dashView(){
   const mine = feed.filter(isMyStandardOnly);
   const urgent = feed.filter(u => u.urgency === 'high');
   const f = levyFigures(MEMBER.payroll, MEMBER.standards);
-  const soon = MILESTONES.filter(m => daysAgo(m.date) < 0)
+  const soon = myMilestones().filter(m => daysAgo(m.date) < 0)
     .sort((a,b) => new Date(a.date) - new Date(b.date)).slice(0,3);
 
   const defunded = MEMBER.standards.filter(s =>
@@ -288,33 +307,54 @@ function dashView(){
 }
 
 function feedView(){
-  const feed = allUpdates().filter(isMine).sort((a,b) => {
-    const am = isMyStandardOnly(a), bm = isMyStandardOnly(b);
-    if(am !== bm) return am ? -1 : 1;
-    return new Date(b.date) - new Date(a.date);
-  });
+  const feed = allUpdates().filter(isMine);
+
+  const mine = feed.filter(isMyStandardOnly)
+    .sort((a,b) => new Date(b.date) - new Date(a.date));
+  const general = feed.filter(u => !isMyStandardOnly(u))
+    .sort((a,b) => (a.pinned === b.pinned) ? new Date(b.date) - new Date(a.date) : (a.pinned ? -1 : 1));
+
+  function card(u, flag){
+    return '<div class="card ' + u.urgency + '">' +
+      (flag ? '<span class="dotflag"></span>' : '') +
+      '<h3>' + u.title + '</h3>' +
+      '<p>' + (u.short || firstClause(u.summary)) + '</p>' +
+      '<span class="cdate">' + fmtShort(u.date) + ' ' + fmtYear(u.date) + '</span>' +
+      '<div class="links" style="margin-top:8px">' +
+        (u.article ? '<a class="read" href="articles.html#' + u.article + '">Detail</a>' : '') +
+        '<a href="' + u.url + '" target="_blank" rel="noopener">Source</a>' +
+      '</div></div>';
+  }
+
+  function col(title, blurb, rows, lead, flag){
+    const body = rows.length
+      ? rows.map(r => card(r, flag)).join('')
+      : '<div class="colempty">Nothing here right now.</div>';
+    return '<section class="col' + (lead ? ' lead' : '') + '">' +
+      '<div class="colhead"><h2>' + title + ' <em>' + rows.length + '</em></h2><p>' + blurb + '</p></div>' +
+      '<div class="colbody">' + body + '</div></section>';
+  }
 
   return '<div class="pagehead"><h1>My feed</h1>' +
-    '<p>Changes to your own standards first, then the funding rule and levy changes that apply across the board. ' +
+    '<p>Split in two. On the left, changes to the standards you deliver. On the right, the funding rule and levy changes that apply whatever you run. ' +
     feed.length + ' items, down from ' + allUpdates().length + ' on the public feed.</p></div>' +
-    feed.map(u => {
-      const mine = isMyStandardOnly(u);
-      return '<div class="item ' + u.urgency + '">' +
-        '<div class="when"><b>' + fmtShort(u.date) + '</b>' + fmtYear(u.date) + '</div>' +
-        '<div><div class="meta">' +
-          (mine ? '<span class="pill flag">Yours</span>' : '') +
-          '<span class="pill ' + u.status + '">' + STATUS_LABELS[u.status] + '</span></div>' +
-          '<h3>' + u.title + '</h3><p>' + (u.short || firstClause(u.summary)) + '</p>' +
-          '<div class="links">' +
-            (u.article ? '<a class="read" href="articles.html#' + u.article + '">Full analysis</a>' : '') +
-            '<a href="' + u.url + '" target="_blank" rel="noopener">Source</a></div>' +
-        '</div></div>';
-    }).join('');
+    '<div class="kanban two">' +
+      col('My standards', 'Changes to the ' + MEMBER.standards.length + ' programmes you deliver.', mine, true, true) +
+      col('General funding rules', 'Funding rules and levy changes that apply to everyone.', general, false, false) +
+    '</div>';
 }
 
+let calScope = 'mine';
+
 function calView(){
+  const mine = myMilestones().length, all = MILESTONES.length;
   return '<div class="pagehead"><h1>My calendar</h1>' +
-    '<p>Twelve months ahead. Coloured days carry a deadline — hover or tap for the detail and the action it requires.</p></div>' +
+    '<p>Twelve months ahead, filtered to the ' + MEMBER.standards.length + ' standards you deliver and the ' +
+    'rules that apply to everyone. Coloured days carry a deadline — hover or tap for the detail.</p></div>' +
+    '<div class="scopeswitch">' +
+      '<button data-scope="mine"' + (calScope === 'mine' ? ' class="on"' : '') + '>Relevant to me <em>' + mine + '</em></button>' +
+      '<button data-scope="all"' + (calScope === 'all' ? ' class="on"' : '') + '>Everything <em>' + all + '</em></button>' +
+    '</div>' +
     '<div class="key">' +
       '<span><i class="h"></i> Hard deadline or high risk</span>' +
       '<span><i class="m"></i> Confirmed change, plan for it</span>' +
@@ -418,8 +458,12 @@ function prefsView(){
 const DOW = ['M','T','W','T','F','S','S'];
 
 function buildCalendar(){
+  const source = calScope === 'mine' ? myMilestones() : MILESTONES;
   const byDate = {};
-  MILESTONES.forEach(m => { (byDate[m.date] = byDate[m.date] || []).push(m); });
+  source.forEach(m => { (byDate[m.date] = byDate[m.date] || []).push(m); });
+
+  document.querySelectorAll('.scopeswitch button').forEach(b =>
+    b.addEventListener('click', () => { calScope = b.dataset.scope; render(); }));
 
   const start = new Date(); start.setDate(1);
   let html = '';
@@ -437,7 +481,9 @@ function buildCalendar(){
     if(!evs) return;
     pop.innerHTML = evs.map(m =>
       '<div class="pd">' + fmtLong(m.date) + '</div><div class="who">' + m.who + '</div>' +
-      '<h4>' + m.title + '</h4><p>' + m.action + '</p>' +
+      '<h4>' + m.title + '</h4>' +
+      '<div class="reason">' + milestoneReason(m) + '</div>' +
+      '<p>' + m.action + '</p>' +
       (m.article ? '<a href="articles.html#' + m.article + '">Read the full analysis &rarr;</a>' : '')
     ).join('<hr style="border:none;border-top:1px solid var(--line);margin:13px 0">');
     pop.classList.add('on');
@@ -459,7 +505,7 @@ function buildCalendar(){
   document.addEventListener('click', hidePop);
   window.addEventListener('scroll', hidePop, { passive:true });
 
-  const list = MILESTONES.slice().sort((a,b) => new Date(a.date) - new Date(b.date));
+  const list = source.slice().sort((a,b) => new Date(a.date) - new Date(b.date));
   const groups = {};
   list.forEach(m => { const k = fmtMonthYear(m.date); (groups[k] = groups[k] || []).push(m); });
   document.getElementById('cal').innerHTML = Object.keys(groups).map(k =>
@@ -468,7 +514,7 @@ function buildCalendar(){
       return '<div class="mile ' + m.urgency + (past ? ' past' : '') + '">' +
         '<div class="d">' + d.getDate() + ' ' + d.toLocaleDateString('en-GB',{month:'short'}) +
         '<small>' + d.getFullYear() + (past ? ' · passed' : '') + '</small></div>' +
-        '<div><div class="who">' + m.who + '</div><h3>' + m.title + '</h3><p>' + m.action + '</p>' +
+        '<div><div class="who">' + m.who + ' · ' + milestoneReason(m) + '</div><h3>' + m.title + '</h3><p>' + m.action + '</p>' +
         (m.article ? '<div class="links"><a class="read" href="articles.html#' + m.article + '">Read the full analysis</a></div>' : '') +
         '</div></div>';
     }).join('') + '</section>').join('');

@@ -175,22 +175,42 @@ function closeDetail(){
   document.getElementById('scrim').classList.remove('on');
 }
 
-const COLUMNS = [
-  { key:'recent', title:'Recent changes', blurb:'Already in force. Check you are compliant.',
+const isStandard = i => i.category === 'standard';
+const isGeneral  = i => i.category !== 'standard';
+
+const BANDS = [
+  {
+    key: 'recent', title: 'Recent changes',
+    blurb: 'Already in force. Check you are compliant.',
     lead: true,
     test: i => i.status === 'updated' && !isFuture(i.date),
-    sort: (a,b) => new Date(b.date) - new Date(a.date) },
-  { key:'upcoming', title:'Upcoming', blurb:'Confirmed for a future date. Plan and prepare.',
-    test: i => i.status === 'upcoming' || isFuture(i.date),
-    sort: (a,b) => new Date(a.date) - new Date(b.date) },
-  { key:'review', title:'In review', blurb:'Under review or in development. No confirmed outcome yet.',
-    test: i => i.status === 'in-review',
-    sort: (a,b) => new Date(b.date) - new Date(a.date) }
+    sort: (a,b) => new Date(b.date) - new Date(a.date),
+    cols: [
+      { title: 'To standards',          blurb: 'Version changes, funding bands and new approvals.', test: isStandard },
+      { title: 'To general funding rules', blurb: 'Rules, levy and T-Level policy affecting everyone.', test: isGeneral }
+    ]
+  },
+  {
+    key: 'upcoming', title: 'Upcoming changes',
+    blurb: 'Confirmed for a future date, or under review with no confirmed outcome yet.',
+    test: i => i.status === 'upcoming' || i.status === 'in-review' || isFuture(i.date),
+    sort: (a,b) => {
+      // confirmed dates first, then things still in review
+      const ar = a.status === 'in-review', br = b.status === 'in-review';
+      if(ar !== br) return ar ? 1 : -1;
+      return new Date(a.date) - new Date(b.date);
+    },
+    cols: [
+      { title: 'To standards',          blurb: 'Defunding, revisions and standards in review.', test: isStandard },
+      { title: 'To general funding rules', blurb: 'Rule changes and levy reform still to land.', test: isGeneral }
+    ]
+  }
 ];
 
 function renderBoard(filter, query){
   const routeKey = detectRoute(query);
   FEEDINDEX = [];
+
   let list = FEED.slice();
   if(filter !== 'all') list = list.filter(i => i.category === filter);
   list = list.filter(i => matches(i, query, routeKey));
@@ -198,22 +218,33 @@ function renderBoard(filter, query){
   renderRouteContext(routeKey, query, list);
 
   const used = new Set();
-  const board = COLUMNS.map(col => {
-    const rows = list.filter(i => !used.has(i) && col.test(i));
-    rows.forEach(r => used.add(r));
-    rows.sort((a,b) => (a.pinned === b.pinned) ? col.sort(a,b) : (a.pinned ? -1 : 1));
+  let html = '';
 
-    const body = rows.length
-      ? rows.map(r => cardHTML(r, FEEDINDEX.push(r) - 1)).join('')
-      : '<div class="colempty">Nothing here' + (query ? ' for that search' : '') + '.</div>';
+  BANDS.forEach(band => {
+    const inBand = list.filter(i => !used.has(i) && band.test(i));
+    inBand.forEach(i => used.add(i));
 
-    return '<section class="col' + (col.lead ? ' lead' : '') + '"><div class="colhead">' +
-      '<h2>' + col.title + ' <em>' + rows.length + '</em></h2>' +
-      '<p>' + col.blurb + '</p></div>' +
-      '<div class="colbody">' + body + '</div></section>';
-  }).join('');
+    const cols = band.cols.map(col => {
+      const rows = inBand.filter(col.test).sort((a,b) =>
+        (a.pinned === b.pinned) ? band.sort(a,b) : (a.pinned ? -1 : 1));
 
-  document.getElementById('board').innerHTML = board;
+      const body = rows.length
+        ? rows.map(r => cardHTML(r, FEEDINDEX.push(r) - 1)).join('')
+        : '<div class="colempty">Nothing here' + (query ? ' for that search' : '') + '.</div>';
+
+      return '<section class="col"><div class="colhead">' +
+        '<h2>' + col.title + ' <em>' + rows.length + '</em></h2>' +
+        '<p>' + col.blurb + '</p></div>' +
+        '<div class="colbody">' + body + '</div></section>';
+    }).join('');
+
+    html += '<section class="band' + (band.lead ? ' lead' : '') + '">' +
+      '<div class="bandhead"><h2>' + band.title + ' <em>' + inBand.length + '</em></h2>' +
+      '<p>' + band.blurb + '</p></div>' +
+      '<div class="kanban two">' + cols + '</div></section>';
+  });
+
+  document.getElementById('board').innerHTML = html;
 
   document.querySelectorAll('.card').forEach(c => {
     c.addEventListener('click', () => openDetail(FEEDINDEX[+c.dataset.i]));
