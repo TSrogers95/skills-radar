@@ -224,39 +224,75 @@ function milestoneReason(m){
 
 /* ---------- Levy maths ---------- */
 
+/* =========================================================================
+   LEVY MODEL
+
+   Funds in
+     levy      = 0.5% of the annual pay bill
+     available = levy − £15,000 allowance   (nil if the pay bill is under £3m)
+     no 10% top-up is added to new funds from 1 August 2026
+
+   Drawing down, per apprentice
+     80% of the price is paid to the provider in equal monthly instalments
+     across the planned duration; 20% is held back until completion.
+
+       monthly instalment = (price × 0.8) ÷ duration in months
+       annual draw        = monthly × 12, plus the completion payments
+                            falling due that year
+
+     Across a steady cohort those two come to price × (12 ÷ duration) per
+     apprentice per year, which is the figure used here.
+
+   Paying for a shortfall, new starts from 1 August 2026
+     levy payer, balance exhausted   16–24  government pays 100%
+                                     25+    employer pays 25%
+     employer does not pay the levy  16–24  government pays 100%
+                                     25+    employer pays 5%
+   ========================================================================= */
+
 function levyFigures(payroll, standards, under25, levyPayer){
-  const gross  = payroll * LEVY_MODEL.rate;
-  const annual = payroll > LEVY_MODEL.threshold ? Math.max(0, gross - LEVY_MODEL.allowance) : 0;
-  const monthly = annual / 12;
+  const gross     = payroll * LEVY_MODEL.rate;
+  const available = payroll > LEVY_MODEL.threshold
+    ? Math.max(0, gross - LEVY_MODEL.allowance) : 0;
+  const monthlyIn = available / 12;
 
-  let commitment = 0, weightedMonths = 0, heads = 0;
-  standards.forEach(s => {
-    commitment += s.funding * s.count;
-    weightedMonths += s.months * s.count;
-    heads += s.count;
+  const lines = standards.map(s => {
+    const months  = s.months || 12;
+    const monthly = ((s.funding * 0.8) / months) * s.count;
+    const annual  = s.funding * (12 / months) * s.count;
+    return {
+      name: s.name, level: s.level, count: s.count,
+      funding: s.funding, months: months,
+      monthlyAll: monthly, annual: annual, total: s.funding * s.count
+    };
   });
-  const avgMonths = heads ? weightedMonths / heads : 12;
-  const annualDraw = avgMonths > 0 ? commitment / (avgMonths / 12) : commitment;
 
-  const surplus = annual - annualDraw;
-  const shortfall = surplus < 0 ? -surplus : 0;
+  const heads      = lines.reduce((t, l) => t + l.count, 0);
+  const commitment = lines.reduce((t, l) => t + l.total, 0);
+  const annualDraw = lines.reduce((t, l) => t + l.annual, 0);
+  const monthlyOut = lines.reduce((t, l) => t + l.monthlyAll, 0);
 
-  // Split the shortfall by age, because the rate now depends on it
-  const pctUnder = heads ? Math.min(1, under25 / heads) : 0;
-  const shortUnder = shortfall * pctUnder;
-  const shortOver  = shortfall * (1 - pctUnder);
+  const balance   = available - annualDraw;
+  const surplus   = balance > 0 ? balance : 0;
+  const shortfall = balance < 0 ? -balance : 0;
 
-  const rates = levyPayer ? LEVY_MODEL.levyExhausted : LEVY_MODEL.nonLevy;
-  const coUnder = shortUnder * rates.under25;
-  const coOver  = shortOver  * rates.over25;
-  const coInvest = coUnder + coOver;
-  const govShare = shortfall - coInvest;
+  const young      = Math.min(under25, heads);
+  const pctYoung   = heads ? young / heads : 0;
+  const shortYoung = shortfall * pctYoung;
+  const shortOlder = shortfall - shortYoung;
+
+  const rates     = levyPayer ? LEVY_MODEL.levyExhausted : LEVY_MODEL.nonLevy;
+  const costYoung = shortYoung * rates.under25;
+  const costOlder = shortOlder * rates.over25;
+  const youCost   = costYoung + costOlder;
+  const govCost   = shortfall - youCost;
 
   return {
-    gross, annual, monthly, commitment, heads, avgMonths, annualDraw,
-    surplus, shortfall, coInvest, govShare,
-    coUnder, coOver, shortUnder, shortOver, pctUnder, rates,
-    liable: payroll > LEVY_MODEL.threshold
+    gross, available, monthlyIn, lines, heads, commitment,
+    annualDraw, monthlyOut, surplus, shortfall,
+    young, older: heads - young, pctYoung,
+    shortYoung, shortOlder, costYoung, costOlder, youCost, govCost,
+    rates, liable: payroll > LEVY_MODEL.threshold
   };
 }
 
@@ -266,8 +302,7 @@ function dashView(){
   const feed = allUpdates().filter(isMine);
   const mine = feed.filter(isMyStandardOnly);
   const urgent = feed.filter(u => u.urgency === 'high');
-  const under25 = Math.round(MEMBER.apprentices * 0.45);
-  const f = levyFigures(MEMBER.payroll, MEMBER.standards, under25, MEMBER.levyPayer);
+  const f = levyFigures(MEMBER.payroll, MEMBER.standards, Math.round(MEMBER.apprentices * 0.45), MEMBER.levyPayer);
   const soon = myMilestones().filter(m => daysAgo(m.date) < 0)
     .sort((a,b) => new Date(a.date) - new Date(b.date)).slice(0,3);
 
@@ -376,19 +411,81 @@ function calView(){
     '<div id="horizon"></div>';
 }
 
+/* Working copy of the cohort, so edits here do not overwrite the account */
+let COHORT = MEMBER.standards.map(s => ({ ...s }));
+let YOUNG  = Math.round(MEMBER.apprentices * 0.45);
+
+function cohortHeads(){ return COHORT.reduce((t,s) => t + (s.count || 0), 0); }
+
 function levyView(){
+  const heads = cohortHeads();
+
+  const rows = COHORT.map((s, i) =>
+    '<tr>' +
+      '<td class="nm">' + s.name +
+        '<small>Level ' + s.level + ' &middot; ' + s.months + ' months &middot; band ' + money(s.funding) + '</small></td>' +
+      '<td class="num"><input class="cnt" type="number" min="0" max="999" data-i="' + i + '" value="' + s.count + '" aria-label="Apprentices on ' + s.name + '"></td>' +
+      '<td class="num" id="mo-' + i + '">–</td>' +
+      '<td class="num" id="yr-' + i + '">–</td>' +
+      '<td class="num"><button class="rm" data-i="' + i + '">Remove</button></td>' +
+    '</tr>').join('');
+
+  const options = STANDARDS
+    .filter(s => s.months > 0 && !COHORT.some(c => c.name === s.name))
+    .sort((a,b) => a.name.localeCompare(b.name))
+    .map(s => '<option value="' + s.name + '">' + s.name + ' — Level ' + s.level + ', ' + money(s.funding) + '</option>')
+    .join('');
+
   return '<div class="pagehead"><h1>Levy calculator</h1>' +
-    '<p>Model your levy position against your own pay bill and cohort. Change either number and everything recalculates.</p></div>' +
-    '<div class="levyform">' +
-      '<div class="field"><label for="payroll">Annual pay bill</label>' +
-      '<input type="text" id="payroll" inputmode="numeric" value="' + MEMBER.payroll.toLocaleString('en-GB') + '"></div>' +
-      '<div class="field"><label for="heads">Apprentices on programme</label>' +
-      '<input type="text" id="heads" inputmode="numeric" value="' + MEMBER.apprentices + '"></div>' +
-      '<div class="field"><label for="young">Of those, aged 16 to 24</label>' +
-      '<input type="text" id="young" inputmode="numeric" value="' + Math.round(MEMBER.apprentices * 0.45) + '"></div>' +
-    '</div>' +
-    '<p class="hint" style="max-width:62ch;margin:-14px 0 26px">Age matters now. Under version 3 of the 2026/27 rules, a levy payer who runs out of funds pays nothing for apprentices aged 16 to 24 and 25% for those aged 25 and over.</p>' +
-    '<div id="levyout"></div>' +
+    '<p>Enter your pay bill and exactly how many apprentices sit on each standard. Everything recalculates as you type.</p></div>' +
+
+    '<section class="lsection">' +
+      '<div class="lhead"><h2>1. Your pay bill</h2>' +
+      '<p>The levy is 0.5% of your annual pay bill, less a £15,000 allowance, and is only due above £3m.</p></div>' +
+      '<div class="levyform">' +
+        '<div class="field"><label for="payroll">Annual pay bill</label>' +
+        '<input type="text" id="payroll" inputmode="numeric" value="' + MEMBER.payroll.toLocaleString('en-GB') + '"></div>' +
+      '</div>' +
+      '<div id="fundsin"></div>' +
+    '</section>' +
+
+    '<section class="lsection">' +
+      '<div class="lhead"><h2>2. Your cohort</h2>' +
+      '<p>How many apprentices you have on each standard. Add or remove standards to model a different mix.</p></div>' +
+      '<table class="std cohort"><thead><tr>' +
+        '<th>Standard</th><th>On programme</th><th>Monthly draw</th><th>Annual draw</th><th></th>' +
+      '</tr></thead><tbody id="cohortrows">' + rows + '</tbody>' +
+      '<tfoot><tr><td class="nm"><b>Total</b></td>' +
+        '<td class="num" id="t-heads">–</td>' +
+        '<td class="num" id="t-mo">–</td>' +
+        '<td class="num" id="t-yr">–</td><td></td></tr></tfoot>' +
+      '</table>' +
+      '<div class="addrow">' +
+        '<select id="addstd"><option value="">Add another standard…</option>' + options + '</select>' +
+        '<button class="btn small" id="addbtn">Add</button>' +
+      '</div>' +
+    '</section>' +
+
+    '<section class="lsection">' +
+      '<div class="lhead"><h2>3. How old are they?</h2>' +
+      '<p>The single biggest lever on what a shortfall costs. Since 1 August 2026, if your balance runs out, government funds ' +
+      '100% of training for apprentices aged 16 to 24 and 75% for those aged 25 and over.</p></div>' +
+      '<div class="sliderbox">' +
+        '<label for="young">Apprentices aged 16 to 24</label>' +
+        '<div class="sliderrow">' +
+          '<input type="range" id="young" min="0" max="' + heads + '" value="' + Math.min(YOUNG, heads) + '">' +
+          '<output id="youngout"></output>' +
+        '</div>' +
+        '<div class="sliderends"><span>0</span><span id="youngmax"></span></div>' +
+      '</div>' +
+    '</section>' +
+
+    '<section class="lsection costs">' +
+      '<div class="lhead"><h2>Your annual costs</h2>' +
+      '<p>What this cohort means for your budget over a year.</p></div>' +
+      '<div id="levyout"></div>' +
+    '</section>' +
+
     '<div class="grouphead" style="margin-top:44px"><h2>Incentives and grants worth checking</h2><div class="rule"></div></div>' +
     '<div class="readgrid" style="margin-top:16px">' +
       INCENTIVES.map(i => '<div class="readcard">' +
@@ -399,66 +496,121 @@ function levyView(){
 }
 
 function renderLevy(){
-  const num = id => parseFloat((document.getElementById(id).value || '0').replace(/[^\d.]/g,'')) || 0;
-  const payroll = num('payroll');
-  const heads   = Math.round(num('heads'));
-  const young   = Math.min(Math.round(num('young')), heads);
+  const payroll = parseFloat((document.getElementById('payroll').value || '0').replace(/[^\d.]/g,'')) || 0;
+  const heads = cohortHeads();
 
-  const factor = MEMBER.apprentices ? heads / MEMBER.apprentices : 1;
-  const scaled = MEMBER.standards.map(s => ({ ...s, count: Math.round(s.count * factor) }));
-  const f = levyFigures(payroll, scaled, young, MEMBER.levyPayer);
+  const slider = document.getElementById('young');
+  slider.max = heads;
+  if(+slider.value > heads) slider.value = heads;
+  YOUNG = +slider.value;
+  document.getElementById('youngmax').textContent = heads ? heads + ' (all of them)' : '0';
 
-  const rows = [
-    ['Pay bill entered', money(Math.round(payroll)),
-      payroll > LEVY_MODEL.threshold ? 'Above the £3m threshold, so the levy is due' : 'Below the £3m threshold — no levy due, so you are a non-levy employer'],
-    ['Levy at 0.5%', money(Math.round(f.gross)), 'Before the annual allowance'],
-    ['Less annual allowance', '−' + money(LEVY_MODEL.allowance), 'Every employer gets this'],
-    ['Funds available per year', money(Math.round(f.annual)),
-      'Roughly ' + money(Math.round(f.monthly)) + ' a month. No 10% top-up is added to new funds from 1 August 2026'],
-    ['Your cohort commits', money(Math.round(f.commitment)),
-      heads + ' apprentices across ' + scaled.length + ' standards, over the life of each programme'],
-    ['Drawn down per year', money(Math.round(f.annualDraw)),
-      'Averaged over a typical programme length of ' + Math.round(f.avgMonths) + ' months']
-  ];
+  const f = levyFigures(payroll, COHORT, YOUNG, MEMBER.levyPayer);
+
+  document.getElementById('youngout').textContent =
+    f.young + ' of ' + heads + (heads ? '  ·  ' + Math.round(f.pctYoung * 100) + '%' : '');
+
+  /* Funds in */
+  document.getElementById('fundsin').innerHTML =
+    '<table class="std levytable"><tbody>' +
+    '<tr><td class="nm">Levy at 0.5%</td><td class="num big">' + money(Math.round(f.gross)) + '</td>' +
+      '<td>' + (f.liable
+        ? 'Your pay bill is above the £3m threshold, so the levy is due'
+        : 'Below the £3m threshold, so no levy is due and you count as a non-levy employer') + '</td></tr>' +
+    '<tr><td class="nm">Less annual allowance</td><td class="num big">−' + money(LEVY_MODEL.allowance) + '</td>' +
+      '<td>Every employer gets this</td></tr>' +
+    '<tr class="totalrow"><td class="nm"><b>Funds available per year</b></td>' +
+      '<td class="num big">' + money(Math.round(f.available)) + '</td>' +
+      '<td>About ' + money(Math.round(f.monthlyIn)) + ' a month into your account. No 10% top-up is added from 1 August 2026, and new funds expire after 12 months.</td></tr>' +
+    '</tbody></table>';
+
+  /* Per standard */
+  f.lines.forEach((l, i) => {
+    const mo = document.getElementById('mo-' + i);
+    const yr = document.getElementById('yr-' + i);
+    if(mo) mo.textContent = l.count ? money(Math.round(l.monthlyAll)) : '—';
+    if(yr) yr.textContent = l.count ? money(Math.round(l.annual)) : '—';
+  });
+  document.getElementById('t-heads').textContent = heads;
+  document.getElementById('t-mo').textContent = money(Math.round(f.monthlyOut));
+  document.getElementById('t-yr').textContent = money(Math.round(f.annualDraw));
+
+  /* Annual costs */
+  const gap = f.shortfall > 0;
+
+  const summary =
+    '<table class="std levytable"><tbody>' +
+    '<tr><td class="nm">Coming in</td><td class="num big">' + money(Math.round(f.available)) + '</td>' +
+      '<td>Levy funds available to you this year</td></tr>' +
+    '<tr><td class="nm">Going out</td><td class="num big">' + money(Math.round(f.annualDraw)) + '</td>' +
+      '<td>' + heads + ' apprentice' + (heads === 1 ? '' : 's') + ' drawing down across ' +
+      f.lines.filter(l => l.count).length + ' standard' + (f.lines.filter(l => l.count).length === 1 ? '' : 's') + '</td></tr>' +
+    '<tr class="totalrow"><td class="nm"><b>' + (gap ? 'Shortfall' : 'Surplus') + '</b></td>' +
+      '<td class="num big ' + (gap ? 'neg' : 'pos') + '">' + (gap ? '−' : '+') + money(Math.round(gap ? f.shortfall : f.surplus)) + '</td>' +
+      '<td>' + (gap ? 'Training costs beyond what your levy covers' : 'Funds you will not use at the current rate') + '</td></tr>' +
+    '</tbody></table>';
 
   let verdict;
-  if(f.shortfall > 0){
-    const pct = Math.round(f.pctUnder * 100);
-    verdict = '<div class="alert"><b>You will exhaust your levy balance.</b> ' +
-      'You draw down roughly ' + money(Math.round(f.annualDraw)) + ' a year against ' +
-      money(Math.round(f.annual)) + ' coming in — a gap of about ' + money(Math.round(f.shortfall)) + '. ' +
-      'What that costs you now depends on how old your apprentices are.</div>' +
-
-      '<table class="std levytable" style="margin-top:14px"><tbody>' +
-      '<tr><td class="nm">' + young + ' aged 16 to 24 (' + pct + '%)</td>' +
-        '<td class="num big">' + money(Math.round(f.coUnder)) + '</td>' +
-        '<td>Government funds 100% of training and assessment up to the band maximum, even with the balance exhausted. You pay nothing for this group.</td></tr>' +
-      '<tr><td class="nm">' + (heads - young) + ' aged 25 and over</td>' +
-        '<td class="num big">' + money(Math.round(f.coOver)) + '</td>' +
-        '<td>Co-investment at 25%. Government funds the remaining 75%.</td></tr>' +
-      '<tr><td class="nm"><b>Your annual cost</b></td>' +
-        '<td class="num big">' + money(Math.round(f.coInvest)) + '</td>' +
-        '<td>Government covers ' + money(Math.round(f.govShare)) + ' of the shortfall.</td></tr>' +
+  if(gap){
+    const perHead = f.older ? f.costOlder / f.older : 0;
+    verdict =
+      '<h3 class="csub">What the shortfall actually costs you</h3>' +
+      '<table class="std levytable"><tbody>' +
+      '<tr><td class="nm">' + f.young + ' aged 16 to 24</td>' +
+        '<td class="num big pos">' + money(Math.round(f.costYoung)) + '</td>' +
+        '<td>' + money(Math.round(f.shortYoung)) + ' of the shortfall sits with this group. Government funds 100% of training and assessment up to the band maximum, even with your balance exhausted.</td></tr>' +
+      '<tr><td class="nm">' + f.older + ' aged 25 and over</td>' +
+        '<td class="num big neg">' + money(Math.round(f.costOlder)) + '</td>' +
+        '<td>' + money(Math.round(f.shortOlder)) + ' of the shortfall, co-invested at ' + (f.rates.over25 * 100) + '%. Government funds the remaining ' + (100 - f.rates.over25 * 100) + '%.</td></tr>' +
+      '<tr class="totalrow"><td class="nm"><b>You pay</b></td>' +
+        '<td class="num big neg">' + money(Math.round(f.youCost)) + '</td>' +
+        '<td>Government covers ' + money(Math.round(f.govCost)) + ' of the shortfall.</td></tr>' +
       '</tbody></table>' +
-
-      (young > 0 ? '<div class="okbox">Shifting recruitment towards 16 to 24 year olds is now worth real money. ' +
-        'Every apprentice you move from the over-25 group to the under-25 group removes 25% of their training cost from your budget.</div>' : '');
+      (f.older > 0
+        ? '<div class="okbox">At this cohort size, moving one apprentice from the over-25 group to the under-25 group saves roughly ' +
+          money(Math.round(perHead)) + ' a year. Age is a budget lever now, not just a recruitment preference.</div>'
+        : '<div class="okbox">Every apprentice here is under 25, so the shortfall costs you nothing — government funds all of it.</div>');
   } else {
-    verdict = '<div class="okbox"><b>You have a surplus of about ' + money(Math.round(f.surplus)) + ' a year.</b> ' +
-      'New funds expire after ' + LEVY_MODEL.expiryMonths + ' months rather than 24, so a surplus is money you lose if you do not commit it. ' +
-      'Consider apprenticeship units, foundation apprenticeships, or transferring up to 50% to another employer — the transfer allowance now covers units as well as full apprenticeships.</div>';
+    verdict =
+      '<h3 class="csub">What to do with the surplus</h3>' +
+      '<div class="okbox"><b>' + money(Math.round(f.surplus)) + ' a year is going unused.</b> ' +
+      'New funds expire after 12 months rather than 24, so this is money you lose rather than money you bank. ' +
+      'Apprenticeship units and foundation apprenticeships are both fundable, and you can transfer up to 50% of your annual funds ' +
+      'to another employer — the transfer allowance now covers units as well as full apprenticeships.</div>';
   }
 
-  document.getElementById('levyout').innerHTML =
-    '<table class="std levytable"><tbody>' +
-    rows.map(r => '<tr><td class="nm">' + r[0] + '</td><td class="num big">' + r[1] + '</td><td>' + r[2] + '</td></tr>').join('') +
-    '</tbody></table>' + verdict +
-    '<div class="notice" style="margin-top:18px"><b>How this is worked out, and what it assumes.</b> ' +
-    'Levy is 0.5% of the pay bill less a £15,000 allowance. The annual draw-down spreads each apprentice\'s funding band ' +
-    'evenly across their programme length, which real drawdown does not do exactly — front-loaded delivery draws faster and ' +
-    'the 20% completion payment lands at the end. It assumes every apprentice runs to completion at the band maximum. ' +
+  document.getElementById('levyout').innerHTML = summary + verdict +
+    '<div class="notice" style="margin-top:18px"><b>How the drawdown is worked out.</b> ' +
+    'For each apprentice, 80% of the price is paid to the provider in equal monthly instalments across the planned duration, ' +
+    'and 20% is held back until completion. Across a steady cohort those come to the funding band divided by the duration in months, ' +
+    'multiplied by twelve. It assumes every apprentice runs to completion at the band maximum, which is the worst case — ' +
+    'withdrawals and prices negotiated below the band will both reduce it. The shortfall is split between age groups in proportion to headcount. ' +
     'Treat it as a planning estimate and check your Apprenticeship Service account for actual figures. ' +
     LEVY_MODEL.note + '</div>';
+}
+
+function wireLevy(){
+  document.getElementById('payroll').addEventListener('input', renderLevy);
+  document.getElementById('young').addEventListener('input', renderLevy);
+
+  document.querySelectorAll('.cnt').forEach(inp => {
+    inp.addEventListener('input', () => {
+      COHORT[+inp.dataset.i].count = Math.max(0, parseInt(inp.value, 10) || 0);
+      renderLevy();
+    });
+  });
+
+  document.querySelectorAll('.rm').forEach(btn => {
+    btn.addEventListener('click', () => { COHORT.splice(+btn.dataset.i, 1); render(); });
+  });
+
+  document.getElementById('addbtn').addEventListener('click', () => {
+    const name = document.getElementById('addstd').value;
+    const s = STANDARDS.find(x => x.name === name);
+    if(!s) return;
+    COHORT.push({ name:s.name, code:s.code, level:s.level, funding:s.funding, months:s.months, count:1 });
+    render();
+  });
 }
 
 function prefsView(){
@@ -600,8 +752,7 @@ function render(){
   if(view === 'levy'){
     panel.innerHTML = levyView();
     renderLevy();
-    ['payroll','heads','young'].forEach(id =>
-      document.getElementById(id).addEventListener('input', renderLevy));
+    wireLevy();
   }
   if(view === 'prefs'){
     panel.innerHTML = prefsView();

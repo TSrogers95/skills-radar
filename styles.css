@@ -1391,3 +1391,102 @@ button.card p{ overflow-wrap:break-word; }
 
 .kanban.one{ grid-template-columns:1fr; }
 .kanban.one .colbody{ max-height:56vh; }
+
+/* ---------- Levy calculator sections ---------- */
+
+.lsection{ margin-top:34px; }
+.lhead{ margin-bottom:14px; }
+.lhead h2{
+  font-family:var(--display); font-size:19px; font-weight:600;
+  letter-spacing:-0.02em; margin:0 0 5px;
+}
+.lhead p{ margin:0; font-size:14px; color:var(--text-2); max-width:68ch; line-height:1.6; }
+
+/* The costs block is set apart, because it is the answer */
+.lsection.costs{
+  margin-top:42px; padding:26px 28px 28px;
+  background:var(--surface);
+  border:2px solid var(--ink);
+  border-top:5px solid var(--ink);
+}
+.lsection.costs .lhead h2{ font-size:22px; }
+.lsection.costs .lhead{ padding-bottom:14px; border-bottom:1px solid var(--line); margin-bottom:20px; }
+.lsection.costs table.std{ border-color:var(--line-strong); }
+
+.csub{
+  font-family:var(--display); font-size:14px; font-weight:600;
+  margin:26px 0 11px; color:var(--text-2);
+}
+
+/* ---------- Cohort table ---------- */
+
+table.cohort input.cnt{
+  width:74px; font-family:var(--display); font-size:16px; font-weight:500;
+  padding:6px 9px; text-align:center;
+  border:1px solid var(--line-strong); background:var(--surface);
+  color:var(--text); border-radius:2px;
+}
+table.cohort input.cnt:focus{ outline:none; border-color:var(--ink-3); box-shadow:0 0 0 3px rgba(22,48,47,0.08); }
+table.cohort tfoot td{
+  border-top:2px solid var(--line-strong); padding:12px;
+  font-family:var(--display); font-size:15px; font-weight:500; color:var(--text);
+}
+table.cohort .rm{
+  border:none; background:none; cursor:pointer; padding:5px 8px;
+  font-family:var(--sans); font-size:12px; color:var(--text-3); text-decoration:underline;
+}
+table.cohort .rm:hover{ color:var(--high); }
+
+.addrow{ display:flex; gap:9px; margin-top:14px; flex-wrap:wrap; }
+.addrow select{
+  flex:1; min-width:260px; font-family:var(--sans); font-size:14px;
+  padding:9px 12px; border:1px solid var(--line-strong);
+  background:var(--surface); color:var(--text); border-radius:2px;
+}
+.addrow select:focus{ outline:none; border-color:var(--ink-3); box-shadow:0 0 0 3px rgba(22,48,47,0.08); }
+.btn.small{ padding:9px 20px; font-size:14px; }
+
+/* ---------- Age slider ---------- */
+
+.sliderbox{ background:var(--surface); border:1px solid var(--line); padding:20px 24px 18px; }
+.sliderbox > label{ display:block; font-size:14px; font-weight:500; margin-bottom:14px; }
+.sliderrow{ display:flex; align-items:center; gap:20px; }
+
+.sliderrow input[type=range]{
+  flex:1; -webkit-appearance:none; appearance:none;
+  height:6px; background:var(--line); border-radius:3px; outline:none;
+}
+.sliderrow input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none; appearance:none;
+  width:22px; height:22px; border-radius:50%;
+  background:var(--ink); border:3px solid var(--surface);
+  box-shadow:0 0 0 1px var(--line-strong); cursor:pointer;
+}
+.sliderrow input[type=range]::-moz-range-thumb{
+  width:22px; height:22px; border-radius:50%;
+  background:var(--ink); border:3px solid var(--surface);
+  box-shadow:0 0 0 1px var(--line-strong); cursor:pointer;
+}
+.sliderrow input[type=range]:focus-visible{ box-shadow:0 0 0 3px rgba(22,48,47,0.16); }
+
+.sliderrow output{
+  font-family:var(--display); font-size:17px; font-weight:500;
+  color:var(--text); white-space:nowrap; min-width:130px; text-align:right;
+}
+.sliderends{
+  display:flex; justify-content:space-between;
+  font-size:11.5px; color:var(--text-3); margin-top:9px;
+}
+
+/* ---------- Figures ---------- */
+
+table.levytable tr.totalrow td{ border-top:2px solid var(--line-strong); background:var(--paper); }
+table.levytable td.big.neg{ color:var(--high); }
+table.levytable td.big.pos{ color:var(--low); }
+table.levytable td.num.big{ white-space:nowrap; }
+
+@media (max-width:640px){
+  .lsection.costs{ padding:20px 18px 22px; }
+  .sliderrow{ flex-direction:column; align-items:stretch; gap:12px; }
+  .sliderrow output{ text-align:left; }
+}
