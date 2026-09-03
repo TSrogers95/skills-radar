@@ -1490,3 +1490,26 @@ table.levytable td.num.big{ white-space:nowrap; }
   .sliderrow{ flex-direction:column; align-items:stretch; gap:12px; }
   .sliderrow output{ text-align:left; }
 }
+
+/* ---------- Compliance note ---------- */
+
+.lawbox{
+  background:#F2F4F8; border-left:3px solid #2A4A78;
+  padding:16px 19px; margin-top:18px;
+  font-size:14px; line-height:1.62; color:#2C3A52;
+}
+.lawbox b{ color:#1F3557; }
+
+/* ---------- Card links ---------- */
+
+.readcard .cardlinks{
+  display:flex; gap:14px; flex-wrap:wrap;
+  margin-top:12px; padding-top:11px; border-top:1px solid var(--line);
+}
+.readcard .cardlinks a{
+  font-family:var(--sans); font-size:12.5px; font-weight:500;
+  color:var(--ink-3); text-decoration:none;
+  border-bottom:1px solid var(--line-strong); padding-bottom:1px;
+}
+.readcard .cardlinks a:hover{ border-bottom-color:var(--ink-3); }
+.readcard .cardlinks a:last-child{ color:var(--text-2); font-weight:400; }

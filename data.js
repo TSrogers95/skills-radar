@@ -412,7 +412,7 @@ const ARTICLES = [
       "What it changed from: non-levy employers paid 5% of training costs up to the funding band maximum, with government covering 95%. Full funding was previously available only in narrower circumstances, typically for apprentices under 21 at employers with fewer than 50 staff.",
       "What follows, and this is the part most people miss: it substantially undercuts the rationale for levy transfers. Large employers have been able to transfer levy funds to SMEs, charities and flexi-job agencies, and many built social value and supply chain programmes around doing so. If an SME can now access full funding directly for anyone under 25, the transfer adds little for that cohort.",
       "Organisations that report levy transfer as a social value metric should revisit what they are actually claiming. The transfer mechanism still matters for apprentices aged 25 and over at non-levy employers, and for cases where an SME wants a specific provider relationship, but the headline case has weakened.",
-      "For SMEs the practical effect is straightforward: hiring an apprentice under 25 no longer carries a direct training cost, which changes the arithmetic on entry-level recruitment considerably."
+      "For SMEs the practical effect is that an apprentice under 25 carries no direct training cost. That is worth knowing when you build a training budget or make the case for an apprenticeship programme internally. It is not a reason to prefer younger candidates: age is a protected characteristic under the Equality Act 2010, and selecting on it is unlawful regardless of the funding position."
     ],
     sources: [
       { label: "Apprenticeship Service — Budget 2025, Growth and Skills Levy", url: "https://help.apprenticeships.education.gov.uk/hc/en-gb/articles/31398346955154-Budget-2025-Growth-and-Skills-Levy" }
@@ -1676,31 +1676,31 @@ const LEVY_MODEL = {
    These change frequently — every one links to the source to verify. */
 
 const INCENTIVES = [
-  { name:"£2,000 apprenticeship hiring payment", amount:"£2,000 per apprentice",
+  { article:"inc-hiring-payment", name:"£2,000 apprenticeship hiring payment", amount:"£2,000 per apprentice",
     who:"Non-levy employers recruiting an apprentice aged 16 to 24",
     detail:"New from October 2026. Applies to apprenticeships starting on or after 1 October 2026 where the apprentice began their job with you within the previous 3 months. Paid in two instalments, the first once they complete 90 days. Applies to foundation apprenticeships too, and sits outside subsidy control for 2026/27.",
     url:"https://www.gov.uk/government/publications/apprenticeship-funding-rules-and-assessment-plan-guidance-2026-to-2027/apprenticeship-funding-rules-summary-of-changes-version-1" },
-  { name:"£1,000 employer incentive payment", amount:"£1,000 per apprentice",
+  { article:"inc-additional-payment", name:"£1,000 employer incentive payment", amount:"£1,000 per apprentice",
     who:"Apprentices aged 16 to 18, or 19 to 24 with an EHC plan or care experience",
     detail:"Paid to the employer in two instalments, at 90 days and at 365 days on programme. A matching £1,000 goes to the training provider.",
     url:"https://www.gov.uk/guidance/apprenticeship-funding-rules" },
-  { name:"Care leavers' bursary", amount:"£3,000 to the apprentice",
+  { article:"inc-care-leavers", name:"Care leavers' bursary", amount:"£3,000 to the apprentice",
     who:"Apprentices who have been in local authority care",
     detail:"Paid directly to the apprentice, not the employer. Separate from the employer incentive and can be claimed alongside it.",
     url:"https://www.gov.uk/government/collections/funding-rules-for-apprenticeships" },
-  { name:"Learning support funding", amount:"£150 per month, plus one-off claims",
+  { article:"inc-learning-support", name:"Learning support funding", amount:"£150 per month, plus one-off claims",
     who:"Apprentices with an identified learning difficulty or disability",
     detail:"A fixed monthly rate paid to the provider. One-off costs above £150 can be claimed as they occur. Reviews every three months.",
     url:"https://www.gov.uk/government/collections/funding-rules-for-apprenticeships" },
-  { name:"Full funding for under-25s at non-levy employers", amount:"100% of training costs",
+  { article:"inc-full-funding", name:"Full funding for apprentices aged 16 to 24", amount:"100% of training costs",
     who:"Small and medium employers who do not pay the levy",
     detail:"Removes co-investment entirely for apprentices under 25. Not available to levy payers, but relevant if you transfer funds to a smaller employer.",
     url:"https://help.apprenticeships.education.gov.uk/hc/en-gb/articles/31398346955154-Budget-2025-Growth-and-Skills-Levy" },
-  { name:"Levy transfer, as a sending employer", amount:"Up to 50% of annual funds",
+  { article:"inc-transfers", name:"Levy transfer, as a sending employer", amount:"Up to 50% of annual funds",
     who:"Levy payers with a surplus balance",
     detail:"Transferring a surplus to another business uses funds that would otherwise expire. Receiving employers have 6 weeks to accept and 3 months to link the funds to an apprenticeship.",
     url:"https://www.gov.uk/government/collections/funding-rules-for-apprenticeships" },
-  { name:"English and maths funding", amount:"Funded separately from the band",
+  { article:"inc-english-maths-funding", name:"English and maths funding", amount:"Funded separately from the band",
     who:"Any apprentice studying English or maths",
     detail:"Does not come out of the funding band, so it does not consume your levy balance against the apprenticeship itself. Now optional for those who began aged 19 or over.",
     url:"https://assets.publishing.service.gov.uk/media/67b32312b56d8b0856c2fd60/Apprenticeship_funding_rules_2024_to_2025_summary_of_changes.pdf" }
@@ -2022,3 +2022,152 @@ const OTHER_DOCS = [
   { name:"Skills England apprenticeship register", url:"https://skillsengland.education.gov.uk/apprenticeships/",
     note:"Now also where each standard's minimum off-the-job training volume lives, following the removal of Annex C from the rules." }
 ];
+
+/* ---------- 11. INCENTIVE ARTICLES -------------------------------------
+   Each incentive gets a piece on the articles page, so people read the
+   detail here first and reach the source from there rather than being
+   pushed straight off the site.
+   ----------------------------------------------------------------------- */
+
+ARTICLES.push(
+
+{
+  id: "inc-hiring-payment",
+  icon: "coin", tag: "Levy", urgency: "high", route: "",
+  date: "2026-10-01",
+  title: "The £2,000 hiring payment for non-levy employers",
+  summary: "New from October 2026 for smaller employers taking on an apprentice aged 16 to 24, with a three-month job-start window that catches people out.",
+  standfirst: "The most substantial new money in the 2026/27 rules, and the eligibility condition most likely to be missed.",
+  body: [
+    "From October 2026, employers who do not pay the apprenticeship levy can claim a £2,000 hiring payment when they recruit a new apprentice aged 16 to 24. It applies to apprenticeships starting on or after 1 October 2026, and is paid in two instalments, the first once the apprentice has completed 90 days on programme.",
+    "The condition that trips people up is the job-start window. The apprentice must have started their job with that employer within the previous three months. This is a hiring payment, not a training payment — it is designed to support recruitment of someone new, not to reward putting a long-standing member of staff onto an apprenticeship. If your apprentice has been with you a year and you enrol them, the payment does not apply.",
+    "It applies to foundation apprenticeships as well as full standards, which matters because those are eight-month Level 2 programmes aimed squarely at this age group.",
+    "It also sits outside subsidy control from 1 August 2026 to 31 July 2027, so it does not count against an employer's minimal financial assistance allowance for that year. That is worth knowing for employers already close to their threshold through other support.",
+    "What follows: check that your onboarding records capture the date the apprentice started their job separately from the date they started their apprenticeship, because eligibility turns on the gap between the two. Providers should build this into enrolment paperwork now rather than reconstructing it later. It stacks with the existing £1,000 additional payment where the apprentice is 16 to 18, so a single eligible apprentice can attract £3,000 to the employer."
+  ],
+  sources: [
+    { label: "DWP — Apprenticeship funding rules: summary of changes (version 3), paragraphs 133 to 141", url: "https://www.gov.uk/government/publications/apprenticeship-funding-rules-and-assessment-plan-guidance-2026-to-2027/apprenticeship-funding-rules-summary-of-changes-version-1" },
+    { label: "GOV.UK — Apprenticeship funding rules: 2026 to 2027", url: "https://www.gov.uk/government/publications/apprenticeship-funding-rules-and-assessment-plan-guidance-2026-to-2027" }
+  ]
+},
+
+{
+  id: "inc-additional-payment",
+  icon: "coin", tag: "Levy", urgency: "medium", route: "",
+  date: "2026-08-01",
+  title: "The £1,000 additional payment, and who actually receives it",
+  summary: "Paid to both the employer and the provider, in two instalments, for younger apprentices and for care leavers and those with an EHC plan.",
+  standfirst: "Long-standing, widely claimed, and still routinely missed because nobody chases the bank details.",
+  body: [
+    "Employers receive an additional payment of £1,000 for an apprentice aged 16 to 18 at the start of their apprenticeship, or aged 19 to 24 where the apprentice has an Education, Health and Care plan or has been in the care of their local authority. The training provider receives a matching £1,000.",
+    "It is paid in two instalments: the first once the apprentice has completed 90 days on programme, and the second at 365 days. It is separate from the funding band, so it does not come out of a levy account or count towards co-investment.",
+    "The 2026/27 rules clarified two operational points. Both the provider and the employer receive the payment where the apprentice meets the criteria — this had been a source of confusion. And there are now minimum expectations on providers when contacting employers for their bank details, because the most common reason the payment goes unclaimed is simply that nobody collected the details.",
+    "The rules also set out what information providers must give apprentices about declaring care leaver status. An apprentice who does not know they can declare it will not, and the payment is lost along with the apprentice's own £3,000 bursary.",
+    "What follows: this is money left on the table more often than it should be. If you are a provider, audit which of your current apprentices are eligible and whether the employer bank details are on file. If you are an employer, check your finance team knows to expect two payments rather than one, and that they are not being coded as training income."
+  ],
+  sources: [
+    { label: "DWP — Summary of changes, paragraphs 125, 127.1 and 132", url: "https://www.gov.uk/government/publications/apprenticeship-funding-rules-and-assessment-plan-guidance-2026-to-2027/apprenticeship-funding-rules-summary-of-changes-version-1" }
+  ]
+},
+
+{
+  id: "inc-care-leavers",
+  icon: "book", tag: "Levy", urgency: "medium", route: "",
+  date: "2026-08-01",
+  title: "The care leavers' bursary goes to the apprentice, not the employer",
+  summary: "£3,000 paid directly to apprentices who have been in local authority care, and it depends entirely on them knowing to declare it.",
+  standfirst: "A payment that only reaches the people it is meant for if somebody tells them it exists.",
+  body: [
+    "Apprentices who have been in the care of their local authority can receive a bursary of £3,000. Unlike the additional payments, it goes directly to the apprentice rather than to the employer or provider, and it is separate from — not instead of — the £1,000 additional payment the employer and provider receive for the same apprentice.",
+    "The whole mechanism depends on declaration. An apprentice who does not know the bursary exists, or does not realise their circumstances count, will not declare their status and will not receive it. This is why the 2026/27 rules added a clarification about what information providers must give apprentices, specifically to reduce the risk that providers do not share everything an apprentice needs in order to declare.",
+    "Care experience is also one of the two routes by which someone aged 19 to 24 attracts the £1,000 additional payment, and one of the two exceptions to the Level 7 age restriction — a 22 to 24 year old who has been in care remains eligible for a Level 7 apprenticeship when others of the same age do not.",
+    "What follows: the practical task is making declaration easy and unembarrassing. That means clear information at enrolment rather than a box buried in a form, wording that covers the range of care arrangements people may not think of as care, and an offer to discuss it privately. For an apprentice on a Level 2 wage, £3,000 is not a marginal sum."
+  ],
+  sources: [
+    { label: "GOV.UK — Apprenticeships bursary for care leavers", url: "https://www.gov.uk/government/collections/funding-rules-for-apprenticeships" },
+    { label: "DWP — Summary of changes, paragraph 127.1", url: "https://www.gov.uk/government/publications/apprenticeship-funding-rules-and-assessment-plan-guidance-2026-to-2027/apprenticeship-funding-rules-summary-of-changes-version-1" }
+  ]
+},
+
+{
+  id: "inc-learning-support",
+  icon: "check", tag: "Funding rules", urgency: "medium", route: "",
+  date: "2026-08-01",
+  title: "Learning support funding, and the new light-touch review",
+  summary: "£150 a month plus one-off claims, with reviews now allowed to be lighter where a need is stable and permanent.",
+  standfirst: "Funding that is neither means-tested nor capped by the band, and is under-claimed as a result of being misunderstood.",
+  body: [
+    "Where an apprentice has an identified learning difficulty or disability, learning support funding is paid to the provider at a fixed rate of £150 a month. Costs above that can be claimed as one-off payments as they occur. It sits outside the funding band, so it neither consumes a levy balance against the apprenticeship nor affects co-investment.",
+    "Eligibility does not require an Education, Health and Care plan. Providers can determine it through a thorough, evidence-based assessment of a learning difficulty or disability, and a detailed assessment can be carried out at any point during the apprenticeship rather than only at the start. That matters because needs are often identified months in, once someone is struggling with a specific element.",
+    "The 2026/27 rules added a proportionality clarification: where the need is stable because of a permanent disability and is unlikely to change, reviews may be light-touch rather than a full reassessment each time. Reviews otherwise run alongside progress reviews.",
+    "The same evidence base also unlocks the English and maths flexibilities, including offering Entry Level 3 functional skills in the adjusted subject where that is appropriate.",
+    "What follows: the under-claiming here is usually procedural rather than deliberate — the assessment is done, the support is delivered, and nobody records it in a way that triggers the claim. Check that your learning support process produces the evidence the funding requires as a by-product, rather than as a separate task somebody has to remember."
+  ],
+  sources: [
+    { label: "GOV.UK — Supporting learners with learning difficulties and disabilities", url: "https://www.gov.uk/government/collections/funding-rules-for-apprenticeships" },
+    { label: "DWP — Summary of changes, paragraph 44.5", url: "https://www.gov.uk/government/publications/apprenticeship-funding-rules-and-assessment-plan-guidance-2026-to-2027/apprenticeship-funding-rules-summary-of-changes-version-1" }
+  ]
+},
+
+{
+  id: "inc-full-funding",
+  icon: "shop", tag: "Levy", urgency: "high", route: "",
+  date: "2026-08-01",
+  title: "Full funding for 16 to 24 year olds, and the new co-investment map",
+  summary: "Since August 2026 what you pay depends on the apprentice's age as well as your levy status — and for one group it is nothing at all.",
+  standfirst: "The single change most likely to alter a training budget this year.",
+  body: [
+    "Version 3 of the 2026/27 rules, published on 29 July 2026, set out a co-investment position that now turns on two things: whether you pay the levy, and how old the apprentice is at the start of their training.",
+    "If you do not pay the levy, government funds all training and assessment costs up to the funding band maximum for apprentices aged 16 to 24. For apprentices aged 25 and over, you co-invest at 5%.",
+    "If you do pay the levy and your account balance is exhausted, government funds all costs up to the band maximum for apprentices aged 16 to 24, and 75% for those aged 25 and over — leaving you co-investing at 25% for that group only.",
+    "What it changed from: co-investment was previously a single rate applied regardless of who the apprentice was, with full funding available only in much narrower circumstances.",
+    "What follows: this changes what a levy shortfall actually costs, sometimes dramatically, and it is worth remodelling your budget rather than assuming last year's figures hold. It also weakens the case for levy transfers as a way of supporting smaller employers with younger apprentices, since those employers can now access full funding directly.",
+    "One thing it is not: a reason to prefer younger candidates. Age is a protected characteristic under the Equality Act 2010 and selecting on it is unlawful, whatever the funding position. This is information for building and defending a budget, not for shaping a shortlist."
+  ],
+  sources: [
+    { label: "DWP — Summary of changes, paragraphs 213, 213.1, 214 and 214.2", url: "https://www.gov.uk/government/publications/apprenticeship-funding-rules-and-assessment-plan-guidance-2026-to-2027/apprenticeship-funding-rules-summary-of-changes-version-1" },
+    { label: "GOV.UK — Funding for employers who do not pay the levy", url: "https://www.gov.uk/government/collections/funding-rules-for-apprenticeships" }
+  ]
+},
+
+{
+  id: "inc-transfers",
+  icon: "handshake", tag: "Levy", urgency: "medium", route: "",
+  date: "2026-08-01",
+  title: "Levy transfers: what they are still good for",
+  summary: "Up to 50% of your annual funds, now covering apprenticeship units too — but the strongest reason for doing it has weakened.",
+  standfirst: "A mechanism worth revisiting rather than continuing on autopilot.",
+  body: [
+    "A levy-paying employer can transfer up to 50% of their annual funds to another business. With new funds now expiring after 12 months rather than 24, a transfer is one of the ways to use a balance that would otherwise be lost.",
+    "The 2026/27 rules confirmed that the transfer allowance covers apprenticeship units as well as full apprenticeships, which widens what a receiving employer can do with the money. Public sector employers receiving transfers fall outside subsidy control and do not need to complete a minimal financial assistance declaration.",
+    "The timings are unforgiving and worth restating. Once a transfer is approved by the sending employer, the receiving employer has six weeks to accept the funds or they lapse. Once accepted, they have three months to link them to an approved apprenticeship record. Miss either window and a fresh transfer has to be applied for.",
+    "The strategic picture has shifted, though. Many transfer programmes were built on the argument that smaller employers could not otherwise afford apprentices. Since August 2026 a non-levy employer pays nothing for an apprentice aged 16 to 24 and 5% for those aged 25 and over. For younger apprentices the transfer now adds relatively little.",
+    "What follows: transfers remain genuinely useful for apprentices aged 25 and over at smaller employers, for supply chain development, and for using funds that would otherwise expire. If your organisation reports levy transfer as a social value metric, check what you are actually claiming, because the underlying need has changed."
+  ],
+  sources: [
+    { label: "DWP — Summary of changes, paragraphs 234, 234.1 and 242", url: "https://www.gov.uk/government/publications/apprenticeship-funding-rules-and-assessment-plan-guidance-2026-to-2027/apprenticeship-funding-rules-summary-of-changes-version-1" },
+    { label: "GOV.UK — Transferring your apprenticeship levy to another business", url: "https://www.gov.uk/government/collections/funding-rules-for-apprenticeships" }
+  ]
+},
+
+{
+  id: "inc-english-maths-funding",
+  icon: "book", tag: "Funding rules", urgency: "low", route: "",
+  date: "2026-08-01",
+  title: "English and maths is funded separately from the band",
+  summary: "It does not consume your levy balance against the apprenticeship, and apprentices can use their adult skills entitlement alongside it.",
+  standfirst: "Optional for most adults since 2025, but still funded — and the funding route is often misunderstood.",
+  body: [
+    "English and maths training is funded separately from the apprenticeship funding band. It does not come out of the amount available for the apprenticeship itself, so delivering it does not reduce what you can spend on training the occupational content.",
+    "Since February 2025 it has been optional for apprentices who began their training aged 19 or over, except where English or maths forms an essential component of a mandatory qualification within the standard — a determination that sits with the awarding organisation and must be checked standard by standard rather than assumed. Apprentices who began aged 16 to 18 remain subject to the requirement.",
+    "The 2026/27 rules added several clarifications. The provider must establish at initial assessment whether the apprentice will study a standalone qualification. Training must not be delivered entirely by self-directed distance learning. If an apprentice aged 19 or over opts in and later withdraws, the provider must withdraw them to the last day of learning. And apprentices may use their statutory adult skills fund entitlement to study English or maths while on an apprenticeship.",
+    "Providers must also support apprentices who are exempt to develop these skills anyway, which can draw on Level 1 or Level 2 course material without the apprentice being enrolled on the qualification.",
+    "What follows: because it is funded outside the band, there is rarely a funding reason to discourage an apprentice from taking it. The reasons to think carefully are workload and completion risk, not cost."
+  ],
+  sources: [
+    { label: "DWP — Summary of changes, paragraphs 47 to 60", url: "https://www.gov.uk/government/publications/apprenticeship-funding-rules-and-assessment-plan-guidance-2026-to-2027/apprenticeship-funding-rules-summary-of-changes-version-1" },
+    { label: "GOV.UK — Apprenticeship funding rules", url: "https://www.gov.uk/guidance/apprenticeship-funding-rules" }
+  ]
+}
+
+);

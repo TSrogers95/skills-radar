@@ -437,7 +437,8 @@ function levyView(){
     .join('');
 
   return '<div class="pagehead"><h1>Levy calculator</h1>' +
-    '<p>Enter your pay bill and exactly how many apprentices sit on each standard. Everything recalculates as you type.</p></div>' +
+    '<p>Enter your pay bill and exactly how many apprentices sit on each standard. Everything recalculates as you type. ' +
+    'This is a budgeting tool — it forecasts what your existing and planned cohort will cost, and is not a basis for deciding who to recruit.</p></div>' +
 
     '<section class="lsection">' +
       '<div class="lhead"><h2>1. Your pay bill</h2>' +
@@ -467,9 +468,10 @@ function levyView(){
     '</section>' +
 
     '<section class="lsection">' +
-      '<div class="lhead"><h2>3. How old are they?</h2>' +
-      '<p>The single biggest lever on what a shortfall costs. Since 1 August 2026, if your balance runs out, government funds ' +
-      '100% of training for apprentices aged 16 to 24 and 75% for those aged 25 and over.</p></div>' +
+      '<div class="lhead"><h2>3. The age profile of your cohort</h2>' +
+      '<p>Government funds training differently by age, so this changes what a shortfall costs. Since 1 August 2026, if your balance ' +
+      'runs out, government funds 100% of training for apprentices aged 16 to 24 and 75% for those aged 25 and over. ' +
+      'Enter your actual position so the forecast is accurate.</p></div>' +
       '<div class="sliderbox">' +
         '<label for="young">Apprentices aged 16 to 24</label>' +
         '<div class="sliderrow">' +
@@ -489,9 +491,16 @@ function levyView(){
     '<div class="grouphead" style="margin-top:44px"><h2>Incentives and grants worth checking</h2><div class="rule"></div></div>' +
     '<div class="readgrid" style="margin-top:16px">' +
       INCENTIVES.map(i => '<div class="readcard">' +
-        '<a href="' + i.url + '" target="_blank" rel="noopener">' + i.name + '</a>' +
+        (i.article
+          ? '<a href="articles.html#' + i.article + '">' + i.name + '</a>'
+          : '<a href="' + i.url + '" target="_blank" rel="noopener">' + i.name + '</a>') +
         '<p><b style="color:var(--text)">' + i.amount + '</b> — ' + i.who + '.</p>' +
-        '<p>' + i.detail + '</p></div>').join('') +
+        '<p>' + i.detail + '</p>' +
+        (i.article
+          ? '<div class="cardlinks"><a href="articles.html#' + i.article + '">Read the detail</a>' +
+            '<a href="' + i.url + '" target="_blank" rel="noopener">Official source</a></div>'
+          : '') +
+        '</div>').join('') +
     '</div>';
 }
 
@@ -552,7 +561,6 @@ function renderLevy(){
 
   let verdict;
   if(gap){
-    const perHead = f.older ? f.costOlder / f.older : 0;
     verdict =
       '<h3 class="csub">What the shortfall actually costs you</h3>' +
       '<table class="std levytable"><tbody>' +
@@ -567,9 +575,14 @@ function renderLevy(){
         '<td>Government covers ' + money(Math.round(f.govCost)) + ' of the shortfall.</td></tr>' +
       '</tbody></table>' +
       (f.older > 0
-        ? '<div class="okbox">At this cohort size, moving one apprentice from the over-25 group to the under-25 group saves roughly ' +
-          money(Math.round(perHead)) + ' a year. Age is a budget lever now, not just a recruitment preference.</div>'
-        : '<div class="okbox">Every apprentice here is under 25, so the shortfall costs you nothing — government funds all of it.</div>');
+        ? '<div class="lawbox"><b>A note on how to use this figure.</b> ' +
+          'The split above exists because government funds training differently by age, not because apprentices of different ages ' +
+          'are worth different amounts to your organisation. Age is a protected characteristic under the Equality Act 2010, and ' +
+          'selecting or rejecting candidates on the basis of age is unlawful. Use this to forecast your training budget and to ' +
+          'make the case for it internally — not to shape who you recruit. ' +
+          'If your co-investment cost is uncomfortable, the levers that are open to you are the price you negotiate with your provider, ' +
+          'the mix of standards you offer, the timing of starts across funding years, and the incentives below.</div>'
+        : '<div class="okbox">Every apprentice in this cohort is aged 16 to 24, so government funds the whole shortfall and it costs you nothing.</div>');
   } else {
     verdict =
       '<h3 class="csub">What to do with the surplus</h3>' +
