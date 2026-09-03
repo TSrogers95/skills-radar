@@ -180,7 +180,7 @@ function deriveUpdates(){
         category: 'standard',
         route: s.route,
         standard: s.name + (s.code ? ', Level ' + s.level + ' (' + s.code + ')' : ', Level ' + s.level),
-        article: s.article || '',
+        article: articleFor(s, defunded, dev),
         status: status,
         urgency: urgency,
         pinned: false,
@@ -232,4 +232,39 @@ function allUpdates(){
   const seen = new Set(curated.map(u => (u.standard || '').split(',')[0].trim()).filter(Boolean));
   const derived = deriveUpdates().filter(d => !seen.has(d.standard.split(',')[0].trim()));
   return curated.concat(derived);
+}
+
+/* =========================================================================
+   ARTICLE ROUTING
+   Every derived feed item points at an article. Where dozens of standards
+   moved for the same reason they share a grouped piece rather than each
+   getting a thin one of their own.
+   ========================================================================= */
+
+const ROUTE_ARTICLES = {
+  "health-science":              "route-health-science",
+  "digital":                     "route-digital",
+  "engineering-manufacturing":   "route-engineering",
+  "construction":                "route-construction",
+  "creative-design":             "route-creative",
+  "legal-finance-accounting":    "route-legal-finance",
+  "transport-logistics":         "route-transport",
+  "education-early-years":       "route-education",
+  "protective-services":         "route-protective-care",
+  "care-services":               "route-protective-care",
+  "agriculture":                 "route-agriculture",
+  "business-administration":     "route-business-admin",
+  "catering-hospitality":        "route-hospitality-retail",
+  "sales-marketing-procurement": "route-hospitality-retail",
+  "hair-beauty":                 "route-creative"
+};
+
+function articleFor(s, defunded, dev){
+  if(s.article) return s.article;                                   // explicit wins
+  if(defunded)  return 'defunding-16';
+  if(/funding band/i.test(s.changed)) return 'funding-bands';
+  if(/new unit|new foundation/i.test(s.changed)) return 'units-foundation';
+  if(dev) return 'standards-in-review';
+  if(/waiting|pending/i.test(s.epa || '')) return 'no-epa';
+  return ROUTE_ARTICLES[s.route] || 'standards-in-review';
 }

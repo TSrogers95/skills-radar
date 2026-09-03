@@ -98,7 +98,7 @@ function contentsHTML(title, items, extra){
     '</button>' +
     '<div class="clist" id="clist">' +
       items.map(i =>
-        '<a href="' + i.href + '"' + (/^https?:|^rules-document/.test(i.href) ? '' : '') + '>' +
+        '<a href="' + i.href + '"' + (/^https?:/.test(i.href) ? ' target="_blank" rel="noopener"' : '') + '>' +
           (i.dot ? '<i class="cdot ' + i.dot + '"></i>' : '') +
           '<b>' + i.label + '</b>' +
           '<span>' + i.meta + (i.tally ? ' · ' + i.tally + ' change' + (i.tally === 1 ? '' : 's') : '') + '</span>' +
@@ -225,7 +225,7 @@ function renderSearch(query){
       meta: 'Para ' + s.paras,
       tally: RULES_CHANGES.filter(c => c.section === s.id).length
     })),
-    '<a class="cdoc" href="rules-document.html">Open the linkable version &rarr;</a>'
+    ''
   );
   wireContents();
 
@@ -325,11 +325,11 @@ function renderDoc(){
   document.getElementById('contents').innerHTML = contentsHTML(
     'Find a section',
     RULES_SECTIONS.map(s => ({
-      href: 'rules-document.html#' + s.id,
+      href: RULES_DOC.pdf,
       label: s.name,
-      meta: 'Para ' + s.paras
+      meta: 'Search for para ' + s.paras
     })),
-    '<a class="cdoc" href="rules-document.html">Open the linkable version &rarr;</a>'
+    ''
   );
   wireContents();
   document.getElementById('panel').innerHTML =
@@ -344,11 +344,25 @@ function renderDoc(){
     '</div>' +
     '<div class="readgrid" style="margin-top:16px">' +
       '<div class="readcard"><a href="' + RULES_DOC.pdf + '" target="_blank" rel="noopener">The full rules (PDF, ' + RULES_DOC.pages + ' pages)</a>' +
-        '<p>' + RULES_DOC.title + ', ' + RULES_DOC.version + '.</p></div>' +
-      '<div class="readcard"><a href="' + RULES_DOC.changesPdf + '" target="_blank" rel="noopener">Summary of changes (PDF)</a>' +
-        '<p>The Department\'s own list of what changed from 2023/24 and what changed again in version 2.</p></div>' +
+        '<p>' + RULES_DOC.title + ', ' + RULES_DOC.version + '. The wording that actually binds you.</p>' +
+        '<div class="host">assets.publishing.service.gov.uk</div></div>' +
+      '<div class="readcard"><a href="' + RULES_DOC.changesPdf + '" target="_blank" rel="noopener">Summary of changes (PDF, 22 pages)</a>' +
+        '<p>The Department\'s own list of what changed from 2023/24, and what changed again in version 2. Every change on the tab beside this one comes from here.</p>' +
+        '<div class="host">assets.publishing.service.gov.uk</div></div>' +
       '<div class="readcard"><a href="' + RULES_DOC.landing + '" target="_blank" rel="noopener">GOV.UK publication page</a>' +
-        '<p>The official landing page, including how to request an accessible format.</p></div>' +
+        '<p>The official landing page. Check here for newer versions, and to request an accessible format if you need one.</p>' +
+        '<div class="host">gov.uk</div></div>' +
+    '</div>' +
+
+    '<div class="grouphead" style="margin-top:38px"><h2>Other years, and related guidance</h2><div class="rule"></div></div>' +
+    '<p style="font-size:14.5px;color:var(--text-2);max-width:66ch;margin:14px 0 0">' +
+    'Which rules apply depends on each apprentice\'s start date, so more than one year is usually live at once. ' +
+    'These are the other documents you are likely to need.</p>' +
+    '<div class="readgrid" style="margin-top:16px">' +
+      OTHER_DOCS.map(d => '<div class="readcard">' +
+        '<a href="' + d.url + '" target="_blank" rel="noopener">' + d.name + '</a>' +
+        '<p>' + d.note + '</p>' +
+        '<div class="host">' + d.url.replace(/^https?:\/\//,'').split('/')[0] + '</div></div>').join('') +
     '</div>';
 }
 

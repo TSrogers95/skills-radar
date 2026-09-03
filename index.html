@@ -29,10 +29,10 @@
   <div class="wrap">
     <div class="collapsing" id="readingsblock">
       <div class="readings">
-        <div class="reading"><div class="n" id="r-changes">–</div><div class="l">Changes in the last month</div></div>
-        <div class="reading warm"><div class="n" id="r-upcoming">–</div><div class="l">Upcoming changes</div></div>
-        <div class="reading"><div class="n" id="r-review">–</div><div class="l">Standards in review</div></div>
-        <div class="reading cool"><div class="n" id="r-updated">–</div><div class="l">Standards updated this month</div></div>
+        <div class="reading"><div class="n" id="r-rs">–</div><div class="l">Recent changes to standards</div></div>
+        <div class="reading cool"><div class="n" id="r-rg">–</div><div class="l">Recent changes to funding rules</div></div>
+        <div class="reading warm"><div class="n" id="r-us">–</div><div class="l">Upcoming, standards</div></div>
+        <div class="reading warm"><div class="n" id="r-ug">–</div><div class="l">Upcoming, funding rules</div></div>
       </div>
     </div>
   </div>
@@ -94,11 +94,13 @@ document.getElementById('heroblock').innerHTML = titleBlockHTML(
 );
 document.getElementById('navslot').innerHTML = navHTML('index.html');
 
-function renderReadings(items){
-  document.getElementById('r-changes').textContent  = items.filter(i => i.status !== 'in-review' && daysAgo(i.date) >= 0 && daysAgo(i.date) <= 30).length;
-  document.getElementById('r-upcoming').textContent = items.filter(i => i.status === 'upcoming' && isFuture(i.date)).length;
-  document.getElementById('r-review').textContent   = items.filter(i => i.category === 'standard' && i.status === 'in-review').length;
-  document.getElementById('r-updated').textContent  = items.filter(i => i.category === 'standard' && i.status === 'updated' && daysAgo(i.date) >= 0 && daysAgo(i.date) <= 30).length;
+/* The counters are computed from exactly the same tests the board uses,
+   so the number at the top always equals the number in the column. */
+function renderReadings(counts){
+  document.getElementById('r-rs').textContent = counts['recent-0'] || 0;
+  document.getElementById('r-rg').textContent = counts['recent-1'] || 0;
+  document.getElementById('r-us').textContent = counts['upcoming-0'] || 0;
+  document.getElementById('r-ug').textContent = counts['upcoming-1'] || 0;
 }
 
 function renderRouteContext(routeKey, query, results){
@@ -218,15 +220,17 @@ function renderBoard(filter, query){
   renderRouteContext(routeKey, query, list);
 
   const used = new Set();
+  const counts = {};
   let html = '';
 
   BANDS.forEach(band => {
     const inBand = list.filter(i => !used.has(i) && band.test(i));
     inBand.forEach(i => used.add(i));
 
-    const cols = band.cols.map(col => {
+    const cols = band.cols.map((col, ci) => {
       const rows = inBand.filter(col.test).sort((a,b) =>
         (a.pinned === b.pinned) ? band.sort(a,b) : (a.pinned ? -1 : 1));
+      counts[band.key + '-' + ci] = rows.length;
 
       const body = rows.length
         ? rows.map(r => cardHTML(r, FEEDINDEX.push(r) - 1)).join('')
@@ -239,8 +243,10 @@ function renderBoard(filter, query){
     }).join('');
 
     html += '<section class="band' + (band.lead ? ' lead' : '') + '">' +
-      '<div class="bandhead"><h2>' + band.title + ' <em>' + inBand.length + '</em></h2>' +
-      '<p>' + band.blurb + '</p></div>' +
+      '<div class="bandhead">' +
+        '<div class="bandtitle"><h2>' + band.title + '</h2><em>' + inBand.length + '</em></div>' +
+        '<p>' + band.blurb + '</p>' +
+      '</div>' +
       '<div class="kanban two">' + cols + '</div></section>';
   });
 
@@ -249,11 +255,12 @@ function renderBoard(filter, query){
   document.querySelectorAll('.card').forEach(c => {
     c.addEventListener('click', () => openDetail(FEEDINDEX[+c.dataset.i]));
   });
+
+  renderReadings(counts);
 }
 
 let currentFilter = 'all', currentQuery = '';
 const FEED = allUpdates();
-renderReadings(FEED);
 renderBoard(currentFilter, currentQuery);
 wireCollapse();
 

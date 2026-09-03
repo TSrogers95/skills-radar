@@ -207,7 +207,7 @@ const UPDATES = [
     date: "2026-08-05",
     title: "Bus, coach and HGV maintenance standard updated to version 2.0",
     category: "standard", route: "transport-logistics",
-    standard: "Bus, Coach and HGV Service and Maintenance Technician, Level 2 (ST1422)", article: "",
+    standard: "Bus, Coach and HGV Service and Maintenance Technician, Level 2 (ST1422)", article: "route-transport",
     status: "updated", urgency: "medium", pinned: false,
     summary: "A revised version approved for delivery from August 2026, covering servicing and maintenance of buses, coaches and heavy goods vehicles. 24 months, £14,000 funding band.",
     url: "https://skillsengland.education.gov.uk/apprenticeships/"
@@ -216,7 +216,7 @@ const UPDATES = [
     date: "2026-08-15",
     title: "Data Engineer standard revision underway",
     category: "standard", route: "digital",
-    standard: "Data Engineer, Level 5 (ST1386)", article: "",
+    standard: "Data Engineer, Level 5 (ST1386)", article: "route-digital",
     status: "in-review", urgency: "low", pinned: false,
     summary: "An approved version sits alongside a new version in development. Learners progressing from the Digital Data Analytics T-Level commonly feed into this standard.",
     url: "https://skillsengland.education.gov.uk/apprenticeships/"
@@ -225,7 +225,7 @@ const UPDATES = [
     date: "2026-08-15",
     title: "Applications Support Lead standard in development",
     category: "standard", route: "digital",
-    standard: "Applications Support Lead, Level 4 (ST0949)", article: "",
+    standard: "Applications Support Lead, Level 4 (ST0949)", article: "standards-in-review",
     status: "in-review", urgency: "low", pinned: false,
     summary: "Moving through proposal, standard, assessment plan and funding stages rather than being approved for delivery. 24 months, £17,000 funding band.",
     url: "https://skillsengland.education.gov.uk/apprenticeships/"
@@ -234,7 +234,7 @@ const UPDATES = [
     date: "2026-04-21",
     title: "Three AI leadership apprenticeship units approved",
     category: "standard", route: "digital",
-    standard: "AI Leadership units, Level 5 (AU0009, AU0010, AU0011)", article: "",
+    standard: "AI Leadership units, Level 5 (AU0009, AU0010, AU0011)", article: "route-digital",
     status: "updated", urgency: "low", pinned: false,
     summary: "Level 5 units covering AI strategy and opportunity, AI adoption, procurement and governance, and AI delivery and organisational transformation. £750 per unit.",
     url: "https://skillsengland.education.gov.uk/apprenticeships/"
@@ -243,7 +243,7 @@ const UPDATES = [
     date: "2026-04-14",
     title: "Journalist and Junior Journalist standards restructured",
     category: "standard", route: "creative-design",
-    standard: "Journalist, Level 6 (ST1490) and Junior Journalist, Level 5 (ST1516)", article: "",
+    standard: "Journalist, Level 6 (ST1490) and Junior Journalist, Level 5 (ST1516)", article: "route-creative",
     status: "updated", urgency: "low", pinned: false,
     summary: "The Level 5 Journalist standard has retired, replaced by a Level 6 Journalist and a new Level 5 Junior Journalist, changing the progression ladder on this pathway.",
     url: "https://skillsengland.education.gov.uk/apprenticeships/"
@@ -252,7 +252,7 @@ const UPDATES = [
     date: "2026-04-01",
     title: "Two new foundation apprenticeships approved for delivery",
     category: "standard", route: "catering-hospitality",
-    standard: "Catering and Hospitality (FA0008) and Retail Service, Supply and Administration (FA0009), Level 2", article: "",
+    standard: "Catering and Hospitality (FA0008) and Retail Service, Supply and Administration (FA0009), Level 2", article: "route-hospitality-retail",
     status: "updated", urgency: "medium", pinned: false,
     summary: "Both are 8-month Level 2 foundation apprenticeships funded at £3,500, giving an entry route for learners not yet ready for a full standard.",
     url: "https://skillsengland.education.gov.uk/apprenticeships/"
@@ -260,7 +260,7 @@ const UPDATES = [
   {
     date: "2026-01-01",
     title: "2025 to 2026 funding rules updated to version 3",
-    category: "funding-rules", route: "", standard: "", article: "",
+    category: "funding-rules", route: "", standard: "", article: "rules-2627",
     status: "updated", urgency: "medium", pinned: false,
     summary: "References to the former Education and Skills Funding Agency removed following the move of its functions into the Department for Education. A new annex sets out minimum off-the-job training by standard.",
     url: "https://assets.publishing.service.gov.uk/media/6936acd76a167b6884b7360e/Funding_Rules_2025_to_2026.pdf"
@@ -268,7 +268,7 @@ const UPDATES = [
   {
     date: "2026-03-10",
     title: "Employer Support Fund continues into 2026/27",
-    category: "levy", route: "", standard: "", article: "",
+    category: "levy", route: "", standard: "", article: "tlevel-placements",
     status: "updated", urgency: "low", pinned: false,
     summary: "The fund continues for 2026/27, helping employers delivering the Health T-Level, and small and medium employers delivering all T-Levels, meet the essential costs of industry placements.",
     url: "https://support.tlevels.gov.uk/hc/en-gb/articles/33892267278994-T-Levels-update-10-March-2026"
@@ -277,7 +277,7 @@ const UPDATES = [
     date: "2026-05-21",
     title: "Interior Designer standard updated to version 2.0",
     category: "standard", route: "creative-design",
-    standard: "Interior Designer, Level 6 (ST1361)", article: "",
+    standard: "Interior Designer, Level 6 (ST1361)", article: "route-creative",
     status: "updated", urgency: "low", pinned: false,
     summary: "A revised version approved for delivery from May 2026. 36 months, £26,000 funding band.",
     url: "https://skillsengland.education.gov.uk/apprenticeships/"
@@ -1593,4 +1593,319 @@ const INCENTIVES = [
     who:"Any apprentice studying English or maths",
     detail:"Does not come out of the funding band, so it does not consume your levy balance against the apprenticeship itself. Now optional for those who began aged 19 or over.",
     url:"https://assets.publishing.service.gov.uk/media/67b32312b56d8b0856c2fd60/Apprenticeship_funding_rules_2024_to_2025_summary_of_changes.pdf" }
+];
+
+/* ---------- 10. GROUPED ARTICLES ---------------------------------------
+   Every change in the feed maps to an article. Where dozens of standards
+   moved for the same reason, they are grouped into one piece rather than
+   repeated. The mapping is done in app.js by articleFor().
+   ----------------------------------------------------------------------- */
+
+ARTICLES.push(
+
+{
+  id: "standards-in-review",
+  icon: "check", tag: "Standard", urgency: "medium", route: "",
+  date: "2026-08-15",
+  title: "The 32 standards currently in review, and what that actually means",
+  summary: "A standard in review is still fully deliverable — but the version you start someone on may not be the version they finish under.",
+  standfirst: "Being in development is not the same as being withdrawn, and confusing the two costs providers cohorts they could have run.",
+  body: [
+    "At the time of writing 32 apprenticeship standards sit in development, revision or a notice period on the Skills England register rather than simply being approved. They are spread unevenly: creative and design carries 9, digital 7, transport and logistics 5, and most other routes one or two apiece.",
+    "The register uses several statuses that mean subtly different things. A standard with an approved version alongside a new version in development is being revised — you can still start apprentices on the current version. A standard in a notice period is signalling that the current version will be withdrawn for new starts at a future date. A standard paused for starts, such as Space Engineering Technician at Level 4, cannot take new apprentices at all while the pause holds. A retirement consultation, currently open on Aviation Customer Service Operative at Level 2, means the standard may not survive.",
+    "What it changed from: for several years most of the register was static, so a status other than approved was unusual. The volume in development now reflects two things happening at once — the routine cycle of standards reviews, and the wider assessment plan reform touching every standard eventually.",
+    "What follows, and this is where providers get caught: contracts and curriculum plans written against a standard in revision can be overtaken. If a learner starts on version 1.1 and version 2.0 lands mid-programme, the funding rules determine which version applies, and it is usually the one in force at their start date. Check the register before each intake rather than annually, and be wary of building a new commercial offer on a standard carrying a notice period.",
+    "Separately, 29 standards currently have no assessment organisation assigned. That is a distinct problem: you can recruit, but you may struggle to get anyone assessed at the end."
+  ],
+  sources: [
+    { label: "Skills England apprenticeship register", url: "https://skillsengland.education.gov.uk/apprenticeships/" },
+    { label: "GOV.UK — Changes to apprenticeship assessment", url: "https://www.gov.uk/government/publications/apprenticeship-funding-rules-2025-to-2026/changes-to-apprenticeship-assessment-2025-to-2026" }
+  ]
+},
+
+{
+  id: "no-epa",
+  icon: "check", tag: "Standard", urgency: "high", route: "",
+  date: "2026-08-01",
+  title: "29 standards have no assessment organisation assigned",
+  summary: "You can recruit onto them, deliver them and reach gateway — and then find there is nobody to assess your apprentice.",
+  standfirst: "The quietest risk on the register, because nothing about it stops you enrolling.",
+  body: [
+    "Twenty-nine standards on the register are marked as waiting for an assessment organisation, or as pending because the standard itself is still in development. Several are newly approved versions: Bus, Coach and HGV Service and Maintenance Technician at Level 2, Interior Designer at Level 6, Production Manager at Level 6, Cold Forming Setter Technician at Level 3 and Dental Hygienist at Level 6 all show as approved for delivery while awaiting an organisation to assess against them.",
+    "What it changed from: historically a standard reaching approved status arrived with an assessment organisation already in place, so the two were treated as the same milestone. The volume of revisions now moving through the system has separated them.",
+    "The practical consequence is a timing gap rather than a block. You can start apprentices, and typically an organisation is appointed well before the first cohort reaches gateway on a two or three year programme. On a 12 to 18 month programme the margin is much thinner.",
+    "What follows: before committing to a cohort on any newly approved version, check the register for an assessment organisation and, if there is none, ask how long the appointment process is expected to take against your planned end dates. Build the answer into your risk register rather than assuming it resolves itself. Where the gap is genuinely uncomfortable, the previous version of the standard may still be available for starts, which buys time — but check the funding rules for the version that applies to each start date before relying on that."
+  ],
+  sources: [
+    { label: "Skills England apprenticeship register", url: "https://skillsengland.education.gov.uk/apprenticeships/" }
+  ]
+},
+
+{
+  id: "funding-bands",
+  icon: "coin", tag: "Standard", urgency: "medium", route: "",
+  date: "2025-08-21",
+  title: "Five funding bands raised, and what a band change actually does",
+  summary: "Domestic Electrician, Urban Driver, General Farm Worker, Livestock Unit Technician and Early Years Lead Practitioner all moved up.",
+  standfirst: "Funding band reviews are quiet, infrequent and financially significant — and they only apply to starts after the change.",
+  body: [
+    "Five standards have had their maximum funding raised following routine band reviews. Domestic Electrician at Level 3 moved from £15,000 to £19,000. Urban Driver at Level 2 went from £5,000 to £8,000. General Farm Worker at Level 2 rose from £5,000 to £8,000 and Livestock Unit Technician at Level 3 from £5,000 to £9,000. Early Years Lead Practitioner at Level 5 moved from £8,000 to £9,000.",
+    "What it changed from: each of these had a band set when the standard was first approved, in some cases years earlier, and the cost of delivering them had drifted well past it. The agricultural increases are the largest proportionally, reflecting how far below cost those two had fallen.",
+    "The band is a maximum, not a price. It caps what can be drawn from a levy account or co-invested, but the actual price is negotiated between employer and provider. A band increase does not automatically raise what you charge, and it does not entitle you to more money for apprentices already on programme.",
+    "What follows: the band that applies is the one in force at the apprentice's start date. Apprentices already on programme stay on the old band for their duration, so you may be delivering the same standard at two prices simultaneously — check your MIS applies the right one per learner. For employers, a higher band means a higher potential draw on the levy account, which matters when funds now expire after 12 months. For providers, this is the moment to revisit pricing on those five, because the previous rates were set against costs that no longer exist."
+  ],
+  sources: [
+    { label: "Skills England apprenticeship register", url: "https://skillsengland.education.gov.uk/apprenticeships/" },
+    { label: "GOV.UK — Apprenticeship technical funding guide", url: "https://www.gov.uk/government/collections/funding-rules-for-apprenticeships" }
+  ]
+},
+
+{
+  id: "route-health-science",
+  icon: "check", tag: "Standard", urgency: "medium", route: "health-science",
+  date: "2026-03-25",
+  title: "Health and science: 23 standards updated as regulators rewrite their frameworks",
+  summary: "The largest batch of changes on any route, driven by the GDC and NMC updating their own standards rather than by funding policy.",
+  standfirst: "When a professional regulator moves, every apprenticeship mapped to it has to move with it.",
+  body: [
+    "Health and science carries more recorded changes than any other route: 23 standards, most of them clustered in March 2026. The pattern is unusual because the driver is regulatory rather than financial.",
+    "The dental group moved as one. Dental Nurse at Level 3, Dental Technician at Level 5, Clinical Dental Technician at Level 5 and Orthodontic Therapist at Level 4 all retired their General Dental Council 2023 versions and replaced them with version 2.0. Dental Hygienist at Level 6 also moved to 2.0 and is currently awaiting an assessment organisation.",
+    "The nursing and midwifery group followed the same logic against Nursing and Midwifery Council standards. Midwife moved to version 2.0, as did Community Nurse Specialist Practitioner and Specialist Community Public Health Nurse, both at Level 7 against the NMC 2022 standards. Doctor at Level 7, Orthoptist at Level 6, Dispensing Optician at Level 6 and Osteopath at Level 6 all moved to 2.0 in the same window. Biomedical Scientist at Level 6 moved earlier, in August 2025.",
+    "What it changed from: each of these sat on a version mapped to an earlier iteration of its regulator's framework. Where a regulator updates the competences required for registration, the apprenticeship has to be remapped or it stops producing registrable practitioners.",
+    "What follows: this is not optional catch-up. Delivering against a retired version risks apprentices completing without meeting current registration requirements. Confirm which version each cohort sits on, and where a regulator's own consultation is still open, expect another revision behind this one."
+  ],
+  sources: [
+    { label: "Skills England apprenticeship register", url: "https://skillsengland.education.gov.uk/apprenticeships/" }
+  ]
+},
+
+{
+  id: "route-digital",
+  icon: "blocks", tag: "Standard", urgency: "medium", route: "digital",
+  date: "2026-08-15",
+  title: "Digital: 18 changes, seven of them standards still in development",
+  summary: "The route with the most unfinished business — plus the first AI units to reach the register.",
+  standfirst: "Digital moves faster than the standards process, and the register shows the strain.",
+  body: [
+    "Eighteen digital standards carry a recorded change, and seven of them are in development or a notice period rather than settled. Data Engineer at Level 5, Applications Support Lead at Level 4, Machine Learning Engineer at Level 6, Information Communications Technician at Level 3, Digital Product Manager at Level 4 and Digital Accessibility Specialist at Level 4 are all mid-revision.",
+    "Against that, three new AI Leadership units at Level 5 were approved in April 2026, funded at £750 each, covering AI strategy and opportunity, AI adoption and procurement and governance, and AI delivery and organisational transformation. Artificial Intelligence and Automation Practitioner at Level 4 moved to version 2.1 in December 2025. The Software and Data and Hardware, Network and Infrastructure foundation apprenticeships at Level 2 give an entry route at eight months and £4,000.",
+    "What it changed from: the digital route was built around job titles that were stable in the late 2010s. Several of those roles have either split, merged or been absorbed into work that did not exist when the standard was written.",
+    "What follows: the units are the interesting development. They let an employer fund a short, specific piece of AI capability from the levy without committing to a full apprenticeship, which suits a workforce that needs updating rather than qualifying. For providers, the volume of standards in revision means curriculum planning on this route should be provisional — check the register at each intake, particularly for Information Communications Technician, which is high volume and carries a notice period."
+  ],
+  sources: [
+    { label: "Skills England apprenticeship register", url: "https://skillsengland.education.gov.uk/apprenticeships/" }
+  ]
+},
+
+{
+  id: "route-engineering",
+  icon: "blocks", tag: "Standard", urgency: "medium", route: "engineering-manufacturing",
+  date: "2026-03-24",
+  title: "Engineering and manufacturing: new units target the industrial strategy priorities",
+  summary: "Twenty-one changes, including short modular units in welding, battery manufacturing and electrical assembly.",
+  standfirst: "The clearest example yet of apprenticeship funding being pointed at a specific industrial policy.",
+  body: [
+    "Twenty-one engineering and manufacturing standards carry a recorded change, four of them entirely new units approved in March 2026. Welding, mechanised at Level 2 is funded at £2,100. Battery Manufacturing, Electrical Fitting and Assembly, and Mechanical Fitting and Assembly, all at Level 2, are funded at £1,650 each. The Engineering and Manufacturing foundation apprenticeship at Level 2 runs eight months at £4,500.",
+    "On the standards themselves, Maritime Mechanical Fitter at Level 3 moved to version 1.2 in May 2026 and Maritime Electrical Fitter to 1.1. Aerospace Engineering Technician at Level 3 moved to 1.1. Production Manager at Level 6 reached version 2.0 in April 2026 and is awaiting an assessment organisation, as is Cold Forming Setter Technician at Level 3. Space Engineering Technician at Level 4 is paused for starts while it is revised.",
+    "What it changed from: engineering could previously only be funded through full apprenticeships running three to four years. For an employer needing twenty people who can weld to a specific standard within a quarter, that was unusable.",
+    "What follows: the unit funding is small per head but the volume potential is large, and it is the first realistic route for upskilling an existing production workforce using levy money. Watch the pause on Space Engineering Technician if that sits in your portfolio, and check assessment organisation availability on Production Manager before committing a cohort, given the shorter 18-month duration leaves less margin."
+  ],
+  sources: [
+    { label: "Skills England apprenticeship register", url: "https://skillsengland.education.gov.uk/apprenticeships/" }
+  ]
+},
+
+{
+  id: "route-construction",
+  icon: "flame", tag: "Standard", urgency: "medium", route: "construction",
+  date: "2026-05-05",
+  title: "Construction: net zero units arrive and the craft standards keep moving",
+  summary: "Fifteen changes including solar, EV charging and modular building units, plus a funding band rise for Domestic Electrician.",
+  standfirst: "The route where new provision and defunding are happening at the same time.",
+  body: [
+    "Construction carries fifteen recorded changes. Three are new units approved in March 2026: Solar PV Installation and Maintenance and EV Charging Point Installation and Maintenance, both Level 3 at £950, and Permanent Modular Building Assembly at Level 2 for £3,200. Low Carbon Heating Technician at Level 3 moved to version 1.2 in May 2026 and remains the anchor programme for heat pump installation at £22,000 over 36 months.",
+    "Three foundation apprenticeships give an eight-month entry route at Level 2 and £4,000 each: Building Services Engineering, Onsite Trades and Finishing Trades.",
+    "On the craft standards, Craft Bricklayer moved to version 1.2, Craft Painter and Decorator to 1.2, Floorlayer Wood Based to 1.1 and Fire Safety Engineer to 1.2. Domestic Electrician at Level 3 had its funding band raised from £15,000 to £19,000, a substantial correction.",
+    "Against all of that, Facilities Management Supervisor at Level 3 is one of the sixteen standards losing funding from September 2026, removing a supervisory progression step from the route.",
+    "What follows: construction now has the most complete ladder of any route for net zero work — foundation apprenticeship, T-Level specialism in low carbon heating from September 2026, full technician standard, and short units for upskilling existing installers. The constraint is no longer qualification structure but employer placement capacity, which is untested at volume in this specialism."
+  ],
+  sources: [
+    { label: "Skills England apprenticeship register", url: "https://skillsengland.education.gov.uk/apprenticeships/" },
+    { label: "T-Levels update, 10 March 2026", url: "https://support.tlevels.gov.uk/hc/en-gb/articles/33892267278994-T-Levels-update-10-March-2026" }
+  ]
+},
+
+{
+  id: "route-creative",
+  icon: "desk", tag: "Standard", urgency: "low", route: "creative-design",
+  date: "2026-04-14",
+  title: "Creative and design: half the route is mid-revision",
+  summary: "Nine of eighteen changed standards are in development or a notice period — the highest proportion anywhere.",
+  standfirst: "A route being substantially rewritten while it is being delivered.",
+  body: [
+    "Creative and design carries eighteen recorded changes, and nine of those standards are in development, a notice period, or otherwise unsettled. Publishing Professional at Level 4, Creative Industries Production Technician at Level 3, Scenic Artist at Level 3 and Hair, Wigs, Make-up and Prosthetics Technician at Level 3 are all mid-revision with notice periods attached.",
+    "The most structurally significant change is journalism. The Level 5 Journalist standard has been retired and replaced by a Level 6 Journalist at £14,000 over 18 months and a new Level 5 Junior Journalist at £13,000 over 14 months, both approved in April 2026. That changes the progression ladder rather than simply updating a version.",
+    "Elsewhere, Interior Designer at Level 6 moved to version 2.0 in May 2026 and is awaiting an assessment organisation. Junior VFX Artist or Assistant Technical Director at Level 4 moved to 1.2, Furniture Restorer at Level 3 to 1.1 and Print Operative at Level 2 to 1.2.",
+    "What it changed from: many creative standards were written against production practices that have since been reshaped by streaming economics, virtual production and, more recently, generative tools.",
+    "What follows: the journalism restructure is the one to act on, because a retired standard cannot take new starts and the replacement sits at a different level with different entry expectations. For the nine in revision, treat curriculum plans as provisional and confirm the position at each intake rather than at the start of the academic year."
+  ],
+  sources: [
+    { label: "Skills England apprenticeship register", url: "https://skillsengland.education.gov.uk/apprenticeships/" }
+  ]
+},
+
+{
+  id: "route-legal-finance",
+  icon: "cap", tag: "Standard", urgency: "medium", route: "legal-finance-accounting",
+  date: "2026-07-27",
+  title: "Legal, finance and accounting: eleven standards move to version 2.0",
+  summary: "A coordinated batch update across the legal professions, against a route already reshaped by the Level 7 restriction.",
+  standfirst: "The route hit hardest by the Level 7 age restriction is also the one rewriting the most standards.",
+  body: [
+    "Eleven standards on this route carry recorded changes, most of them moves to version 2.0 during 2026. Advanced Paralegal at Level 5 and Professional Taxation Technician at Level 4 both moved in July 2026. Barrister at Level 7 and Chartered Legal Executive Litigator and Advocate at Level 7 moved in May. Licensed Conveyancer or Licensed Probate Practitioner at Level 6 and Legal Technician at Level 4 moved in June. Internal Audit Technician at Level 4 moved to 2.0 in March.",
+    "What it changed from: these standards map onto professional qualification routes controlled by regulators and professional bodies, so version changes tend to arrive in clusters when those bodies update their own requirements.",
+    "The context that matters more than any individual version change is the Level 7 restriction. Since January 2026, Level 7 apprenticeships are funded only for apprentices aged 16 to 21, or 22 to 24 with an EHC plan or care experience. Barrister at Level 7 over 72 months and Chartered Legal Executive at Level 7 over 66 months are exactly the programmes that restriction removes for mid-career entrants — which was much of their volume.",
+    "What follows: a firm that used Level 7 apprenticeships to qualify existing paralegals has lost that funding route entirely. The Level 4 Legal Technician and Level 5 Advanced Paralegal standards become more important as a consequence, since they remain funded at any age. Expect demand to redistribute downward rather than disappear."
+  ],
+  sources: [
+    { label: "Skills England apprenticeship register", url: "https://skillsengland.education.gov.uk/apprenticeships/" },
+    { label: "GOV.UK — Apprenticeship funding rules", url: "https://www.gov.uk/guidance/apprenticeship-funding-rules" }
+  ]
+},
+
+{
+  id: "route-transport",
+  icon: "signpost", tag: "Standard", urgency: "medium", route: "transport-logistics",
+  date: "2026-08-05",
+  title: "Transport and logistics: half the changed standards are unsettled",
+  summary: "Five of ten in development, one retirement consultation open, and a substantial funding band rise for Urban Driver.",
+  standfirst: "A small route with a disproportionate amount of uncertainty in it.",
+  body: [
+    "Ten transport and logistics standards carry a recorded change, and five of those are in development or a notice period: Rail Infrastructure Operator at Level 3, Transport Scheduler at Level 3, Removals Operative at Level 2 and Non Home Office Police Officer among them. Aviation Customer Service Operative at Level 2 has a retirement consultation open, which means the standard may not continue at all.",
+    "The settled changes matter financially. Urban Driver at Level 2 had its funding band raised from £5,000 to £8,000, a 60% increase reflecting how far below delivery cost it had fallen. Bus, Coach and HGV Service and Maintenance Technician at Level 2 moved to version 2.0 in August 2026 at £14,000 over 24 months, and is awaiting an assessment organisation. Traffic Operator at Level 2 moved to version 1.1.",
+    "What it changed from: driver and logistics standards were priced when the sector looked very different, before the driver shortage of the early 2020s reset both wages and training costs.",
+    "What follows: the Urban Driver band change makes that programme commercially viable for providers who had stopped offering it. The retirement consultation on Aviation Customer Service Operative is worth responding to if you deliver it, because consultation is the only point at which the outcome can be influenced. And given five standards are mid-revision, this is a route where checking the register at each intake genuinely matters."
+  ],
+  sources: [
+    { label: "Skills England apprenticeship register", url: "https://skillsengland.education.gov.uk/apprenticeships/" }
+  ]
+},
+
+{
+  id: "route-education",
+  icon: "book", tag: "Standard", urgency: "high", route: "education-early-years",
+  date: "2026-09-01",
+  title: "Education and early years: three standards defunded, and the assessor pipeline breaks",
+  summary: "Learning and Skills Assessor, Learning and Skills Mentor and Outdoor Learning Specialist all lose funding.",
+  standfirst: "The sector loses the apprenticeship route into the roles that train apprentices.",
+  body: [
+    "Three standards on this route lose funding from September 2026: Learning and Skills Assessor at Level 3, Learning and Skills Mentor at Level 4 and Outdoor Learning Specialist at Level 5. The first two are the standards the FE sector itself used to develop assessors and mentors.",
+    "There is a circularity here worth stating plainly. Providers used the Learning and Skills Assessor apprenticeship to qualify the people who assess other apprentices. Removing it does not remove the need for assessors; it removes the funded route into becoming one, at a point when reformed assessment plans are increasing the demands on that workforce.",
+    "Elsewhere on the route, Specialist Teaching Assistant at Level 5 has a reformed assessment plan taking effect from 14 December 2026, one of the first cohort of standards to move under assessment reform. Teacher — Undergraduate at Level 6 moved to version 2.0 in August 2026. Early Years Lead Practitioner at Level 5 had its band raised from £8,000 to £9,000. Early Years Teacher with EYTS at Level 6 moved to version 1.1.",
+    "What follows: if you deliver the assessor or mentor standards, September 2026 is a hard stop for new starts and there is no announced replacement. Existing apprentices remain funded to completion. Workforce planning for your own assessment capacity should assume self-funded or non-apprenticeship development from that point, and the Specialist Teaching Assistant reformed plan is worth reading early as an indicator of what the rest of the reform looks like."
+  ],
+  sources: [
+    { label: "Skills England — Streamlining apprenticeships", url: "https://help.apprenticeships.education.gov.uk/hc/en-gb/articles/34005717182226-Streamlining-apprenticeships" },
+    { label: "Skills England apprenticeship register", url: "https://skillsengland.education.gov.uk/apprenticeships/" }
+  ]
+},
+
+{
+  id: "route-protective-care",
+  icon: "cap", tag: "Standard", urgency: "high", route: "protective-services",
+  date: "2026-09-01",
+  title: "Protective services and care: five standards defunded between them",
+  summary: "Four of five changed protective services standards are losing funding, alongside Lead Practitioner in Adult Care.",
+  standfirst: "Proportionally the worst hit route on the register.",
+  body: [
+    "Protective services loses four standards from September 2026: Professional Security Operative at Level 2, Security First Line Manager at Level 3, Custody and Detention Professional at Level 3, and Public Sector Compliance Investigator and Officer at Level 3. Care services loses Lead Practitioner in Adult Care at Level 4.",
+    "Proportionally this is the heaviest impact anywhere. Of the five protective services standards carrying a recorded change, four are being defunded. The route retains Protective Security Adviser at Level 4, Anti-Social Behaviour and Community Safety Officer at Level 4 and Resilience and Emergencies Professional at Level 6, but loses both its Level 2 entry point and its first-line management step.",
+    "What it changed from: security in particular used the Level 2 standard as a structured entry route into a sector with high turnover and a young workforce, which is precisely the demographic the streamlining exercise says it wants to protect.",
+    "In adult care, Lead Practitioner at Level 4 sat between Lead Adult Care Worker at Level 3 and Leader in Adult Care at Level 5. Removing it leaves a two-level gap in a sector already struggling with progression and retention.",
+    "What follows: for both routes the practical question is whether an adjacent standard can absorb the demand, and in most cases it cannot at the same level. Employers using these as recruitment pipelines need an alternative in place before the September cut-off, and given contracting and eligibility checks typically take six to eight weeks, that decision is effectively already due."
+  ],
+  sources: [
+    { label: "Skills England — Streamlining apprenticeships", url: "https://help.apprenticeships.education.gov.uk/hc/en-gb/articles/34005717182226-Streamlining-apprenticeships" }
+  ]
+},
+
+{
+  id: "route-agriculture",
+  icon: "shop", tag: "Standard", urgency: "medium", route: "agriculture",
+  date: "2025-07-25",
+  title: "Agriculture: two funding bands corrected sharply upward",
+  summary: "General Farm Worker and Livestock Unit Technician both rose from £5,000, having fallen well below delivery cost.",
+  standfirst: "The largest proportional band corrections on the register, and a signal about how far behind some bands had drifted.",
+  body: [
+    "Eleven agriculture, environmental and animal care standards carry a recorded change. Two are funding band corrections and they are substantial: General Farm Worker at Level 2 moved from £5,000 to £8,000, and Livestock Unit Technician at Level 3 from £5,000 to £9,000. Both had been set at a level that made delivery marginal for providers working across dispersed rural employers.",
+    "Elsewhere, Forestry Works Manager at Level 4 was approved in February 2025 at £8,000 over 15 months. Detection and Protection Working Dog Specialist at Level 3 was approved in June 2025 at £12,000. Fisher at Level 2 moved to version 1.1. Professional Arboriculturist at Level 6 has an integrated degree version in development.",
+    "What it changed from: agricultural standards were among the earliest approved and several kept their original bands for the best part of a decade, through a period when travel costs, assessor time and employer engagement in rural areas all became more expensive.",
+    "What follows: the corrections make these programmes viable to deliver again, and providers who withdrew from agricultural provision on cost grounds should revisit the numbers. As with every band change, it applies to starts from the change date only, so learners already on programme continue at the old rate — worth checking your MIS handles both. The route still has no T-Level, with Agriculture, Land Management and Production in development, so foundation apprenticeships and direct entry remain the ways in."
+  ],
+  sources: [
+    { label: "Skills England apprenticeship register", url: "https://skillsengland.education.gov.uk/apprenticeships/" }
+  ]
+},
+
+{
+  id: "route-business-admin",
+  icon: "desk", tag: "Standard", urgency: "high", route: "business-administration",
+  date: "2026-09-01",
+  title: "Business and administration: six standards defunded, gutting the management ladder",
+  summary: "Team Leader, Operations Manager, Coaching Professional, Improvement Practitioner, Improvement Leader and Chartered Manager all go.",
+  standfirst: "The route that loses most, and the one where almost every employer in the country has provision.",
+  body: [
+    "Six business and administration standards lose funding from September 2026, and between them they represent the standard management progression route used across almost every sector: Team Leader at Level 3, Operations Manager at Level 5, Coaching Professional at Level 5, Improvement Practitioner at Level 4, Improvement Leader at Level 6 and Chartered Manager Degree at Level 6.",
+    "What remains on the route is thin by comparison. Business Administrator sits at Level 3, the new Administration Assistant at Level 2 is restricted to apprentices aged 16 to 24, Senior People Professional sits at Level 7 and is therefore subject to the age restriction, and Payroll Assistant Manager at Level 5 moved to version 2.0 in July 2026. Governance Officer at Level 4 is in development.",
+    "What it changed from: Team Leader and Operations Manager were among the highest-volume standards in the country, functioning as the default first and second rungs of management development. Chartered Manager Degree was the flagship degree apprenticeship.",
+    "What follows: an employer developing supervisors and managers through the levy has, from September, essentially no funded route at Levels 3 to 6 on this route. The realistic responses are apprenticeship units for specific capability, self-funded management development, or moving people onto a sector-specific standard where one exists. Skills England has signalled further streamlining is under discussion and sector bodies have publicly warned more management standards could follow, so treat any remaining management provision as carrying policy risk."
+  ],
+  sources: [
+    { label: "Skills England — Streamlining apprenticeships", url: "https://help.apprenticeships.education.gov.uk/hc/en-gb/articles/34005717182226-Streamlining-apprenticeships" },
+    { label: "Skills England apprenticeship register", url: "https://skillsengland.education.gov.uk/apprenticeships/" }
+  ]
+},
+
+{
+  id: "route-hospitality-retail",
+  icon: "shop", tag: "Standard", urgency: "medium", route: "catering-hospitality",
+  date: "2026-04-01",
+  title: "Hospitality and retail: new foundation apprenticeships, one standard defunded",
+  summary: "Two eight-month Level 2 foundation routes arrive at £3,500 as Cleaning Hygiene Operative loses funding.",
+  standfirst: "Entry-level provision reshaped rather than reduced — though not for everyone.",
+  body: [
+    "Two foundation apprenticeships were approved in April 2026: Catering and Hospitality at Level 2 and Retail Service, Supply and Administration at Level 2, both running eight months at £3,500. They are aimed at 16 to 21 year olds, and at 22 to 24 year olds with an EHC plan or care experience.",
+    "At the same time Cleaning Hygiene Operative at Level 2 is one of the sixteen standards losing funding from September 2026, removing a funded entry route into facilities and cleaning work.",
+    "The rest of the route is stable. Hospitality Accommodation Team Member at Level 2 and Food and Beverage Team Member at Level 2 sit at £6,000, Pastry Chef at Level 3 at £11,000 and Lead Baker at Level 3 at £9,000, none carrying recent changes.",
+    "What it changed from: entry into hospitality and retail through apprenticeships previously meant a full Level 2 standard running twelve months or more, which suited neither the seasonal shape of the sector nor learners who were not yet ready to commit.",
+    "What follows: the eight-month foundation route fits the sector's rhythm considerably better and is worth building recruitment around, particularly for September and January intakes. The age restriction is the constraint — there is no equivalent funded entry route for an adult career-changer into hospitality, and with Cleaning Hygiene Operative going, the options for over-25s at Level 2 on this route narrow further."
+  ],
+  sources: [
+    { label: "Skills England apprenticeship register", url: "https://skillsengland.education.gov.uk/apprenticeships/" },
+    { label: "Skills England — Streamlining apprenticeships", url: "https://help.apprenticeships.education.gov.uk/hc/en-gb/articles/34005717182226-Streamlining-apprenticeships" }
+  ]
+}
+
+);
+
+/* Other funding rule documents. Which set applies depends on each
+   apprentice's start date, so several are live at any one time. */
+
+const OTHER_DOCS = [
+  { name:"2026 to 2027 funding rules", url:"https://www.gov.uk/guidance/apprenticeship-funding-rules",
+    note:"Applies to starts from 1 August 2026. Carries the Level 7 age restriction as baseline, the Administration Assistant age restriction, and the Growth and Skills Levy changes." },
+  { name:"2025 to 2026 funding rules and assessment plan guidance", url:"https://www.gov.uk/government/collections/funding-rules-for-apprenticeships",
+    note:"Applies to starts between 1 August 2025 and 31 July 2026, now at version 3. Includes the annex on minimum off-the-job training by standard." },
+  { name:"Changes to apprenticeship assessment", url:"https://www.gov.uk/government/publications/apprenticeship-funding-rules-2025-to-2026/changes-to-apprenticeship-assessment-2025-to-2026",
+    note:"How reformed assessment plans are being introduced, and which rules apply while a standard is still waiting for its revised plan." },
+  { name:"Apprenticeship technical funding guide", url:"https://www.gov.uk/government/collections/funding-rules-for-apprenticeships",
+    note:"How payments are actually calculated — monthly instalments, the completion payment, and what happens on breaks and withdrawals." },
+  { name:"Funding for employers who do not pay the levy", url:"https://www.gov.uk/government/collections/funding-rules-for-apprenticeships",
+    note:"Co-investment, reservations and full funding for under-25s at smaller employers." },
+  { name:"Transferring your apprenticeship levy to another business", url:"https://www.gov.uk/government/collections/funding-rules-for-apprenticeships",
+    note:"The sending side of levy transfers, including the 6-week acceptance and 3-month linking windows." },
+  { name:"Supporting learners with learning difficulties and disabilities", url:"https://www.gov.uk/government/collections/funding-rules-for-apprenticeships",
+    note:"Learning support funding, the English and maths flexibilities, and what evidence is needed." },
+  { name:"Apprenticeships bursary for care leavers", url:"https://www.gov.uk/government/collections/funding-rules-for-apprenticeships",
+    note:"The £3,000 bursary paid directly to apprentices who have been in local authority care." }
 ];

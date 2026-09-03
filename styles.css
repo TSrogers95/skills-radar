@@ -1296,3 +1296,55 @@ table.levytable td.nm{ width:30%; }
 @media (max-width:600px){
   .joinlayout .benefits{ grid-template-columns:1fr; }
 }
+
+
+/* ---------- Band layout, refined ---------- */
+
+.band{ margin-top:38px; position:relative; }
+.band.lead{ margin-top:20px; }
+
+.band:not(.lead)::before{
+  content:''; display:block; height:1px;
+  background:var(--line-strong); margin-bottom:36px;
+}
+
+.bandhead{ margin-bottom:16px; padding-bottom:0; border-bottom:none; }
+.bandtitle{ display:flex; align-items:baseline; gap:12px; }
+.bandtitle h2{
+  font-family:var(--display); font-size:24px; font-weight:600;
+  letter-spacing:-0.028em; margin:0; line-height:1.1;
+}
+.bandtitle em{
+  font-style:normal; font-size:12px; font-weight:500;
+  background:var(--surface); border:1px solid var(--line-strong);
+  color:var(--text-2); padding:2px 9px;
+}
+.band.lead .bandtitle em{ background:var(--ink); border-color:var(--ink); color:#fff; }
+.bandhead p{ margin:7px 0 0; font-size:14px; color:var(--text-2); max-width:66ch; }
+
+/* Lead band gets more room to breathe */
+.band.lead .colbody{ max-height:60vh; padding:12px; }
+.band.lead .colhead{ padding:16px 18px; }
+.band.lead .colhead h2{ font-size:16px; }
+.band.lead button.card{ padding:15px 17px 14px; margin-bottom:9px; }
+.band.lead button.card h3{ font-size:15.5px; margin-bottom:6px; }
+.band.lead button.card p{ font-size:13.5px; margin-bottom:9px; }
+
+.band:not(.lead) .colbody{ max-height:44vh; }
+.band:not(.lead) .colhead{ background:var(--paper); }
+
+/* 2. Sign-in panel matches the height of the benefits grid */
+.joinlayout{ align-items:stretch; }
+.joinpanel{
+  position:static; display:flex; flex-direction:column;
+  border-top:3px solid var(--ink);
+}
+.joinpanel form{ margin-top:auto; }
+.joinpanel > p{ margin-bottom:20px; }
+.joinlayout .benefits{ align-content:stretch; }
+.joinlayout .benefit{ display:flex; flex-direction:column; }
+.joinlayout .benefit p{ margin-top:auto; }
+
+@media (max-width:900px){
+  .joinpanel{ min-height:0; }
+}
