@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Members — Skills Radar</title>
+<meta name="description" content="A personal compliance calendar, a feed filtered to the standards you deliver, levy modelling and a tailored newsletter.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="masthead">
+  <div class="wrap"><div id="heroblock"></div></div>
+</div>
+
+<div class="stickybar">
+  <div class="wrap inner">
+    <a class="mini" href="index.html">Skills Radar</a>
+    <div id="navslot"></div>
+  </div>
+</div>
+
+<!-- ============ PUBLIC LANDING ============ -->
+<div id="public">
+  <div class="wrap">
+    <div class="pagehead">
+      <h1>Skills Radar Members</h1>
+      <p>The public feed tells you what changed. Membership tells you what it means <em>for you</em> — filtered to the standards you actually deliver, with the dates in your own calendar and the funding modelled against your own payroll.</p>
+    </div>
+
+    <div class="benefits">
+      <div class="benefit">
+        <h3>Your own compliance calendar</h3>
+        <p>Twelve months of deadlines, but only the ones that touch your standards. Each date carries the action it requires and who it lands on, so preparation starts weeks before the deadline rather than the week of it.</p>
+      </div>
+      <div class="benefit">
+        <h3>A feed built around your provision</h3>
+        <p>Select every standard you deliver and the feed reorders itself. Changes to your programmes come first and are flagged; everything else drops back. No more reading 180 updates to find the four that matter.</p>
+      </div>
+      <div class="benefit">
+        <h3>Levy modelling against your payroll</h3>
+        <p>Enter your pay bill and your cohort. See annual funds in, what your current apprentices commit you to, and the point at which you tip into 25% co-investment — before it arrives on an invoice.</p>
+      </div>
+      <div class="benefit">
+        <h3>A newsletter that is actually yours</h3>
+        <p>Weekly or monthly, written around your routes and your standards. If something changes on a programme you run, it leads the email rather than sitting on page three.</p>
+      </div>
+    </div>
+
+    <div class="signin" style="margin-top:44px">
+      <div class="signin-panel">
+        <div class="markrule" style="margin-bottom:22px">
+          <span class="tick" aria-hidden="true"><b></b><b></b><b></b></span>
+          <span class="lbl" style="color:var(--text-3)">Sign in</span>
+          <span class="line" style="background:var(--line)"></span>
+        </div>
+        <h2>Members sign in</h2>
+        <p>Your calendar, your feed, your levy position.</p>
+
+        <form id="loginform" novalidate>
+          <div class="field">
+            <label for="u">Username</label>
+            <input type="text" id="u" autocomplete="username" autocapitalize="off" spellcheck="false" placeholder="Your username">
+          </div>
+          <div class="field">
+            <label for="p">Password</label>
+            <div class="pwwrap">
+              <input type="password" id="p" autocomplete="current-password" placeholder="Your password">
+              <button type="button" class="peek" id="peek" aria-label="Show password">Show</button>
+            </div>
+          </div>
+          <div class="err" id="loginerr" hidden>That username and password combination is not recognised.</div>
+          <button class="btn" type="submit" id="signinbtn">Sign in</button>
+        </form>
+
+        <div class="demo">
+          <b>Demo access</b>
+          <span>Username <code>test</code> &nbsp;·&nbsp; Password <code>test</code></span>
+          <button type="button" class="fill" id="fill">Fill it in for me</button>
+        </div>
+      </div>
+
+      <aside class="signin-side">
+        <h3>The demo account</h3>
+        <p style="font-size:13px;color:var(--text-2);line-height:1.55;margin:0 0 14px">Signing in with <code>test</code> loads a worked example: a levy-paying provider with 45 apprentices across four standards and a £4.5m pay bill.</p>
+        <p class="note">This is a demonstration gate. It checks credentials in your browser, so it is not real security — anyone can read the page source. Replace it with server-side authentication and a real account system before this holds anyone's data.</p>
+      </aside>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MEMBERS AREA ============ -->
+<div id="members" hidden>
+
+  <div class="memberbar">
+    <div class="wrap inner">
+      <div class="who"><b id="orgname"></b><span id="orgmeta"></span></div>
+      <button class="linkbtn" id="signout">Sign out</button>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="wrap controlgrid">
+      <div class="tabs" id="mtabs">
+        <button data-view="dash" class="active">Dashboard</button>
+        <button data-view="feed">My feed</button>
+        <button data-view="cal">My calendar</button>
+        <button data-view="levy">Levy calculator</button>
+        <button data-view="prefs">Newsletter</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div id="mpanel"></div>
+  </div>
+</div>
+
+<div class="cpop" id="pop" role="dialog" aria-live="polite"></div>
+
+<footer>
+  <div class="wrap">
+    <p>Levy figures are estimates built from the rates in the current funding rules and the numbers you enter. They are a planning aid, not a statement of your account. Check your Apprenticeship Service account and the funding rules before making a financial decision. Incentives and grants change frequently — every one links to its source.</p>
+  </div>
+</footer>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script src="ui.js"></script>
+<script>
+
+document.getElementById('heroblock').innerHTML = titleBlockHTML('');
+document.getElementById('navslot').innerHTML = navHTML('members.html');
+
+/* ---------- Sign in ---------- */
+
+function unlock(){
+  document.getElementById('public').hidden = true;
+  document.getElementById('members').hidden = false;
+  document.getElementById('orgname').textContent = MEMBER.org;
+  document.getElementById('orgmeta').textContent =
+    (MEMBER.levyPayer ? 'Levy payer' : 'Non-levy') + ' · ' +
+    MEMBER.apprentices + ' apprentices · ' + MEMBER.standards.length + ' standards';
+  render();
+}
+
+document.getElementById('loginform').addEventListener('submit', e => {
+  e.preventDefault();
+  const u = document.getElementById('u').value.trim().toLowerCase();
+  const p = document.getElementById('p').value.trim();
+  if(u === MEMBER.username && p === MEMBER.password){
+    try { sessionStorage.setItem('sr-member','1'); } catch(err){}
+    unlock();
+  } else {
+    document.getElementById('loginerr').hidden = false;
+  }
+});
+
+document.getElementById('peek').addEventListener('click', () => {
+  const p = document.getElementById('p');
+  const shown = p.type === 'text';
+  p.type = shown ? 'password' : 'text';
+  document.getElementById('peek').textContent = shown ? 'Show' : 'Hide';
+  p.focus();
+});
+
+document.getElementById('fill').addEventListener('click', () => {
+  document.getElementById('u').value = MEMBER.username;
+  document.getElementById('p').value = MEMBER.password;
+  document.getElementById('loginerr').hidden = true;
+  document.getElementById('signinbtn').focus();
+});
+
+['u','p'].forEach(id => document.getElementById(id).addEventListener('input', () => {
+  document.getElementById('loginerr').hidden = true;
+}));
+
+document.getElementById('signout').addEventListener('click', () => {
+  try { sessionStorage.removeItem('sr-member'); } catch(e){}
+  location.reload();
+});
+
+/* ---------- Matching updates to the member's own standards ---------- */
+
+function myStandardNames(){
+  return MEMBER.standards.map(s => s.name.toLowerCase());
+}
+
+function isMine(item){
+  const mine = myStandardNames();
+  const hay = ((item.standard || '') + ' ' + item.title).toLowerCase();
+  if(mine.some(n => hay.includes(n))) return true;
+  // funding rule and levy changes apply to everyone
+  return item.category === 'funding-rules' || item.category === 'levy';
+}
+
+function isMyStandardOnly(item){
+  const mine = myStandardNames();
+  const hay = ((item.standard || '') + ' ' + item.title).toLowerCase();
+  return mine.some(n => hay.includes(n));
+}
+
+/* ---------- Levy maths ---------- */
+
+function levyFigures(payroll, standards){
+  const gross  = payroll * LEVY_MODEL.rate;
+  const annual = Math.max(0, gross - LEVY_MODEL.allowance);
+  const monthly = annual / 12;
+
+  // What the current cohort commits you to, and roughly per year
+  let commitment = 0, weightedMonths = 0, heads = 0;
+  standards.forEach(s => {
+    commitment += s.funding * s.count;
+    weightedMonths += s.months * s.count;
+    heads += s.count;
+  });
+  const avgMonths = heads ? weightedMonths / heads : 12;
+  const annualDraw = avgMonths > 0 ? commitment / (avgMonths / 12) : commitment;
+
+  const surplus = annual - annualDraw;
+  const shortfall = surplus < 0 ? -surplus : 0;
+  const coInvest = shortfall * LEVY_MODEL.coInvestment;
+  const govShare = shortfall * (1 - LEVY_MODEL.coInvestment);
+
+  return {
+    gross, annual, monthly, commitment, heads, avgMonths, annualDraw,
+    surplus, shortfall, coInvest, govShare,
+    liable: payroll > LEVY_MODEL.threshold
+  };
+}
+
+/* ---------- Views ---------- */
+
+function dashView(){
+  const feed = allUpdates().filter(isMine);
+  const mine = feed.filter(isMyStandardOnly);
+  const urgent = feed.filter(u => u.urgency === 'high');
+  const f = levyFigures(MEMBER.payroll, MEMBER.standards);
+  const soon = MILESTONES.filter(m => daysAgo(m.date) < 0)
+    .sort((a,b) => new Date(a.date) - new Date(b.date)).slice(0,3);
+
+  const defunded = MEMBER.standards.filter(s =>
+    STANDARDS.some(x => x.name === s.name && /Defunded/i.test(x.status)));
+
+  return '<div class="pagehead"><h1>Good to see you, ' + MEMBER.org + '</h1>' +
+    '<p>Everything below is filtered to the ' + MEMBER.standards.length +
+    ' standards you deliver, plus the funding rule and levy changes that apply to everyone.</p></div>' +
+
+    (defunded.length ? '<div class="alert"><b>' + defunded.length + ' of your standards ' +
+      (defunded.length === 1 ? 'is' : 'are') + ' losing funding from 1 September 2026.</b> ' +
+      defunded.map(s => 'L' + s.level + ' ' + s.name).join(', ') + '. ' +
+      'Existing apprentices remain funded to completion, but you cannot start anyone new after the cut-off. ' +
+      '<a href="articles.html#defunding-16">Read what this means</a></div>' : '') +
+
+    '<div class="mgrid">' +
+      '<div class="mcard"><div class="n">' + mine.length + '</div><div class="l">Changes to your standards</div></div>' +
+      '<div class="mcard warm"><div class="n">' + urgent.length + '</div><div class="l">Marked act now</div></div>' +
+      '<div class="mcard"><div class="n">' + MEMBER.apprentices + '</div><div class="l">Apprentices on programme</div></div>' +
+      '<div class="mcard ' + (f.shortfall ? 'bad' : 'cool') + '"><div class="n">' +
+        (f.shortfall ? '−' + money(Math.round(f.shortfall)) : money(Math.round(f.surplus))) +
+        '</div><div class="l">' + (f.shortfall ? 'Annual levy shortfall' : 'Annual levy surplus') + '</div></div>' +
+    '</div>' +
+
+    '<div class="grouphead"><h2>Your standards</h2><div class="rule"></div></div>' +
+    '<table class="std" style="margin-top:12px"><thead><tr>' +
+      '<th>Standard</th><th>Level</th><th>On programme</th><th>Band</th><th>Status</th>' +
+    '</tr></thead><tbody>' +
+    MEMBER.standards.map(s => {
+      const reg = STANDARDS.find(x => x.name === s.name);
+      const bad = reg && /Defunded/i.test(reg.status);
+      return '<tr class="' + (bad ? 'defunded' : '') + '">' +
+        '<td class="nm"><a class="stdlink" href="' + (reg ? standardURL(reg) : '#') + '" target="_blank" rel="noopener">' + s.name + '</a>' +
+        '<small>' + (s.code || 'code to confirm') + '</small></td>' +
+        '<td class="num">Level ' + s.level + '</td>' +
+        '<td class="num">' + s.count + '</td>' +
+        '<td class="num">' + money(s.funding) + '</td>' +
+        '<td>' + (reg ? reg.status : 'Not tracked') + '</td></tr>';
+    }).join('') + '</tbody></table>' +
+
+    '<div class="grouphead"><h2>Next deadlines</h2><div class="rule"></div></div>' +
+    soon.map(m => '<div class="mile ' + m.urgency + '">' +
+      '<div class="d">' + new Date(m.date).getDate() + ' ' + new Date(m.date).toLocaleDateString('en-GB',{month:'short'}) +
+      '<small>' + new Date(m.date).getFullYear() + '</small></div>' +
+      '<div><div class="who">' + m.who + '</div><h3>' + m.title + '</h3><p>' + m.action + '</p></div></div>').join('');
+}
+
+function feedView(){
+  const feed = allUpdates().filter(isMine).sort((a,b) => {
+    const am = isMyStandardOnly(a), bm = isMyStandardOnly(b);
+    if(am !== bm) return am ? -1 : 1;
+    return new Date(b.date) - new Date(a.date);
+  });
+
+  return '<div class="pagehead"><h1>My feed</h1>' +
+    '<p>Changes to your own standards first, then the funding rule and levy changes that apply across the board. ' +
+    feed.length + ' items, down from ' + allUpdates().length + ' on the public feed.</p></div>' +
+    feed.map(u => {
+      const mine = isMyStandardOnly(u);
+      return '<div class="item ' + u.urgency + '">' +
+        '<div class="when"><b>' + fmtShort(u.date) + '</b>' + fmtYear(u.date) + '</div>' +
+        '<div><div class="meta">' +
+          (mine ? '<span class="pill flag">Yours</span>' : '') +
+          '<span class="pill ' + u.status + '">' + STATUS_LABELS[u.status] + '</span></div>' +
+          '<h3>' + u.title + '</h3><p>' + (u.short || firstClause(u.summary)) + '</p>' +
+          '<div class="links">' +
+            (u.article ? '<a class="read" href="articles.html#' + u.article + '">Full analysis</a>' : '') +
+            '<a href="' + u.url + '" target="_blank" rel="noopener">Source</a></div>' +
+        '</div></div>';
+    }).join('');
+}
+
+function calView(){
+  return '<div class="pagehead"><h1>My calendar</h1>' +
+    '<p>Twelve months ahead. Coloured days carry a deadline — hover or tap for the detail and the action it requires.</p></div>' +
+    '<div class="key">' +
+      '<span><i class="h"></i> Hard deadline or high risk</span>' +
+      '<span><i class="m"></i> Confirmed change, plan for it</span>' +
+      '<span><i class="l"></i> For awareness</span></div>' +
+    '<div class="calgrid" id="calgrid"></div>' +
+    '<div class="callist"><div class="grouphead"><h2>Every milestone in full</h2><div class="rule"></div></div><div id="cal"></div></div>' +
+    '<div class="pagehead" style="margin-top:52px"><h1>On the horizon</h1>' +
+    '<p>What is coming next. Confidence is marked so you can tell a confirmed date from a signalled direction.</p></div>' +
+    '<div id="horizon"></div>';
+}
+
+function levyView(){
+  return '<div class="pagehead"><h1>Levy calculator</h1>' +
+    '<p>Model your levy position against your own pay bill and cohort. Change either number and everything recalculates.</p></div>' +
+    '<div class="levyform">' +
+      '<div class="field"><label for="payroll">Annual pay bill</label>' +
+      '<input type="text" id="payroll" inputmode="numeric" value="' + MEMBER.payroll.toLocaleString('en-GB') + '"></div>' +
+      '<div class="field"><label for="heads">Apprentices on programme</label>' +
+      '<input type="text" id="heads" inputmode="numeric" value="' + MEMBER.apprentices + '"></div>' +
+    '</div>' +
+    '<div id="levyout"></div>' +
+    '<div class="grouphead" style="margin-top:44px"><h2>Incentives and grants worth checking</h2><div class="rule"></div></div>' +
+    '<div class="readgrid" style="margin-top:16px">' +
+      INCENTIVES.map(i => '<div class="readcard">' +
+        '<a href="' + i.url + '" target="_blank" rel="noopener">' + i.name + '</a>' +
+        '<p><b style="color:var(--text)">' + i.amount + '</b> — ' + i.who + '.</p>' +
+        '<p>' + i.detail + '</p></div>').join('') +
+    '</div>';
+}
+
+function renderLevy(){
+  const payroll = parseFloat((document.getElementById('payroll').value || '0').replace(/[^\d.]/g,'')) || 0;
+  const heads   = parseInt((document.getElementById('heads').value || '0').replace(/[^\d]/g,''), 10) || 0;
+
+  // scale the modelled cohort to the number of apprentices entered
+  const factor = MEMBER.apprentices ? heads / MEMBER.apprentices : 1;
+  const scaled = MEMBER.standards.map(s => ({ ...s, count: Math.round(s.count * factor) }));
+  const f = levyFigures(payroll, scaled);
+
+  const rows = [
+    ['Pay bill entered', money(Math.round(payroll)), payroll > LEVY_MODEL.threshold ? 'Above the £3m threshold, so the levy is due' : 'Below the £3m threshold — no levy due'],
+    ['Levy at 0.5%', money(Math.round(f.gross)), 'Before the annual allowance'],
+    ['Less annual allowance', '−' + money(LEVY_MODEL.allowance), 'Every employer gets this'],
+    ['Funds available per year', money(Math.round(f.annual)), 'Roughly ' + money(Math.round(f.monthly)) + ' a month into your account'],
+    ['Your cohort commits', money(Math.round(f.commitment)), heads + ' apprentices across ' + scaled.length + ' standards, over the life of each programme'],
+    ['Drawn down per year', money(Math.round(f.annualDraw)), 'Averaged over a typical programme length of ' + Math.round(f.avgMonths) + ' months']
+  ];
+
+  const verdict = f.shortfall > 0
+    ? '<div class="alert"><b>You will exhaust your levy balance.</b> ' +
+      'On these numbers you draw down roughly ' + money(Math.round(f.annualDraw)) + ' a year against ' +
+      money(Math.round(f.annual)) + ' coming in — a gap of about ' + money(Math.round(f.shortfall)) + '. ' +
+      'Once the balance is gone you co-invest at ' + (LEVY_MODEL.coInvestment * 100) + '%, so budget around <b>' +
+      money(Math.round(f.coInvest)) + ' a year</b> of your own money, with government covering ' +
+      money(Math.round(f.govShare)) + '.</div>'
+    : '<div class="okbox"><b>You have a surplus of about ' + money(Math.round(f.surplus)) + ' a year.</b> ' +
+      'Under the Growth and Skills Levy new funds expire after ' + LEVY_MODEL.expiryMonths + ' months rather than 24, ' +
+      'so a surplus is money you lose if you do not commit it. Consider apprenticeship units, foundation apprenticeships, ' +
+      'or transferring up to 50% to another employer.</div>';
+
+  document.getElementById('levyout').innerHTML =
+    '<table class="std levytable"><tbody>' +
+    rows.map(r => '<tr><td class="nm">' + r[0] + '</td><td class="num big">' + r[1] + '</td><td>' + r[2] + '</td></tr>').join('') +
+    '</tbody></table>' + verdict +
+    '<div class="notice" style="margin-top:18px"><b>How this is worked out, and what it assumes.</b> ' +
+    'Levy is 0.5% of the pay bill less a £15,000 allowance. The annual draw-down spreads each apprentice\'s funding band ' +
+    'evenly across their programme length, which real drawdown does not do exactly — front-loaded delivery draws faster, ' +
+    'and the 20% completion payment lands at the end. It also assumes every apprentice runs to completion at the band maximum. ' +
+    'Treat it as a planning estimate and check your Apprenticeship Service account for actual figures. ' +
+    LEVY_MODEL.note + '</div>';
+}
+
+function prefsView(){
+  return '<div class="pagehead"><h1>Newsletter preferences</h1>' +
+    '<p>What lands in your inbox, and how often. Changes here also reorder your feed and calendar.</p></div>' +
+    '<div class="form" style="max-width:640px;margin-top:8px">' +
+      '<div class="field"><label>How often?</label>' +
+        '<div class="opts" id="freq">' +
+          '<label class="opt' + (MEMBER.frequency === 'weekly' ? ' sel' : '') + '"><input type="radio" name="f" value="weekly"' + (MEMBER.frequency === 'weekly' ? ' checked' : '') + '> Weekly</label>' +
+          '<label class="opt' + (MEMBER.frequency === 'monthly' ? ' sel' : '') + '"><input type="radio" name="f" value="monthly"' + (MEMBER.frequency === 'monthly' ? ' checked' : '') + '> Monthly</label>' +
+        '</div></div>' +
+      '<div class="field"><label>Standards you deliver</label>' +
+        '<p class="hint">Changes to these lead your email and are flagged in your feed.</p>' +
+        '<div class="routegrid opts">' +
+          MEMBER.standards.map(s => '<label class="opt sel"><input type="checkbox" checked> L' + s.level + ' ' + s.name + '</label>').join('') +
+        '</div></div>' +
+      '<div class="field"><label>Occupational routes</label>' +
+        '<div class="routegrid opts">' +
+          Object.keys(ROUTES).map(k => '<label class="opt' + (MEMBER.routes.indexOf(k) > -1 ? ' sel' : '') + '">' +
+            '<input type="checkbox"' + (MEMBER.routes.indexOf(k) > -1 ? ' checked' : '') + '> ' + ROUTES[k].label + '</label>').join('') +
+        '</div></div>' +
+      '<button class="btn" id="savep">Save preferences</button>' +
+      '<div class="notice" style="margin-top:20px"><b>Nothing sends yet.</b> A static site cannot deliver email. ' +
+      'Connect a mailing service — Buttondown, MailerLite, Kit or Mailchimp — and store these preferences server-side ' +
+      'alongside real accounts. Right now they live only in this browser session.</div>' +
+    '</div>';
+}
+
+/* ---------- Calendar internals ---------- */
+
+const DOW = ['M','T','W','T','F','S','S'];
+
+function buildCalendar(){
+  const byDate = {};
+  MILESTONES.forEach(m => { (byDate[m.date] = byDate[m.date] || []).push(m); });
+
+  const start = new Date(); start.setDate(1);
+  let html = '';
+  for(let i = 0; i < 12; i++){
+    const d = new Date(start.getFullYear(), start.getMonth() + i, 1);
+    html += monthGrid(d.getFullYear(), d.getMonth(), byDate);
+  }
+  const grid = document.getElementById('calgrid');
+  if(!grid) return;
+  grid.innerHTML = html;
+
+  const pop = document.getElementById('pop');
+  function showPop(cell){
+    const evs = byDate[cell.dataset.key];
+    if(!evs) return;
+    pop.innerHTML = evs.map(m =>
+      '<div class="pd">' + fmtLong(m.date) + '</div><div class="who">' + m.who + '</div>' +
+      '<h4>' + m.title + '</h4><p>' + m.action + '</p>' +
+      (m.article ? '<a href="articles.html#' + m.article + '">Read the full analysis &rarr;</a>' : '')
+    ).join('<hr style="border:none;border-top:1px solid var(--line);margin:13px 0">');
+    pop.classList.add('on');
+    const r = cell.getBoundingClientRect(), w = 340;
+    let left = Math.max(12, Math.min(r.left + r.width/2 - w/2, window.innerWidth - w - 12));
+    let top = r.bottom + 8;
+    if(top + pop.offsetHeight > window.innerHeight - 12) top = r.top - pop.offsetHeight - 8;
+    pop.style.left = left + 'px'; pop.style.top = Math.max(12, top) + 'px';
+  }
+  function hidePop(){ pop.classList.remove('on'); }
+
+  grid.querySelectorAll('.cday.has').forEach(cell => {
+    cell.addEventListener('mouseenter', () => showPop(cell));
+    cell.addEventListener('focus', () => showPop(cell));
+    cell.addEventListener('mouseleave', hidePop);
+    cell.addEventListener('blur', hidePop);
+    cell.addEventListener('click', e => { e.stopPropagation(); showPop(cell); });
+  });
+  document.addEventListener('click', hidePop);
+  window.addEventListener('scroll', hidePop, { passive:true });
+
+  const list = MILESTONES.slice().sort((a,b) => new Date(a.date) - new Date(b.date));
+  const groups = {};
+  list.forEach(m => { const k = fmtMonthYear(m.date); (groups[k] = groups[k] || []).push(m); });
+  document.getElementById('cal').innerHTML = Object.keys(groups).map(k =>
+    '<section class="month"><h2>' + k + '</h2>' + groups[k].map(m => {
+      const past = daysAgo(m.date) > 0, d = new Date(m.date);
+      return '<div class="mile ' + m.urgency + (past ? ' past' : '') + '">' +
+        '<div class="d">' + d.getDate() + ' ' + d.toLocaleDateString('en-GB',{month:'short'}) +
+        '<small>' + d.getFullYear() + (past ? ' · passed' : '') + '</small></div>' +
+        '<div><div class="who">' + m.who + '</div><h3>' + m.title + '</h3><p>' + m.action + '</p>' +
+        (m.article ? '<div class="links"><a class="read" href="articles.html#' + m.article + '">Read the full analysis</a></div>' : '') +
+        '</div></div>';
+    }).join('') + '</section>').join('');
+
+  document.getElementById('horizon').innerHTML = HORIZON.map(h =>
+    '<div class="horizon ' + h.risk + '"><div class="win">' + h.window + '</div><h3>' + h.title + '</h3>' +
+    '<div class="meta"><span class="conf ' + h.confidence + '">' +
+    (h.confidence === 'confirmed' ? 'Confirmed' : h.confidence === 'signalled' ? 'Signalled, not confirmed' : 'Speculative') +
+    '</span></div><p>' + h.detail + '</p>' +
+    '<div class="watch"><b>What to watch:</b> ' + h.watch + '</div></div>').join('');
+}
+
+function monthGrid(year, month, byDate){
+  const first = new Date(year, month, 1);
+  const startDow = (first.getDay() + 6) % 7;
+  const days = new Date(year, month + 1, 0).getDate();
+  const today = new Date();
+  const isThisMonth = today.getFullYear() === year && today.getMonth() === month;
+
+  let cells = '';
+  for(let i = 0; i < startDow; i++) cells += '<div class="cday out">0</div>';
+  for(let d = 1; d <= days; d++){
+    const key = year + '-' + String(month+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+    const evs = byDate[key];
+    let cls = 'cday', bang = '';
+    if(evs){
+      const worst = evs.some(e => e.urgency === 'high') ? 'high'
+                  : evs.some(e => e.urgency === 'medium') ? 'medium' : 'low';
+      cls += ' has ' + worst;
+      if(worst === 'high') bang = '<span class="bang">!</span>';
+    }
+    if(isThisMonth && d === today.getDate()) cls += ' today';
+    const attr = evs ? ' tabindex="0" data-key="' + key + '" role="button"' : '';
+    cells += '<div class="' + cls + '"' + attr + '>' + d + bang + '</div>';
+  }
+  return '<div class="cmonth"><h3>' + first.toLocaleDateString('en-GB',{month:'long', year:'numeric'}) + '</h3>' +
+    '<div class="cdays">' + DOW.map(d => '<div class="cdow">' + d + '</div>').join('') + cells + '</div></div>';
+}
+
+/* ---------- Routing ---------- */
+
+let view = 'dash';
+
+function render(){
+  const panel = document.getElementById('mpanel');
+  if(view === 'dash')  panel.innerHTML = dashView();
+  if(view === 'feed')  panel.innerHTML = feedView();
+  if(view === 'cal'){  panel.innerHTML = calView(); buildCalendar(); }
+  if(view === 'levy'){
+    panel.innerHTML = levyView();
+    renderLevy();
+    ['payroll','heads'].forEach(id =>
+      document.getElementById(id).addEventListener('input', renderLevy));
+  }
+  if(view === 'prefs'){
+    panel.innerHTML = prefsView();
+    panel.querySelectorAll('.opt input').forEach(i =>
+      i.addEventListener('change', () => {
+        i.closest('.opts').querySelectorAll('.opt').forEach(o =>
+          o.classList.toggle('sel', o.querySelector('input').checked));
+      }));
+    document.getElementById('savep').addEventListener('click', () => {
+      const b = document.getElementById('savep');
+      b.textContent = 'Saved for this session';
+      setTimeout(() => { b.textContent = 'Save preferences'; }, 2200);
+    });
+  }
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+document.querySelectorAll('#mtabs button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#mtabs button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    view = btn.dataset.view;
+    render();
+  });
+});
+
+try { if(sessionStorage.getItem('sr-member') === '1') unlock(); } catch(err){}
+
+</script>
+</body>
+</html>

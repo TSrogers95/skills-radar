@@ -53,6 +53,7 @@
 </div>
 
 <div class="wrap">
+  <div id="contents"></div>
   <div class="tally" id="tally"></div>
   <div id="panel"></div>
 </div>
@@ -81,6 +82,31 @@ document.getElementById('licence').innerHTML =
   'Always read the rule as published before acting on it. <a href="' + RULES_DOC.landing + '" target="_blank" rel="noopener" style="color:#C6D3D0">Official page on GOV.UK</a>';
 
 /* ---------- Search across sections ---------- */
+
+/* Deep-linking into a PDF is not reliable — browsers disagree on whether
+   they honour #page= and none of them support anchoring to a phrase. So
+   rather than pretend, each section gives the exact paragraph numbers to
+   search for and a button that copies them, alongside the PDF link. */
+function locatorHTML(s){
+  const first = s.paras.split(/[,\s]/)[0];
+  return '<div class="locator">' +
+    '<a class="read" href="' + RULES_DOC.pdf + '" target="_blank" rel="noopener">Open the rules (PDF)</a>' +
+    '<span class="find">then search the document for <code>' + first + '</code></span>' +
+    '<button class="copybtn" data-copy="' + first + '">Copy</button>' +
+  '</div>';
+}
+
+function wireCopy(root){
+  root.querySelectorAll('.copybtn').forEach(b => {
+    b.addEventListener('click', () => {
+      const t = b.dataset.copy;
+      if(navigator.clipboard) navigator.clipboard.writeText(t);
+      const was = b.textContent;
+      b.textContent = 'Copied';
+      setTimeout(() => { b.textContent = was; }, 1400);
+    });
+  });
+}
 
 function scoreSection(s, query){
   const q = query.toLowerCase().trim();
@@ -121,7 +147,7 @@ function sectionHTML(s, changes){
     '<div class="win">Paragraphs ' + s.paras + '</div>' +
     '<h3>' + s.name + '</h3>' +
     '<p>' + s.gist + '</p>' +
-    '<div class="links"><a class="read" href="' + RULES_DOC.pdf + '" target="_blank" rel="noopener">Open the official PDF</a></div>' +
+    locatorHTML(s) +
     chgHTML + relHTML +
   '</div>';
 }
@@ -141,6 +167,7 @@ function renderSearch(query){
 
   if(list.length === 0){
     tally.textContent = '';
+    document.getElementById('contents').innerHTML = '';
     panel.innerHTML = '<div class="empty"><b>No section matches that.</b>' +
       'Try a plainer word — &ldquo;transfer&rdquo;, &ldquo;duration&rdquo;, &ldquo;wages&rdquo;, &ldquo;eligibility&rdquo; — or clear the search to browse all ' +
       RULES_SECTIONS.length + ' sections.</div>';
@@ -151,7 +178,13 @@ function renderSearch(query){
     ? list.length + ' section' + (list.length === 1 ? '' : 's') + ' matching \u201c' + query + '\u201d, best first'
     : 'All ' + list.length + ' sections of the 2024/25 rules';
 
+  document.getElementById('contents').innerHTML =
+    '<nav class="contents"><h2>Jump to a section</h2><div class="clist">' +
+    list.map(s => '<a href="#sec-' + s.id + '"><b>' + s.name + '</b><span>Para ' + s.paras + '</span></a>').join('') +
+    '</div></nav>';
+
   panel.innerHTML = list.map(s => sectionHTML(s, RULES_CHANGES)).join('');
+  wireCopy(panel);
 
   panel.querySelectorAll('.jump').forEach(a => {
     a.addEventListener('click', e => {
@@ -168,17 +201,26 @@ function renderSearch(query){
 
 /* ---------- Material changes ---------- */
 
+function changeID(c){ return 'chg-' + c.section + '-' + c.paras.replace(/[^\w]/g,''); }
+
 function changeHTML(c){
   const sec = RULES_SECTIONS.find(s => s.id === c.section);
   const when = c.when === 'v2'
     ? 'From 11 February 2025 (version 2)'
     : 'From 1 August 2024 (version 1)';
 
-  return '<div class="horizon ' + c.impact + '">' +
+  const first = c.paras.split(/[,\s]/)[0];
+  return '<div class="horizon ' + c.impact + '" id="' + changeID(c) + '">' +
     '<div class="win">' + when + ' · paragraphs ' + c.paras + ' · ' + (sec ? sec.name : '') + '</div>' +
     '<h3>' + c.title + '</h3>' +
     '<p><b style="color:var(--text)">Previously:</b> ' + c.from + '</p>' +
     '<p><b style="color:var(--text)">Now:</b> ' + c.to + '</p>' +
+    '<div class="locator">' +
+      '<a class="read" href="' + RULES_DOC.pdf + '" target="_blank" rel="noopener">Open the rules (PDF)</a>' +
+      '<a href="' + RULES_DOC.changesPdf + '" target="_blank" rel="noopener">Summary of changes</a>' +
+      '<span class="find">search for <code>' + first + '</code></span>' +
+      '<button class="copybtn" data-copy="' + first + '">Copy</button>' +
+    '</div>' +
   '</div>';
 }
 
@@ -204,6 +246,7 @@ function renderChanges(query){
 
   if(list.length === 0){
     tally.textContent = '';
+    document.getElementById('contents').innerHTML = '';
     panel.innerHTML = '<div class="empty"><b>No change matches that.</b>Clear the search to see all ' + RULES_CHANGES.length + ' material changes.</div>';
     return;
   }
@@ -211,15 +254,28 @@ function renderChanges(query){
   tally.textContent = list.length + ' material change' + (list.length === 1 ? '' : 's') +
     (query ? ' matching \u201c' + query + '\u201d' : ' from the 2023/24 rules and within the year');
 
+  document.getElementById('contents').innerHTML =
+    '<nav class="contents"><h2>Jump to a change</h2><div class="clist">' +
+    list.map(c => '<a href="#' + changeID(c) + '"><b>' + c.title + '</b><span>' +
+      (c.impact === 'high' ? 'High impact' : c.impact === 'medium' ? 'Medium' : 'Low') +
+      ' · para ' + c.paras + '</span></a>').join('') +
+    '</div></nav>';
+
   panel.innerHTML =
     '<div class="notice" style="margin:20px 0 4px">These are the changes the Department itself flagged as differences from the 2023/24 rules, plus those introduced mid-year in version 2. Paragraph numbers refer to the 2024/25 document.</div>' +
     list.map(changeHTML).join('');
+  wireCopy(panel);
 }
 
 /* ---------- The document ---------- */
 
 function renderDoc(){
   document.getElementById('tally').textContent = '';
+  document.getElementById('contents').innerHTML =
+    '<nav class="contents"><h2>Find a section in the document</h2><div class="clist">' +
+    RULES_SECTIONS.map(s => '<a href="' + RULES_DOC.pdf + '" target="_blank" rel="noopener">' +
+      '<b>' + s.name + '</b><span>Search for para ' + s.paras + '</span></a>').join('') +
+    '</div></nav>';
   document.getElementById('panel').innerHTML =
     '<div class="notice" style="margin-top:20px">' +
       '<strong>This is the official document, served from GOV.UK.</strong> ' +

@@ -128,7 +128,7 @@ const UPDATES = [
     category: "funding-rules", route: "", standard: "", article: "english-maths",
     status: "updated", urgency: "high", pinned: false,
     summary: "Apprentices aged 19 or over at the start of training no longer have to pass English and maths to complete, except where it is an essential part of a mandatory qualification within the standard.",
-    url: "https://skillsengland.education.gov.uk/apprenticeships/"
+    url: "https://assets.publishing.service.gov.uk/media/67b32312b56d8b0856c2fd60/Apprenticeship_funding_rules_2024_to_2025_summary_of_changes.pdf"
   },
   {
     date: "2025-08-28",
@@ -136,7 +136,7 @@ const UPDATES = [
     category: "funding-rules", route: "", standard: "", article: "min-duration",
     status: "updated", urgency: "high", pinned: false,
     summary: "For new starts from 1 August 2025 the minimum programme duration fell to 8 months. This supersedes 12-month references in existing end-point assessment plans. Earlier starters stay on 12 months.",
-    url: "https://skillsengland.education.gov.uk/apprenticeships/"
+    url: "https://www.gov.uk/guidance/apprenticeship-funding-rules"
   },
   {
     date: "2026-08-01",
@@ -371,7 +371,8 @@ const ARTICLES = [
       "What follows: achievement rates on adult programmes should improve, and the delivery cost of long functional skills provision falls. The trade-off is genuine and has been raised by sector bodies including the CIPD — adults completing an apprenticeship may now do so without demonstrating Level 2 literacy and numeracy, which affects transferability. Learners who opt out can still access these qualifications separately through Adult Skills Funding."
     ],
     sources: [
-      { label: "Skills England — apprenticeship register policy notices", url: "https://skillsengland.education.gov.uk/apprenticeships/" }
+      { label: "GOV.UK — Apprenticeship funding rules 2024 to 2025 (the rules themselves)", url: "https://www.gov.uk/government/publications/apprenticeship-funding-rules-2024-to-2025" },
+      { label: "GOV.UK — Summary of changes, version 2, February 2025", url: "https://assets.publishing.service.gov.uk/media/67b32312b56d8b0856c2fd60/Apprenticeship_funding_rules_2024_to_2025_summary_of_changes.pdf" }
     ]
   },
   {
@@ -392,7 +393,8 @@ const ARTICLES = [
       "The risks are practical. Off-the-job training requirements did not shrink proportionally, so a compressed programme concentrates the same hours into fewer months, which is harder on both employer release and learner workload. Providers should be careful that a shorter duration is a genuine judgement about occupational competence rather than a commercial reflex, because inspection and audit will look at whether the duration was justified for the individual apprentice."
     ],
     sources: [
-      { label: "Skills England — apprenticeship register policy notices", url: "https://skillsengland.education.gov.uk/apprenticeships/" }
+      { label: "GOV.UK — Apprenticeship funding rules 2024 to 2025 (the rules themselves)", url: "https://www.gov.uk/government/publications/apprenticeship-funding-rules-2024-to-2025" },
+      { label: "GOV.UK — Summary of changes, version 2, February 2025", url: "https://assets.publishing.service.gov.uk/media/67b32312b56d8b0856c2fd60/Apprenticeship_funding_rules_2024_to_2025_summary_of_changes.pdf" }
     ]
   },
   {
@@ -434,7 +436,8 @@ const ARTICLES = [
       "What follows: more ways to use a levy balance before the new 12-month expiry bites. It also adds real complexity for providers, who now manage three product types with different rules, durations and funding arrangements running in parallel."
     ],
     sources: [
-      { label: "Skills England apprenticeship register", url: "https://skillsengland.education.gov.uk/apprenticeships/" }
+      { label: "Skills England apprenticeship register", url: "https://skillsengland.education.gov.uk/apprenticeships/" },
+      { label: "GOV.UK — Funding rules for apprenticeships collection", url: "https://www.gov.uk/government/collections/funding-rules-for-apprenticeships" }
     ]
   },
   {
@@ -498,6 +501,7 @@ const ARTICLES = [
     ],
     sources: [
       { label: "Skills England apprenticeship register", url: "https://skillsengland.education.gov.uk/apprenticeships/" },
+      { label: "GOV.UK — Funding rules for apprenticeships collection", url: "https://www.gov.uk/government/collections/funding-rules-for-apprenticeships" },
       { label: "GOV.UK — Apprenticeship funding rules", url: "https://www.gov.uk/guidance/apprenticeship-funding-rules" }
     ]
   },
@@ -1489,4 +1493,71 @@ const RULES_CHANGES = [
     title:"ILR cannot be submitted without a reservation and matching service record",
     from:"Terminology around reservations and service records was inconsistent.",
     to:"Providers cannot submit an ILR where funds have not been reserved for a start or re-start and an apprenticeship service record has not been added or approved with matching details." }
+];
+
+/* ---------- 9. MEMBER ACCOUNT ------------------------------------------
+   Demo account only. Replace with real accounts and server-side auth
+   before this holds anyone's actual data.
+   ----------------------------------------------------------------------- */
+
+const MEMBER = {
+  username: "test",
+  password: "test",
+  org: "DemoIT Company",
+  contact: "Programme Lead",
+  type: "provider",
+  levyPayer: true,
+  payroll: 4500000,
+  apprentices: 45,
+  frequency: "weekly",
+  standards: [
+    { name:"Business Administrator", code:"ST0070", level:3, funding:5000,  months:18, count:18 },
+    { name:"Operations Manager",     code:"",       level:5, funding:7000,  months:18, count:9  },
+    { name:"Project Manager",        code:"ST0360", level:6, funding:22000, months:36, count:7  },
+    { name:"Engineering Technician", code:"ST0457", level:3, funding:27000, months:42, count:11 }
+  ],
+  routes: ["business-administration","digital","engineering-manufacturing"]
+};
+
+/* Levy mechanics, England, as at the 2026/27 rules.
+   Kept in one place so the calculator has a single source of truth. */
+
+const LEVY_MODEL = {
+  rate: 0.005,            // 0.5% of annual pay bill
+  allowance: 15000,       // annual levy allowance
+  threshold: 3000000,     // pay bill above which the levy is due
+  topUp: 0,               // 10% government top-up removed on new funds
+  coInvestment: 0.25,     // employer share once the balance is exhausted
+  expiryMonths: 12,       // new funds expire after 12 months
+  note: "The 10% top-up has been removed on new funds and co-investment for levy payers who exhaust their balance rose from 5% to 25%. New funds expire after 12 months rather than 24."
+};
+
+/* Incentives and additional payments worth checking.
+   These change frequently — every one links to the source to verify. */
+
+const INCENTIVES = [
+  { name:"£1,000 employer incentive payment", amount:"£1,000 per apprentice",
+    who:"Apprentices aged 16 to 18, or 19 to 24 with an EHC plan or care experience",
+    detail:"Paid to the employer in two instalments, at 90 days and at 365 days on programme. A matching £1,000 goes to the training provider.",
+    url:"https://www.gov.uk/guidance/apprenticeship-funding-rules" },
+  { name:"Care leavers' bursary", amount:"£3,000 to the apprentice",
+    who:"Apprentices who have been in local authority care",
+    detail:"Paid directly to the apprentice, not the employer. Separate from the employer incentive and can be claimed alongside it.",
+    url:"https://www.gov.uk/government/collections/funding-rules-for-apprenticeships" },
+  { name:"Learning support funding", amount:"£150 per month, plus one-off claims",
+    who:"Apprentices with an identified learning difficulty or disability",
+    detail:"A fixed monthly rate paid to the provider. One-off costs above £150 can be claimed as they occur. Reviews every three months.",
+    url:"https://www.gov.uk/government/collections/funding-rules-for-apprenticeships" },
+  { name:"Full funding for under-25s at non-levy employers", amount:"100% of training costs",
+    who:"Small and medium employers who do not pay the levy",
+    detail:"Removes co-investment entirely for apprentices under 25. Not available to levy payers, but relevant if you transfer funds to a smaller employer.",
+    url:"https://help.apprenticeships.education.gov.uk/hc/en-gb/articles/31398346955154-Budget-2025-Growth-and-Skills-Levy" },
+  { name:"Levy transfer, as a sending employer", amount:"Up to 50% of annual funds",
+    who:"Levy payers with a surplus balance",
+    detail:"Transferring a surplus to another business uses funds that would otherwise expire. Receiving employers have 6 weeks to accept and 3 months to link the funds to an apprenticeship.",
+    url:"https://www.gov.uk/government/collections/funding-rules-for-apprenticeships" },
+  { name:"English and maths funding", amount:"Funded separately from the band",
+    who:"Any apprentice studying English or maths",
+    detail:"Does not come out of the funding band, so it does not consume your levy balance against the apprenticeship itself. Now optional for those who began aged 19 or over.",
+    url:"https://assets.publishing.service.gov.uk/media/67b32312b56d8b0856c2fd60/Apprenticeship_funding_rules_2024_to_2025_summary_of_changes.pdf" }
 ];

@@ -176,14 +176,15 @@ function closeDetail(){
 }
 
 const COLUMNS = [
+  { key:'recent', title:'Recent changes', blurb:'Already in force. Check you are compliant.',
+    lead: true,
+    test: i => i.status === 'updated' && !isFuture(i.date),
+    sort: (a,b) => new Date(b.date) - new Date(a.date) },
   { key:'upcoming', title:'Upcoming', blurb:'Confirmed for a future date. Plan and prepare.',
     test: i => i.status === 'upcoming' || isFuture(i.date),
     sort: (a,b) => new Date(a.date) - new Date(b.date) },
   { key:'review', title:'In review', blurb:'Under review or in development. No confirmed outcome yet.',
     test: i => i.status === 'in-review',
-    sort: (a,b) => new Date(b.date) - new Date(a.date) },
-  { key:'recent', title:'Recent changes', blurb:'Already in force. Check you are compliant.',
-    test: i => i.status === 'updated' && !isFuture(i.date),
     sort: (a,b) => new Date(b.date) - new Date(a.date) }
 ];
 
@@ -206,7 +207,7 @@ function renderBoard(filter, query){
       ? rows.map(r => cardHTML(r, FEEDINDEX.push(r) - 1)).join('')
       : '<div class="colempty">Nothing here' + (query ? ' for that search' : '') + '.</div>';
 
-    return '<section class="col"><div class="colhead">' +
+    return '<section class="col' + (col.lead ? ' lead' : '') + '"><div class="colhead">' +
       '<h2>' + col.title + ' <em>' + rows.length + '</em></h2>' +
       '<p>' + col.blurb + '</p></div>' +
       '<div class="colbody">' + body + '</div></section>';

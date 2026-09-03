@@ -168,11 +168,9 @@ function deriveUpdates(){
         ', maximum funding ' + money(s.funding) + '.' +
         (/pending|waiting/i.test(s.epa || '') ? ' No assessment organisation assigned yet.' : '');
 
-      const verb = defunded ? 'Funding withdrawn' : dev ? 'In review' : 'Updated';
-
       return {
         date: s.since,
-        title: s.name + ' L' + s.level + ' — ' + verb,
+        title: 'L' + s.level + ' ' + s.name,
         short: shortLine(s, defunded, dev),
         level: s.level,
         months: s.months,
@@ -195,13 +193,20 @@ function deriveUpdates(){
 
 /* A very short status line for the board — one glanceable phrase, no more. */
 function shortLine(s, defunded, dev){
-  if(defunded) return 'No new starts after 1 September 2026';
-  if(dev)      return /retirement/i.test(s.status) ? 'Retirement consultation open' : 'New version in development';
-  if(/funding band/i.test(s.changed))      return 'Funding band changed to ' + money(s.funding);
-  if(/age restriction/i.test(s.changed))   return 'New age restriction applies';
-  if(/replaces|retired/i.test(s.changed))  return 'Version ' + s.version + ' now current';
+  if(defunded) return 'Funding withdrawn — no new starts after 1 September 2026';
+  if(dev){
+    if(/retirement/i.test(s.status))            return 'Retirement consultation open';
+    if(/paused/i.test(s.status))                return 'Paused for new starts';
+    if(/funding/i.test(s.changed))              return 'Funding band under review';
+    if(/assessment plan/i.test(s.changed))      return 'Assessment plan being revised';
+    return 'In review — new version in development';
+  }
+  if(/funding band/i.test(s.changed))           return 'Funding band changed to ' + money(s.funding);
+  if(/age restriction/i.test(s.changed))        return 'New age restriction applies';
+  if(/replaces|retired/i.test(s.changed))       return 'Updated to version ' + s.version;
   if(/new unit|new standard|new foundation/i.test(s.changed)) return 'Newly approved for delivery';
-  return 'Version ' + s.version + ' approved for delivery';
+  if(/waiting|pending/i.test(s.epa || ''))      return 'Updated — no assessment organisation yet';
+  return 'Updated to version ' + s.version;
 }
 
 /* Trim a summary down to its first clause, for the board cards. */

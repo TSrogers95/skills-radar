@@ -1045,3 +1045,95 @@ button.card .cdate{ font-size:11.5px; color:var(--text-3); }
   padding:3px 9px; margin-left:11px;
 }
 .routeblock.common table.std{ border-color:var(--line-strong); }
+
+/* ---------- Lead column ---------- */
+
+.kanban{ grid-template-columns:1.34fr 1fr 1fr; }
+.col.lead{ border-color:var(--line-strong); }
+.col.lead .colhead{ background:var(--ink); border-bottom-color:var(--ink); }
+.col.lead .colhead h2{ color:#fff; }
+.col.lead .colhead h2 em{ background:transparent; border-color:var(--ink-3); color:#9DB0AD; }
+.col.lead .colhead p{ color:#8FA4A1; }
+.col.lead .colbody{ max-height:66vh; }
+
+@media (max-width:900px){ .kanban{ grid-template-columns:1fr; } }
+
+/* ---------- Members ---------- */
+
+.benefits{ display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:14px; margin-top:26px; }
+.benefit{ background:var(--surface); border:1px solid var(--line); border-top:3px solid var(--ink-3); padding:22px 24px; }
+.benefit h3{ font-family:var(--display); font-size:17px; font-weight:600; letter-spacing:-0.015em; margin:0 0 9px; }
+.benefit p{ font-size:14px; color:var(--text-2); line-height:1.6; margin:0; }
+
+.memberbar{ background:var(--ink-2); color:#C6D3D0; }
+.memberbar .inner{ display:flex; align-items:center; justify-content:space-between; gap:20px; padding:11px 0; flex-wrap:wrap; }
+.memberbar .who b{ font-family:var(--display); font-size:15px; font-weight:600; color:#fff; margin-right:12px; }
+.memberbar .who span{ font-size:12.5px; color:#8FA4A1; }
+.memberbar .linkbtn{ color:#9DB0AD; }
+.memberbar .linkbtn:hover{ color:#fff; }
+
+.mgrid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; margin:22px 0 8px; }
+.mcard{ background:var(--surface); border:1px solid var(--line); border-left:3px solid var(--line-strong); padding:18px 20px; }
+.mcard .n{ font-family:var(--display); font-size:30px; font-weight:500; line-height:1; letter-spacing:-0.025em; }
+.mcard .l{ font-size:12.5px; color:var(--text-2); margin-top:8px; line-height:1.4; }
+.mcard.warm{ border-left-color:var(--med); } .mcard.warm .n{ color:var(--med); }
+.mcard.cool{ border-left-color:var(--low); } .mcard.cool .n{ color:var(--low); }
+.mcard.bad{ border-left-color:var(--high); }  .mcard.bad .n{ color:var(--high); }
+
+.alert{
+  background:var(--high-bg); border-left:3px solid var(--high);
+  padding:16px 19px; margin:22px 0 4px; font-size:14.5px; line-height:1.62; color:#6E1D17;
+}
+.alert b{ color:var(--high); }
+.alert a{ color:#6E1D17; }
+
+.okbox{
+  background:var(--low-bg); border-left:3px solid var(--low);
+  padding:16px 19px; margin-top:18px; font-size:14.5px; line-height:1.62; color:#0B5A4E;
+}
+
+.levyform{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; max-width:560px; margin-bottom:26px; }
+.levyform input{
+  width:100%; font-family:var(--display); font-size:20px; font-weight:500;
+  padding:11px 13px; border:1px solid var(--line-strong); background:var(--surface); border-radius:2px;
+}
+.levyform input:focus{ outline:none; border-color:var(--ink-3); box-shadow:0 0 0 3px rgba(22,48,47,0.08); }
+
+table.levytable td.big{ font-family:var(--display); font-size:17px; font-weight:500; color:var(--text); }
+table.levytable td.nm{ width:30%; }
+
+/* ---------- Contents navigation ---------- */
+
+.contents{ background:var(--surface); border:1px solid var(--line); padding:18px 20px 16px; margin-top:22px; }
+.contents h2{
+  font-family:var(--display); font-size:13px; font-weight:600;
+  color:var(--text-2); margin:0 0 13px; padding-bottom:10px; border-bottom:1px solid var(--line);
+}
+.clist{ display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:2px; }
+.clist a{
+  display:block; padding:8px 10px; text-decoration:none;
+  border-left:2px solid transparent; transition:background .14s ease;
+}
+.clist a:hover{ background:var(--paper); border-left-color:var(--ink-3); }
+.clist a b{ display:block; font-size:13.5px; font-weight:500; color:var(--text); line-height:1.35; }
+.clist a span{ display:block; font-size:11.5px; color:var(--text-3); margin-top:2px; }
+
+/* ---------- Document locator ---------- */
+
+.locator{
+  display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+  margin-top:14px; padding-top:13px; border-top:1px solid var(--line);
+}
+.locator a{ font-size:13px; color:var(--text); text-decoration:none; border-bottom:1px solid var(--line-strong); padding-bottom:1px; }
+.locator a.read{ color:var(--ink-3); font-weight:500; border-bottom-color:var(--ink-3); }
+.locator a:hover{ border-bottom-color:var(--text); }
+.locator .find{ font-size:12.5px; color:var(--text-3); }
+.locator .find code{
+  background:var(--paper); border:1px solid var(--line);
+  padding:1.5px 6px; font-family:ui-monospace, monospace; font-size:12px; color:var(--text);
+}
+.copybtn{
+  border:1px solid var(--line-strong); background:var(--surface);
+  font-family:var(--sans); font-size:12px; padding:4px 11px; cursor:pointer; color:var(--text-2);
+}
+.copybtn:hover{ background:var(--paper); color:var(--text); }

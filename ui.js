@@ -10,8 +10,7 @@ const PAGES = [
   { file: "articles.html",   label: "Articles" },
   { file: "standards.html",  label: "Standards" },
   { file: "rules.html",      label: "24/25 rules" },
-  { file: "calendar.html",   label: "Calendar" },
-  { file: "newsletter.html", label: "Newsletter" }
+  { file: "members.html",    label: "Members" }
 ];
 
 function navHTML(current){
