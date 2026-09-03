@@ -1048,7 +1048,7 @@ button.card .cdate{ font-size:11.5px; color:var(--text-3); }
 
 /* ---------- Lead column ---------- */
 
-.kanban{ grid-template-columns:1.34fr 1fr 1fr; }
+/* retired: the board no longer uses a three-column grid */
 .col.lead{ border-color:var(--line-strong); }
 .col.lead .colhead{ background:var(--ink); border-bottom-color:var(--ink); }
 .col.lead .colhead h2{ color:#fff; }
@@ -1348,3 +1348,31 @@ table.levytable td.nm{ width:30%; }
 @media (max-width:900px){
   .joinpanel{ min-height:0; }
 }
+
+/* =========================================================================
+   BOARD LAYOUT FIX
+   #board previously carried the .kanban grid class, which made the two
+   bands sit side by side as grid columns instead of stacking. The bands
+   must be full-width block rows; only the columns inside them are a grid.
+   ========================================================================= */
+
+#board{ display:block; width:100%; }
+#board > .band{ display:block; width:100%; }
+
+/* Column headers: title and count on one line, blurb underneath */
+.colhead{ display:block; }
+.colhead h2{
+  display:flex; align-items:center; gap:9px;
+  flex-wrap:nowrap; min-width:0;
+}
+.colhead h2 em{ flex:none; }
+.colhead p{ display:block; width:100%; margin:6px 0 0; }
+
+/* Stop long standard names blowing out the column width */
+.col{ min-width:0; }
+.colbody{ min-width:0; overflow-x:hidden; }
+button.card h3{ overflow-wrap:break-word; word-break:normal; hyphens:auto; }
+button.card p{ overflow-wrap:break-word; }
+
+/* Give the two bands clear separation */
+.band + .band{ margin-top:44px; }
