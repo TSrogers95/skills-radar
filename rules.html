@@ -219,7 +219,7 @@ function renderSearch(query){
 
   tally.textContent = query
     ? list.length + ' section' + (list.length === 1 ? '' : 's') + ' matching \u201c' + query + '\u201d, best first'
-    : 'All ' + list.length + ' sections of the 2024/25 rules';
+    : 'All ' + list.length + ' sections of the 2026/27 rules';
 
   document.getElementById('contents').innerHTML = contentsHTML(
     'Jump to a section',
@@ -304,7 +304,7 @@ function renderChanges(query){
   }
 
   tally.textContent = list.length + ' material change' + (list.length === 1 ? '' : 's') +
-    (query ? ' matching \u201c' + query + '\u201d' : ' from the 2023/24 rules and within the year');
+    (query ? ' matching \u201c' + query + '\u201d' : ' from the 2025/26 rules, and within the year');
 
   document.getElementById('contents').innerHTML = contentsHTML(
     'Jump to a change',

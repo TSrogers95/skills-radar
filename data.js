@@ -1329,8 +1329,8 @@ const READING = [
     note:"An awarding organisation tracking reformed assessment plan progress standard by standard." }
 ];
 
-/* ---------- 8. 2024/25 FUNDING RULES INDEX ------------------------------
-   A searchable index of the August 2024 to July 2025 apprenticeship funding
+/* ---------- 8. 2026/27 FUNDING RULES INDEX ------------------------------
+   A searchable index of the August 2026 to July 2027 apprenticeship funding
    rules. Paragraph numbers are the real ones from the published document.
    "related" lists other sections a reader should check at the same time —
    this drives the "you should also review" suggestions.
