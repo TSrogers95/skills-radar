@@ -185,6 +185,8 @@ function deriveUpdates(){
         urgency: urgency,
         pinned: false,
         derived: true,
+        changeText: s.changed,
+        rawStatus: s.status,
         summary: summary,
         url: standardURL(s)
       };
@@ -267,4 +269,142 @@ function articleFor(s, defunded, dev){
   if(dev) return 'standards-in-review';
   if(/waiting|pending/i.test(s.epa || '')) return 'no-epa';
   return ROUTE_ARTICLES[s.route] || 'standards-in-review';
+}
+
+/* =========================================================================
+   WHAT CHANGED — a two or three word label
+
+   The "changed" text is a sentence. This reduces it to something you can
+   read at a glance in a list, so you can scan a column of forty items and
+   see which ones are money, which are paperwork, and which are fatal.
+   ========================================================================= */
+
+function changeTag(text, status){
+  const t = String(text || '').toLowerCase();
+  const s = String(status || '').toLowerCase();
+
+  if(/defunded/.test(s) || /funding withdrawn/.test(t))     return { label:'Funding withdrawn', tone:'stop' };
+  // "version 1.1 retired; 1.2 current" is a new version, not a retirement
+  if(/version .* retired|retired.*current|now current/.test(t)) return { label:'New version', tone:'info' };
+  if(/retirement consultation/.test(t + ' ' + s))           return { label:'Retirement consultation', tone:'stop' };
+  if(/^retired|standard retired|retired standard/.test(t) || /^retired/.test(s))
+                                                            return { label:'Retired', tone:'stop' };
+  if(/paused/.test(t + ' ' + s))                            return { label:'Paused for starts', tone:'stop' };
+
+  if(/funding band/.test(t)){
+    const nums = t.match(/£([\d,]+)/g);
+    if(nums && nums.length >= 2){
+      const from = parseInt(nums[0].replace(/[£,]/g,''), 10);
+      const to   = parseInt(nums[1].replace(/[£,]/g,''), 10);
+      if(to > from) return { label:'Funding band increased', tone:'money' };
+      if(to < from) return { label:'Funding band reduced',   tone:'money' };
+    }
+    return { label:'Funding band changed', tone:'money' };
+  }
+
+  if(/age restriction/.test(t))                             return { label:'Age restriction added', tone:'warn' };
+  if(/duration changed/.test(t))                            return { label:'Duration changed', tone:'warn' };
+  if(/level changed/.test(t))                               return { label:'Level changed', tone:'warn' };
+  if(/assessment plan/.test(t))                             return { label:'Assessment plan revised', tone:'warn' };
+  if(/ksb|knowledge, skills/.test(t))                       return { label:'KSBs revised', tone:'warn' };
+  if(/replaces|replaced by/.test(t))                        return { label:'Replaced', tone:'warn' };
+
+  if(/new standard|new unit|new foundation|newly approved|new on the register/.test(t))
+                                                            return { label:'Newly approved', tone:'new' };
+  if(/development|in revision|notice period/.test(t + ' ' + s))
+                                                            return { label:'In revision', tone:'info' };
+  if(/waiting|no assessment organisation/.test(t))          return { label:'Awaiting assessor', tone:'warn' };
+  if(/version/.test(t))                                     return { label:'New version', tone:'info' };
+  if(/status changed/.test(t))                              return { label:'Status changed', tone:'info' };
+
+  return { label:'Updated', tone:'info' };
+}
+
+function changeTagHTML(text, status){
+  const t = changeTag(text, status);
+  return '<span class="ctag ' + t.tone + '">' + t.label + '</span>';
+}
+
+/* Hand-written updates carry their own label, because guessing from prose
+   misfires — a summary mentioning assessment plans is not necessarily a
+   change to one. Derived items fall back to reading the change text. */
+function itemTagHTML(item){
+  if(item.tag) return '<span class="ctag ' + item.tag.tone + '">' + item.tag.label + '</span>';
+  if(item.derived) return changeTagHTML(item.changeText, item.rawStatus);
+  return changeTagHTML(item.title + '. ' + item.summary, item.status);
+}
+
+/* =========================================================================
+   SEARCH RANKING
+
+   A boolean "does this contain the word" test returns the right set but in
+   the wrong order — typing "project manager" put Level 6 Project Manager
+   somewhere past forty near-misses. This scores every hit so the closest
+   match is first.
+   ========================================================================= */
+
+function scoreMatch(query, fields){
+  const q = String(query || '').toLowerCase().trim();
+  if(!q) return 0;
+
+  const name  = String(fields.name  || '').toLowerCase();
+  const code  = String(fields.code  || '').toLowerCase();
+  const extra = String(fields.extra || '').toLowerCase();
+
+  const words = q.split(/\s+/).filter(w => w.length > 1);
+  let score = 0;
+
+  // exact and near-exact beat everything
+  if(code && code === q)            score += 1000;
+  if(name === q)                    score += 900;
+  if(name.replace(/[^a-z0-9]/g,'') === q.replace(/[^a-z0-9]/g,'')) score += 850;
+
+  // the name starts with what you typed
+  if(name.startsWith(q))            score += 600;
+
+  // a word in the name starts with what you typed
+  if(new RegExp('\\b' + escapeRe(q)).test(name)) score += 400;
+
+  // the phrase appears anywhere in the name
+  if(name.includes(q))              score += 250;
+
+  // every word you typed appears in the name, in order
+  if(words.length > 1){
+    let pos = 0, ordered = true;
+    for(const w of words){
+      const at = name.indexOf(w, pos);
+      if(at < 0){ ordered = false; break; }
+      pos = at + w.length;
+    }
+    if(ordered) score += 300;
+  }
+
+  // each word present in the name
+  words.forEach(w => {
+    if(new RegExp('\\b' + escapeRe(w)).test(name)) score += 90;
+    else if(name.includes(w)) score += 55;
+  });
+
+  // partial code match, e.g. typing "1472"
+  if(code && q.length > 2 && code.includes(q)) score += 300;
+
+  // route, status and description are weak signals, not strong ones
+  words.forEach(w => { if(extra.includes(w)) score += 8; });
+
+  // shorter names win ties: "Project Manager" over "Project Manager (Degree)"
+  if(score > 0) score += Math.max(0, 40 - name.length) / 4;
+
+  return score;
+}
+
+function escapeRe(s){ return String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+/* Rank a list by relevance, keeping only real hits. */
+function rankBySearch(list, query, getFields){
+  if(!query) return list;
+  return list
+    .map(item => ({ item: item, score: scoreMatch(query, getFields(item)) }))
+    .filter(x => x.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .map(x => x.item);
 }

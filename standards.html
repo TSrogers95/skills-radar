@@ -145,15 +145,12 @@ function renderReadings(){
 }
 
 function changeCell(s){
-  if(isDefunded(s)){
-    const link = s.article ? ' <a href="articles.html#' + s.article + '">Why</a>' : '';
-    return '<span class="chg stop">' + s.changed + '</span>' + link;
-  }
-  if(s.changed){
-    const link = s.article ? ' <a href="articles.html#' + s.article + '">Why</a>' : '';
-    return '<span class="chg yes">' + s.changed + '</span><br><span class="chg none">' + fmtLong(s.since) + '</span>' + link;
-  }
-  return '<span class="chg none">No change since ' + fmtLong(s.since) + '</span>';
+  if(!s.changed) return '<span class="chg none">No change since ' + fmtLong(s.since) + '</span>';
+
+  const link = s.article ? ' <a href="articles.html#' + s.article + '">Why</a>' : '';
+  return changeTagHTML(s.changed, s.status) +
+    '<div class="chg ' + (isDefunded(s) ? 'stop' : 'yes') + '" style="margin-top:5px">' + s.changed + '</div>' +
+    '<span class="chg none">' + fmtLong(s.since) + '</span>' + link;
 }
 
 function rowHTML(s){
@@ -211,14 +208,24 @@ function render(filter, query){
   if(filter === 'changed')  list = list.filter(changedRecently);
   if(filter === 'dev')      list = list.filter(isDev);
 
+  // Rank by how closely each standard matches, not alphabetically. Route
+  // matches are kept but scored below name matches so they sit underneath.
   if(query){
-    const q = query.toLowerCase();
-    const words = q.split(/\s+/).filter(w => w.length > 2);
-    list = list.filter(s => {
-      if(routeKey && s.route === routeKey) return true;
-      const hay = (s.name + ' ' + s.code + ' ' + s.status + ' ' + (s.epa||'') + ' ' + s.changed + ' ' + routeText(s.route)).toLowerCase();
-      return words.length ? words.some(w => hay.includes(w)) : hay.includes(q);
-    });
+    const scored = list.map(s => {
+      let score = scoreMatch(query, {
+        name: s.name,
+        code: s.code,
+        extra: s.status + ' ' + (s.epa || '') + ' ' + s.changed
+      });
+      if(routeKey && s.route === routeKey) score += 20;   // relevant, not a close match
+      return { s: s, score: score };
+    }).filter(x => x.score > 0);
+
+    scored.sort((a,b) => b.score - a.score);
+    list = scored.map(x => x.s);
+    searchRanked = true;
+  } else {
+    searchRanked = false;
   }
 
   if(list.length === 0){
@@ -230,6 +237,17 @@ function render(filter, query){
 
   tally.textContent = list.length + (list.length === 1 ? ' standard' : ' standards') +
     (query ? ' matching “' + query + '”' : '');
+
+  if(searchRanked){
+    blocks.innerHTML = '<section class="routeblock">' +
+      '<h2>Best matches</h2>' +
+      '<p class="sub">Closest first. ' + list.length + ' standard' + (list.length === 1 ? '' : 's') + ' matching &ldquo;' + query + '&rdquo;</p>' +
+      '<table class="std"><thead><tr>' +
+        '<th>Standard</th><th>Level</th><th class="hidecol">Duration</th>' +
+        '<th>Max funding</th><th class="hidecol">EPA</th><th class="hidecol">Status</th><th>Change</th>' +
+      '</tr></thead><tbody>' + list.map(rowHTML).join('') + '</tbody></table></section>';
+    return;
+  }
 
   const grouped = {};
   list.forEach(s => { (grouped[s.route] = grouped[s.route] || []).push(s); });
@@ -270,7 +288,7 @@ function render(filter, query){
   }
 }
 
-let currentFilter = 'all', currentQuery = '';
+let currentFilter = 'all', currentQuery = '', searchRanked = false;
 renderReadings();
 render(currentFilter, currentQuery);
 

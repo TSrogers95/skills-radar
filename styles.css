@@ -1608,3 +1608,34 @@ table.cohort .rm:focus-visible{ outline:2px solid var(--ink); outline-offset:1px
 .dropmain{ font-family:var(--display); font-size:17px; font-weight:500; margin:0 0 7px; color:var(--text); }
 .dropsub{ font-size:13px; color:var(--text-3); margin:0; }
 .dropzone .linkbtn{ font-size:17px; font-family:var(--display); font-weight:500; }
+
+/* ---------- What changed ---------- */
+
+.whatchanged{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:0 0 8px; }
+.whatchanged.big{ margin:10px 0 14px; }
+.wclabel{ font-size:10.5px; letter-spacing:0.04em; color:var(--text-3); }
+
+.ctag{ font-size:11.5px; padding:2.5px 9px; white-space:nowrap; }
+.ctag.stop{ background:var(--high-bg); color:var(--high); font-weight:500; }
+.ctag.money{ background:#EDEBF7; color:#443E86; font-weight:500; }
+.ctag.warn{ background:var(--med-bg); color:var(--med); }
+.ctag.new{ background:var(--low-bg); color:var(--low); }
+.ctag.info{ background:#EEECE5; color:var(--text-2); }
+
+table.std .ctag{ display:inline-block; }
+
+/* ---------- Import: documents tool ---------- */
+
+.form textarea{
+  width:100%; font-family:var(--sans); font-size:14.5px; line-height:1.55;
+  padding:10px 12px; border:1px solid var(--line-strong);
+  background:var(--surface); color:var(--text); border-radius:2px; resize:vertical;
+}
+.form textarea:focus{ outline:none; border-color:var(--ink-3); box-shadow:0 0 0 3px rgba(22,48,47,0.08); }
+
+.codeout{
+  background:var(--ink); color:#D7E3E0; padding:18px 20px; margin:0;
+  font-family:ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size:12.5px; line-height:1.6; overflow-x:auto; white-space:pre-wrap;
+  border-radius:2px;
+}

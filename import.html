@@ -23,12 +23,52 @@
   </div>
 </div>
 
-<div class="wrap">
+<div class="wrap" id="gate">
+  <div class="signin" style="max-width:520px;margin:48px auto 60px;grid-template-columns:1fr">
+    <div class="signin-panel">
+      <div class="markrule" style="margin-bottom:20px">
+        <span class="tick" aria-hidden="true"><b></b><b></b><b></b></span>
+        <span class="lbl" style="color:var(--text-3)">Admin</span>
+        <span class="line" style="background:var(--line)"></span>
+      </div>
+      <h2>Data import</h2>
+      <p>This tool rewrites the site's data. Enter the admin password to continue.</p>
+      <form id="gateform" novalidate>
+        <div class="field">
+          <label for="gp">Password</label>
+          <div class="pwwrap">
+            <input type="password" id="gp" autocomplete="current-password" placeholder="Admin password">
+            <button type="button" class="peek" id="gpeek" aria-label="Show password">Show</button>
+          </div>
+        </div>
+        <div class="err" id="gerr" hidden>That password is not recognised.</div>
+        <button class="btn" type="submit">Unlock</button>
+      </form>
+      <div class="demo" style="margin-top:22px">
+        <b>Note</b>
+        <span>This gate runs in the browser, so it keeps honest people out — it is not real security. Anyone determined can read the page source. Keep this page's address to yourself.</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap" id="tool" hidden>
   <div class="pagehead">
-    <h1>Import the full register</h1>
-    <p>Turns the official Skills England CSV into the site's data file, keeping everything you have written by hand. Nothing is uploaded anywhere — the whole thing runs in your browser.</p>
+    <h1>Import data</h1>
+    <p>Everything runs in your browser. Nothing is uploaded anywhere.</p>
   </div>
 
+  <div class="controls" style="position:static;margin-bottom:8px">
+    <div class="wrap controlgrid" style="padding:0">
+      <div class="tabs" id="itabs">
+        <button data-view="standards" class="active">Standards CSV</button>
+        <button data-view="docs">Funding rules and documents</button>
+      </div>
+      <button class="linkbtn" id="lockit" style="margin-left:auto">Lock</button>
+    </div>
+  </div>
+
+  <div id="view-standards">
   <section class="lsection">
     <div class="lhead"><h2>1. Download the CSV</h2>
     <p>Open the register, scroll to <b>Download a list of apprenticeships</b>, and download the CSV of all standards. Don't filter it — take the lot.</p></div>
@@ -48,6 +88,9 @@
   </section>
 
   <div id="results"></div>
+  </div>
+
+  <div id="view-docs" hidden></div>
 </div>
 
 <footer>
@@ -63,6 +106,60 @@
 
 document.getElementById('heroblock').innerHTML = titleBlockHTML('');
 document.getElementById('navslot').innerHTML = navHTML('standards.html');
+
+/* =========================================================================
+   ADMIN GATE
+
+   Change ADMIN_PASSWORD to whatever you like. This is a front-of-house lock:
+   it stops anyone stumbling in, but the check runs in the browser so the
+   password is readable in the page source. Move the import behind real
+   server-side auth before the site has users who might go looking.
+   ========================================================================= */
+
+const ADMIN_PASSWORD = "radar-admin";
+
+function unlockTool(){
+  document.getElementById('gate').hidden = true;
+  document.getElementById('tool').hidden = false;
+  try { sessionStorage.setItem('sr-admin','1'); } catch(e){}
+}
+
+document.getElementById('gateform').addEventListener('submit', e => {
+  e.preventDefault();
+  if(document.getElementById('gp').value === ADMIN_PASSWORD) unlockTool();
+  else document.getElementById('gerr').hidden = false;
+});
+
+document.getElementById('gp').addEventListener('input', () => {
+  document.getElementById('gerr').hidden = true;
+});
+
+document.getElementById('gpeek').addEventListener('click', () => {
+  const p = document.getElementById('gp'), shown = p.type === 'text';
+  p.type = shown ? 'password' : 'text';
+  document.getElementById('gpeek').textContent = shown ? 'Show' : 'Hide';
+  p.focus();
+});
+
+document.getElementById('lockit').addEventListener('click', () => {
+  try { sessionStorage.removeItem('sr-admin'); } catch(e){}
+  location.reload();
+});
+
+try { if(sessionStorage.getItem('sr-admin') === '1') unlockTool(); } catch(e){}
+
+/* ---------- Tabs ---------- */
+
+document.querySelectorAll('#itabs button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#itabs button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const v = btn.dataset.view;
+    document.getElementById('view-standards').hidden = v !== 'standards';
+    document.getElementById('view-docs').hidden = v !== 'docs';
+    if(v === 'docs') renderDocsTool();
+  });
+});
 
 /* =========================================================================
    CSV PARSING
@@ -491,6 +588,154 @@ function show(rows, cols, built, m, file){
   });
 
   document.getElementById('results').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+/* =========================================================================
+   DOCUMENTS TOOL
+
+   For everything that is not the standards CSV: a new funding rules year, a
+   new version of the current rules, or any guidance worth linking. It writes
+   the data entry for you rather than asking you to edit JavaScript by hand.
+   ========================================================================= */
+
+function renderDocsTool(){
+  const el = document.getElementById('view-docs');
+  if(el.dataset.built) return;
+  el.dataset.built = '1';
+
+  el.innerHTML =
+    '<section class="lsection">' +
+      '<div class="lhead"><h2>What do you want to add?</h2>' +
+      '<p>Fill in the form and copy the result into <code>data.js</code>. Each option tells you exactly where it goes.</p></div>' +
+      '<div class="tabs" id="dkind">' +
+        '<button data-k="related" class="active">A guidance document</button>' +
+        '<button data-k="rules">A new funding rules year</button>' +
+        '<button data-k="change">A rule change</button>' +
+      '</div>' +
+    '</section>' +
+    '<div id="dform"></div>';
+
+  el.querySelectorAll('#dkind button').forEach(b =>
+    b.addEventListener('click', () => {
+      el.querySelectorAll('#dkind button').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+      docForm(b.dataset.k);
+    }));
+
+  docForm('related');
+}
+
+const DOC_FORMS = {
+  related: {
+    title: 'Add a guidance document',
+    where: 'Goes in the OTHER_DOCS list in data.js. Appears on the Links tab of the rules page.',
+    fields: [
+      { id:'name', label:'Document title', ph:'Apprenticeship technical funding guide' },
+      { id:'url',  label:'Link', ph:'https://www.gov.uk/...' },
+      { id:'note', label:'Why someone would open it', ph:'How payments are calculated — instalments, the completion payment, and breaks.', area:true }
+    ],
+    build: v => 'Add this inside the OTHER_DOCS = [ ... ] list:\n\n' +
+      '  { name:' + q(v.name) + ', url:' + q(v.url) + ',\n' +
+      '    note:' + q(v.note) + ' },'
+  },
+
+  rules: {
+    title: 'Replace the current funding rules year',
+    where: 'Replaces the RULES_DOC block in data.js. Move the outgoing year into OTHER_DOCS first, using the tab beside this one.',
+    fields: [
+      { id:'title',   label:'Full title', ph:'Apprenticeship funding rules: August 2027 to July 2028' },
+      { id:'version', label:'Version and date', ph:'Version 1, published 15 June 2027' },
+      { id:'applies', label:'Who it applies to', ph:'Apprenticeships starting on or after 1 August 2027' },
+      { id:'landing', label:'GOV.UK publication page', ph:'https://www.gov.uk/government/publications/...' },
+      { id:'changes', label:'Summary of changes page', ph:'https://www.gov.uk/government/publications/.../summary-of-changes' },
+      { id:'owner',   label:'Published by', ph:'Department for Work and Pensions' }
+    ],
+    build: v => 'Replace the whole RULES_DOC = { ... } block with this:\n\n' +
+      'const RULES_DOC = {\n' +
+      '  title: ' + q(v.title) + ',\n' +
+      '  version: ' + q(v.version) + ',\n' +
+      '  applies: ' + q(v.applies) + ',\n' +
+      '  landing: ' + q(v.landing) + ',\n' +
+      '  changes: ' + q(v.changes) + ',\n' +
+      '  collection: "https://www.gov.uk/government/collections/funding-rules-for-apprenticeships",\n' +
+      '  guidance: "https://www.gov.uk/guidance/apprenticeship-funding-rules",\n' +
+      '  owner: ' + q(v.owner || 'Department for Work and Pensions') + ',\n' +
+      '  licence: "Crown copyright, licensed under the Open Government Licence v3.0"\n' +
+      '};'
+  },
+
+  change: {
+    title: 'Add a rule change',
+    where: 'Goes in the RULES_CHANGES list in data.js. Appears on the What changed tab, and in the contents.',
+    fields: [
+      { id:'title',   label:'What changed, in a sentence', ph:'Subcontracting de-minimis opened up to every provider' },
+      { id:'section', label:'Section id it belongs to', ph:'subcontracting', hint:'Must match an id in RULES_SECTIONS — e.g. eligibility, co-investment, off-the-job' },
+      { id:'paras',   label:'Paragraph numbers', ph:'262.3' },
+      { id:'from',    label:'What the rule was before', ph:'The de-minimis could only be used by providers who had achieved the subcontracting standard.', area:true },
+      { id:'to',      label:'What it is now', ph:'From 1 August 2026 any provider can use the exemption.', area:true },
+      { id:'impact',  label:'Impact', ph:'high', hint:'high, medium or low' },
+      { id:'when',    label:'Which version it arrived in', ph:'v1', hint:'draft, v1, v2 or v3' }
+    ],
+    build: v => 'Add this inside the RULES_CHANGES = [ ... ] list:\n\n' +
+      '  { section:' + q(v.section) + ', when:' + q(v.when || 'draft') + ', paras:' + q(v.paras) + ', impact:' + q(v.impact || 'medium') + ',\n' +
+      '    title:' + q(v.title) + ',\n' +
+      '    from:' + q(v.from) + ',\n' +
+      '    to:' + q(v.to) + ' },'
+  }
+};
+
+function q(v){ return '"' + String(v || '').replace(/\\/g,'\\\\').replace(/"/g,'\\"') + '"'; }
+
+function docForm(kind){
+  const f = DOC_FORMS[kind];
+  const wrap = document.getElementById('dform');
+
+  wrap.innerHTML =
+    '<section class="lsection">' +
+      '<div class="lhead"><h2>' + f.title + '</h2><p>' + f.where + '</p></div>' +
+      '<div class="form" style="max-width:660px;margin-top:0">' +
+        f.fields.map(x =>
+          '<div class="field"><label for="d-' + x.id + '">' + x.label + '</label>' +
+          (x.hint ? '<p class="hint">' + x.hint + '</p>' : '') +
+          (x.area
+            ? '<textarea id="d-' + x.id + '" rows="3" placeholder="' + x.ph + '"></textarea>'
+            : '<input type="text" id="d-' + x.id + '" placeholder="' + x.ph + '">') +
+          '</div>').join('') +
+        '<button class="btn" id="dgen">Generate the entry</button>' +
+      '</div>' +
+      '<div id="dout"></div>' +
+    '</section>';
+
+  document.getElementById('dgen').addEventListener('click', () => {
+    const v = {};
+    let missing = [];
+    f.fields.forEach(x => {
+      v[x.id] = (document.getElementById('d-' + x.id).value || '').trim();
+      if(!v[x.id] && x.id !== 'owner') missing.push(x.label);
+    });
+
+    if(missing.length){
+      document.getElementById('dout').innerHTML =
+        '<div class="alert" style="margin-top:18px"><b>Still needed:</b> ' + missing.join(', ') + '</div>';
+      return;
+    }
+
+    const code = f.build(v);
+    document.getElementById('dout').innerHTML =
+      '<div class="lsection costs" style="margin-top:26px">' +
+        '<div class="lhead"><h2>Paste this into data.js</h2><p>' + f.where + '</p></div>' +
+        '<pre class="codeout" id="dcode">' + code.replace(/</g,'&lt;') + '</pre>' +
+        '<button class="btn small" id="dcopy" style="margin-top:14px">Copy</button>' +
+        '<div class="notice" style="margin-top:16px"><b>Then update the stamp.</b> ' +
+        'Change <code>DATA_UPDATED</code> at the top of <code>data.js</code> to today, so the site shows the right review date.</div>' +
+      '</div>';
+
+    document.getElementById('dcopy').addEventListener('click', () => {
+      navigator.clipboard.writeText(code);
+      document.getElementById('dcopy').textContent = 'Copied';
+      setTimeout(() => { document.getElementById('dcopy').textContent = 'Copy'; }, 1600);
+    });
+  });
 }
 
 /* Fetch our own data.js so the download can be a complete, working file

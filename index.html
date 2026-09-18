@@ -149,8 +149,11 @@ let FEEDINDEX = [];
 function cardHTML(item, i){
   const flag = item.pinned ? '<span class="dotflag" title="Priority"></span>' : '';
   const line = item.short || firstClause(item.summary);
+  const tag  = itemTagHTML(item);
   return '<button class="card ' + item.urgency + '" data-i="' + i + '">' +
-    flag + '<h3>' + item.title + '</h3><p>' + line + '</p>' +
+    flag + '<h3>' + item.title + '</h3>' +
+    '<div class="whatchanged"><span class="wclabel">What changed</span>' + tag + '</div>' +
+    '<p>' + line + '</p>' +
     '<span class="cdate">' + fmtShort(item.date) + ' ' + fmtYear(item.date) + '</span>' +
   '</button>';
 }
@@ -178,6 +181,9 @@ function openDetail(item){
       '<span class="pill ' + item.status + '">' + STATUS_LABELS[item.status] + '</span>' +
     '</div>' +
     '<h2>' + item.title + '</h2>' +
+    '<div class="whatchanged big"><span class="wclabel">What changed</span>' +
+      itemTagHTML(item) +
+    '</div>' +
     (item.standard ? '<p class="stdname">' + item.standard + '</p>' : '') +
     '<p class="dsum">' + item.summary + '</p>' +
     '<dl class="facts">' + factHTML + '</dl>' +
@@ -247,6 +253,19 @@ function renderBoard(filter, query){
   if(filter !== 'all') list = list.filter(i => i.category === filter);
   list = list.filter(i => matches(i, query, routeKey));
 
+  // Rank so the closest match leads each column, rather than the newest.
+  if(query){
+    const ranked = rankBySearch(list, query, i => ({
+      name:  (i.standard || i.title),
+      code:  (i.standard || '').match(/\b(ST|FA|AU)\d+\b/) ? RegExp.lastMatch : '',
+      extra: i.title + ' ' + i.summary + ' ' + routeText(i.route)
+    }));
+    const order = new Map(ranked.map((it, n) => [it, n]));
+    list.forEach(i => { i._rank = order.has(i) ? order.get(i) : 9999; });
+  } else {
+    list.forEach(i => { i._rank = null; });
+  }
+
   renderRouteContext(routeKey, query, list);
 
   const used = new Set();
@@ -260,8 +279,10 @@ function renderBoard(filter, query){
     const colDefs = columnsFor(filter, band);
 
     const cols = colDefs.map((col, ci) => {
-      const rows = inBand.filter(col.test).sort((a,b) =>
-        (a.pinned === b.pinned) ? band.sort(a,b) : (a.pinned ? -1 : 1));
+      const rows = inBand.filter(col.test).sort((a,b) => {
+        if(a._rank !== null && b._rank !== null && a._rank !== b._rank) return a._rank - b._rank;
+        return (a.pinned === b.pinned) ? band.sort(a,b) : (a.pinned ? -1 : 1);
+      });
       if(colDefs.length === 1){
         counts[band.key] = rows.length;
       } else {
