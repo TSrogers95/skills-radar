@@ -87,12 +87,13 @@
     <div id="fileerr"></div>
 
     <label class="announce">
-      <input type="checkbox" id="announce">
+      <input type="checkbox" id="announce" checked>
       <span>
         <b>Announce standards that are new to the site in the feed</b>
-        Leave this off for your first import, or 1,400 backfilled standards all
-        arrive as news at once. Turn it on for every import after that, so a
-        genuinely new standard on the register shows up as one.
+        On by default, which is right for a routine import — a standard newly
+        added to the register is news. Untick it when you are backfilling a
+        large batch that is new to the site but not new to the world, or the
+        real changes get buried.
       </span>
     </label>
   </section>
@@ -358,7 +359,7 @@ function epaFrom(rec){
    The hand-written fields are the point of the site. They survive.
    ========================================================================= */
 
-let ANNOUNCE_NEW = false;
+let ANNOUNCE_NEW = true;
 
 function merge(imported){
   const byCode = {}, byName = {};
@@ -560,6 +561,13 @@ function show(rows, cols, built, m, file){
         ? '<div class="alert"><b>' + noRoute + ' standards have no route.</b> ' +
           'Either the CSV has no route column, or its route names did not match. ' +
           'They will still appear in search and on the members page, but they will not group under a route on the standards page.</div>'
+        : '') +
+
+      (ANNOUNCE_NEW && m.added.length > 100
+        ? '<div class="alert"><b>' + m.added.length.toLocaleString('en-GB') + ' standards are new to the site, and all of them would go into the feed.</b> ' +
+          'That is almost certainly a backfill rather than ' + m.added.length.toLocaleString('en-GB') + ' new occupations, and it would bury the ' +
+          m.updated.length + ' genuine change' + (m.updated.length === 1 ? '' : 's') + ' this import found. ' +
+          'Untick the box above for this one import, then leave it ticked from here on.</div>'
         : '') +
 
       '<div class="okbox" style="margin-top:14px"><b>What reaches the feed.</b> ' +
