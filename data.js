@@ -707,15 +707,6 @@ const MILESTONES = [
     article: ""
   },
   {
-    date: "2026-10-01",
-    title: "T-Levels Week",
-    scope:"all", standards:[], routes:[],
-    type: "window", urgency: "low",
-    who: "Providers and employers",
-    action: "Annual T-Levels Week takes place in October. A practical window for employer engagement and placement recruitment for the following year.",
-    article: ""
-  },
-  {
     date: "2026-12-31",
     title: "Review levy balance against the new 12-month expiry",
     scope:"all", standards:[], routes:[],
@@ -1263,8 +1254,8 @@ const MEMBER = {
   standards: [
     { name:"Business Administrator", code:"ST0070", level:3, funding:5000,  months:18, count:18 },
     { name:"Operations Manager",     code:"",       level:5, funding:7000,  months:18, count:9  },
-    { name:"Project Manager",        code:"ST0360", level:6, funding:22000, months:36, count:7  },
-    { name:"Engineering Technician", code:"ST0457", level:3, funding:27000, months:42, count:11 }
+    { name:"Project Manager (integrated degree)", code:"ST0275", level:6, funding:22000, months:36, count:7  },
+    { name:"Engineering Technician", code:"ST0457", level:3, funding:21000, months:36, count:11 }
   ],
   routes: ["business-administration","digital","engineering-manufacturing"]
 };

@@ -1795,3 +1795,64 @@ table.std .ctag{ display:inline-block; }
   .backdrop{ opacity:0.55; }
   .nav{ margin-top:22px; }
 }
+
+/* ---------- Dashboard: things to do ---------- */
+
+.todolist{ margin-top:12px; }
+.todo{
+  display:flex; gap:20px; align-items:flex-start; justify-content:space-between;
+  background:var(--surface); border:1px solid var(--line);
+  border-left:3px solid var(--line-strong);
+  padding:17px 20px; margin-bottom:8px; flex-wrap:wrap;
+}
+.todo.stop{ border-left-color:var(--high); }
+.todo.warn{ border-left-color:var(--med); }
+.todo.watch{ border-left-color:var(--low); }
+.todotext{ flex:1; min-width:240px; }
+.todo h3{
+  font-family:var(--display); font-size:15.5px; font-weight:500;
+  letter-spacing:-0.012em; margin:0 0 6px; line-height:1.35;
+}
+.todo p{ font-size:13.5px; color:var(--text-2); line-height:1.6; margin:0; max-width:70ch; }
+
+.todoact{
+  flex:none; font-family:var(--sans); font-size:13px; font-weight:500;
+  padding:8px 15px; cursor:pointer; white-space:nowrap; text-decoration:none;
+  border:1px solid var(--line-strong); background:var(--paper); color:var(--text);
+  border-radius:2px; align-self:center;
+}
+.todoact:hover{ background:var(--ink); border-color:var(--ink); color:#fff; }
+.todo.stop .todoact{ border-color:var(--high); color:var(--high); }
+.todo.stop .todoact:hover{ background:var(--high); color:#fff; }
+
+/* ---------- Dashboard: coming up ---------- */
+
+.soonlist{ margin-top:12px; }
+.soon{
+  display:grid; grid-template-columns:96px 1fr; gap:20px;
+  background:var(--surface); border:1px solid var(--line);
+  border-left:3px solid var(--line-strong);
+  padding:16px 20px; margin-bottom:8px;
+}
+.soon.high{ border-left-color:var(--high); }
+.soon.medium{ border-left-color:var(--med); }
+.soon.low{ border-left-color:var(--low); }
+.soondate{
+  font-family:var(--display); font-size:18px; font-weight:500;
+  color:var(--text); line-height:1.15;
+}
+.soondate small{
+  display:block; font-family:var(--sans); font-size:11.5px;
+  font-weight:400; color:var(--text-3); margin-top:4px;
+}
+.soon h3{ font-family:var(--display); font-size:15.5px; font-weight:500; margin:0 0 6px; letter-spacing:-0.012em; }
+.soon p{ font-size:13.5px; color:var(--text-2); line-height:1.6; margin:0 0 7px; max-width:70ch; }
+.soon .who{ font-size:11.5px; color:var(--low); background:var(--low-bg); display:inline-block; padding:2px 8px; }
+
+.grouphead .linkbtn{ margin-left:auto; }
+
+@media (max-width:640px){
+  .soon{ grid-template-columns:1fr; gap:8px; }
+  .todo{ flex-direction:column; gap:12px; }
+  .todoact{ align-self:flex-start; }
+}

@@ -303,58 +303,183 @@ function levyFigures(payroll, standards, under25, levyPayer){
 
 /* ---------- Views ---------- */
 
-function dashView(){
-  const feed = allUpdates().filter(isMine);
-  const mine = feed.filter(isMyStandardOnly);
-  const urgent = feed.filter(u => u.urgency === 'high');
+/* =========================================================================
+   DASHBOARD
+
+   Deliberately not a second feed. The feed tab lists what has happened; this
+   answers a different question — what do I have to do, and what is coming.
+   Every item here is something with an action attached or a date to plan
+   against, drawn from the member's own cohort.
+   ========================================================================= */
+
+/* Things on this member's own standards that warrant doing something. */
+function attentionItems(){
+  const out = [];
+
+  COHORT.forEach(c => {
+    const reg = findStandard(c);
+    if(!reg){
+      out.push({ level:'warn', title:'L' + c.level + ' ' + c.name + ' is not matching the register',
+        detail: unmatchedNote(c) + ' Until it matches, changes to it will not reach your feed or calendar.',
+        action:'Fix the name', view:'levy' });
+      return;
+    }
+
+    const heads = c.count || 0;
+
+    if(/Defunded/i.test(reg.status)){
+      out.push({ level:'stop', title:'L' + c.level + ' ' + c.name + ' loses funding on 1 September 2026',
+        detail: heads + ' apprentice' + (heads === 1 ? '' : 's') + ' on programme stay funded to completion, but you cannot start anyone new. ' +
+          'Contracting takes six to eight weeks, so the practical deadline is earlier than the formal one.',
+        action:'Read what this means', href:'articles.html#std-' + (reg.code || reg.name.toLowerCase().replace(/[^a-z0-9]+/g,'-')) });
+    }
+
+    if(/waiting|pending/i.test(reg.epa || '')){
+      out.push({ level:'warn', title:'L' + c.level + ' ' + c.name + ' has no assessment organisation',
+        detail:'You can enrol and deliver, but nobody is currently appointed to assess. On a ' + (reg.months || c.months) +
+          '-month programme that is a real timing risk — ask how long appointment is expected to take against your planned end dates.',
+        action:'View on the register', href: standardURL(reg), external:true });
+    }
+
+    if(/development|notice period|paused|retirement/i.test(reg.status)){
+      out.push({ level:'watch', title:'L' + c.level + ' ' + c.name + ' is ' + reg.status.toLowerCase(),
+        detail: /paused/i.test(reg.status)
+          ? 'No new starts are possible while the pause holds. Existing apprentices continue.'
+          : 'A revision is in progress. You can still start apprentices on the current version, but treat curriculum plans as provisional.',
+        action:'View on the register', href: standardURL(reg), external:true });
+    }
+
+    if(reg.funding && c.funding && reg.funding !== c.funding){
+      out.push({ level:'warn', title:'L' + c.level + ' ' + c.name + ' band is now ' + money(reg.funding),
+        detail:'Your cohort is costed at ' + money(c.funding) + '. The band that applies is the one in force at each apprentice\'s start date, ' +
+          'so you may be running the same standard at two prices. Check your MIS.',
+        action:'Update your figures', view:'levy' });
+    }
+  });
+
+  // Money
   const f = levyFigures(MEMBER.payroll, COHORT, YOUNG, MEMBER.levyPayer);
-  const soon = myMilestones().filter(m => daysAgo(m.date) < 0)
-    .sort((a,b) => new Date(a.date) - new Date(b.date)).slice(0,3);
+  if(f.shortfall > 0 && f.youCost > 0){
+    out.push({ level:'warn', title:'Budget around ' + money(Math.round(f.youCost)) + ' of co-investment this year',
+      detail:'You draw down roughly ' + money(Math.round(f.annualDraw)) + ' against ' + money(Math.round(f.available)) +
+        ' coming in. Government covers ' + money(Math.round(f.govCost)) + ' of the gap; the rest is yours.',
+      action:'Open the calculator', view:'levy' });
+  } else if(f.surplus > 1000){
+    out.push({ level:'watch', title:money(Math.round(f.surplus)) + ' of levy may expire unused',
+      detail:'New funds expire after twelve months rather than twenty-four, so an unspent balance is money lost rather than banked. ' +
+        'Units, foundation apprenticeships and transfers are all ways to commit it.',
+      action:'Open the calculator', view:'levy' });
+  }
 
-  const defunded = COHORT.filter(s =>
-    STANDARDS.some(x => x.name === s.name && /Defunded/i.test(x.status)));
+  const order = { stop:0, warn:1, watch:2 };
+  return out.sort((a,b) => order[a.level] - order[b.level]);
+}
 
-  return '<div class="pagehead"><h1>Good to see you, ' + MEMBER.org + '</h1>' +
-    '<p>Everything below is filtered to the ' + COHORT.length +
-    ' standards you deliver, plus the funding rule and levy changes that apply to everyone.</p></div>' +
+/* Milestones in the next 90 days that apply to this member. */
+function comingUp(days){
+  return myMilestones()
+    .filter(m => { const d = -daysAgo(m.date); return d >= 0 && d <= days; })
+    .sort((a,b) => new Date(a.date) - new Date(b.date));
+}
 
-    (defunded.length ? '<div class="alert"><b>' + defunded.length + ' of your standards ' +
-      (defunded.length === 1 ? 'is' : 'are') + ' losing funding from 1 September 2026.</b> ' +
-      defunded.map(s => 'L' + s.level + ' ' + s.name).join(', ') + '. ' +
-      'Existing apprentices remain funded to completion, but you cannot start anyone new after the cut-off. ' +
-      '<a href="articles.html#defunding-16">Read what this means</a></div>' : '') +
+/* When each cohort finishes, based on the standard's typical duration. */
+function completionForecast(){
+  const out = [];
+  COHORT.filter(c => c.count > 0 && c.months > 0).forEach(c => {
+    const reg = findStandard(c);
+    const months = (reg && reg.months) || c.months;
+    // spread across the programme: on a steady intake, roughly a twelfth of
+    // the cohort reaches gateway each month once the first year is through
+    const perYear = Math.round(c.count * (12 / months));
+    out.push({ name: c.name, level: c.level, count: c.count, months: months, perYear: perYear });
+  });
+  return out.sort((a,b) => b.perYear - a.perYear);
+}
+
+function dashView(){
+  const attention = attentionItems();
+  const soon = comingUp(90);
+  const forecast = completionForecast();
+  const stops = attention.filter(a => a.level === 'stop').length;
+
+  const attentionHTML = attention.length
+    ? attention.map((a, i) =>
+        '<div class="todo ' + a.level + '">' +
+          '<div class="todotext"><h3>' + a.title + '</h3><p>' + a.detail + '</p></div>' +
+          (a.href
+            ? '<a class="todoact" href="' + a.href + '"' + (a.external ? ' target="_blank" rel="noopener"' : '') + '>' + a.action + '</a>'
+            : '<button class="todoact" data-go="' + a.view + '">' + a.action + '</button>') +
+        '</div>').join('')
+    : '<div class="okbox">Nothing on your standards needs attention right now. The feed still has the wider picture.</div>';
+
+  const soonHTML = soon.length
+    ? soon.map(m => {
+        const d = new Date(m.date), away = Math.ceil(-daysAgo(m.date));
+        return '<div class="soon ' + m.urgency + '">' +
+          '<div class="soondate">' + d.getDate() + ' ' + d.toLocaleDateString('en-GB',{month:'short'}) +
+            '<small>' + (away === 0 ? 'today' : 'in ' + away + ' day' + (away === 1 ? '' : 's')) + '</small></div>' +
+          '<div><h3>' + m.title + '</h3><p>' + m.action + '</p>' +
+          '<div class="who">' + milestoneReason(m) + '</div></div>' +
+        '</div>';
+      }).join('')
+    : '<div class="okbox">No deadlines in the next 90 days that touch your standards.</div>';
+
+  return '<div class="pagehead"><h1>' + MEMBER.org + '</h1>' +
+    '<p>What needs doing, and what is coming. The wider picture of everything that has changed is on ' +
+    '<button class="linkbtn" data-go="feed">your feed</button>.</p></div>' +
 
     '<div class="mgrid">' +
-      '<div class="mcard"><div class="n">' + mine.length + '</div><div class="l">Changes to your standards</div></div>' +
-      '<div class="mcard warm"><div class="n">' + urgent.length + '</div><div class="l">Marked act now</div></div>' +
+      '<div class="mcard ' + (stops ? 'bad' : '') + '"><div class="n">' + attention.length + '</div>' +
+        '<div class="l">Needing attention' + (stops ? ' — ' + stops + ' urgent' : '') + '</div></div>' +
+      '<div class="mcard warm"><div class="n">' + soon.length + '</div><div class="l">Deadlines in 90 days</div></div>' +
       '<div class="mcard"><div class="n">' + cohortHeads() + '</div><div class="l">Apprentices on programme</div></div>' +
-      '<div class="mcard ' + (f.shortfall ? 'bad' : 'cool') + '"><div class="n">' +
-        (f.shortfall ? '−' + money(Math.round(f.shortfall)) : money(Math.round(f.surplus))) +
-        '</div><div class="l">' + (f.shortfall ? 'Annual levy shortfall' : 'Annual levy surplus') + '</div></div>' +
+      '<div class="mcard cool"><div class="n">' + COHORT.length + '</div><div class="l">Standards you deliver</div></div>' +
     '</div>' +
 
+    '<div class="grouphead"><h2>Needs your attention</h2><div class="rule"></div></div>' +
+    '<div class="todolist">' + attentionHTML + '</div>' +
+
+    '<div class="grouphead"><h2>Next 90 days</h2><div class="rule"></div>' +
+      '<button class="linkbtn" data-go="cal">Full calendar</button></div>' +
+    '<div class="soonlist">' + soonHTML + '</div>' +
+
+    (forecast.length
+      ? '<div class="grouphead"><h2>Completion forecast</h2><div class="rule"></div></div>' +
+        '<p class="hint" style="max-width:66ch;margin:12px 0">Roughly how many apprentices reach gateway each year at your current cohort size, ' +
+        'assuming a steady intake and the register\'s typical duration. Useful for planning assessment capacity and next year\'s recruitment.</p>' +
+        '<table class="std" style="margin-top:4px"><thead><tr>' +
+          '<th>Standard</th><th>On programme</th><th class="hidecol">Duration</th><th>Completing per year</th>' +
+        '</tr></thead><tbody>' +
+        forecast.map(f => '<tr><td class="nm">L' + f.level + ' ' + f.name + '</td>' +
+          '<td class="num">' + f.count + '</td>' +
+          '<td class="num hidecol">' + f.months + ' months</td>' +
+          '<td class="num"><b>' + f.perYear + '</b></td></tr>').join('') +
+        '<tr class="totalrow"><td class="nm"><b>Total</b></td>' +
+          '<td class="num">' + cohortHeads() + '</td><td class="hidecol"></td>' +
+          '<td class="num"><b>' + forecast.reduce((t,f) => t + f.perYear, 0) + '</b></td></tr>' +
+        '</tbody></table>'
+      : '') +
+
     '<div class="grouphead"><h2>Your standards</h2><div class="rule"></div>' +
-      '<button class="linkbtn" id="tolevy">Edit these</button></div>' +
+      '<button class="linkbtn" data-go="levy">Edit these</button></div>' +
     '<table class="std" style="margin-top:12px"><thead><tr>' +
       '<th>Standard</th><th>Level</th><th>On programme</th><th>Band</th><th>Status</th>' +
     '</tr></thead><tbody>' +
     COHORT.map(s => {
-      const reg = STANDARDS.find(x => x.name === s.name);
+      const reg = findStandard(s);
       const bad = reg && /Defunded/i.test(reg.status);
       return '<tr class="' + (bad ? 'defunded' : '') + '">' +
-        '<td class="nm"><a class="stdlink" href="' + (reg ? standardURL(reg) : '#') + '" target="_blank" rel="noopener">' + s.name + '</a>' +
-        '<small>' + (s.code || 'code to confirm') + '</small></td>' +
+        '<td class="nm">' + (reg
+          ? '<a class="stdlink" href="' + standardURL(reg) + '" target="_blank" rel="noopener">' + reg.name + '</a>' +
+            '<small>' + (reg.code || 'code to confirm') + ' &middot; v' + reg.version + '</small>'
+          : s.name + '<small>' + unmatchedNote(s) + '</small>') + '</td>' +
         '<td class="num">Level ' + s.level + '</td>' +
         '<td class="num">' + s.count + '</td>' +
-        '<td class="num">' + money(s.funding) + '</td>' +
-        '<td>' + (reg ? reg.status : 'Not tracked') + '</td></tr>';
-    }).join('') + '</tbody></table>' +
-
-    '<div class="grouphead"><h2>Next deadlines</h2><div class="rule"></div></div>' +
-    soon.map(m => '<div class="mile ' + m.urgency + '">' +
-      '<div class="d">' + new Date(m.date).getDate() + ' ' + new Date(m.date).toLocaleDateString('en-GB',{month:'short'}) +
-      '<small>' + new Date(m.date).getFullYear() + '</small></div>' +
-      '<div><div class="who">' + m.who + '</div><h3>' + m.title + '</h3><p>' + m.action + '</p></div></div>').join('');
+        '<td class="num">' + money((reg && reg.funding) || s.funding) + '</td>' +
+        '<td>' + (reg
+          ? (reg.changed ? changeTagHTML(reg.changed, reg.status) : '<span class="chg none">' + reg.status + '</span>')
+          : '<span class="chg yes">Check the name</span>') + '</td></tr>';
+    }).join('') + '</tbody></table>';
 }
 
 function feedView(){
@@ -898,12 +1023,13 @@ function render(){
   const panel = document.getElementById('mpanel');
   if(view === 'dash'){
     panel.innerHTML = dashView();
-    const j = document.getElementById('tolevy');
-    if(j) j.addEventListener('click', () => {
-      document.querySelectorAll('#mtabs button').forEach(b => b.classList.toggle('active', b.dataset.view === 'levy'));
-      view = 'levy';
-      render();
-    });
+    panel.querySelectorAll('[data-go]').forEach(b =>
+      b.addEventListener('click', () => {
+        const to = b.dataset.go;
+        document.querySelectorAll('#mtabs button').forEach(x => x.classList.toggle('active', x.dataset.view === to));
+        view = to;
+        render();
+      }));
   }
   if(view === 'feed')  panel.innerHTML = feedView();
   if(view === 'cal'){  panel.innerHTML = calView(); buildCalendar(); }

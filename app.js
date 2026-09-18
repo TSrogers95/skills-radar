@@ -629,3 +629,58 @@ function sourceLabel(){
   if(s === 'sync')   return 'automatic register sync';
   return 'register';
 }
+
+
+/* =========================================================================
+   MATCHING A MEMBER'S STANDARD TO THE REGISTER
+
+   People write "Project Manager"; the register says "Project Manager
+   (integrated degree)". An exact-name lookup fails and the page reports
+   "Not tracked", which reads like the standard does not exist. It tries
+   progressively looser matches instead, and says plainly when it genuinely
+   cannot find one.
+   ========================================================================= */
+
+function findStandard(entry){
+  if(!entry) return null;
+  const name = String(entry.name || '');
+  const code = String(entry.code || '');
+  const norm = s => String(s).toLowerCase().replace(/[^a-z0-9]/g, '');
+  const n = norm(name);
+
+  // 1. reference number, if we have one
+  if(code){
+    const byCode = STANDARDS.find(s => s.code && s.code.toUpperCase() === code.toUpperCase());
+    if(byCode) return byCode;
+  }
+
+  // 2. exact name
+  const exact = STANDARDS.find(s => norm(s.name) === n);
+  if(exact) return exact;
+
+  // 3. the register name with a qualifier on the end, at the same level
+  //    "Project Manager" -> "Project Manager (integrated degree)"
+  const prefixed = STANDARDS.filter(s => norm(s.name).startsWith(n));
+  if(prefixed.length){
+    return prefixed.find(s => s.level === entry.level) || prefixed[0];
+  }
+
+  // 4. contained in a longer register name, but only at the same level, so
+  //    "Engineering Technician" does not silently become "Rail Engineering
+  //    Technician"
+  const within = STANDARDS.filter(s => norm(s.name).includes(n) && s.level === entry.level);
+  if(within.length === 1) return within[0];
+
+  return null;
+}
+
+/* What to show when a cohort entry cannot be matched. */
+function unmatchedNote(entry){
+  const norm = s => String(s).toLowerCase().replace(/[^a-z0-9]/g, '');
+  const near = STANDARDS
+    .filter(s => norm(s.name).includes(norm(entry.name)) || norm(entry.name).includes(norm(s.name)))
+    .slice(0, 2);
+  return near.length
+    ? 'Not matched — did you mean ' + near.map(s => 'L' + s.level + ' ' + s.name).join(' or ') + '?'
+    : 'Not on the register under this name';
+}
