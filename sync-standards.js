@@ -18,7 +18,7 @@
 const { readFile, writeFile, sendEmail, authorised, today } = require('./_lib');
 
 const API   = 'https://occupational-maps-api.skillsengland.education.gov.uk/api/v1';
-const PATH  = 'data.js';
+const PATH  = 'standards.js';
 const BEGIN = '/* STANDARDS:BEGIN';
 const END   = '/* STANDARDS:END */';
 
@@ -63,11 +63,11 @@ module.exports = async function handler(req, res){
   /* ---- 2. Read what the site currently has ---- */
 
   const file = await readFile(PATH);
-  if(!file) return res.status(500).json({ error: 'data.js not found in the repo' });
+  if(!file) return res.status(500).json({ error: 'standards.js not found in the repo' });
 
   const a = file.content.indexOf(BEGIN);
   const b = file.content.indexOf(END);
-  if(a < 0 || b < 0) return res.status(500).json({ error: 'STANDARDS markers missing from data.js' });
+  if(a < 0 || b < 0) return res.status(500).json({ error: 'STANDARDS markers missing from standards.js' });
 
   const block = file.content.slice(a, b);
   const local = parseLocal(block);
@@ -150,20 +150,31 @@ module.exports = async function handler(req, res){
 
   const rebuilt =
     file.content.slice(0, a) +
-    BEGIN + ' — the sync job rewrites everything between these two\n' +
-    '   markers. Do not remove them. Hand-added fields (common, article) are\n' +
-    '   preserved by the sync; machine fields are overwritten from the register.\n' +
+    BEGIN + ' — the importer and sync job rewrite everything between\n' +
+    '   these two markers. Do not remove them.\n' +
     '   Last synced ' + today() + '. */\n' +
     'const STANDARDS = [\n' +
     merged.map(render).join('\n') + '\n];\n\n' +
     file.content.slice(b);
 
-  const stamped = rebuilt
-    .replace(/const DATA_UPDATED = "[\d-]+";/, 'const DATA_UPDATED = "' + today() + '";')
-    .replace(/const DATA_SOURCE  = "[a-z]+";/, 'const DATA_SOURCE  = "sync";');
-
-  await writeFile(PATH, stamped, file.sha,
+  // The review stamp lives in data.js, which the sync never writes, so it is
+  // updated separately rather than as part of the register rewrite.
+  await writeFile(PATH, rebuilt, file.sha,
     'Register sync ' + today() + ' — ' + added.length + ' new, ' + updated.length + ' updated');
+
+  try {
+    const meta = await readFile('data.js');
+    if(meta){
+      const stamped = meta.content
+        .replace(/const DATA_UPDATED = "[\d-]+";/, 'const DATA_UPDATED = "' + today() + '";')
+        .replace(/const DATA_SOURCE  = "[a-z]+";/, 'const DATA_SOURCE  = "sync";');
+      if(stamped !== meta.content){
+        await writeFile('data.js', stamped, meta.sha, 'Update review date after register sync ' + today());
+      }
+    }
+  } catch(err){
+    console.log('Could not update the review stamp:', err.message);
+  }
 
   await sendEmail(
     'Skills Radar — ' + total + ' standard' + (total === 1 ? '' : 's') + ' updated from the register',

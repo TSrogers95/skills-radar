@@ -180,7 +180,7 @@ function deriveUpdates(){
         category: 'standard',
         route: s.route,
         standard: s.name + (s.code ? ', Level ' + s.level + ' (' + s.code + ')' : ', Level ' + s.level),
-        article: articleFor(s, defunded, dev),
+        article: articleForStandard(s, defunded, dev),
         status: status,
         urgency: urgency,
         pinned: false,
@@ -407,4 +407,195 @@ function rankBySearch(list, query, getFields){
     .filter(x => x.score > 0)
     .sort((a, b) => b.score - a.score)
     .map(x => x.item);
+}
+
+/* =========================================================================
+   COMPILED ARTICLES
+
+   The written articles cover policy. They cannot cover every standard — but
+   a defunding, a withdrawal, a funding band move or a pause is significant
+   enough that it deserves its own page rather than being folded into a route
+   round-up.
+
+   These are compiled from the register, not written. Every fact in them
+   comes from the standard's own record. They are labelled as compiled on the
+   articles page so nobody mistakes them for analysis.
+   ========================================================================= */
+
+/* Which changes are significant enough to warrant their own article. */
+function significance(s){
+  if(!s.changed) return null;
+  const c = s.changed.toLowerCase(), st = (s.status || '').toLowerCase();
+
+  if(/defunded/.test(st) || /funding withdrawn/.test(c))  return 'defunded';
+  if(/retirement consultation/.test(c + st))              return 'retiring';
+  if(/^retired|standard retired/.test(c))                 return 'retired';
+  if(/paused/.test(c + st))                               return 'paused';
+  if(/funding band/.test(c))                              return 'band';
+  if(/age restriction/.test(c))                           return 'age';
+  if(/replaces|replaced by/.test(c))                      return 'replaced';
+  return null;                                            // routine: route round-up covers it
+}
+
+function gbp(n){ return '£' + Number(n || 0).toLocaleString('en-GB'); }
+
+function compiledArticle(s){
+  const kind  = significance(s);
+  if(!kind) return null;
+
+  const route = ROUTES[s.route];
+  const level = 'Level ' + s.level;
+  const dur   = s.months ? s.months + ' months' : 'delivered as a unit';
+  const rname = route ? route.label : 'its route';
+
+  const spec = level + ', ' + dur + ', maximum funding ' + gbp(s.funding) +
+    (s.code ? ', reference ' + s.code : '') + ', currently at version ' + s.version + '.';
+
+  const body = [], sources = [];
+  let title, summary, standfirst, urgency, icon;
+
+  if(kind === 'defunded'){
+    urgency = 'high'; icon = 'stop';
+    title = s.name + ' loses funding from September 2026';
+    summary = 'One of the sixteen standards being defunded. Existing apprentices are safe; no new starts after the cut-off.';
+    standfirst = 'A funded route into this occupation closes, and for most of the sixteen no replacement has been announced.';
+    body.push(
+      s.name + ' at ' + level + ' is one of sixteen apprenticeship standards losing funding from no earlier than 1 September 2026. ' + spec,
+      'What changes: government funding is withdrawn for new starts. Apprentices already on programme are unaffected and remain funded through to completion. What you cannot do is start anyone new after the cut-off.',
+      'The practical deadline is earlier than the formal one. Eligibility checks, contracting and onboarding typically take six to eight weeks, so a start that has not been set up well before September will not be funded.',
+      'The reason given is budget pressure combined with a policy shift towards younger apprentices. Skills England has noted the offer grew beyond 700 standards while starts among 16 to 24 year olds fell around 40% over a decade, with growth concentrated in older, higher-level and more expensive provision.',
+      'What to do about it: if you deliver this standard, decide now whether learners can move to an adjacent standard on ' + rname + ', whether apprenticeship units can cover the same capability, or whether development here moves outside the levy entirely. If you are an employer using it as a pipeline, you need that answer before the cut-off rather than after it.'
+    );
+    sources.push({ label: 'Skills England — Streamlining apprenticeships', url: 'https://help.apprenticeships.education.gov.uk/hc/en-gb/articles/34005717182226-Streamlining-apprenticeships' });
+  }
+
+  else if(kind === 'retiring'){
+    urgency = 'high'; icon = 'stop';
+    title = s.name + ': retirement consultation open';
+    summary = 'Skills England is consulting on withdrawing this standard. Consultation is the only point at which the outcome can be influenced.';
+    standfirst = 'Not yet a decision — which is exactly why it is worth responding to.';
+    body.push(
+      'A retirement consultation is open on ' + s.name + ' at ' + level + '. ' + spec,
+      'A retirement consultation means Skills England is asking whether the standard should continue. It is not a decision, and outcomes do vary — some standards emerge revised rather than withdrawn.',
+      'What changes today: nothing. The standard remains approved for delivery and you can continue to start apprentices on it while the consultation runs.',
+      'What could change: if the outcome is retirement, the standard closes to new starts from a date to be announced, with existing apprentices funded to completion as usual.',
+      'What to do about it: respond. Consultation is the only stage at which employer and provider demand is formally counted, and standards on ' + rname + ' with quiet consultations are the ones most likely to go. In the meantime, avoid building a new commercial offer on this standard until the outcome is known, and have an alternative identified.'
+    );
+    sources.push({ label: 'Skills England apprenticeship register', url: 'https://skillsengland.education.gov.uk/apprenticeships/' });
+  }
+
+  else if(kind === 'retired'){
+    urgency = 'high'; icon = 'stop';
+    title = s.name + ' has been retired';
+    summary = 'Closed to new starts. Apprentices already on programme continue to completion.';
+    standfirst = 'The standard is gone for new starts, and the question is what replaces it.';
+    body.push(
+      s.name + ' at ' + level + ' has been retired on the Skills England register. ' + spec,
+      'A retired standard cannot take new starts. Apprentices who began before the retirement date continue under the rules and version that applied when they started, and remain funded to completion.',
+      'Where a standard is retired because it has been replaced by a newer version or a restructured occupation, the replacement will be on the register under its own reference. Where it is retired because the occupation no longer warrants an apprenticeship, there is no replacement.',
+      'What to do about it: check the register for a successor standard on ' + rname + ' before assuming either. Then confirm which version each apprentice on programme sits under, because the funding rules that apply are those in force on their individual start date rather than today.'
+    );
+    sources.push({ label: 'Skills England apprenticeship register', url: 'https://skillsengland.education.gov.uk/apprenticeships/' });
+  }
+
+  else if(kind === 'paused'){
+    urgency = 'high'; icon = 'stop';
+    title = s.name + ' is paused for new starts';
+    summary = 'You cannot enrol anyone while the pause holds, though existing apprentices continue.';
+    standfirst = 'The most disruptive status on the register, because it arrives without notice.';
+    body.push(
+      s.name + ' at ' + level + ' is currently paused for starts. ' + spec,
+      'A pause is different from a revision. A standard in revision can still take new apprentices on the current version. A paused standard cannot take anyone at all until the pause lifts.',
+      'Apprentices already on programme are unaffected and continue to completion.',
+      'Pauses are usually applied while something material is being resolved — an assessment plan problem, a regulatory change, or a funding review. No end date is normally published.',
+      'What to do about it: if you had a cohort planned, you need an alternative on ' + rname + ' now rather than a wait-and-see. Check the register weekly, since a pause can lift as suddenly as it appeared, and tell any employer expecting to recruit onto this standard before they advertise a vacancy they cannot fill.'
+    );
+    sources.push({ label: 'Skills England apprenticeship register', url: 'https://skillsengland.education.gov.uk/apprenticeships/' });
+  }
+
+  else if(kind === 'band'){
+    const nums = String(s.changed).match(/£([\d,]+)/g) || [];
+    const from = nums[0] ? parseInt(nums[0].replace(/[£,]/g,''), 10) : null;
+    const to   = nums[1] ? parseInt(nums[1].replace(/[£,]/g,''), 10) : s.funding;
+    const up   = from !== null && to > from;
+    const pct  = from ? Math.round(((to - from) / from) * 100) : null;
+
+    urgency = 'medium'; icon = 'coin';
+    title = s.name + ': funding band ' + (up ? 'raised' : 'changed') + ' to ' + gbp(to);
+    summary = up
+      ? 'Up' + (pct ? ' ' + pct + '%' : '') + ' from ' + gbp(from) + ', which changes whether this is viable to deliver.'
+      : 'The maximum you can draw for this standard has moved.';
+    standfirst = 'Band reviews are quiet, infrequent and financially significant.';
+    body.push(
+      'The funding band for ' + s.name + ' at ' + level + ' has moved' +
+        (from !== null ? ' from ' + gbp(from) + ' to ' + gbp(to) : ' to ' + gbp(to)) +
+        (pct ? ', an increase of around ' + pct + '%' : '') + '. ' + spec,
+      'The band is a maximum, not a price. It caps what can be drawn from a levy account or co-invested. The actual price is negotiated between employer and provider, so a band increase does not automatically raise what you charge.',
+      'The band that applies is the one in force at the apprentice\'s start date. Apprentices already on programme stay on the old band for their full duration, which means you may be delivering the same standard at two prices at once. Check your MIS applies the right one per learner rather than the current one to everybody.',
+      up
+        ? 'What to do about it: if you withdrew from this standard on cost grounds, the arithmetic has changed and it is worth revisiting. For employers, a higher band means a larger potential draw on the levy account, which matters more now that new funds expire after twelve months.'
+        : 'What to do about it: re-cost the programme before your next cohort, and check the reduction does not take delivery below viability on ' + rname + '.'
+    );
+    sources.push({ label: 'Skills England apprenticeship register', url: 'https://skillsengland.education.gov.uk/apprenticeships/' });
+  }
+
+  else if(kind === 'age'){
+    urgency = 'medium'; icon = 'cap';
+    title = s.name + ': new age restriction applies';
+    summary = 'Eligibility now depends on the apprentice\'s age at the start of training.';
+    standfirst = 'An eligibility rule rather than a funding rate — get it wrong and the whole start is unfunded.';
+    body.push(
+      'An age restriction now applies to ' + s.name + ' at ' + level + '. ' + spec,
+      'This is an eligibility condition, not a co-investment rate. An apprentice outside the age range cannot be funded on this standard at all, rather than being funded at a different percentage.',
+      'Age is assessed at the start of the apprenticeship, using the learning start date recorded in the ILR. Someone who turns 25 during their programme remains eligible; someone who was already 25 on day one never was.',
+      'Age restrictions of this kind fit the wider pattern across the 2026/27 rules of directing funding towards younger apprentices, alongside the Level 7 restriction and the changes to co-investment.',
+      'What to do about it: check the eligibility gate in your enrolment process actually tests this, rather than relying on someone remembering. An ineligible start discovered at audit is a clawback, not a correction. And be aware there is now no funded route at this level on ' + rname + ' for adults outside the range.'
+    );
+    sources.push({ label: 'GOV.UK — Apprenticeship funding rules', url: 'https://www.gov.uk/guidance/apprenticeship-funding-rules' });
+  }
+
+  else if(kind === 'replaced'){
+    urgency = 'medium'; icon = 'signpost';
+    title = s.name + ' has been restructured';
+    summary = 'The occupation has been reorganised, which changes the progression ladder rather than just the content.';
+    standfirst = 'A replacement is not a version change — the shape of the route moves.';
+    body.push(
+      s.name + ' at ' + level + ' has been restructured on the register. ' + spec,
+      'A restructure differs from a version update. A new version revises content within the same standard. A restructure replaces one standard with another, sometimes at a different level, which changes where the occupation sits on the progression ladder.',
+      'For apprentices already on programme, the standard and version they started under continues to apply through to completion.',
+      'What to do about it: map the new structure against your existing offer on ' + rname + ' before your next intake. Entry requirements, duration and funding may all differ from the standard it replaces, and marketing written for the old one will be wrong. Check whether learners you would previously have placed here now belong at a different level.'
+    );
+    sources.push({ label: 'Skills England apprenticeship register', url: 'https://skillsengland.education.gov.uk/apprenticeships/' });
+  }
+
+  return {
+    id: 'std-' + (s.code || s.name.toLowerCase().replace(/[^a-z0-9]+/g,'-')),
+    compiled: true,
+    icon: icon,
+    tag: 'Standard',
+    urgency: urgency,
+    route: s.route || '',
+    date: s.since,
+    title: title,
+    summary: summary,
+    standfirst: standfirst,
+    body: body,
+    sources: sources,
+    standardName: s.name,
+    standardCode: s.code
+  };
+}
+
+/* Every article the site can show: written first, then compiled. */
+function allArticles(){
+  const compiled = STANDARDS.map(compiledArticle).filter(Boolean);
+  const seen = new Set(ARTICLES.map(a => a.id));
+  return ARTICLES.concat(compiled.filter(a => !seen.has(a.id)));
+}
+
+/* Point a feed item at its own compiled article where one exists, and fall
+   back to the route round-up where the change is routine. */
+function articleForStandard(s, defunded, dev){
+  if(significance(s)) return 'std-' + (s.code || s.name.toLowerCase().replace(/[^a-z0-9]+/g,'-'));
+  return articleFor(s, defunded, dev);
 }

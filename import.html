@@ -109,6 +109,7 @@
   </div>
 </footer>
 
+<script src="standards.js"></script>
 <script src="data.js"></script>
 <script src="app.js"></script>
 <script src="ui.js"></script>
@@ -586,28 +587,30 @@ function show(rows, cols, built, m, file){
 
     '<section class="lsection">' +
       '<div class="lhead"><h2>4. Put it into the site</h2>' +
-      '<p>Download the new data file, or copy just the standards block.</p></div>' +
+      '<p>Download the new register file, or copy just the standards block. ' +
+      'Afterwards, change <code>DATA_UPDATED</code> at the top of <code>data.js</code> to today so the site shows the right review date.</p></div>' +
       '<div class="addrow">' +
-        '<button class="btn" id="dl">Download data.js</button>' +
+        '<button class="btn" id="dl">Download standards.js</button>' +
         '<button class="btn small" id="copy">Copy the standards block</button>' +
       '</div>' +
-      '<div class="notice" style="margin-top:18px"><b>How to use it.</b> ' +
-      'The download is your complete <code>data.js</code> with the standards replaced and everything else — ' +
-      'articles, milestones, rules, routes — untouched. Upload it to GitHub in place of the current one, ' +
-      'commit, and Vercel redeploys in about thirty seconds. ' +
-      'If anything looks wrong afterwards, revert the commit and you are back where you started.</div>' +
+      '<div class="notice" style="margin-top:18px"><b>This only ever writes standards.js.</b> ' +
+      'Upload it to GitHub in place of the current <code>standards.js</code>, commit, and Vercel redeploys in about thirty seconds. ' +
+      '<code>data.js</code> is never touched, so nothing you or anyone else has written — articles, milestones, ' +
+      'rules, routes — can be overwritten by an import. If a result looks wrong, revert the commit and you are back where you started.</div>' +
     '</section>';
 
-  const full = DATA_FILE_SOURCE
-    ? DATA_FILE_SOURCE.replace(/\/\* STANDARDS:BEGIN[\s\S]*?\/\* STANDARDS:END \*\//, code + '\n/* STANDARDS:END */')
-        .replace(/const DATA_UPDATED = "[\d-]+";/, 'const DATA_UPDATED = "' + new Date().toISOString().slice(0,10) + '";')
-    : code;
+  // Rebuild standards.js, keeping its header comment and replacing only the
+  // block between the markers. data.js is never opened.
+  const header = STANDARDS_FILE_SOURCE
+    ? STANDARDS_FILE_SOURCE.slice(0, STANDARDS_FILE_SOURCE.indexOf('/* STANDARDS:BEGIN'))
+    : '';
+  const full = header + code + '\n/* STANDARDS:END */\n';
 
   document.getElementById('dl').addEventListener('click', () => {
     const blob = new Blob([full], { type: 'text/javascript' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = 'data.js';
+    a.download = 'standards.js';
     a.click();
     URL.revokeObjectURL(a.href);
   });
@@ -796,10 +799,10 @@ function docForm(kind){
   });
 }
 
-/* Fetch our own data.js so the download can be a complete, working file
-   rather than just the block. */
-let DATA_FILE_SOURCE = '';
-fetch('data.js').then(r => r.text()).then(t => { DATA_FILE_SOURCE = t; }).catch(() => {});
+/* Fetch the current standards.js so the download keeps its header comment.
+   data.js is deliberately never read or written by this page. */
+let STANDARDS_FILE_SOURCE = '';
+fetch('standards.js').then(r => r.text()).then(t => { STANDARDS_FILE_SOURCE = t; }).catch(() => {});
 
 </script>
 </body>
