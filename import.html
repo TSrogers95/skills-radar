@@ -85,6 +85,16 @@
       <p class="dropsub">Expecting a file with a few thousand rows</p>
     </div>
     <div id="fileerr"></div>
+
+    <label class="announce">
+      <input type="checkbox" id="announce">
+      <span>
+        <b>Announce standards that are new to the site in the feed</b>
+        Leave this off for your first import, or 1,400 backfilled standards all
+        arrive as news at once. Turn it on for every import after that, so a
+        genuinely new standard on the register shows up as one.
+      </span>
+    </label>
   </section>
 
   <div id="results"></div>
@@ -144,6 +154,10 @@ document.getElementById('gpeek').addEventListener('click', () => {
 document.getElementById('lockit').addEventListener('click', () => {
   try { sessionStorage.removeItem('sr-admin'); } catch(e){}
   location.reload();
+});
+
+document.getElementById('announce').addEventListener('change', () => {
+  if(LAST_FILE) handle(LAST_FILE);
 });
 
 try { if(sessionStorage.getItem('sr-admin') === '1') unlockTool(); } catch(e){}
@@ -343,6 +357,8 @@ function epaFrom(rec){
    The hand-written fields are the point of the site. They survive.
    ========================================================================= */
 
+let ANNOUNCE_NEW = false;
+
 function merge(imported){
   const byCode = {}, byName = {};
   STANDARDS.forEach(s => {
@@ -365,7 +381,8 @@ function merge(imported){
         months: r.months, funding: r.funding, route: r.route,
         epa: epa, status: r.status, version: r.version,
         since: r.since || new Date().toISOString().slice(0,10),
-        changed: '', article: ''
+        changed: ANNOUNCE_NEW ? 'New on the register' : '',
+        article: ''
       });
       return;
     }
@@ -462,7 +479,10 @@ function fail(msg){
   document.getElementById('results').innerHTML = '';
 }
 
+let LAST_FILE = null;
+
 function handle(file){
+  LAST_FILE = file;
   document.getElementById('fileerr').innerHTML = '';
   document.getElementById('results').innerHTML =
     '<div class="lsection"><p style="color:var(--text-2)">Reading ' + file.name + '…</p></div>';
@@ -477,6 +497,7 @@ function handle(file){
 }
 
 function process(text, file){
+  ANNOUNCE_NEW = document.getElementById('announce').checked;
   const rows = parseCSV(text);
   if(rows.length < 2) throw new Error('That file has no rows in it.');
 
@@ -514,7 +535,8 @@ function show(rows, cols, built, m, file){
       '<p>' + file.name + ' · ' + (rows.length - 1).toLocaleString('en-GB') + ' rows</p></div>' +
       '<div class="mgrid">' +
         '<div class="mcard"><div class="n">' + m.out.length.toLocaleString('en-GB') + '</div><div class="l">Standards after import</div></div>' +
-        '<div class="mcard cool"><div class="n">' + m.added.length.toLocaleString('en-GB') + '</div><div class="l">New to the site</div></div>' +
+        '<div class="mcard cool"><div class="n">' + m.added.length.toLocaleString('en-GB') + '</div><div class="l">New to the site' +
+          (ANNOUNCE_NEW ? ' — going in the feed' : ' — not in the feed') + '</div></div>' +
         '<div class="mcard warm"><div class="n">' + m.updated.length + '</div><div class="l">Updated</div></div>' +
         '<div class="mcard"><div class="n">' + built.skippedRetired.toLocaleString('en-GB') + '</div><div class="l">Retired versions skipped</div></div>' +
       '</div>' +
@@ -538,6 +560,15 @@ function show(rows, cols, built, m, file){
           'Either the CSV has no route column, or its route names did not match. ' +
           'They will still appear in search and on the members page, but they will not group under a route on the standards page.</div>'
         : '') +
+
+      '<div class="okbox" style="margin-top:14px"><b>What reaches the feed.</b> ' +
+        m.updated.length + ' changed standard' + (m.updated.length === 1 ? '' : 's') +
+        ' will appear in both the public feed and members\' feeds automatically, each with a ' +
+        '&ldquo;what changed&rdquo; label worked out from the difference. ' +
+        (ANNOUNCE_NEW
+          ? 'The ' + m.added.length + ' new standards will appear too, labelled Newly approved.'
+          : 'The ' + m.added.length + ' new standards will be searchable and selectable but will not appear in the feed — tick the box above if you want them announced.') +
+      '</div>' +
 
       (m.updated.length
         ? '<div class="grouphead" style="margin-top:24px"><h2>Changes it found</h2><div class="rule"></div></div>' +
@@ -611,6 +642,7 @@ function renderDocsTool(){
         '<button data-k="related" class="active">A guidance document</button>' +
         '<button data-k="rules">A new funding rules year</button>' +
         '<button data-k="change">A rule change</button>' +
+        '<button data-k="feed">A feed update</button>' +
       '</div>' +
     '</section>' +
     '<div id="dform"></div>';
@@ -664,6 +696,32 @@ const DOC_FORMS = {
       '};'
   },
 
+  feed: {
+    title: 'Add an update to the feed',
+    where: 'Goes in the UPDATES list in data.js. Appears on the home feed, and in members\' feeds if it is a funding rule or levy change.',
+    fields: [
+      { id:'title',   label:'Headline', ph:'2027 to 2028 apprenticeship funding rules published' },
+      { id:'summary', label:'One or two sentences', ph:'The next funding year\'s rules are published separately. Which set applies depends on each apprentice\'s start date.', area:true },
+      { id:'date',    label:'Date it takes effect, or was published', ph:'2027-08-01', hint:'Written as YYYY-MM-DD. A future date puts it in the Upcoming row.' },
+      { id:'category',label:'Category', ph:'funding-rules', hint:'funding-rules, levy, t-levels or standard' },
+      { id:'urgency', label:'Urgency', ph:'high', hint:'high = act now, medium = plan ahead, low = for information' },
+      { id:'tag',     label:'What changed, in two or three words', ph:'New rules published', hint:'Shows as the label on the feed card' },
+      { id:'url',     label:'Source link', ph:'https://www.gov.uk/...' },
+      { id:'article', label:'Article id, if you have written one', ph:'rules-2627', hint:'Leave blank if not. Must match an id in ARTICLES.' }
+    ],
+    build: v => 'Add this inside the UPDATES = [ ... ] list:\n\n' +
+      '  {\n' +
+      '    date: ' + q(v.date) + ',\n' +
+      '    title: ' + q(v.title) + ',\n' +
+      '    tag: { label: ' + q(v.tag) + ', tone: ' +
+        q(v.urgency === 'high' ? 'stop' : v.urgency === 'medium' ? 'warn' : 'info') + ' },\n' +
+      '    category: ' + q(v.category) + ', route: "", standard: "", article: ' + q(v.article) + ',\n' +
+      '    status: ' + q(new Date(v.date) > new Date() ? 'upcoming' : 'updated') + ', urgency: ' + q(v.urgency) + ', pinned: false,\n' +
+      '    summary: ' + q(v.summary) + ',\n' +
+      '    url: ' + q(v.url) + '\n' +
+      '  },'
+  },
+
   change: {
     title: 'Add a rule change',
     where: 'Goes in the RULES_CHANGES list in data.js. Appears on the What changed tab, and in the contents.',
@@ -711,7 +769,7 @@ function docForm(kind){
     let missing = [];
     f.fields.forEach(x => {
       v[x.id] = (document.getElementById('d-' + x.id).value || '').trim();
-      if(!v[x.id] && x.id !== 'owner') missing.push(x.label);
+      if(!v[x.id] && x.id !== 'owner' && x.id !== 'article') missing.push(x.label);
     });
 
     if(missing.length){

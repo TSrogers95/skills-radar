@@ -1639,3 +1639,16 @@ table.std .ctag{ display:inline-block; }
   font-size:12.5px; line-height:1.6; overflow-x:auto; white-space:pre-wrap;
   border-radius:2px;
 }
+
+/* ---------- Announce toggle ---------- */
+
+.announce{
+  display:flex; gap:13px; align-items:flex-start;
+  background:var(--surface); border:1px solid var(--line);
+  border-left:3px solid var(--med);
+  padding:15px 18px; margin-top:14px; cursor:pointer;
+}
+.announce:hover{ background:var(--paper); }
+.announce input{ margin-top:3px; flex:none; }
+.announce b{ display:block; font-size:14px; font-weight:500; margin-bottom:4px; }
+.announce span{ font-size:13px; color:var(--text-2); line-height:1.55; }
