@@ -1595,3 +1595,16 @@ table.cohort .rm:focus-visible{ outline:2px solid var(--ink); outline-offset:1px
 
 .agenote{ display:block; font-size:11.5px; color:#7D918E; margin-top:2px; }
 .agenote.stale{ color:#F2B858; }
+
+/* ---------- CSV import ---------- */
+
+.dropzone{
+  border:2px dashed var(--line-strong); background:var(--surface);
+  padding:44px 24px; text-align:center; cursor:pointer;
+  transition:border-color .16s ease, background .16s ease;
+}
+.dropzone:hover{ border-color:var(--ink-3); background:var(--paper); }
+.dropzone.over{ border-color:var(--ink); background:var(--low-bg); }
+.dropmain{ font-family:var(--display); font-size:17px; font-weight:500; margin:0 0 7px; color:var(--text); }
+.dropsub{ font-size:13px; color:var(--text-3); margin:0; }
+.dropzone .linkbtn{ font-size:17px; font-family:var(--display); font-weight:500; }

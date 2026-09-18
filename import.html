@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Import the register — Skills Radar</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="masthead">
+  <div class="wrap"><div id="heroblock"></div></div>
+</div>
+
+<div class="stickybar">
+  <div class="wrap inner">
+    <a class="mini" href="index.html">Skills Radar</a>
+    <div id="navslot"></div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="pagehead">
+    <h1>Import the full register</h1>
+    <p>Turns the official Skills England CSV into the site's data file, keeping everything you have written by hand. Nothing is uploaded anywhere — the whole thing runs in your browser.</p>
+  </div>
+
+  <section class="lsection">
+    <div class="lhead"><h2>1. Download the CSV</h2>
+    <p>Open the register, scroll to <b>Download a list of apprenticeships</b>, and download the CSV of all standards. Don't filter it — take the lot.</p></div>
+    <p><a class="btn" href="https://skillsengland.education.gov.uk/apprenticeships/" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none">Open the register &nearr;</a></p>
+  </section>
+
+  <section class="lsection">
+    <div class="lhead"><h2>2. Drop it here</h2>
+    <p>The file stays on your computer. Nothing is sent over the internet.</p></div>
+
+    <div class="dropzone" id="drop">
+      <input type="file" id="file" accept=".csv,text/csv" hidden>
+      <p class="dropmain">Drag the CSV here, or <button class="linkbtn" id="browse">choose a file</button></p>
+      <p class="dropsub">Expecting a file with a few thousand rows</p>
+    </div>
+    <div id="fileerr"></div>
+  </section>
+
+  <div id="results"></div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <p>This page reads the CSV in your browser using the File API. It never uploads it. Data comes from Skills England under the Open Government Licence; their terms require the Skills England logo and an attribution statement on anything built with it.</p>
+  </div>
+</footer>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script src="ui.js"></script>
+<script>
+
+document.getElementById('heroblock').innerHTML = titleBlockHTML('');
+document.getElementById('navslot').innerHTML = navHTML('standards.html');
+
+/* =========================================================================
+   CSV PARSING
+
+   Handles quoted fields, embedded commas, escaped quotes and both line
+   ending styles. Written out rather than pulled from a library so there is
+   nothing to load and nothing to go stale.
+   ========================================================================= */
+
+function parseCSV(text){
+  const rows = [];
+  let row = [], field = '', inQuotes = false;
+
+  if(text.charCodeAt(0) === 0xFEFF) text = text.slice(1);   // strip BOM
+
+  for(let i = 0; i < text.length; i++){
+    const c = text[i], next = text[i+1];
+
+    if(inQuotes){
+      if(c === '"' && next === '"'){ field += '"'; i++; }
+      else if(c === '"'){ inQuotes = false; }
+      else field += c;
+    } else {
+      if(c === '"'){ inQuotes = true; }
+      else if(c === ','){ row.push(field); field = ''; }
+      else if(c === '\r'){ /* ignore */ }
+      else if(c === '\n'){ row.push(field); rows.push(row); row = []; field = ''; }
+      else field += c;
+    }
+  }
+  if(field.length || row.length){ row.push(field); rows.push(row); }
+  return rows.filter(r => r.some(c => c.trim() !== ''));
+}
+
+/* =========================================================================
+   COLUMN MATCHING
+
+   Skills England can rename columns without warning, so rather than assume
+   fixed positions we look for any header containing the right words.
+   ========================================================================= */
+
+const COLUMNS = {
+  name:    ['title', 'standard name', 'apprenticeship', 'name'],
+  code:    ['reference', 'standard reference', 'ifate reference', 'st reference', 'code'],
+  level:   ['level'],
+  months:  ['typical duration', 'duration'],
+  funding: ['maximum funding', 'max funding', 'funding band', 'funding cap', 'funding'],
+  version: ['version'],
+  status:  ['status'],
+  route:   ['route', 'sector'],
+  approved:['approved for delivery', 'approved date', 'approval date'],
+  epao:    ['epao', 'assessment organisation', 'aao']
+};
+
+function matchColumns(header){
+  const lower = header.map(h => String(h).toLowerCase().trim());
+  const found = {};
+
+  for(const field in COLUMNS){
+    let best = -1, bestScore = 0;
+    lower.forEach((h, i) => {
+      COLUMNS[field].forEach(want => {
+        let score = 0;
+        if(h === want) score = 10;
+        else if(h.startsWith(want)) score = 6;
+        else if(h.includes(want)) score = 3;
+        if(score > bestScore){ bestScore = score; best = i; }
+      });
+    });
+    if(best >= 0) found[field] = best;
+  }
+  return found;
+}
+
+/* =========================================================================
+   TURNING ROWS INTO STANDARDS
+   ========================================================================= */
+
+function num(v){
+  const n = String(v || '').replace(/[^\d.]/g, '');
+  return n ? Math.round(parseFloat(n)) : 0;
+}
+
+function toISO(v){
+  const s = String(v || '').trim();
+  if(!s) return '';
+  let m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);            if(m) return m[0];
+  m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);  // dd/mm/yyyy
+  if(m) return m[3] + '-' + m[2].padStart(2,'0') + '-' + m[1].padStart(2,'0');
+  const d = new Date(s);
+  return isNaN(d) ? '' : d.toISOString().slice(0,10);
+}
+
+function versionNum(v){
+  const parts = String(v || '1.0').split('.').map(x => parseInt(x, 10) || 0);
+  return (parts[0] || 0) * 1000 + (parts[1] || 0);
+}
+
+function slugRoute(name){
+  const n = String(name || '').toLowerCase();
+  if(n.includes('agricultur')) return 'agriculture';
+  if(n.includes('business')) return 'business-administration';
+  if(n.includes('care service')) return 'care-services';
+  if(n.includes('catering') || n.includes('hospitality')) return 'catering-hospitality';
+  if(n.includes('construction')) return 'construction';
+  if(n.includes('creative')) return 'creative-design';
+  if(n.includes('digital')) return 'digital';
+  if(n.includes('education')) return 'education-early-years';
+  if(n.includes('engineering')) return 'engineering-manufacturing';
+  if(n.includes('hair')) return 'hair-beauty';
+  if(n.includes('health')) return 'health-science';
+  if(n.includes('legal')) return 'legal-finance-accounting';
+  if(n.includes('protective')) return 'protective-services';
+  if(n.includes('sales')) return 'sales-marketing-procurement';
+  if(n.includes('transport')) return 'transport-logistics';
+  return '';
+}
+
+/* The CSV carries one row per version, including retired ones. We keep only
+   the newest live version of each standard, which is what the site shows. */
+
+function build(rows, cols){
+  const byCode = {};
+  let skippedRetired = 0, skippedBlank = 0;
+
+  rows.forEach(r => {
+    const get = f => cols[f] !== undefined ? String(r[cols[f]] || '').trim() : '';
+
+    const name = get('name');
+    const code = get('code').toUpperCase();
+    if(!name || !code){ skippedBlank++; return; }
+
+    const status = get('status') || 'Approved';
+    if(/^retired|^withdrawn/i.test(status)){ skippedRetired++; return; }
+
+    const rec = {
+      name:    name,
+      code:    code,
+      raw:     status,
+      level:   num(get('level')),
+      months:  num(get('months')),
+      funding: num(get('funding')),
+      version: get('version') || '1.0',
+      status:  tidyStatus(status),
+      route:   slugRoute(get('route')),
+      since:   toISO(get('approved')),
+      epao:    get('epao')
+    };
+
+    const held = byCode[code];
+    if(!held || versionNum(rec.version) > versionNum(held.version)) byCode[code] = rec;
+  });
+
+  return { list: Object.values(byCode), skippedRetired: skippedRetired, skippedBlank: skippedBlank };
+}
+
+/* The CSV and the site word the same status differently. Without this, every
+   single standard reports a status change and the real ones get buried. */
+function tidyStatus(s){
+  const t = String(s || '').trim();
+  if(/^approved for delivery/i.test(t)) return 'Approved';
+  if(/^standard in development|^in development/i.test(t)) return 'In development';
+  if(/^proposal/i.test(t)) return 'Proposal in development';
+  if(/paused/i.test(t)) return 'Paused for starts';
+  if(/retirement consultation/i.test(t)) return 'Retirement consultation';
+  if(/notice period/i.test(t)) return 'In development';
+  if(/defunded/i.test(t)) return 'Defunded from Sept 2026';
+  return t || 'Approved';
+}
+
+function epaFrom(rec){
+  if(rec.months === 0 || /^AU/.test(rec.code)) return 'Not applicable (unit)';
+  if(/development|proposal/i.test(rec.status)) return 'Pending — standard in development';
+  if(/waiting/i.test(rec.raw || '') || /waiting/i.test(rec.epao || '')) return 'Waiting for an assessment organisation';
+  return 'Assigned';
+}
+
+/* =========================================================================
+   MERGING WITH WHAT IS ALREADY THERE
+
+   The hand-written fields are the point of the site. They survive.
+   ========================================================================= */
+
+function merge(imported){
+  const byCode = {}, byName = {};
+  STANDARDS.forEach(s => {
+    if(s.code) byCode[s.code] = s;
+    byName[s.name.toLowerCase().replace(/[^a-z0-9]/g,'')] = s;
+  });
+
+  const added = [], updated = [], unchanged = [], kept = [];
+  const seen = new Set();
+  const out = [];
+
+  imported.forEach(r => {
+    const old = byCode[r.code] || byName[r.name.toLowerCase().replace(/[^a-z0-9]/g,'')];
+    const epa = epaFrom(r);
+
+    if(!old){
+      added.push(r);
+      out.push({
+        common: false, name: r.name, code: r.code, level: r.level,
+        months: r.months, funding: r.funding, route: r.route,
+        epa: epa, status: r.status, version: r.version,
+        since: r.since || new Date().toISOString().slice(0,10),
+        changed: '', article: ''
+      });
+      return;
+    }
+
+    seen.add(old.name);
+    const diffs = [];
+    const gbp = n => '£' + Number(n).toLocaleString('en-GB');
+
+    if(r.funding && r.funding !== old.funding) diffs.push('Funding band changed from ' + gbp(old.funding) + ' to ' + gbp(r.funding));
+    if(r.months  && r.months  !== old.months)  diffs.push('Duration changed from ' + old.months + ' to ' + r.months + ' months');
+    if(r.level   && r.level   !== old.level)   diffs.push('Level changed from ' + old.level + ' to ' + r.level);
+    if(r.version && r.version !== old.version) diffs.push('Updated to version ' + r.version);
+    if(r.status  && r.status  !== old.status)  diffs.push('Status changed from ' + old.status + ' to ' + r.status);
+
+    if(diffs.length){
+      updated.push({ name: r.name, code: r.code, diffs: diffs });
+      out.push({
+        ...old,                                   // keeps common, article
+        level: r.level || old.level,
+        months: r.months || old.months,
+        funding: r.funding || old.funding,
+        route: r.route || old.route,
+        epa: epa, status: r.status, version: r.version,
+        since: r.since || new Date().toISOString().slice(0,10),
+        changed: diffs.join('. ')
+      });
+    } else {
+      unchanged.push(old);
+      out.push(old);
+    }
+  });
+
+  // Anything we hold that the CSV does not mention stays. A standard missing
+  // from an export is more likely a filter than a fact.
+  STANDARDS.forEach(s => {
+    if(seen.has(s.name)) return;
+    if(imported.some(r => r.code && r.code === s.code)) return;
+    kept.push(s);
+    out.push(s);
+  });
+
+  out.sort((a,b) => (a.route || 'zz').localeCompare(b.route || 'zz') ||
+                    a.level - b.level || a.name.localeCompare(b.name));
+
+  return { out: out, added: added, updated: updated, unchanged: unchanged, kept: kept };
+}
+
+/* =========================================================================
+   OUTPUT
+   ========================================================================= */
+
+function render(s){
+  const q = v => '"' + String(v).replace(/\\/g,'\\\\').replace(/"/g,'\\"') + '"';
+  return '  { ' + (s.common ? 'common:true, ' : '') +
+    'name:' + q(s.name) + ', code:' + q(s.code || '') +
+    ', level:' + (s.level||0) + ', months:' + (s.months||0) + ', funding:' + (s.funding||0) +
+    ', route:' + q(s.route || '') + ', epa:' + q(s.epa || 'Assigned') +
+    ', status:' + q(s.status || 'Approved') + ', version:' + q(s.version || '1.0') +
+    ', since:' + q(s.since || '') + ', changed:' + q(s.changed || '') +
+    (s.article ? ', article:' + q(s.article) : '') + ' },';
+}
+
+function block(list){
+  return '/* STANDARDS:BEGIN — the sync job rewrites everything between these two\n' +
+    '   markers. Do not remove them. Hand-added fields (common, article) are\n' +
+    '   preserved by the sync; machine fields are overwritten from the register.\n' +
+    '   Imported from the Skills England CSV on ' + new Date().toISOString().slice(0,10) + '. */\n' +
+    'const STANDARDS = [\n' + list.map(render).join('\n') + '\n];\n';
+}
+
+/* =========================================================================
+   THE PAGE
+   ========================================================================= */
+
+const drop = document.getElementById('drop');
+const fileInput = document.getElementById('file');
+
+document.getElementById('browse').addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', e => { if(e.target.files[0]) handle(e.target.files[0]); });
+
+['dragenter','dragover'].forEach(ev =>
+  drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
+['dragleave','drop'].forEach(ev =>
+  drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
+drop.addEventListener('drop', e => {
+  const f = e.dataTransfer.files[0];
+  if(f) handle(f);
+});
+drop.addEventListener('click', e => { if(e.target === drop || e.target.className === 'dropmain') fileInput.click(); });
+
+function fail(msg){
+  document.getElementById('fileerr').innerHTML =
+    '<div class="alert" style="margin-top:14px"><b>That did not work.</b> ' + msg + '</div>';
+  document.getElementById('results').innerHTML = '';
+}
+
+function handle(file){
+  document.getElementById('fileerr').innerHTML = '';
+  document.getElementById('results').innerHTML =
+    '<div class="lsection"><p style="color:var(--text-2)">Reading ' + file.name + '…</p></div>';
+
+  const reader = new FileReader();
+  reader.onerror = () => fail('The file could not be read.');
+  reader.onload = () => {
+    try { process(reader.result, file); }
+    catch(err){ fail(err.message); }
+  };
+  reader.readAsText(file);
+}
+
+function process(text, file){
+  const rows = parseCSV(text);
+  if(rows.length < 2) throw new Error('That file has no rows in it.');
+
+  const cols = matchColumns(rows[0]);
+  const missing = ['name','code','level'].filter(f => cols[f] === undefined);
+  if(missing.length){
+    throw new Error('Could not find a column for: ' + missing.join(', ') +
+      '. The header row reads: ' + rows[0].slice(0,12).join(' | '));
+  }
+
+  const built = build(rows.slice(1), cols);
+  if(built.list.length < 100){
+    throw new Error('Only ' + built.list.length + ' standards were read, which is far too few. ' +
+      'Check you downloaded the unfiltered list of all standards.');
+  }
+
+  const m = merge(built.list);
+  show(rows, cols, built, m, file);
+}
+
+function show(rows, cols, built, m, file){
+  const code = block(m.out);
+  const noRoute = m.out.filter(s => !s.route).length;
+
+  const colTable = Object.keys(COLUMNS).map(f =>
+    '<tr><td class="nm">' + f + '</td><td>' +
+    (cols[f] !== undefined
+      ? '<b>' + (rows[0][cols[f]] || '') + '</b>'
+      : '<span style="color:var(--text-3)">not found — left as it was</span>') +
+    '</td></tr>').join('');
+
+  document.getElementById('results').innerHTML =
+    '<section class="lsection">' +
+      '<div class="lhead"><h2>3. What was in the file</h2>' +
+      '<p>' + file.name + ' · ' + (rows.length - 1).toLocaleString('en-GB') + ' rows</p></div>' +
+      '<div class="mgrid">' +
+        '<div class="mcard"><div class="n">' + m.out.length.toLocaleString('en-GB') + '</div><div class="l">Standards after import</div></div>' +
+        '<div class="mcard cool"><div class="n">' + m.added.length.toLocaleString('en-GB') + '</div><div class="l">New to the site</div></div>' +
+        '<div class="mcard warm"><div class="n">' + m.updated.length + '</div><div class="l">Updated</div></div>' +
+        '<div class="mcard"><div class="n">' + built.skippedRetired.toLocaleString('en-GB') + '</div><div class="l">Retired versions skipped</div></div>' +
+      '</div>' +
+
+      '<div class="grouphead" style="margin-top:26px"><h2>Columns matched</h2><div class="rule"></div></div>' +
+      '<table class="std levytable" style="margin-top:12px"><tbody>' + colTable + '</tbody></table>' +
+    '</section>' +
+
+    '<section class="lsection costs">' +
+      '<div class="lhead"><h2>What this will do</h2>' +
+      '<p>Nothing has changed yet. Read this before you copy anything.</p></div>' +
+
+      '<div class="okbox"><b>Your written work is kept.</b> ' +
+        m.out.filter(s => s.common).length + ' commonly-delivered flags and ' +
+        m.out.filter(s => s.article).length + ' article links carried across. ' +
+        m.kept.length + ' standard' + (m.kept.length === 1 ? '' : 's') +
+        ' not in the CSV were left in place rather than deleted.</div>' +
+
+      (noRoute
+        ? '<div class="alert"><b>' + noRoute + ' standards have no route.</b> ' +
+          'Either the CSV has no route column, or its route names did not match. ' +
+          'They will still appear in search and on the members page, but they will not group under a route on the standards page.</div>'
+        : '') +
+
+      (m.updated.length
+        ? '<div class="grouphead" style="margin-top:24px"><h2>Changes it found</h2><div class="rule"></div></div>' +
+          '<div style="max-height:320px;overflow-y:auto;border:1px solid var(--line);margin-top:12px">' +
+          '<table class="std"><tbody>' +
+          m.updated.slice(0, 200).map(u =>
+            '<tr><td class="nm">' + u.name + '<small>' + u.code + '</small></td>' +
+            '<td style="font-size:13px">' + u.diffs.join('. ') + '</td></tr>').join('') +
+          '</tbody></table></div>' +
+          (m.updated.length > 200 ? '<p class="hint">Showing the first 200 of ' + m.updated.length + '.</p>' : '') +
+          '<p style="font-size:14px;color:var(--text-2);margin-top:14px">' +
+          'Each of these becomes an item in the feed automatically, with its urgency worked out from what changed.</p>'
+        : '') +
+    '</section>' +
+
+    '<section class="lsection">' +
+      '<div class="lhead"><h2>4. Put it into the site</h2>' +
+      '<p>Download the new data file, or copy just the standards block.</p></div>' +
+      '<div class="addrow">' +
+        '<button class="btn" id="dl">Download data.js</button>' +
+        '<button class="btn small" id="copy">Copy the standards block</button>' +
+      '</div>' +
+      '<div class="notice" style="margin-top:18px"><b>How to use it.</b> ' +
+      'The download is your complete <code>data.js</code> with the standards replaced and everything else — ' +
+      'articles, milestones, rules, routes — untouched. Upload it to GitHub in place of the current one, ' +
+      'commit, and Vercel redeploys in about thirty seconds. ' +
+      'If anything looks wrong afterwards, revert the commit and you are back where you started.</div>' +
+    '</section>';
+
+  const full = DATA_FILE_SOURCE
+    ? DATA_FILE_SOURCE.replace(/\/\* STANDARDS:BEGIN[\s\S]*?\/\* STANDARDS:END \*\//, code + '\n/* STANDARDS:END */')
+        .replace(/const DATA_UPDATED = "[\d-]+";/, 'const DATA_UPDATED = "' + new Date().toISOString().slice(0,10) + '";')
+    : code;
+
+  document.getElementById('dl').addEventListener('click', () => {
+    const blob = new Blob([full], { type: 'text/javascript' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'data.js';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+
+  document.getElementById('copy').addEventListener('click', () => {
+    navigator.clipboard.writeText(code);
+    document.getElementById('copy').textContent = 'Copied';
+    setTimeout(() => { document.getElementById('copy').textContent = 'Copy the standards block'; }, 1600);
+  });
+
+  document.getElementById('results').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+/* Fetch our own data.js so the download can be a complete, working file
+   rather than just the block. */
+let DATA_FILE_SOURCE = '';
+fetch('data.js').then(r => r.text()).then(t => { DATA_FILE_SOURCE = t; }).catch(() => {});
+
+</script>
+</body>
+</html>
