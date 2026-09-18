@@ -1652,3 +1652,146 @@ table.std .ctag{ display:inline-block; }
 .announce input{ margin-top:3px; flex:none; }
 .announce b{ display:block; font-size:14px; font-weight:500; margin-bottom:4px; }
 .announce span{ font-size:13px; color:var(--text-2); line-height:1.55; }
+
+/* =========================================================================
+   MASTHEAD — rebuilt
+
+   Overrides the earlier header rules. Depth comes from a gradient and a set
+   of radar arcs sweeping out of the right-hand corner, so the wordmark can
+   carry the page without a logo next to it.
+   ========================================================================= */
+
+.masthead{
+  background:
+    radial-gradient(1100px 420px at 88% 18%, #173834 0%, rgba(23,56,52,0) 62%),
+    linear-gradient(168deg, #0A1518 0%, #0D1B1E 46%, #112724 100%);
+  padding:0;
+  position:relative;
+  overflow:hidden;
+  border-bottom:1px solid #1D3C38;
+}
+.masthead > .wrap{ position:relative; z-index:2; }
+
+.titleblock{ position:relative; padding:40px 0 30px; }
+
+/* ---------- Radar backdrop ---------- */
+
+.backdrop{
+  position:absolute; inset:-40px -28px -30px 0;
+  pointer-events:none; z-index:0;
+  mask-image:linear-gradient(90deg, transparent 0%, #000 42%, #000 100%);
+  -webkit-mask-image:linear-gradient(90deg, transparent 0%, #000 42%, #000 100%);
+}
+.backdrop svg{ width:100%; height:100%; display:block; }
+
+/* ---------- Eyebrow ---------- */
+
+.markrule{
+  position:relative; z-index:2;
+  display:flex; align-items:center; gap:13px; margin:0 0 20px;
+}
+.markrule .lbl{
+  font-size:11px; color:#7FA79F; letter-spacing:0.14em;
+  white-space:nowrap; text-transform:uppercase;
+}
+.markrule .line{
+  flex:1; height:1px;
+  background:linear-gradient(90deg, #2A5049, rgba(42,80,73,0));
+}
+
+.pulse{
+  width:7px; height:7px; border-radius:50%;
+  background:#6ED0B6; flex:none; position:relative;
+  box-shadow:0 0 0 0 rgba(110,208,182,0.6);
+  animation:pulse 2.6s ease-out infinite;
+}
+@keyframes pulse{
+  0%   { box-shadow:0 0 0 0 rgba(110,208,182,0.5); }
+  70%  { box-shadow:0 0 0 9px rgba(110,208,182,0); }
+  100% { box-shadow:0 0 0 0 rgba(110,208,182,0); }
+}
+
+/* ---------- Wordmark ---------- */
+
+.brandrow{ position:relative; z-index:2; display:flex; align-items:flex-end; justify-content:space-between; gap:40px; flex-wrap:wrap; }
+.brandmain{ min-width:0; }
+
+.wordmark{
+  font-family:var(--display);
+  font-size:clamp(42px, 6.4vw, 68px);
+  font-weight:600; letter-spacing:-0.045em; line-height:0.94;
+  margin:0; color:#FFFFFF;
+}
+.wordmark a{ color:inherit; text-decoration:none; display:inline-block; }
+.wordmark em{
+  font-style:normal; font-weight:600;
+  background:linear-gradient(96deg, #6ED0B6 0%, #9BE3CF 58%, #F2B858 130%);
+  -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent; color:#6ED0B6;
+}
+
+/* a hairline under the wordmark, weighted to the left */
+.wordmark::after{
+  content:''; display:block; height:2px; width:96px; margin-top:16px;
+  background:linear-gradient(90deg, #6ED0B6, rgba(110,208,182,0));
+}
+
+.hero{
+  margin:20px 0 2px; max-width:56ch;
+  color:#A9C2BC; font-size:clamp(15px, 1.25vw, 17.5px); line-height:1.6;
+}
+
+/* ---------- Stamp ---------- */
+
+.stamp{
+  text-align:right; font-size:12.5px; color:#7FA79F; line-height:1.7;
+  padding:12px 0 8px 18px; border-left:1px solid #22443F;
+  align-self:flex-end; white-space:nowrap;
+}
+.stamp strong{ color:#E6EFEC; font-weight:500; display:block; font-size:13.5px; }
+
+/* ---------- Navigation ---------- */
+
+.nav{ position:relative; z-index:2; margin-top:32px; gap:0; }
+.nav a{
+  font-size:14px; padding:12px 16px; color:#8FAEA8;
+  border-bottom:2px solid transparent; letter-spacing:0.005em;
+}
+.nav a:first-child{ padding-left:0; }
+.nav a:hover{ color:#FFFFFF; }
+.nav a.on{ color:#FFFFFF; border-bottom-color:#6ED0B6; }
+
+/* ---------- Readings strip ---------- */
+
+.readings{ position:relative; z-index:2; border-top:1px solid #1D3C38; margin-top:0; }
+.reading{ border-right:1px solid #1D3C38; padding:22px 24px 26px 0; }
+.reading .n{ font-size:36px; letter-spacing:-0.03em; }
+.reading .l{ color:#89A7A1; }
+
+/* ---------- Sticky bar ---------- */
+
+.stickybar{
+  background:rgba(10,21,24,0.94);
+  backdrop-filter:saturate(1.3) blur(10px);
+  -webkit-backdrop-filter:saturate(1.3) blur(10px);
+  border-bottom:1px solid #1D3C38;
+}
+.stickybar .mini{ letter-spacing:-0.035em; font-size:21px; }
+.stickybar .mini em{
+  font-style:normal;
+  background:linear-gradient(96deg, #6ED0B6, #9BE3CF);
+  -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent; color:#6ED0B6;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .pulse{ animation:none; }
+}
+
+@media (max-width:760px){
+  .titleblock{ padding:30px 0 24px; }
+  .wordmark::after{ width:70px; margin-top:12px; }
+  .stamp{ text-align:left; border-left:none; padding:14px 0 0; border-top:1px solid #22443F; width:100%; }
+  .backdrop{ opacity:0.55; }
+  .nav{ margin-top:22px; }
+}

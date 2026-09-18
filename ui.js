@@ -19,25 +19,37 @@ function navHTML(current){
   ).join('') + '</nav>';
 }
 
-/* Horizontal scan lines behind the wordmark */
-function scanlinesHTML(){
-  let out = '<div class="scanlines" aria-hidden="true">';
-  for(let i = 0; i < 7; i++){
-    out += '<i style="top:' + (10 + i * 11) + 'px;opacity:' + (0.55 - i * 0.06).toFixed(2) + '"></i>';
+/* Concentric arcs sweeping out of the corner — the radar idea without a
+   logo, sitting behind the wordmark rather than competing with it. */
+function backdropHTML(){
+  let arcs = '';
+  for(let i = 0; i < 6; i++){
+    const r = 130 + i * 115;
+    arcs += '<circle cx="960" cy="300" r="' + r + '" fill="none" ' +
+            'stroke="#2F5D55" stroke-width="1" opacity="' + (0.5 - i * 0.06).toFixed(2) + '"/>';
   }
-  return out + '</div>';
+  return '<div class="backdrop" aria-hidden="true">' +
+    '<svg viewBox="0 0 1200 340" preserveAspectRatio="xMaxYMid slice">' +
+      arcs +
+      '<path d="M960 300 L960 40 A260 260 0 0 1 1144 116 Z" fill="url(#sweep)" opacity="0.5"/>' +
+      '<defs><linearGradient id="sweep" x1="0" y1="1" x2="1" y2="0">' +
+        '<stop offset="0%" stop-color="#6ED0B6" stop-opacity="0.16"/>' +
+        '<stop offset="100%" stop-color="#6ED0B6" stop-opacity="0"/>' +
+      '</linearGradient></defs>' +
+    '</svg>' +
+  '</div>';
 }
 
 function titleBlockHTML(stampHTML){
-  return '<div class="titleblock">' + scanlinesHTML() +
+  return '<div class="titleblock">' + backdropHTML() +
     '<div class="markrule">' +
-      '<span class="tick" aria-hidden="true"><b></b><b></b><b></b></span>' +
-      '<span class="lbl">Apprenticeships · Funding · T-Levels</span>' +
+      '<span class="pulse" aria-hidden="true"></span>' +
+      '<span class="lbl">Apprenticeships &middot; Funding &middot; T-Levels</span>' +
       '<span class="line"></span>' +
     '</div>' +
     '<div class="brandrow">' +
-      '<div>' +
-        '<h1 class="wordmark"><a href="index.html">Skills Radar</a></h1>' +
+      '<div class="brandmain">' +
+        '<h1 class="wordmark"><a href="index.html">Skills <em>Radar</em></a></h1>' +
         '<p class="hero">' + HERO + '</p>' +
       '</div>' +
       (stampHTML ? '<div class="stamp">' + stampHTML + '</div>' : '') +
