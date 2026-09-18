@@ -131,13 +131,17 @@ document.getElementById('navslot').innerHTML = navHTML('members.html');
 
 /* ---------- Sign in ---------- */
 
+function refreshBar(){
+  const el = document.getElementById('orgmeta');
+  if(el) el.textContent = (MEMBER.levyPayer ? 'Levy payer' : 'Non-levy') + ' · ' +
+    cohortHeads() + ' apprentices · ' + COHORT.length + ' standard' + (COHORT.length === 1 ? '' : 's');
+}
+
 function unlock(){
   document.getElementById('public').hidden = true;
   document.getElementById('members').hidden = false;
   document.getElementById('orgname').textContent = MEMBER.org;
-  document.getElementById('orgmeta').textContent =
-    (MEMBER.levyPayer ? 'Levy payer' : 'Non-levy') + ' · ' +
-    MEMBER.apprentices + ' apprentices · ' + MEMBER.standards.length + ' standards';
+  refreshBar();
   render();
 }
 
@@ -180,7 +184,7 @@ document.getElementById('signout').addEventListener('click', () => {
 /* ---------- Matching updates to the member's own standards ---------- */
 
 function myStandardNames(){
-  return MEMBER.standards.map(s => s.name.toLowerCase());
+  return COHORT.map(s => s.name.toLowerCase());
 }
 
 function isMine(item){
@@ -200,7 +204,7 @@ function isMyStandardOnly(item){
 /* ---------- Which milestones actually apply to this member ---------- */
 
 function myMilestones(){
-  const mine = MEMBER.standards.map(s => s.name.toLowerCase());
+  const mine = COHORT.map(s => s.name.toLowerCase());
   return MILESTONES.filter(m => {
     if(m.scope === 'all') return true;
     if(m.scope === 'route')     return (m.routes || []).some(r => MEMBER.routes.indexOf(r) > -1);
@@ -210,7 +214,7 @@ function myMilestones(){
 }
 
 function milestoneReason(m){
-  const mine = MEMBER.standards.map(s => s.name.toLowerCase());
+  const mine = COHORT.map(s => s.name.toLowerCase());
   if(m.scope === 'standards'){
     const hit = (m.standards || []).filter(n => mine.indexOf(n.toLowerCase()) > -1);
     return hit.length ? 'Affects your ' + hit.join(' and ') : '';
@@ -302,15 +306,15 @@ function dashView(){
   const feed = allUpdates().filter(isMine);
   const mine = feed.filter(isMyStandardOnly);
   const urgent = feed.filter(u => u.urgency === 'high');
-  const f = levyFigures(MEMBER.payroll, MEMBER.standards, Math.round(MEMBER.apprentices * 0.45), MEMBER.levyPayer);
+  const f = levyFigures(MEMBER.payroll, COHORT, YOUNG, MEMBER.levyPayer);
   const soon = myMilestones().filter(m => daysAgo(m.date) < 0)
     .sort((a,b) => new Date(a.date) - new Date(b.date)).slice(0,3);
 
-  const defunded = MEMBER.standards.filter(s =>
+  const defunded = COHORT.filter(s =>
     STANDARDS.some(x => x.name === s.name && /Defunded/i.test(x.status)));
 
   return '<div class="pagehead"><h1>Good to see you, ' + MEMBER.org + '</h1>' +
-    '<p>Everything below is filtered to the ' + MEMBER.standards.length +
+    '<p>Everything below is filtered to the ' + COHORT.length +
     ' standards you deliver, plus the funding rule and levy changes that apply to everyone.</p></div>' +
 
     (defunded.length ? '<div class="alert"><b>' + defunded.length + ' of your standards ' +
@@ -322,17 +326,18 @@ function dashView(){
     '<div class="mgrid">' +
       '<div class="mcard"><div class="n">' + mine.length + '</div><div class="l">Changes to your standards</div></div>' +
       '<div class="mcard warm"><div class="n">' + urgent.length + '</div><div class="l">Marked act now</div></div>' +
-      '<div class="mcard"><div class="n">' + MEMBER.apprentices + '</div><div class="l">Apprentices on programme</div></div>' +
+      '<div class="mcard"><div class="n">' + cohortHeads() + '</div><div class="l">Apprentices on programme</div></div>' +
       '<div class="mcard ' + (f.shortfall ? 'bad' : 'cool') + '"><div class="n">' +
         (f.shortfall ? '−' + money(Math.round(f.shortfall)) : money(Math.round(f.surplus))) +
         '</div><div class="l">' + (f.shortfall ? 'Annual levy shortfall' : 'Annual levy surplus') + '</div></div>' +
     '</div>' +
 
-    '<div class="grouphead"><h2>Your standards</h2><div class="rule"></div></div>' +
+    '<div class="grouphead"><h2>Your standards</h2><div class="rule"></div>' +
+      '<button class="linkbtn" id="tolevy">Edit these</button></div>' +
     '<table class="std" style="margin-top:12px"><thead><tr>' +
       '<th>Standard</th><th>Level</th><th>On programme</th><th>Band</th><th>Status</th>' +
     '</tr></thead><tbody>' +
-    MEMBER.standards.map(s => {
+    COHORT.map(s => {
       const reg = STANDARDS.find(x => x.name === s.name);
       const bad = reg && /Defunded/i.test(reg.status);
       return '<tr class="' + (bad ? 'defunded' : '') + '">' +
@@ -381,10 +386,10 @@ function feedView(){
   }
 
   return '<div class="pagehead"><h1>My feed</h1>' +
-    '<p>Split in two. On the left, changes to the standards you deliver. On the right, the funding rule and levy changes that apply whatever you run. ' +
+    '<p>Split in two. On the left, changes to the ' + COHORT.length + ' standards you deliver. On the right, the funding rule and levy changes that apply whatever you run. ' +
     feed.length + ' items, down from ' + allUpdates().length + ' on the public feed.</p></div>' +
     '<div class="kanban two">' +
-      col('My standards', 'Changes to the ' + MEMBER.standards.length + ' programmes you deliver.', mine, true, true) +
+      col('My standards', 'Changes to the ' + COHORT.length + ' programmes you deliver.', mine, true, true) +
       col('General funding rules', 'Funding rules and levy changes that apply to everyone.', general, false, false) +
     '</div>';
 }
@@ -394,7 +399,7 @@ let calScope = 'mine';
 function calView(){
   const mine = myMilestones().length, all = MILESTONES.length;
   return '<div class="pagehead"><h1>My calendar</h1>' +
-    '<p>Twelve months ahead, filtered to the ' + MEMBER.standards.length + ' standards you deliver and the ' +
+    '<p>Twelve months ahead, filtered to the ' + COHORT.length + ' standards you deliver and the ' +
     'rules that apply to everyone. Coloured days carry a deadline — hover or tap for the detail.</p></div>' +
     '<div class="scopeswitch">' +
       '<button data-scope="mine"' + (calScope === 'mine' ? ' class="on"' : '') + '>Relevant to me <em>' + mine + '</em></button>' +
@@ -411,11 +416,147 @@ function calView(){
     '<div id="horizon"></div>';
 }
 
-/* Working copy of the cohort, so edits here do not overwrite the account */
-let COHORT = MEMBER.standards.map(s => ({ ...s }));
-let YOUNG  = Math.round(MEMBER.apprentices * 0.45);
+/* =========================================================================
+   MY STANDARDS
+
+   One editable list drives the whole members area — the dashboard, the feed,
+   the calendar and the levy calculator all read from it. Edits survive tab
+   switches within a session. Once accounts are live this saves to the
+   database instead of sessionStorage.
+   ========================================================================= */
+
+let COHORT = loadCohort();
+let YOUNG  = Math.round(cohortHeads() * 0.45);
+
+function loadCohort(){
+  try {
+    const saved = sessionStorage.getItem('sr-cohort');
+    if(saved) return JSON.parse(saved);
+  } catch(e){}
+  return MEMBER.standards.map(s => ({ ...s }));
+}
+
+function saveCohort(){
+  try { sessionStorage.setItem('sr-cohort', JSON.stringify(COHORT)); } catch(e){}
+}
 
 function cohortHeads(){ return COHORT.reduce((t,s) => t + (s.count || 0), 0); }
+
+function addStandard(name){
+  if(COHORT.some(c => c.name === name)) return false;
+  const s = STANDARDS.find(x => x.name === name);
+  if(!s) return false;
+  COHORT.push({
+    name: s.name, code: s.code, level: s.level,
+    funding: s.funding, months: s.months || 12, count: 1
+  });
+  saveCohort();
+  return true;
+}
+
+function removeStandard(i){
+  COHORT.splice(i, 1);
+  saveCohort();
+}
+
+/* ---------- Search-to-add ----------
+   A type-ahead over every standard on the register, rather than a dropdown
+   of 378 options nobody can scan. */
+
+function pickerHTML(id){
+  return '<div class="picker" id="' + id + '">' +
+    '<label for="' + id + '-q">Add a standard</label>' +
+    '<div class="pickerbox">' +
+      '<input type="search" id="' + id + '-q" autocomplete="off" ' +
+        'placeholder="Search the register — try &ldquo;business admin&rdquo;, &ldquo;ST0070&rdquo;, &ldquo;nursing&rdquo;">' +
+      '<svg class="radar" id="' + id + '-r" viewBox="0 0 20 20" aria-hidden="true">' +
+        '<circle cx="10" cy="10" r="8.6" fill="none" stroke="#CBC5B6" stroke-width="1"/>' +
+        '<circle cx="10" cy="10" r="4.6" fill="none" stroke="#CBC5B6" stroke-width="1"/>' +
+        '<g class="sweep"><path d="M10 10 L10 1.4 A8.6 8.6 0 0 1 17.4 5.7 Z" fill="#10796A" fill-opacity="0.3"/>' +
+        '<line x1="10" y1="10" x2="10" y2="1.4" stroke="#10796A" stroke-width="1.4"/></g></svg>' +
+    '</div>' +
+    '<div class="pickerresults" id="' + id + '-res"></div>' +
+  '</div>';
+}
+
+function wirePicker(id, onAdd){
+  const input = document.getElementById(id + '-q');
+  const res   = document.getElementById(id + '-res');
+  const radar = document.getElementById(id + '-r');
+  if(!input) return;
+
+  function results(q){
+    if(!q || q.length < 2){ res.innerHTML = ''; res.classList.remove('on'); return; }
+    const routeKey = detectRoute(q);
+    const words = q.toLowerCase().split(/\s+/).filter(w => w.length > 1);
+
+    const hits = STANDARDS
+      .filter(s => !COHORT.some(c => c.name === s.name))
+      .map(s => {
+        const hay = (s.name + ' ' + (s.code || '') + ' ' + routeText(s.route)).toLowerCase();
+        let score = 0;
+        if(s.name.toLowerCase().startsWith(q.toLowerCase())) score += 12;
+        if(s.name.toLowerCase().includes(q.toLowerCase())) score += 8;
+        if((s.code || '').toLowerCase() === q.toLowerCase()) score += 20;
+        words.forEach(w => { if(hay.includes(w)) score += 3; });
+        if(routeKey && s.route === routeKey) score += 2;
+        return { s: s, score: score };
+      })
+      .filter(x => x.score > 0)
+      .sort((a,b) => b.score - a.score)
+      .slice(0, 8);
+
+    if(!hits.length){
+      res.innerHTML = '<div class="pickernone">Nothing on the register matches that.</div>';
+      res.classList.add('on');
+      return;
+    }
+
+    res.innerHTML = hits.map(x => {
+      const s = x.s;
+      const route = ROUTES[s.route] ? ROUTES[s.route].label : '';
+      const gone = /Defunded/i.test(s.status);
+      return '<button class="pickeritem" data-name="' + s.name.replace(/"/g,'&quot;') + '">' +
+        '<b>L' + s.level + ' ' + s.name + '</b>' +
+        '<span>' + (s.code || 'code to confirm') + ' · ' + money(s.funding) +
+          (s.months ? ' · ' + s.months + ' months' : ' · unit') +
+          (route ? ' · ' + route : '') + '</span>' +
+        (gone ? '<em class="warn">Losing funding September 2026</em>' : '') +
+      '</button>';
+    }).join('');
+    res.classList.add('on');
+
+    res.querySelectorAll('.pickeritem').forEach(b => {
+      b.addEventListener('click', () => {
+        if(addStandard(b.dataset.name)){
+          input.value = '';
+          res.innerHTML = '';
+          res.classList.remove('on');
+          onAdd();
+        }
+      });
+    });
+  }
+
+  let timer;
+  input.addEventListener('input', () => {
+    if(radar) radar.classList.add('on');
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      results(input.value.trim());
+      if(radar) radar.classList.remove('on');
+    }, 180);
+  });
+
+  input.addEventListener('keydown', e => {
+    if(e.key === 'Escape'){ input.value = ''; res.innerHTML = ''; res.classList.remove('on'); }
+  });
+
+  document.addEventListener('click', e => {
+    if(!document.getElementById(id) || document.getElementById(id).contains(e.target)) return;
+    res.classList.remove('on');
+  });
+}
 
 function levyView(){
   const heads = cohortHeads();
@@ -427,14 +568,8 @@ function levyView(){
       '<td class="num"><input class="cnt" type="number" min="0" max="999" data-i="' + i + '" value="' + s.count + '" aria-label="Apprentices on ' + s.name + '"></td>' +
       '<td class="num" id="mo-' + i + '">–</td>' +
       '<td class="num" id="yr-' + i + '">–</td>' +
-      '<td class="num"><button class="rm" data-i="' + i + '">Remove</button></td>' +
+      '<td class="num"><button class="rm" data-i="' + i + '" title="Remove ' + s.name.replace(/"/g,'&quot;') + '" aria-label="Remove ' + s.name.replace(/"/g,'&quot;') + '">&times;</button></td>' +
     '</tr>').join('');
-
-  const options = STANDARDS
-    .filter(s => s.months > 0 && !COHORT.some(c => c.name === s.name))
-    .sort((a,b) => a.name.localeCompare(b.name))
-    .map(s => '<option value="' + s.name + '">' + s.name + ' — Level ' + s.level + ', ' + money(s.funding) + '</option>')
-    .join('');
 
   return '<div class="pagehead"><h1>Levy calculator</h1>' +
     '<p>Enter your pay bill and exactly how many apprentices sit on each standard. Everything recalculates as you type. ' +
@@ -455,16 +590,15 @@ function levyView(){
       '<p>How many apprentices you have on each standard. Add or remove standards to model a different mix.</p></div>' +
       '<table class="std cohort"><thead><tr>' +
         '<th>Standard</th><th>On programme</th><th>Monthly draw</th><th>Annual draw</th><th></th>' +
-      '</tr></thead><tbody id="cohortrows">' + rows + '</tbody>' +
+      '</tr></thead><tbody id="cohortrows">' +
+        (rows || '<tr><td colspan="5" class="cohortempty">No standards yet. Search below to add the ones you deliver.</td></tr>') +
+      '</tbody>' +
       '<tfoot><tr><td class="nm"><b>Total</b></td>' +
         '<td class="num" id="t-heads">–</td>' +
         '<td class="num" id="t-mo">–</td>' +
         '<td class="num" id="t-yr">–</td><td></td></tr></tfoot>' +
       '</table>' +
-      '<div class="addrow">' +
-        '<select id="addstd"><option value="">Add another standard…</option>' + options + '</select>' +
-        '<button class="btn small" id="addbtn">Add</button>' +
-      '</div>' +
+      pickerHTML('cohortpick') +
     '</section>' +
 
     '<section class="lsection">' +
@@ -606,24 +740,19 @@ function wireLevy(){
   document.getElementById('payroll').addEventListener('input', renderLevy);
   document.getElementById('young').addEventListener('input', renderLevy);
 
-  document.querySelectorAll('.cnt').forEach(inp => {
+  document.querySelectorAll('#cohortrows .cnt').forEach(inp => {
     inp.addEventListener('input', () => {
       COHORT[+inp.dataset.i].count = Math.max(0, parseInt(inp.value, 10) || 0);
+      saveCohort();
       renderLevy();
     });
   });
 
-  document.querySelectorAll('.rm').forEach(btn => {
-    btn.addEventListener('click', () => { COHORT.splice(+btn.dataset.i, 1); render(); });
+  document.querySelectorAll('#cohortrows .rm').forEach(btn => {
+    btn.addEventListener('click', () => { removeStandard(+btn.dataset.i); render(); });
   });
 
-  document.getElementById('addbtn').addEventListener('click', () => {
-    const name = document.getElementById('addstd').value;
-    const s = STANDARDS.find(x => x.name === name);
-    if(!s) return;
-    COHORT.push({ name:s.name, code:s.code, level:s.level, funding:s.funding, months:s.months, count:1 });
-    render();
-  });
+  wirePicker('cohortpick', render);
 }
 
 function prefsView(){
@@ -636,10 +765,15 @@ function prefsView(){
           '<label class="opt' + (MEMBER.frequency === 'monthly' ? ' sel' : '') + '"><input type="radio" name="f" value="monthly"' + (MEMBER.frequency === 'monthly' ? ' checked' : '') + '> Monthly</label>' +
         '</div></div>' +
       '<div class="field"><label>Standards you deliver</label>' +
-        '<p class="hint">Changes to these lead your email and are flagged in your feed.</p>' +
-        '<div class="routegrid opts">' +
-          MEMBER.standards.map(s => '<label class="opt sel"><input type="checkbox" checked> L' + s.level + ' ' + s.name + '</label>').join('') +
-        '</div></div>' +
+        '<p class="hint">Changes to these lead your email and are flagged in your feed. This is the same list the calculator and calendar use.</p>' +
+        '<div class="chiplist">' +
+          (COHORT.length
+            ? COHORT.map((s, i) => '<span class="stdchip">L' + s.level + ' ' + s.name +
+                '<button class="chipx" data-i="' + i + '" aria-label="Remove ' + s.name.replace(/"/g,'&quot;') + '">&times;</button></span>').join('')
+            : '<span class="chipnone">None yet — search below to add the standards you deliver.</span>') +
+        '</div>' +
+        pickerHTML('prefspick') +
+      '</div>' +
       '<div class="field"><label>Occupational routes</label>' +
         '<div class="routegrid opts">' +
           Object.keys(ROUTES).map(k => '<label class="opt' + (MEMBER.routes.indexOf(k) > -1 ? ' sel' : '') + '">' +
@@ -759,7 +893,15 @@ let view = 'dash';
 
 function render(){
   const panel = document.getElementById('mpanel');
-  if(view === 'dash')  panel.innerHTML = dashView();
+  if(view === 'dash'){
+    panel.innerHTML = dashView();
+    const j = document.getElementById('tolevy');
+    if(j) j.addEventListener('click', () => {
+      document.querySelectorAll('#mtabs button').forEach(b => b.classList.toggle('active', b.dataset.view === 'levy'));
+      view = 'levy';
+      render();
+    });
+  }
   if(view === 'feed')  panel.innerHTML = feedView();
   if(view === 'cal'){  panel.innerHTML = calView(); buildCalendar(); }
   if(view === 'levy'){
@@ -769,6 +911,9 @@ function render(){
   }
   if(view === 'prefs'){
     panel.innerHTML = prefsView();
+    panel.querySelectorAll('.chipx').forEach(b =>
+      b.addEventListener('click', () => { removeStandard(+b.dataset.i); render(); }));
+    wirePicker('prefspick', render);
     panel.querySelectorAll('.opt input').forEach(i =>
       i.addEventListener('change', () => {
         i.closest('.opts').querySelectorAll('.opt').forEach(o =>
@@ -780,6 +925,7 @@ function render(){
       setTimeout(() => { b.textContent = 'Save preferences'; }, 2200);
     });
   }
+  refreshBar();
   window.scrollTo({ top:0, behavior:'smooth' });
 }
 

@@ -1513,3 +1513,80 @@ table.levytable td.num.big{ white-space:nowrap; }
 }
 .readcard .cardlinks a:hover{ border-bottom-color:var(--ink-3); }
 .readcard .cardlinks a:last-child{ color:var(--text-2); font-weight:400; }
+
+/* ---------- Standards picker ---------- */
+
+.picker{ margin-top:16px; position:relative; }
+.picker > label{ display:block; font-size:13.5px; font-weight:500; margin-bottom:7px; }
+
+.pickerbox{ position:relative; }
+.pickerbox input{
+  width:100%; font-family:var(--sans); font-size:14.5px;
+  padding:11px 38px 11px 13px;
+  border:1px solid var(--line-strong); background:var(--surface);
+  color:var(--text); border-radius:2px;
+}
+.pickerbox input::placeholder{ color:var(--text-3); }
+.pickerbox input:focus{
+  outline:none; border-color:var(--ink-3);
+  box-shadow:0 0 0 3px rgba(22,48,47,0.08);
+}
+.pickerbox .radar{ right:12px; }
+
+.pickerresults{
+  display:none; position:absolute; left:0; right:0; top:100%; z-index:30;
+  background:var(--surface); border:1px solid var(--ink-3); border-top:none;
+  box-shadow:0 8px 24px rgba(13,27,30,0.13);
+  max-height:330px; overflow-y:auto;
+}
+.pickerresults.on{ display:block; }
+
+.pickeritem{
+  display:block; width:100%; text-align:left; cursor:pointer;
+  border:none; border-bottom:1px solid var(--line);
+  background:var(--surface); padding:11px 14px;
+  font-family:var(--sans);
+}
+.pickeritem:last-child{ border-bottom:none; }
+.pickeritem:hover, .pickeritem:focus-visible{ background:var(--paper); outline:none; }
+.pickeritem b{
+  display:block; font-family:var(--display); font-size:14.5px;
+  font-weight:500; color:var(--text); line-height:1.3;
+}
+.pickeritem span{ display:block; font-size:12px; color:var(--text-3); margin-top:3px; }
+.pickeritem em.warn{
+  display:inline-block; font-style:normal; font-size:11px; margin-top:6px;
+  background:var(--high-bg); color:var(--high); padding:2px 7px;
+}
+.pickernone{ padding:16px 14px; font-size:13.5px; color:var(--text-3); }
+
+/* ---------- Remove buttons ---------- */
+
+table.cohort .rm{
+  border:1px solid transparent; background:none; cursor:pointer;
+  width:28px; height:28px; border-radius:2px; padding:0;
+  font-size:19px; line-height:1; color:var(--text-3);
+}
+table.cohort .rm:hover{ background:var(--high-bg); color:var(--high); border-color:var(--high); }
+table.cohort .rm:focus-visible{ outline:2px solid var(--ink); outline-offset:1px; }
+
+.cohortempty{ padding:22px 12px !important; color:var(--text-3); font-size:13.5px; text-align:center; }
+
+/* ---------- Standard chips ---------- */
+
+.chiplist{ display:flex; flex-wrap:wrap; gap:7px; margin-bottom:4px; }
+.stdchip{
+  display:inline-flex; align-items:center; gap:8px;
+  background:var(--paper); border:1px solid var(--line-strong);
+  padding:6px 7px 6px 12px; font-size:13.5px; color:var(--text);
+}
+.chipx{
+  border:none; background:none; cursor:pointer; padding:0;
+  width:20px; height:20px; border-radius:2px;
+  font-size:16px; line-height:1; color:var(--text-3);
+}
+.chipx:hover{ background:var(--high-bg); color:var(--high); }
+.chipx:focus-visible{ outline:2px solid var(--ink); outline-offset:1px; }
+.chipnone{ font-size:13.5px; color:var(--text-3); }
+
+.grouphead .linkbtn{ font-size:13px; white-space:nowrap; }
