@@ -5,6 +5,17 @@
    pages update at once. Keep the commas between entries.
    ========================================================================= */
 
+/* ---------- 0. DATA STAMP ----------------------------------------------
+   When the data in THIS FILE was last reviewed or changed. The site shows
+   this, not today's date, so a stale site looks stale.
+
+   Update it by hand when you edit anything below. The sync job updates it
+   automatically when it commits a change.
+   ----------------------------------------------------------------------- */
+
+const DATA_UPDATED = "2026-09-02";
+const DATA_SOURCE  = "hand";   // "hand" or "sync"
+
 /* ---------- 1. OCCUPATIONAL ROUTES -------------------------------------
    The 15 Skills England routes. "terms" are the words people actually
    type when they mean that route — add to them freely to improve search.
@@ -794,6 +805,9 @@ MILESTONES.push(
    changed : "" means no change recorded since the date in "since".
    ----------------------------------------------------------------------- */
 
+/* STANDARDS:BEGIN — the sync job rewrites everything between these two
+   markers. Do not remove them. Hand-added fields (common, article) are
+   preserved by the sync; machine fields are overwritten from the register. */
 const STANDARDS = [
   /* Business and administration */
   { name:"Administration Assistant", code:"ST1472", level:2, months:12, funding:4000, route:"business-administration", epa:"Assigned", status:"Approved", version:"2.0", since:"2026-08-01", changed:"Version 2.0 approved; new age restriction 16 to 24", article:"admin-assistant" },
@@ -1221,6 +1235,8 @@ const STANDARDS = [
   { name:"Intelligence Analyst", code:"ST0292", level:4, months:18, funding:9000, route:"protective-services", epa:"Assigned", status:"Approved", version:"1.1", since:"2023-08-01", changed:"" }
 ];
 
+/* STANDARDS:END */
+
 /* ---------- 7. FURTHER READING -----------------------------------------
    Reputable places to read more. Shown on the articles page.
    type : "official" | "press" | "sector" | "provider"
@@ -1300,6 +1316,7 @@ const FURTHER_READING = [
     url: "https://www.gov.uk/government/organisations/ofqual"
   }
 ];
+
 
 /* ---------- 7. FURTHER READING ----------------------------------------
    Reputable places to follow this beat. Grouped by topic so the articles

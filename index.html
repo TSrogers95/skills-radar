@@ -90,9 +90,22 @@
 <script>
 
 document.getElementById('heroblock').innerHTML = titleBlockHTML(
-  '<strong>Reviewed ' + new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}) + '</strong>'
+  '<strong>Data reviewed ' + fmtLong(DATA_UPDATED) + '</strong>' +
+  '<span class="agenote" id="agenote"></span>'
 );
 document.getElementById('navslot').innerHTML = navHTML('index.html');
+
+/* Say plainly how old the data is. A site that quietly looks live while
+   running on months-old data is worse than one that admits its age. */
+(function(){
+  const el = document.getElementById('agenote');
+  if(!el) return;
+  const days = Math.floor(daysAgo(DATA_UPDATED));
+  if(days <= 1){ el.textContent = 'Updated today'; return; }
+  if(days <= 10){ el.textContent = days + ' days ago'; return; }
+  el.textContent = days + ' days ago — may be out of date';
+  el.classList.add('stale');
+})();
 
 /* The counters are computed from exactly the same tests the board uses,
    so the number at the top always equals the number in the column. */
