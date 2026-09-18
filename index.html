@@ -90,8 +90,10 @@
 <script src="ui.js"></script>
 <script>
 
+const LAST = lastUpdated();
+
 document.getElementById('heroblock').innerHTML = titleBlockHTML(
-  '<strong>Data reviewed ' + fmtLong(DATA_UPDATED) + '</strong>' +
+  '<strong>Data reviewed ' + (LAST.date ? fmtLong(LAST.date) : 'unknown') + '</strong>' +
   '<span class="agenote" id="agenote"></span>'
 );
 document.getElementById('navslot').innerHTML = navHTML('index.html');
@@ -100,11 +102,13 @@ document.getElementById('navslot').innerHTML = navHTML('index.html');
    running on months-old data is worse than one that admits its age. */
 (function(){
   const el = document.getElementById('agenote');
-  if(!el) return;
-  const days = Math.floor(daysAgo(DATA_UPDATED));
-  if(days <= 1){ el.textContent = 'Updated today'; return; }
-  if(days <= 10){ el.textContent = days + ' days ago'; return; }
-  el.textContent = days + ' days ago — may be out of date';
+  if(!el || !LAST.date) return;
+  const days = Math.floor(daysAgo(LAST.date));
+  const via  = LAST.by ? ' · ' + LAST.by : '';
+
+  if(days <= 1){ el.textContent = 'Updated today' + via; return; }
+  if(days <= 10){ el.textContent = days + ' days ago' + via; return; }
+  el.textContent = days + ' days ago — may be out of date' + via;
   el.classList.add('stale');
 })();
 

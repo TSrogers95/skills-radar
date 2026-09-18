@@ -595,12 +595,16 @@ function show(rows, cols, built, m, file){
 
     '<section class="lsection">' +
       '<div class="lhead"><h2>4. Put it into the site</h2>' +
-      '<p>Download the new register file, or copy just the standards block. ' +
-      'Afterwards, change <code>DATA_UPDATED</code> at the top of <code>data.js</code> to today so the site shows the right review date.</p></div>' +
+      '<p>Download the new register file, or copy just the standards block.</p></div>' +
       '<div class="addrow">' +
         '<button class="btn" id="dl">Download standards.js</button>' +
         '<button class="btn small" id="copy">Copy the standards block</button>' +
       '</div>' +
+      '<div class="okbox" style="margin-bottom:14px"><b>The review date updates itself.</b> ' +
+      'The download carries today\'s date as the register stamp, so the home page will read ' +
+      '&ldquo;Data reviewed ' + new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}) +
+      '&rdquo; once this is live. Nothing to change by hand.</div>' +
+
       '<div class="notice" style="margin-top:18px"><b>This only ever writes standards.js.</b> ' +
       'Upload it to GitHub in place of the current <code>standards.js</code>, commit, and Vercel redeploys in about thirty seconds. ' +
       '<code>data.js</code> is never touched, so nothing you or anyone else has written — articles, milestones, ' +
@@ -609,9 +613,23 @@ function show(rows, cols, built, m, file){
 
   // Rebuild standards.js, keeping its header comment and replacing only the
   // block between the markers. data.js is never opened.
-  const header = STANDARDS_FILE_SOURCE
+  const today = new Date().toISOString().slice(0,10);
+
+  let header = STANDARDS_FILE_SOURCE
     ? STANDARDS_FILE_SOURCE.slice(0, STANDARDS_FILE_SOURCE.indexOf('/* STANDARDS:BEGIN'))
     : '';
+
+  // Move the register's own date stamp on, so the home page shows the import
+  // rather than the last time data.js was edited.
+  if(/const STANDARDS_UPDATED = "[\d-]+";/.test(header)){
+    header = header
+      .replace(/const STANDARDS_UPDATED = "[\d-]+";/, 'const STANDARDS_UPDATED = "' + today + '";')
+      .replace(/const STANDARDS_SOURCE  = "[a-z]+";/, 'const STANDARDS_SOURCE  = "import";');
+  } else {
+    header += 'const STANDARDS_UPDATED = "' + today + '";\n' +
+              'const STANDARDS_SOURCE  = "import";\n\n';
+  }
+
   const full = header + code + '\n/* STANDARDS:END */\n';
 
   document.getElementById('dl').addEventListener('click', () => {

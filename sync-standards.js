@@ -148,8 +148,18 @@ module.exports = async function handler(req, res){
 
   /* ---- 4. Write it back ---- */
 
+  // Move the register's own stamp on, so the home page reflects the sync.
+  let head = file.content.slice(0, a);
+  if(/const STANDARDS_UPDATED = "[\d-]+";/.test(head)){
+    head = head
+      .replace(/const STANDARDS_UPDATED = "[\d-]+";/, 'const STANDARDS_UPDATED = "' + today() + '";')
+      .replace(/const STANDARDS_SOURCE  = "[a-z]+";/, 'const STANDARDS_SOURCE  = "sync";');
+  } else {
+    head += 'const STANDARDS_UPDATED = "' + today() + '";\nconst STANDARDS_SOURCE  = "sync";\n\n';
+  }
+
   const rebuilt =
-    file.content.slice(0, a) +
+    head +
     BEGIN + ' — the importer and sync job rewrite everything between\n' +
     '   these two markers. Do not remove them.\n' +
     '   Last synced ' + today() + '. */\n' +
@@ -161,20 +171,6 @@ module.exports = async function handler(req, res){
   // updated separately rather than as part of the register rewrite.
   await writeFile(PATH, rebuilt, file.sha,
     'Register sync ' + today() + ' — ' + added.length + ' new, ' + updated.length + ' updated');
-
-  try {
-    const meta = await readFile('data.js');
-    if(meta){
-      const stamped = meta.content
-        .replace(/const DATA_UPDATED = "[\d-]+";/, 'const DATA_UPDATED = "' + today() + '";')
-        .replace(/const DATA_SOURCE  = "[a-z]+";/, 'const DATA_SOURCE  = "sync";');
-      if(stamped !== meta.content){
-        await writeFile('data.js', stamped, meta.sha, 'Update review date after register sync ' + today());
-      }
-    }
-  } catch(err){
-    console.log('Could not update the review stamp:', err.message);
-  }
 
   await sendEmail(
     'Skills Radar — ' + total + ' standard' + (total === 1 ? '' : 's') + ' updated from the register',

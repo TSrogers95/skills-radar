@@ -599,3 +599,33 @@ function articleForStandard(s, defunded, dev){
   if(significance(s)) return 'std-' + (s.code || s.name.toLowerCase().replace(/[^a-z0-9]+/g,'-'));
   return articleFor(s, defunded, dev);
 }
+
+
+/* =========================================================================
+   HOW CURRENT THE SITE IS
+
+   Two stamps: DATA_UPDATED in data.js covers the written content, and
+   STANDARDS_UPDATED in standards.js covers the register. An import moves the
+   second without touching the first, so the site reports the later of the
+   two rather than whichever happens to be to hand.
+   ========================================================================= */
+
+function lastUpdated(){
+  const written  = typeof DATA_UPDATED === 'string' ? DATA_UPDATED : null;
+  const register = typeof STANDARDS_UPDATED === 'string' ? STANDARDS_UPDATED : null;
+
+  if(!written && !register) return { date: null, by: null };
+  if(!register) return { date: written, by: 'written content' };
+  if(!written)  return { date: register, by: sourceLabel() };
+
+  return new Date(register) >= new Date(written)
+    ? { date: register, by: sourceLabel() }
+    : { date: written, by: 'written content' };
+}
+
+function sourceLabel(){
+  const s = typeof STANDARDS_SOURCE === 'string' ? STANDARDS_SOURCE : 'hand';
+  if(s === 'import') return 'register import';
+  if(s === 'sync')   return 'automatic register sync';
+  return 'register';
+}
