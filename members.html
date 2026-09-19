@@ -101,11 +101,13 @@
       <div class="tabs" id="mtabs">
         <button data-view="dash" class="active">Dashboard</button>
         <button data-view="feed">My feed</button>
-        <button data-view="cal">My calendar</button>
+        <button data-view="cal">Calendar</button>
+        <span class="tabsep" aria-hidden="true"></span>
         <button data-view="otj">Off-the-job</button>
-        <button data-view="levy">Levy calculator</button>
-        <button data-view="prefs">Newsletter</button>
+        <button data-view="levy">Levy</button>
+        <span class="tabsep" aria-hidden="true"></span>
         <button data-view="report">Report</button>
+        <button data-view="prefs">Newsletter</button>
       </div>
     </div>
   </div>
@@ -124,6 +126,7 @@
 </footer>
 
 <script src="standards.js"></script>
+<script src="otj-minimums.js"></script>
 <script src="data.js"></script>
 <script src="app.js"></script>
 <script src="ui.js"></script>
@@ -492,6 +495,8 @@ function dashView(){
       '<div class="mcard cool"><div class="n">' + openEvents().length + '</div><div class="l">Your events outstanding</div></div>' +
     '</div>' +
 
+    dasPanelHTML(true) +
+
     '<div class="grouphead"><h2>Needs your attention</h2><div class="rule"></div></div>' +
     '<div class="todolist">' + attentionHTML + '</div>' +
 
@@ -807,6 +812,8 @@ function levyView(){
       '<div id="levyout"></div>' +
     '</section>' +
 
+    dasPanelHTML(false) +
+
     '<div class="grouphead" style="margin-top:44px"><h2>Incentives and grants worth checking</h2><div class="rule"></div></div>' +
     '<div class="readgrid" style="margin-top:16px">' +
       INCENTIVES.map(i => '<div class="readcard">' +
@@ -954,7 +961,8 @@ function otjView(){
     const p = otjPosition(c, o);
     const reg = findStandard(c);
 
-    const stateCell = p.planned == null
+    const stateCell = p.unknown ? '<span class="chg none">Needs a published figure</span>'
+      : p.planned == null
       ? '<span class="chg none">Not set</span>'
       : p.state === 'illegal' ? '<span class="ctag stop">Below the 187h floor</span>'
       : p.state === 'short'   ? '<span class="ctag stop">Short by ' + Math.abs(p.variance) + 'h</span>'
@@ -965,12 +973,18 @@ function otjView(){
       '<td class="nm">' + c.name +
         '<small>Level ' + c.level + ' &middot; ' + c.count + ' apprentice' + (c.count === 1 ? '' : 's') +
         ' &middot; ' + p.months + ' months' + (reg && reg.code ? ' &middot; ' + reg.code : '') + '</small></td>' +
-      '<td class="num"><input class="otjin" type="number" min="0" data-f="published" data-n="' + esc(c.name) + '" ' +
-        'value="' + (o.published || '') + '" placeholder="' + p.estimated + '" data-i="' + i + '"></td>' +
+      '<td class="num">' +
+        (p.official != null
+          ? '<span class="otjpub">' + p.official + 'h</span><small class="cap">from the annex</small>'
+          : '<span class="otjnone">Not published</span>') +
+        '<input class="otjin small" type="number" min="0" data-f="published" data-n="' + esc(c.name) + '" ' +
+          'value="' + (o.published || '') + '" placeholder="override" data-i="' + i + '">' +
+      '</td>' +
       '<td class="num"><input class="otjin" type="number" min="0" data-f="rpl" data-n="' + esc(c.name) + '" ' +
         'value="' + (o.rpl || '') + '" placeholder="0" data-i="' + i + '"></td>' +
-      '<td class="num" id="otj-req-' + i + '"><b>' + p.required + 'h</b>' +
-        (p.rplCapped ? '<small class="cap">capped at floor</small>' : '') + '</td>' +
+      '<td class="num" id="otj-req-' + i + '">' +
+        (p.unknown ? '<span class="otjnone">&mdash;</span>'
+                   : '<b>' + p.required + 'h</b>' + (p.rplCapped ? '<small class="cap">capped at floor</small>' : '')) + '</td>' +
       '<td class="num"><input class="otjin" type="number" min="0" data-f="planned" data-n="' + esc(c.name) + '" ' +
         'value="' + (o.planned || '') + '" placeholder="—" data-i="' + i + '"></td>' +
       '<td id="otj-state-' + i + '">' + stateCell +
@@ -981,7 +995,8 @@ function otjView(){
   const positions = COHORT.filter(c => c.count > 0).map(c => otjPosition(c, otjFor(c.name)));
   const problems = positions.filter(p => p.state === 'illegal' || p.state === 'short');
   const unset = positions.filter(p => p.planned == null);
-  const usingEstimate = positions.filter(p => p.estimateUsed).length;
+  const missing = positions.filter(p => p.unknown).length;
+  const overridden = positions.filter(p => p.overridden).length;
 
   return '<div class="pagehead"><h1>Off-the-job training</h1>' +
     '<p>Where each cohort stands against its published minimum. Enter the figure from the standard, ' +
@@ -989,9 +1004,12 @@ function otjView(){
 
     '<div class="notice"><b>The rules changed for starts from 1 August 2025.</b> ' +
     'The old six-hours-a-week calculation applies only to apprentices who started before that date. ' +
-    'Since then every standard carries its own published minimum, and from 1 August 2026 that figure appears ' +
-    'on the front of the standard on the Skills England website. You cannot work it out from the duration any more — ' +
-    'read it from the register, per standard and per version.</div>' +
+    'Since then every standard carries its own published minimum. The figures below come from ' +
+    (typeof OTJ_SOURCE !== 'undefined'
+      ? '<a href="' + OTJ_SOURCE.url + '" target="_blank" rel="noopener">' + OTJ_SOURCE.name + '</a>, covering ' + OTJ_SOURCE.count + ' standards. '
+      : 'the published annex. ') +
+    'From 1 August 2026 the same figure appears on the front of each standard on the Skills England register and can move independently, ' +
+    'so check yours and override below if it differs.</div>' +
 
     '<div id="otjbanner">' +
     (problems.length
@@ -1013,11 +1031,16 @@ function otjView(){
       '<th>Position</th>' +
     '</tr></thead><tbody>' + (rows || '<tr><td colspan="6" class="cohortempty">No cohorts with apprentices on them yet.</td></tr>') + '</tbody></table>' +
 
-    (usingEstimate
-      ? '<div class="notice" style="margin-top:16px"><b>' + usingEstimate + ' of these are using an estimate, not the published figure.</b> ' +
-        'Where you have not entered a minimum, the grey number in the box is estimated from the method DWP documented for setting them — ' +
-        '20% of 75% of the typical duration. It reproduces the worked example in their guidance, but it is not authoritative. ' +
-        'Open each standard on the register and enter the real number before you rely on this.</div>'
+    (missing
+      ? '<div class="notice" style="margin-top:16px"><b>' + missing + ' of these has no published minimum on file.</b> ' +
+        'Read the figure from the front of the standard on the Skills England register and type it into the override box. ' +
+        'There is deliberately no estimate: across the published figures the hours per month of typical duration range from under 8 to over 77, ' +
+        'so guessing from duration would be misleading.</div>'
+      : '') +
+    (overridden
+      ? '<div class="notice" style="margin-top:16px"><b>' + overridden + ' figure' + (overridden === 1 ? ' has' : 's have') +
+        ' been overridden.</b> Your entered value is being used instead of the one on file. That is right if you have read a newer ' +
+        'figure from the register — the annex was a 2025/26 snapshot and each standard can now move independently.</div>'
       : '') +
 
     '<div class="grouphead" style="margin-top:34px"><h2>What counts, and what does not</h2><div class="rule"></div></div>' +
@@ -1037,6 +1060,77 @@ function otjView(){
 }
 
 function esc(s){ return String(s).replace(/"/g, '&quot;'); }
+
+/* =========================================================================
+   APPRENTICESHIP SERVICE CONNECTION
+
+   Everything on this page that is currently typed in by hand — cohort sizes,
+   standards, start dates, off-the-job hours actually delivered — already
+   exists in the employer's Apprenticeship Service account. Connecting to it
+   would replace the estimates with facts.
+
+   This panel is not wired up. DAS access needs an approved application and
+   the employer's own authorisation, so there is nothing to connect to yet.
+   It is presented as what it is rather than as a button that pretends.
+   ========================================================================= */
+
+const DAS_STATE_KEY = 'sr-das-interest';
+
+function dasConnected(){ return false; }   // no live connection exists yet
+
+function dasPanelHTML(compact){
+  let registered = false;
+  try { registered = sessionStorage.getItem(DAS_STATE_KEY) === '1'; } catch(e){}
+
+  const pulls = [
+    ['Apprentices on programme', 'live headcount per standard, instead of a number you maintain'],
+    ['Start and planned end dates', 'which makes a completion forecast real rather than an assumption'],
+    ['Standards and versions', 'exactly what each apprentice is enrolled on'],
+    ['Levy balance and transactions', 'actual funds in and drawn down, not a modelled estimate'],
+    ['Co-investment position', 'what you have actually been charged'],
+    ['Off-the-job hours recorded', 'delivered hours against the published minimum']
+  ];
+
+  if(compact){
+    return '<div class="dasmini">' +
+      '<div><b>Connect your Apprenticeship Service account</b>' +
+      '<span>Replace the figures you maintain by hand with live data from DAS.</span></div>' +
+      '<button class="btn small" data-go="levy" id="dasmini-go">Find out more</button>' +
+    '</div>';
+  }
+
+  return '<section class="lsection das">' +
+    '<div class="lhead"><h2>Connect your Apprenticeship Service account</h2>' +
+    '<p>Most of what you type into this page already exists in your DAS account. Connecting it would replace the estimates with your actual position.</p></div>' +
+
+    '<div class="daswhat">' +
+      '<h3>What it would pull through</h3>' +
+      '<ul>' + pulls.map(p => '<li><b>' + p[0] + '</b><span>' + p[1] + '</span></li>').join('') + '</ul>' +
+    '</div>' +
+
+    '<div class="dasaction">' +
+      (registered
+        ? '<div class="okbox" style="margin:0"><b>Noted — you are on the list.</b> ' +
+          'We will get in touch when the connection is available. Nothing has been shared with anyone.</div>'
+        : '<button class="btn" id="dasbtn">Register your interest</button>' +
+          '<p class="hint" style="margin:10px 0 0">One click. It records that you want this, nothing more.</p>') +
+    '</div>' +
+
+    '<div class="notice" style="margin-top:20px"><b>Being straight about where this is.</b> ' +
+    'This is not connected, and the button above does not connect it. Reading an employer\'s DAS account needs an approved ' +
+    'application to the Apprenticeship Service and the employer\'s own authorisation each time — it is a proper integration, ' +
+    'not a switch. Registering interest tells us it is worth building, and gets you in the first group when it is. ' +
+    'Until then, the figures on this page are the ones you enter.</div>' +
+  '</section>';
+}
+
+function wireDas(root){
+  const b = root.querySelector('#dasbtn');
+  if(b) b.addEventListener('click', () => {
+    try { sessionStorage.setItem(DAS_STATE_KEY, '1'); } catch(e){}
+    render();
+  });
+}
 
 /* =========================================================================
    GOVERNANCE REPORT
@@ -1192,8 +1286,9 @@ function wireOtj(panel){
       const p = otjPosition(c, otjFor(c.name));
 
       const req = document.getElementById('otj-req-' + i);
-      if(req) req.innerHTML = '<b>' + p.required + 'h</b>' +
-        (p.rplCapped ? '<small class="cap">capped at floor</small>' : '');
+      if(req) req.innerHTML = p.unknown
+        ? '<span class="otjnone">—</span>'
+        : '<b>' + p.required + 'h</b>' + (p.rplCapped ? '<small class="cap">capped at floor</small>' : '');
 
       const st = document.getElementById('otj-state-' + i);
       if(st){
@@ -1465,6 +1560,7 @@ function render(){
     panel.innerHTML = levyView();
     renderLevy();
     wireLevy();
+    wireDas(panel);
   }
   if(view === 'report'){
     panel.innerHTML = reportView();

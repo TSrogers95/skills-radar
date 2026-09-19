@@ -2024,3 +2024,98 @@ table.reptable .sub{ font-size:12.5px; color:var(--text-2); }
 }
 
 @media print{ .eventadd, .evtick, .evdel{ display:none !important; } }
+
+/* ---------- Off-the-job figures ---------- */
+
+.otjpub{ font-family:var(--display); font-size:15px; font-weight:500; color:var(--text); display:block; }
+.otjnone{ font-size:12.5px; color:var(--text-3); display:block; }
+table.otj input.otjin.small{
+  width:78px; margin-top:6px; font-size:13px; padding:4px 7px;
+  font-family:var(--sans); font-weight:400;
+}
+
+/* ---------- Tab separators ---------- */
+
+.tabsep{
+  width:1px; align-self:stretch; background:var(--line);
+  margin:4px 7px; flex:none;
+}
+
+/* ---------- Apprenticeship Service panel ---------- */
+
+.lsection.das{
+  background:var(--surface); border:1px solid var(--line);
+  border-top:3px solid var(--ink-3); padding:26px 28px 28px; margin-top:44px;
+}
+.lsection.das .lhead{ margin-bottom:18px; }
+
+.daswhat h3{
+  font-family:var(--display); font-size:13px; font-weight:600;
+  color:var(--text-2); margin:0 0 12px;
+}
+.daswhat ul{
+  list-style:none; padding:0; margin:0 0 20px;
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:10px;
+}
+.daswhat li{
+  background:var(--paper); border:1px solid var(--line);
+  border-left:2px solid var(--low); padding:11px 14px;
+}
+.daswhat li b{ display:block; font-size:13.5px; font-weight:500; margin-bottom:3px; }
+.daswhat li span{ font-size:12.5px; color:var(--text-2); line-height:1.5; }
+
+.dasmini{
+  display:flex; align-items:center; justify-content:space-between; gap:20px;
+  background:var(--surface); border:1px solid var(--line);
+  border-left:3px solid var(--ink-3);
+  padding:15px 18px; margin:22px 0 4px; flex-wrap:wrap;
+}
+.dasmini b{ display:block; font-size:14.5px; font-weight:500; margin-bottom:3px; }
+.dasmini span{ font-size:13px; color:var(--text-2); }
+
+@media print{ .das, .dasmini{ display:none !important; } }
+
+/* ---------- Achievement rates ---------- */
+
+.ratelow{ color:var(--high); }
+.ratemid{ color:var(--med); }
+.ratehigh{ color:var(--low); }
+
+/* ---------- Download list ---------- */
+
+.dllist{ margin-top:4px; }
+.dlrow{
+  display:flex; align-items:center; gap:18px; flex-wrap:wrap;
+  background:var(--surface); border:1px solid var(--line);
+  border-left:3px solid var(--ink-3);
+  padding:15px 18px; margin-bottom:8px;
+}
+.dlmain{ flex:1; min-width:250px; }
+.dlmain b{ display:block; font-family:var(--display); font-size:15px; font-weight:500; margin-bottom:4px; }
+.dlmain span{ font-size:13px; color:var(--text-2); line-height:1.55; }
+.dlrow .btn.small{ flex:none; text-decoration:none; display:inline-block; }
+.dlpage{
+  flex:none; font-size:12.5px; color:var(--text-2);
+  text-decoration:none; border-bottom:1px solid var(--line-strong); padding-bottom:1px;
+}
+.dlpage:hover{ color:var(--text); border-bottom-color:var(--text); }
+
+/* ---------- How-to block ---------- */
+
+.howto{
+  background:var(--surface); border:1px solid var(--line);
+  border-left:3px solid var(--ink-3); padding:20px 24px;
+}
+.howto .btn{ display:inline-block; text-decoration:none; margin-bottom:16px; }
+.howto ol{ margin:0 0 12px; padding-left:20px; }
+.howto li{ font-size:14px; color:var(--text-2); line-height:1.6; margin-bottom:7px; }
+.howto li b{ color:var(--text); font-weight:500; }
+
+.looksfor{
+  display:block; margin-top:9px;
+  font-family:ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size:12px; color:var(--text-2);
+  background:var(--paper); border:1px solid var(--line);
+  padding:6px 10px; line-height:1.45;
+}
+.dlrow:has(.looksfor){ align-items:flex-start; }

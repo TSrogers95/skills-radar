@@ -63,6 +63,7 @@
       <div class="tabs" id="itabs">
         <button data-view="standards" class="active">Standards CSV</button>
         <button data-view="docs">Funding rules and documents</button>
+        <button data-view="stats">Starts and achievement rates</button>
       </div>
       <button class="linkbtn" id="lockit" style="margin-left:auto">Lock</button>
     </div>
@@ -72,7 +73,13 @@
   <section class="lsection">
     <div class="lhead"><h2>1. Download the CSV</h2>
     <p>Open the register, scroll to <b>Download a list of apprenticeships</b>, and download the CSV of all standards. Don't filter it — take the lot.</p></div>
-    <p><a class="btn" href="https://skillsengland.education.gov.uk/apprenticeships/" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none">Open the register &nearr;</a></p>
+    <p>
+      <a class="btn" href="https://skillsengland.education.gov.uk/apprenticeships/" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none">Open the register &nearr;</a>
+    </p>
+    <div class="notice" style="margin-top:14px"><b>Where the button is.</b>
+      Scroll past the search results to <b>Download a list of apprenticeships</b> near the foot of the page, and take
+      the CSV of all apprenticeships. Do not filter the list first — the importer needs the lot to work out what has
+      changed and what has not.</div>
   </section>
 
   <section class="lsection">
@@ -102,6 +109,7 @@
   </div>
 
   <div id="view-docs" hidden></div>
+  <div id="view-stats" hidden></div>
 </div>
 
 <footer>
@@ -111,6 +119,7 @@
 </footer>
 
 <script src="standards.js"></script>
+<script src="otj-minimums.js"></script>
 <script src="data.js"></script>
 <script src="app.js"></script>
 <script src="ui.js"></script>
@@ -173,7 +182,9 @@ document.querySelectorAll('#itabs button').forEach(btn => {
     const v = btn.dataset.view;
     document.getElementById('view-standards').hidden = v !== 'standards';
     document.getElementById('view-docs').hidden = v !== 'docs';
+    document.getElementById('view-stats').hidden = v !== 'stats';
     if(v === 'docs') renderDocsTool();
+    if(v === 'stats') renderStatsTool();
   });
 });
 
@@ -674,7 +685,29 @@ function renderDocsTool(){
         '<button data-k="feed">A feed update</button>' +
       '</div>' +
     '</section>' +
-    '<div id="dform"></div>';
+    '<div id="dform"></div>' +
+
+    '<section class="lsection">' +
+      '<div class="lhead"><h2>Other files worth having</h2>' +
+      '<p>Direct downloads. None of these need a key or a sign-in.</p></div>' +
+      '<div class="dllist">' +
+        '<div class="dlrow"><div class="dlmain"><b>APAR — provider and assessment register</b>' +
+          '<span>Every organisation eligible to deliver funded apprenticeship training: UKPRN, legal name, route, and whether they are currently permitted to recruit.</span></div>' +
+          '<a class="btn small" href="https://download.apprenticeships.education.gov.uk/apar" target="_blank" rel="noopener">Open download page</a></div>' +
+
+        '<div class="dlrow"><div class="dlmain"><b>Off-the-job minimum requirements (Annex C)</b>' +
+          '<span>The published minimum hours per standard. Already loaded into the site as otj-minimums.js — replace that file when a new version is issued.</span></div>' +
+          '<a class="btn small" href="https://www.gov.uk/government/publications/apprenticeship-funding-rules-2025-to-2026" target="_blank" rel="noopener">Open publication</a></div>' +
+
+        '<div class="dlrow"><div class="dlmain"><b>2026/27 funding rules and summary of changes</b>' +
+          '<span>The rules themselves and the official list of what changed in each version.</span></div>' +
+          '<a class="btn small" href="https://www.gov.uk/government/publications/apprenticeship-funding-rules-and-assessment-plan-guidance-2026-to-2027" target="_blank" rel="noopener">Open publication</a></div>' +
+
+        '<div class="dlrow"><div class="dlmain"><b>Find an end-point assessment organisation</b>' +
+          '<span>EPAOs were separated out of APAR in December 2024 and live here now. This is the list that says definitively which standards have nobody appointed.</span></div>' +
+          '<a class="btn small" href="https://www.gov.uk/guidance/find-an-end-point-assessment-organisation" target="_blank" rel="noopener">Open service</a></div>' +
+      '</div>' +
+    '</section>';
 
   el.querySelectorAll('#dkind button').forEach(b =>
     b.addEventListener('click', () => {
@@ -823,6 +856,313 @@ function docForm(kind){
       setTimeout(() => { document.getElementById('dcopy').textContent = 'Copy'; }, 1600);
     });
   });
+}
+
+/* =========================================================================
+   STATISTICS IMPORT
+
+   DfE and DWP publish apprenticeship starts, participation and achievement
+   rates jointly through Explore Education Statistics, as open CSV with no
+   key needed. Attaching that to the register turns two guesses into facts:
+
+     "commonly delivered"  becomes actual start volumes
+     nothing               becomes achievement rate per standard
+
+   The second is the more useful. A provider looking at a standard wants to
+   know whether people finish it, and nothing on the site currently says.
+   ========================================================================= */
+
+/* Column names taken from the published data previews on Explore Education
+   Statistics, which uses snake_case headers, plus the friendlier names the
+   table builder produces if you export from there instead. */
+const STATS_COLUMNS = {
+  name:     ['std_fwk_name_stcode', 'standard name', 'framework / standard name',
+             'framework/standard name', 'standard and framework name', 'std name', 'standard'],
+  code:     ['standard code', 'std code', 'larscode', 'lars_code', 'reference'],
+  level:    ['detailed level', 'apprenticeship level', 'level'],
+  starts:   ['starts', 'total starts'],
+  achieved: ['achievers', 'achievements', 'achieved', 'total achievements'],
+  rate:     ['achievement_rate', 'achievement rate', 'overall achievement rate'],
+  leavers:  ['leavers'],
+  ukprn:    ['provider_ukprn', 'ukprn'],
+  year:     ['time_period', 'time period', 'academic year']
+};
+
+/* Landing pages rather than direct file links.
+
+   Dataset identifiers on Explore Education Statistics are re-issued with
+   each release, so a direct CSV link works today and 404s in six months.
+   These pages always carry the current version, so what is below is the
+   page plus the exact name to look for on it. Slightly more clicking, but
+   it does not rot. */
+
+const EES_EXPLORE   = 'https://explore-education-statistics.service.gov.uk/find-statistics/apprenticeships';
+const EES_CATALOGUE = 'https://explore-education-statistics.service.gov.uk/data-catalogue';
+
+const EES_SETS = [
+  { name: 'Starts and achievements by standard',
+    look: 'Subjects — Starts, Achievements, Enrolments … Standard-framework name',
+    note: 'Start volumes per standard. This is what should drive the commonly delivered list, instead of judgement.' },
+  { name: 'Achievement rates by standard',
+    look: 'Achievement Rates Subjects … Standard-framework name',
+    note: 'Whether apprentices on a standard actually finish it. The most useful of the three, and nothing on the site currently says it.' },
+  { name: 'Achievement rates by provider',
+    look: 'Achievement Rates Providers … by Provider, SSA T1, Level, Standard-framework name',
+    note: 'The same rates by provider UKPRN. Needed later if you want members to benchmark themselves against the sector.' }
+];
+
+function renderStatsTool(){
+  const el = document.getElementById('view-stats');
+  if(el.dataset.built) return;
+  el.dataset.built = '1';
+
+  el.innerHTML =
+    '<section class="lsection">' +
+      '<div class="lhead"><h2>1. Download a dataset</h2>' +
+      '<p>Open data from Explore Education Statistics, published jointly by DfE and DWP. No key, no sign-in.</p></div>' +
+
+      '<div class="howto">' +
+        '<a class="btn" href="' + EES_EXPLORE + '" target="_blank" rel="noopener">Open the apprenticeships release &nearr;</a>' +
+        '<ol>' +
+          '<li>Press <b>Explore and download data</b>.</li>' +
+          '<li>Find the dataset you want in the list — the names to look for are below.</li>' +
+          '<li>Press <b>Download data set (ZIP)</b>, then unzip it. The .csv is inside, alongside a guidance file you can ignore.</li>' +
+        '</ol>' +
+        '<p class="hint" style="margin:0">That page always shows the current release, so this route keeps working. ' +
+        'Direct file links do not — the identifiers change every time the data is reissued.</p>' +
+      '</div>' +
+
+      '<div class="dllist" style="margin-top:18px">' +
+        EES_SETS.map(s =>
+          '<div class="dlrow">' +
+            '<div class="dlmain"><b>' + s.name + '</b>' +
+              '<span>' + s.note + '</span>' +
+              '<code class="looksfor">Look for: ' + s.look + '</code>' +
+            '</div>' +
+          '</div>').join('') +
+      '</div>' +
+
+      '<div class="notice" style="margin-top:16px"><b>Cannot find one?</b> ' +
+      'Search the <a href="' + EES_CATALOGUE + '" target="_blank" rel="noopener">data catalogue</a> for the name above. ' +
+      'It covers every release rather than just the latest, so an older year is still there if you want a trend rather than a snapshot. ' +
+      'Whichever you take, note the academic year — these releases run well behind, and a rate describes apprentices who finished a while ago.</div>' +
+    '</section>' +
+
+    '<section class="lsection">' +
+      '<div class="lhead"><h2>2. Drop it here</h2><p>It will work out which columns it has.</p></div>' +
+      '<div class="dropzone" id="sdrop">' +
+        '<input type="file" id="sfile" accept=".csv,text/csv" hidden>' +
+        '<p class="dropmain">Drag the statistics CSV here, or <button class="linkbtn" id="sbrowse">choose a file</button></p>' +
+        '<p class="dropsub">Starts, achievements or achievement rates by standard</p>' +
+      '</div>' +
+      '<div id="serr"></div>' +
+    '</section>' +
+    '<div id="sresults"></div>';
+
+  const sdrop = document.getElementById('sdrop'), sfile = document.getElementById('sfile');
+  document.getElementById('sbrowse').addEventListener('click', () => sfile.click());
+  sfile.addEventListener('change', e => { if(e.target.files[0]) handleStats(e.target.files[0]); });
+  ['dragenter','dragover'].forEach(ev => sdrop.addEventListener(ev, e => { e.preventDefault(); sdrop.classList.add('over'); }));
+  ['dragleave','drop'].forEach(ev => sdrop.addEventListener(ev, e => { e.preventDefault(); sdrop.classList.remove('over'); }));
+  sdrop.addEventListener('drop', e => { const f = e.dataTransfer.files[0]; if(f) handleStats(f); });
+  sdrop.addEventListener('click', e => { if(e.target === sdrop || e.target.className === 'dropmain') sfile.click(); });
+}
+
+function matchStatsColumns(header){
+  const lower = header.map(x => String(x).toLowerCase().trim());
+  const found = {};
+  for(const field in STATS_COLUMNS){
+    let best = -1, bestScore = 0;
+    lower.forEach((hd, i) => {
+      STATS_COLUMNS[field].forEach(want => {
+        let score = 0;
+        if(hd === want) score = 10;
+        else if(hd.startsWith(want)) score = 6;
+        else if(hd.includes(want)) score = 3;
+        if(score > bestScore){ bestScore = score; best = i; }
+      });
+    });
+    if(best >= 0) found[field] = best;
+  }
+  return found;
+}
+
+function handleStats(file){
+  document.getElementById('serr').innerHTML = '';
+  document.getElementById('sresults').innerHTML =
+    '<div class="lsection"><p style="color:var(--text-2)">Reading ' + file.name + '…</p></div>';
+
+  const reader = new FileReader();
+  reader.onerror = () => {
+    document.getElementById('serr').innerHTML = '<div class="alert" style="margin-top:14px">That file could not be read.</div>';
+  };
+  reader.onload = () => {
+    try { processStats(reader.result, file); }
+    catch(err){
+      document.getElementById('serr').innerHTML =
+        '<div class="alert" style="margin-top:14px"><b>That did not work.</b> ' + err.message + '</div>';
+      document.getElementById('sresults').innerHTML = '';
+    }
+  };
+  reader.readAsText(file);
+}
+
+function num(v){
+  const s = String(v == null ? '' : v).replace(/[^\d.\-]/g, '');
+  if(!s || s === '-') return null;
+  const n = parseFloat(s);
+  return isNaN(n) ? null : n;
+}
+
+function processStats(text, file){
+  const rows = parseCSV(text);
+  if(rows.length < 2) throw new Error('That file has no rows in it.');
+
+  const cols = matchStatsColumns(rows[0]);
+  if(cols.name === undefined && cols.code === undefined){
+    throw new Error('No column naming the standard was found. The header reads: ' + rows[0].slice(0,14).join(' | '));
+  }
+  if(cols.starts === undefined && cols.achieved === undefined && cols.rate === undefined){
+    throw new Error('No starts, achievements or achievement rate column was found. The header reads: ' + rows[0].slice(0,14).join(' | '));
+  }
+
+  // The statistics files have one row per breakdown — age, level, region and
+  // so on — so the same standard appears many times. Sum the volumes and take
+  // the widest achievement rate rather than treating each row as a standard.
+  const agg = {};
+  const norm = s => String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+
+  rows.slice(1).forEach(r => {
+    const name = cols.name !== undefined ? String(r[cols.name] || '').trim() : '';
+    const code = cols.code !== undefined ? String(r[cols.code] || '').trim().toUpperCase() : '';
+    if(!name && !code) return;
+
+    const key = code || norm(name);
+    if(!key || key === 'total' || norm(name) === 'total') return;
+
+    const a = agg[key] = agg[key] || { name: name, code: code, starts: 0, achieved: 0, rates: [] };
+    if(name && !a.name) a.name = name;
+
+    const st = cols.starts !== undefined ? num(r[cols.starts]) : null;
+    const ac = cols.achieved !== undefined ? num(r[cols.achieved]) : null;
+    const rt = cols.rate !== undefined ? num(r[cols.rate]) : null;
+
+    if(st != null) a.starts += st;
+    if(ac != null) a.achieved += ac;
+    if(rt != null && rt >= 0 && rt <= 100) a.rates.push(rt);
+  });
+
+  const list = Object.values(agg).map(a => {
+    // Prefer a published rate; fall back to achievements over starts only
+    // where both are present and the numbers are big enough to mean anything.
+    let rate = a.rates.length ? Math.round(a.rates.reduce((x,y) => x+y, 0) / a.rates.length * 10) / 10 : null;
+    if(rate == null && a.starts >= 50 && a.achieved > 0) rate = Math.round(a.achieved / a.starts * 1000) / 10;
+    return { name: a.name, code: a.code, starts: Math.round(a.starts), achieved: Math.round(a.achieved), rate: rate };
+  }).filter(x => x.starts > 0 || x.rate != null);
+
+  if(!list.length) throw new Error('No usable rows were found once totals were excluded.');
+
+  showStats(rows, cols, list, file);
+}
+
+function showStats(rows, cols, list, file){
+  // match against the register
+  const byCode = {}, byName = {};
+  const norm = s => String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  STANDARDS.forEach(s => { if(s.code) byCode[s.code] = s; byName[norm(s.name)] = s; });
+
+  let matched = 0;
+  const out = [];
+  list.forEach(x => {
+    const s = (x.code && byCode[x.code]) || byName[norm(x.name)];
+    if(s){ matched++; out.push({ std: s, stat: x }); }
+  });
+
+  out.sort((a,b) => b.stat.starts - a.stat.starts);
+  const top = out.slice(0, 40);
+  const withRate = out.filter(o => o.stat.rate != null);
+
+  const colTable = Object.keys(STATS_COLUMNS).map(f =>
+    '<tr><td class="nm">' + f + '</td><td>' +
+    (cols[f] !== undefined ? '<b>' + (rows[0][cols[f]] || '') + '</b>'
+                           : '<span style="color:var(--text-3)">not in this file</span>') +
+    '</td></tr>').join('');
+
+  const code = 'const STANDARD_STATS = {\n' +
+    out.map(o => '  "' + (o.std.code || o.std.name) + '": { starts: ' + o.stat.starts +
+      (o.stat.rate != null ? ', rate: ' + o.stat.rate : '') + ' },').join('\n') +
+    '\n};';
+
+  document.getElementById('sresults').innerHTML =
+    '<section class="lsection">' +
+      '<div class="lhead"><h2>3. What was in the file</h2><p>' + file.name + ' · ' +
+      (rows.length - 1).toLocaleString('en-GB') + ' rows</p></div>' +
+      '<div class="mgrid">' +
+        '<div class="mcard"><div class="n">' + list.length.toLocaleString('en-GB') + '</div><div class="l">Standards in the file</div></div>' +
+        '<div class="mcard cool"><div class="n">' + matched.toLocaleString('en-GB') + '</div><div class="l">Matched to your register</div></div>' +
+        '<div class="mcard warm"><div class="n">' + withRate.length.toLocaleString('en-GB') + '</div><div class="l">With an achievement rate</div></div>' +
+        '<div class="mcard"><div class="n">' + (list.length - matched).toLocaleString('en-GB') + '</div><div class="l">Unmatched</div></div>' +
+      '</div>' +
+      '<div class="grouphead" style="margin-top:26px"><h2>Columns matched</h2><div class="rule"></div></div>' +
+      '<table class="std levytable" style="margin-top:12px"><tbody>' + colTable + '</tbody></table>' +
+    '</section>' +
+
+    '<section class="lsection costs">' +
+      '<div class="lhead"><h2>Most delivered standards</h2>' +
+      '<p>By start volume in this file. This is what should drive the &ldquo;commonly delivered&rdquo; list, rather than judgement.</p></div>' +
+      '<div style="max-height:420px;overflow-y:auto;border:1px solid var(--line)">' +
+      '<table class="std"><thead><tr><th>Standard</th><th>Starts</th><th>Achievement rate</th></tr></thead><tbody>' +
+      top.map(o => '<tr><td class="nm">L' + o.std.level + ' ' + o.std.name +
+        '<small>' + (o.std.code || '') + '</small></td>' +
+        '<td class="num">' + o.stat.starts.toLocaleString('en-GB') + '</td>' +
+        '<td class="num">' + (o.stat.rate != null
+          ? '<b class="' + (o.stat.rate < 50 ? 'ratelow' : o.stat.rate < 65 ? 'ratemid' : 'ratehigh') + '">' + o.stat.rate + '%</b>'
+          : '<span class="chg none">—</span>') + '</td></tr>').join('') +
+      '</tbody></table></div>' +
+      (out.length > 40 ? '<p class="hint">Showing the top 40 of ' + out.length + ' matched.</p>' : '') +
+    '</section>' +
+
+    '<section class="lsection">' +
+      '<div class="lhead"><h2>4. Put it into the site</h2>' +
+      '<p>This writes a separate file, <code>standard-stats.js</code>, so it never touches your register or your written content.</p></div>' +
+      '<div class="addrow">' +
+        '<button class="btn" id="sdl">Download standard-stats.js</button>' +
+        '<button class="btn small" id="scopy">Copy</button>' +
+      '</div>' +
+      '<div class="notice" style="margin-top:18px"><b>Add it to the site with a script tag.</b> ' +
+      'Upload <code>standard-stats.js</code> to GitHub, then add ' +
+      '<code>&lt;script src="standard-stats.js"&gt;&lt;/script&gt;</code> next to the other data files on each page. ' +
+      'Nothing breaks if you forget — the site simply carries on without the figures.</div>' +
+      (list.length - matched > 0
+        ? '<div class="notice" style="margin-top:14px"><b>' + (list.length - matched).toLocaleString('en-GB') + ' did not match your register.</b> ' +
+          'Usually these are retired standards or old frameworks that still appear in historical statistics. ' +
+          'They are left out rather than guessed at.</div>'
+        : '') +
+    '</section>';
+
+  const header = '/* =========================================================================\n' +
+    '   STANDARD STATISTICS\n\n' +
+    '   Starts and achievement rates per standard, from Explore Education\n' +
+    '   Statistics (DfE and DWP). Imported from ' + file.name + '\n' +
+    '   on ' + new Date().toISOString().slice(0,10) + '.\n\n' +
+    '   Keyed by standard reference where there is one, otherwise by name.\n' +
+    '   ========================================================================= */\n\n';
+
+  document.getElementById('sdl').addEventListener('click', () => {
+    const blob = new Blob([header + code + '\n'], { type: 'text/javascript' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'standard-stats.js';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+  document.getElementById('scopy').addEventListener('click', () => {
+    navigator.clipboard.writeText(header + code);
+    document.getElementById('scopy').textContent = 'Copied';
+    setTimeout(() => { document.getElementById('scopy').textContent = 'Copy'; }, 1600);
+  });
+
+  document.getElementById('sresults').scrollIntoView({ behavior:'smooth', block:'start' });
 }
 
 /* Fetch the current standards.js so the download keeps its header comment.

@@ -782,12 +782,33 @@ function otjStateLabel(state){
    is shown.
    ========================================================================= */
 
-const OTJ_FLOOR = 187;          // below this, the programme is non-compliant
-const OTJ_HOURS_PER_MONTH = 17.4;  // derived from the documented method
+const OTJ_FLOOR = 187;   // below this, the programme is non-compliant
 
-function otjEstimate(months){
-  if(!months || months <= 0) return null;
-  return Math.round(months * OTJ_HOURS_PER_MONTH);
+/* An earlier version of this file estimated the minimum from the typical
+   duration. The published figures show why that was a bad idea: across the
+   713 standards with a published minimum, the hours per month of typical
+   duration range from under 8 to over 77. There is no reliable relationship
+   to estimate from, so where a figure has not been published we say so
+   rather than guess.
+
+   Looks the standard up by reference number first, then by name. */
+function otjMinimum(entry){
+  if(typeof OTJ_MINIMUMS === 'undefined') return null;
+  const reg = findStandard(entry);
+
+  const code = (reg && reg.code) || entry.code || '';
+  if(code && OTJ_MINIMUMS[code.toUpperCase()]) return OTJ_MINIMUMS[code.toUpperCase()][0];
+
+  const norm = s => String(s).toLowerCase().replace(/[^a-z0-9]/g, '');
+  const want = norm((reg && reg.name) || entry.name);
+  for(const k in OTJ_MINIMUMS){
+    const row = OTJ_MINIMUMS[k];
+    if(norm(row[1]) === want && row[2] === entry.level) return row[0];
+  }
+  for(const k in OTJ_MINIMUMS){
+    if(norm(OTJ_MINIMUMS[k][1]) === want) return OTJ_MINIMUMS[k][0];
+  }
+  return null;
 }
 
 /* Work out where a cohort stands.
@@ -799,13 +820,14 @@ function otjPosition(entry, opts){
   const reg = findStandard(entry);
   const months = (reg && reg.months) || entry.months || 0;
 
-  const estimated = otjEstimate(months);
-  const published = opts.published != null && opts.published > 0 ? opts.published : null;
-  const base = published != null ? published : estimated;
+  const official = otjMinimum(entry);                    // from the annex
+  const entered  = opts.published != null && opts.published > 0 ? opts.published : null;
+  const base = entered != null ? entered : official;
 
   if(base == null){
     return { name: entry.name, level: entry.level, count: entry.count || 0,
-             months: months, unknown: true };
+             months: months, official: null, entered: null,
+             unknown: true, state: 'unknown' };
   }
 
   const rpl = Math.max(0, opts.rpl || 0);
@@ -828,10 +850,13 @@ function otjPosition(entry, opts){
 
   return {
     name: entry.name, level: entry.level, count: entry.count || 0,
-    months: months, estimated: estimated, published: published,
+    months: months, official: official, entered: entered,
     base: base, rpl: rpl, rplCapped: rplCapped,
     required: required, planned: planned, variance: variance,
-    state: state, estimateUsed: published == null,
+    state: state,
+    overridden: entered != null && official != null && entered !== official,
+    // how many hours a week this works out at over the typical duration,
+    // which is a sense check rather than a requirement
     weekly: planned ? (planned / ((months || 12) * 4.33)) : null
   };
 }
