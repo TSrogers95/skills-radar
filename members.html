@@ -683,13 +683,11 @@ function wirePicker(id, onAdd){
     const hits = STANDARDS
       .filter(s => !COHORT.some(c => c.name === s.name))
       .map(s => {
-        const hay = (s.name + ' ' + (s.code || '') + ' ' + routeText(s.route)).toLowerCase();
-        let score = 0;
-        if(s.name.toLowerCase().startsWith(q.toLowerCase())) score += 12;
-        if(s.name.toLowerCase().includes(q.toLowerCase())) score += 8;
-        if((s.code || '').toLowerCase() === q.toLowerCase()) score += 20;
-        words.forEach(w => { if(hay.includes(w)) score += 3; });
-        if(routeKey && s.route === routeKey) score += 2;
+        let score = scoreMatch(q, {
+          name: s.name, code: s.code, options: s.options || [],
+          extra: s.status + ' ' + routeText(s.route)
+        });
+        if(routeKey && s.route === routeKey) score += 20;
         return { s: s, score: score };
       })
       .filter(x => x.score > 0)
@@ -710,7 +708,8 @@ function wirePicker(id, onAdd){
         '<b>L' + s.level + ' ' + s.name + '</b>' +
         '<span>' + (s.code || 'code to confirm') + ' · ' + money(s.funding) +
           (s.months ? ' · ' + s.months + ' months' : ' · unit') +
-          (route ? ' · ' + route : '') + '</span>' +
+          (route ? ' · ' + route : '') +
+          (s.options && s.options.length ? ' · ' + s.options.length + ' pathways' : '') + '</span>' +
         (gone ? '<em class="warn">Losing funding September 2026</em>' : '') +
       '</button>';
     }).join('');

@@ -193,7 +193,7 @@ function openDetail(item){
     '<p class="dsum">' + item.summary + '</p>' +
     '<dl class="facts">' + factHTML + '</dl>' +
     '<div class="links">' +
-      (item.article ? '<a class="read" href="articles.html#' + item.article + '">Read the full analysis</a>' : '') +
+      (item.article ? '<a class="read" href="articles.html#' + item.article + '">' + articleLinkLabel(item) + '</a>' : '') +
       '<a href="' + item.url + '" target="_blank" rel="noopener">' +
         (item.derived ? 'View on Skills England' : 'Read the source') + '</a>' +
       (item.route ? '<a href="standards.html#' + item.route + '">All standards on this route</a>' : '') +

@@ -114,6 +114,16 @@ function bodyHTML(a){
   return '<div class="abody" id="' + a.id + '">' +
     '<p class="standfirst">' + a.standfirst + '</p>' +
     a.body.map(p => '<p>' + p + '</p>').join('') +
+    (a.onRoute && a.onRoute.length
+      ? '<div class="onroute"><h4>Every changed standard on this route — ' + a.onRoute.length + '</h4>' +
+        '<p>Kept current from the register, so it reflects today rather than when this was written.</p>' +
+        '<div class="onroutelist">' + a.onRoute.map(s =>
+          '<div class="orrow">' +
+            '<div><b>L' + s.level + ' ' + s.name + '</b>' +
+              '<span>' + s.changed + '</span></div>' +
+            (s.article ? '<a href="#' + s.article + '">Open</a>' : '<span class="ornone">no separate page</span>') +
+          '</div>').join('') + '</div></div>'
+      : '') +
     (a.compiled
       ? '<div class="notice" style="margin:4px 0 0"><b>This page is compiled, not written.</b> ' +
         'Every figure in it comes from this standard\'s own record on the Skills England register. ' +

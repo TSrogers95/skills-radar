@@ -217,6 +217,7 @@ function render(filter, query){
       let score = scoreMatch(query, {
         name: s.name,
         code: s.code,
+        options: s.options || [],
         extra: s.status + ' ' + (s.epa || '') + ' ' + s.changed
       });
       if(routeKey && s.route === routeKey) score += 20;   // relevant, not a close match

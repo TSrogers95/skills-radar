@@ -194,21 +194,60 @@ function deriveUpdates(){
 }
 
 /* A very short status line for the board — one glanceable phrase, no more. */
+/* One line saying what actually moved, with the number in it. "Duration
+   changed" tells you nothing; "Cut from 18 to 12 months" tells you whether
+   to care. Pulls the specifics out of the recorded change text. */
 function shortLine(s, defunded, dev){
+  const c = String(s.changed || '');
+
   if(defunded) return 'Funding withdrawn — no new starts after 1 September 2026';
-  if(dev){
-    if(/retirement/i.test(s.status))            return 'Retirement consultation open';
-    if(/paused/i.test(s.status))                return 'Paused for new starts';
-    if(/funding/i.test(s.changed))              return 'Funding band under review';
-    if(/assessment plan/i.test(s.changed))      return 'Assessment plan being revised';
-    return 'In review — new version in development';
+
+  // Funding band, with the direction and the numbers
+  const band = c.match(/funding band changed from £([\d,]+) to £([\d,]+)/i);
+  if(band){
+    const from = parseInt(band[1].replace(/,/g,''), 10);
+    const to   = parseInt(band[2].replace(/,/g,''), 10);
+    const pct  = from ? Math.round(((to - from) / from) * 100) : 0;
+    return (to > from ? 'Band up ' : 'Band down ') + money(from) + ' to ' + money(to) +
+           (Math.abs(pct) >= 5 ? ' (' + (pct > 0 ? '+' : '') + pct + '%)' : '');
   }
-  if(/funding band/i.test(s.changed))           return 'Funding band changed to ' + money(s.funding);
-  if(/age restriction/i.test(s.changed))        return 'New age restriction applies';
-  if(/replaces|retired/i.test(s.changed))       return 'Updated to version ' + s.version;
-  if(/new unit|new standard|new foundation/i.test(s.changed)) return 'Newly approved for delivery';
-  if(/waiting|pending/i.test(s.epa || ''))      return 'Updated — no assessment organisation yet';
-  return 'Updated to version ' + s.version;
+  if(/funding band/i.test(c)) return 'Funding band now ' + money(s.funding);
+
+  // Duration
+  const dur = c.match(/duration changed from (\d+) to (\d+) months/i);
+  if(dur){
+    const from = +dur[1], to = +dur[2];
+    return (to < from ? 'Cut from ' : 'Extended from ') + from + ' to ' + to + ' months';
+  }
+  if(/duration changed/i.test(c)) return 'Now ' + s.months + ' months';
+
+  // Level
+  const lvl = c.match(/level changed from (\d+) to (\d+)/i);
+  if(lvl) return 'Moved from Level ' + lvl[1] + ' to Level ' + lvl[2];
+
+  if(/age restriction/i.test(c))       return 'Now restricted to ages 16 to 24';
+  if(/assessment plan/i.test(c))       return 'Assessment plan revised';
+  if(/ksb|knowledge, skills/i.test(c)) return 'KSBs revised';
+
+  if(dev){
+    if(/retirement/i.test(s.status))   return 'Retirement consultation open — respond while you can';
+    if(/paused/i.test(s.status))       return 'Paused — no new starts until it lifts';
+    if(/funding/i.test(c))             return 'Funding band under review';
+    if(/notice period/i.test(s.status + c)) return 'Notice period — current version closing to new starts';
+    return 'Version ' + s.version + ' in development, current one still open';
+  }
+
+  if(/replaces/i.test(c))              return 'Replaces a retired standard';
+  if(/new unit/i.test(c))              return 'New unit, ' + money(s.funding) + ', no full apprenticeship needed';
+  if(/new foundation/i.test(c))        return 'New foundation apprenticeship, ' + (s.months || 8) + ' months at ' + money(s.funding);
+  if(/new standard|newly approved|new on the register/i.test(c)) return 'Newly approved at ' + money(s.funding);
+
+  if(/waiting|pending/i.test(s.epa || '')) return 'Version ' + s.version + ' — but no assessment organisation yet';
+
+  // Version, with what came before it where we know
+  const ver = c.match(/version ([\d.]+) retired/i);
+  if(ver) return 'Version ' + ver[1] + ' to ' + s.version;
+  return 'Now version ' + s.version;
 }
 
 /* Trim a summary down to its first clause, for the board cards. */
@@ -351,6 +390,11 @@ function scoreMatch(query, fields){
   const code  = String(fields.code  || '').toLowerCase();
   const extra = String(fields.extra || '').toLowerCase();
 
+  // Options and pathways sit inside a standard — searching "mechatronics"
+  // should find the standard that contains it, ranked below a standard of
+  // that name but well above a loose word match in a description.
+  const opts = (fields.options || []).map(o => String(o).toLowerCase());
+
   const words = q.split(/\s+/).filter(w => w.length > 1);
   let score = 0;
 
@@ -387,6 +431,14 @@ function scoreMatch(query, fields){
 
   // partial code match, e.g. typing "1472"
   if(code && q.length > 2 && code.includes(q)) score += 300;
+
+  // an option or pathway within the standard
+  opts.forEach(o => {
+    if(o === q) score += 500;
+    else if(o.startsWith(q)) score += 320;
+    else if(o.includes(q)) score += 200;
+    else if(words.some(w => o.includes(w))) score += 70;
+  });
 
   // route, status and description are weak signals, not strong ones
   words.forEach(w => { if(extra.includes(w)) score += 8; });
@@ -434,7 +486,11 @@ function significance(s){
   if(/funding band/.test(c))                              return 'band';
   if(/age restriction/.test(c))                           return 'age';
   if(/replaces|replaced by/.test(c))                      return 'replaced';
-  return null;                                            // routine: route round-up covers it
+  if(/assessment plan/.test(c))                           return 'assessment';
+  if(/waiting|no assessment organisation/.test(c + (s.epa || '').toLowerCase())) return 'noepa';
+  if(/duration changed|level changed/.test(c))            return 'spec';
+  if(/version|approved for delivery|in development|notice period/.test(c + st)) return 'version';
+  return null;
 }
 
 function gbp(n){ return '£' + Number(n || 0).toLocaleString('en-GB'); }
@@ -554,6 +610,69 @@ function compiledArticle(s){
     sources.push({ label: 'GOV.UK — Apprenticeship funding rules', url: 'https://www.gov.uk/guidance/apprenticeship-funding-rules' });
   }
 
+  else if(kind === 'version'){
+    const inDev = /development|notice period/i.test(s.status);
+    urgency = 'low'; icon = 'layers';
+    title = s.name + ': version ' + s.version + (inDev ? ' in development' : ' now current');
+    summary = inDev
+      ? 'A revision is in progress. You can still start apprentices on the current version.'
+      : 'Version ' + s.version + ' is the one to deliver against for new starts.';
+    standfirst = 'A version change is routine, but which version an apprentice sits under is not.';
+    body.push(
+      s.name + ' at ' + level + ' is now at version ' + s.version + '. ' + spec,
+      'Recorded change: ' + s.changed + '.',
+      inDev
+        ? 'In development means a new version is being prepared while the current one remains available for starts. You are not blocked, but anything you build on the current version — curriculum, marketing, employer agreements — may need revisiting when the revision lands.'
+        : 'A new version typically revises the knowledge, skills and behaviours, the assessment plan, or both. Apprentices already on programme continue under the version they started on, and the funding rules that apply are those in force on their individual start date.',
+      'What to do about it: confirm which version each cohort is recorded against in your MIS, because you may be delivering two versions of the same standard side by side. Check whether the assessment plan moved with the version — where it did, your assessment organisation will need to be working to the revised plan. And read the change against ' + rname + ' as a whole, since versions often move in batches when a regulator or sector body updates its own requirements.'
+    );
+    sources.push({ label: 'Skills England apprenticeship register', url: 'https://skillsengland.education.gov.uk/apprenticeships/' });
+  }
+
+  else if(kind === 'assessment'){
+    urgency = 'medium'; icon = 'check';
+    title = s.name + ': assessment plan revised';
+    summary = 'The assessment plan has changed, which affects gateway, grading and who does what.';
+    standfirst = 'Assessment reform reaching one standard at a time — and the old rules apply until it does.';
+    body.push(
+      'The assessment plan for ' + s.name + ' at ' + level + ' has been revised. ' + spec,
+      'Recorded change: ' + s.changed + '.',
+      'Skills England is revising every assessment plan in phases, and until a standard\'s revised plan is approved and available for starts, the existing rules continue to apply to it. That means providers are running two assessment regimes side by side, sometimes within the same curriculum area.',
+      'The direction of the reform is proportionality: assessment matched to the competency being tested, duplication removed, assessment able to take place throughout the apprenticeship rather than only at the end, and providers able to deliver and mark elements of it. Gateway is now called gateway to completion, reflecting exactly that.',
+      'What to do about it: check whether your apprentices on this standard sit under the old plan or the revised one, because that determines which rules bind them. Talk to your assessment organisation about what changes operationally, and revisit internal quality assurance where the split of responsibility between you and them has moved.'
+    );
+    sources.push({ label: 'GOV.UK — Changes to apprenticeship assessment', url: 'https://www.gov.uk/government/publications/apprenticeship-funding-rules-2025-to-2026/changes-to-apprenticeship-assessment-2025-to-2026' });
+  }
+
+  else if(kind === 'noepa'){
+    urgency = 'high'; icon = 'check';
+    title = s.name + ': no assessment organisation appointed';
+    summary = 'You can recruit and deliver, but nobody is currently appointed to assess your apprentices.';
+    standfirst = 'The quietest risk on the register, because nothing about it stops you enrolling.';
+    body.push(
+      s.name + ' at ' + level + ' is approved for delivery but has no assessment organisation appointed. ' + spec,
+      'Historically a standard reaching approved status arrived with an assessment organisation already in place, so the two were treated as the same milestone. The volume of revisions moving through the system has separated them.',
+      'The consequence is a timing gap rather than a block. On a ' + (s.months || 24) + '-month programme an organisation is usually appointed well before the first cohort reaches gateway. The shorter the programme, the thinner that margin.',
+      'What to do about it: before committing a cohort, check the register for an appointment and ask how long the process is expected to take against your planned end dates. Put the answer in your risk register rather than assuming it resolves itself. Where the gap is uncomfortable, an earlier version of the standard may still be open for starts, which buys time — but check which funding rules apply to that start date first.'
+    );
+    sources.push({ label: 'Skills England apprenticeship register', url: 'https://skillsengland.education.gov.uk/apprenticeships/' });
+  }
+
+  else if(kind === 'spec'){
+    urgency = 'medium'; icon = 'clock';
+    title = s.name + ': ' + (/duration/i.test(s.changed) ? 'duration changed' : 'level changed');
+    summary = s.changed + '.';
+    standfirst = 'A change to the shape of the programme, not just its paperwork.';
+    body.push(
+      s.name + ' has changed specification. ' + spec,
+      'Recorded change: ' + s.changed + '.',
+      'Duration and level are not cosmetic. Typical duration drives the published off-the-job training minimum, the drawdown profile against a levy account, and what you can reasonably promise an employer about when someone will be competent. Level affects entry requirements, funding band and progression.',
+      'The version in force at each apprentice\'s start date is the one that binds them, so a change like this will leave you delivering two shapes of the same programme for a while.',
+      'What to do about it: re-check the published off-the-job minimum for this standard, re-cost the programme, and confirm your MIS is holding the right duration per cohort rather than the current one for everybody. On ' + rname + ' this is worth reading alongside any other specification changes, since they often move together.'
+    );
+    sources.push({ label: 'Skills England apprenticeship register', url: 'https://skillsengland.education.gov.uk/apprenticeships/' });
+  }
+
   else if(kind === 'replaced'){
     urgency = 'medium'; icon = 'signpost';
     title = s.name + ' has been restructured';
@@ -590,7 +709,28 @@ function compiledArticle(s){
 function allArticles(){
   const compiled = STANDARDS.map(compiledArticle).filter(Boolean);
   const seen = new Set(ARTICLES.map(a => a.id));
-  return ARTICLES.concat(compiled.filter(a => !seen.has(a.id)));
+  const all = ARTICLES.concat(compiled.filter(a => !seen.has(a.id)));
+
+  // A route round-up is written before the data moves, so it can end up being
+  // linked from a standard it never mentions. Attaching the current list of
+  // changed standards on that route means a reader always finds what they
+  // clicked through for, even when the prose has been overtaken.
+  all.forEach(art => {
+    if(!/^route-/.test(art.id)) return;
+    const key = Object.keys(ROUTE_ARTICLES).find(r => ROUTE_ARTICLES[r] === art.id);
+    if(!key) return;
+
+    art.onRoute = STANDARDS
+      .filter(s => s.route === key && s.changed)
+      .sort((x, y) => new Date(y.since) - new Date(x.since))
+      .map(s => ({
+        name: s.name, level: s.level, code: s.code, changed: s.changed,
+        since: s.since, status: s.status,
+        article: significance(s) ? 'std-' + (s.code || s.name.toLowerCase().replace(/[^a-z0-9]+/g,'-')) : ''
+      }));
+  });
+
+  return all;
 }
 
 /* Point a feed item at its own compiled article where one exists, and fall
@@ -859,4 +999,19 @@ function otjPosition(entry, opts){
     // which is a sense check rather than a requirement
     weekly: planned ? (planned / ((months || 12) * 4.33)) : null
   };
+}
+
+
+/* The label on a feed item's article link. A dedicated page and a route
+   round-up are different things, and calling both "read the full analysis"
+   sets the wrong expectation for one of them. */
+function articleLinkLabel(item){
+  const id = item.article || '';
+  if(!id) return '';
+  if(/^std-/.test(id))    return 'Full analysis';
+  if(/^route-/.test(id))  return 'Route round-up';
+  if(id === 'standards-in-review') return 'What in review means';
+  if(id === 'no-epa')     return 'Why this matters';
+  if(id === 'funding-bands') return 'About band changes';
+  return 'Read the analysis';
 }

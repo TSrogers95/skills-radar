@@ -238,7 +238,13 @@ const COLUMNS = {
   status:  ['status'],
   route:   ['route', 'sector'],
   approved:['approved for delivery', 'approved date', 'approval date'],
-  epao:    ['epao', 'assessment organisation', 'aao']
+  epao:    ['epao', 'assessment organisation', 'aao'],
+  // Several standards carry options, pathways or occupational specialisms —
+  // Mechatronics inside Engineering Technician, for instance. If the export
+  // includes them under any of these headings they are picked up and become
+  // searchable; if not, nothing breaks and the field stays empty.
+  options: ['options', 'option', 'pathways', 'pathway', 'occupational specialisms',
+            'specialisms', 'specialism', 'routes within standard']
 };
 
 function matchColumns(header){
@@ -322,10 +328,13 @@ function build(rows, cols){
     const status = get('status') || 'Approved';
     if(/^retired|^withdrawn/i.test(status)){ skippedRetired++; return; }
 
+    const opts = get('options');
+
     const rec = {
       name:    name,
       code:    code,
       raw:     status,
+      options: opts ? opts.split(/[;|\n]|,(?=\s*[A-Z])/).map(x => x.trim()).filter(Boolean) : [],
       level:   num(get('level')),
       months:  num(get('months')),
       funding: num(get('funding')),
@@ -395,7 +404,8 @@ function merge(imported){
         epa: epa, status: r.status, version: r.version,
         since: r.since || new Date().toISOString().slice(0,10),
         changed: ANNOUNCE_NEW ? 'New on the register' : '',
-        article: ''
+        article: '',
+        options: r.options || []
       });
       return;
     }
@@ -420,7 +430,8 @@ function merge(imported){
         route: r.route || old.route,
         epa: epa, status: r.status, version: r.version,
         since: r.since || new Date().toISOString().slice(0,10),
-        changed: diffs.join('. ')
+        changed: diffs.join('. '),
+        options: (r.options && r.options.length) ? r.options : (old.options || [])
       });
     } else {
       unchanged.push(old);
@@ -455,7 +466,8 @@ function render(s){
     ', route:' + q(s.route || '') + ', epa:' + q(s.epa || 'Assigned') +
     ', status:' + q(s.status || 'Approved') + ', version:' + q(s.version || '1.0') +
     ', since:' + q(s.since || '') + ', changed:' + q(s.changed || '') +
-    (s.article ? ', article:' + q(s.article) : '') + ' },';
+    (s.article ? ', article:' + q(s.article) : '') +
+    (s.options && s.options.length ? ', options:[' + s.options.map(q).join(',') + ']' : '') + ' },';
 }
 
 function block(list){
@@ -552,6 +564,8 @@ function show(rows, cols, built, m, file){
           (ANNOUNCE_NEW ? ' — going in the feed' : ' — not in the feed') + '</div></div>' +
         '<div class="mcard warm"><div class="n">' + m.updated.length + '</div><div class="l">Updated</div></div>' +
         '<div class="mcard"><div class="n">' + built.skippedRetired.toLocaleString('en-GB') + '</div><div class="l">Retired versions skipped</div></div>' +
+        '<div class="mcard cool"><div class="n">' + m.out.filter(s => s.options && s.options.length).length.toLocaleString('en-GB') +
+          '</div><div class="l">With pathways or options</div></div>' +
       '</div>' +
 
       '<div class="grouphead" style="margin-top:26px"><h2>Columns matched</h2><div class="rule"></div></div>' +
