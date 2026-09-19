@@ -102,8 +102,10 @@
         <button data-view="dash" class="active">Dashboard</button>
         <button data-view="feed">My feed</button>
         <button data-view="cal">My calendar</button>
+        <button data-view="otj">Off-the-job</button>
         <button data-view="levy">Levy calculator</button>
         <button data-view="prefs">Newsletter</button>
+        <button data-view="report">Report</button>
       </div>
     </div>
   </div>
@@ -202,9 +204,68 @@ function isMyStandardOnly(item){
   return mine.some(n => hay.includes(n));
 }
 
+/* =========================================================================
+   YOUR OWN EVENTS
+
+   Inductions, reviews, open evenings, EPA windows — the dates that matter to
+   you but exist nowhere in policy. Added here, they sit alongside the policy
+   milestones in the calendar, on the dashboard and in the board report.
+
+   Stored per session for now; they belong in the database once accounts are
+   live, which is the same wait as the cohort and off-the-job figures.
+   ========================================================================= */
+
+let MYEVENTS = [];
+try { MYEVENTS = JSON.parse(sessionStorage.getItem('sr-events') || '[]'); } catch(e){ MYEVENTS = []; }
+function saveEvents(){ try { sessionStorage.setItem('sr-events', JSON.stringify(MYEVENTS)); } catch(e){} }
+
+function addEvent(title, date, note){
+  if(!title || !date) return false;
+  MYEVENTS.push({
+    id: 'ev' + Date.now() + Math.floor(Math.random() * 1000),
+    title: title, date: date, note: note || '', done: false
+  });
+  saveEvents();
+  return true;
+}
+
+function toggleEvent(id){
+  const e = MYEVENTS.find(x => x.id === id);
+  if(e){ e.done = !e.done; saveEvents(); }
+}
+
+function removeEvent(id){
+  MYEVENTS = MYEVENTS.filter(x => x.id !== id);
+  saveEvents();
+}
+
+/* Outstanding = not ticked off. Past dates still count as outstanding,
+   because an overdue induction is exactly the thing worth surfacing. */
+function openEvents(){ return MYEVENTS.filter(e => !e.done); }
+
+/* Shaped like a milestone so the calendar and report can treat them alike. */
+function eventsAsMilestones(){
+  return MYEVENTS.map(e => ({
+    date: e.date,
+    title: e.title,
+    action: e.note || 'Your own entry.',
+    who: 'Added by you',
+    urgency: e.done ? 'low' : 'medium',
+    scope: 'mine',
+    mine: true,
+    done: e.done,
+    id: e.id,
+    article: ''
+  }));
+}
+
 /* ---------- Which milestones actually apply to this member ---------- */
 
 function myMilestones(){
+  return policyMilestones().concat(eventsAsMilestones());
+}
+
+function policyMilestones(){
   const mine = COHORT.map(s => s.name.toLowerCase());
   return MILESTONES.filter(m => {
     if(m.scope === 'all') return true;
@@ -215,6 +276,7 @@ function myMilestones(){
 }
 
 function milestoneReason(m){
+  if(m.mine) return m.done ? 'Your event — done' : 'Your event';
   const mine = COHORT.map(s => s.name.toLowerCase());
   if(m.scope === 'standards'){
     const hit = (m.standards || []).filter(n => mine.indexOf(n.toLowerCase()) > -1);
@@ -382,24 +444,18 @@ function comingUp(days){
     .sort((a,b) => new Date(a.date) - new Date(b.date));
 }
 
-/* When each cohort finishes, based on the standard's typical duration. */
-function completionForecast(){
-  const out = [];
-  COHORT.filter(c => c.count > 0 && c.months > 0).forEach(c => {
-    const reg = findStandard(c);
-    const months = (reg && reg.months) || c.months;
-    // spread across the programme: on a steady intake, roughly a twelfth of
-    // the cohort reaches gateway each month once the first year is through
-    const perYear = Math.round(c.count * (12 / months));
-    out.push({ name: c.name, level: c.level, count: c.count, months: months, perYear: perYear });
-  });
-  return out.sort((a,b) => b.perYear - a.perYear);
-}
+/* A completion forecast lived here. It has been removed rather than
+   corrected, because without each apprentice's actual start date any figure
+   is an assumption about a steady intake dressed up as a projection — not
+   something to put in front of a board.
+
+   Doing it properly needs start dates per apprentice. Those live in the
+   employer's Apprenticeship Service account, so the real answer is a DAS
+   connection rather than more arithmetic here. */
 
 function dashView(){
   const attention = attentionItems();
   const soon = comingUp(90);
-  const forecast = completionForecast();
   const stops = attention.filter(a => a.level === 'stop').length;
 
   const attentionHTML = attention.length
@@ -433,7 +489,7 @@ function dashView(){
         '<div class="l">Needing attention' + (stops ? ' — ' + stops + ' urgent' : '') + '</div></div>' +
       '<div class="mcard warm"><div class="n">' + soon.length + '</div><div class="l">Deadlines in 90 days</div></div>' +
       '<div class="mcard"><div class="n">' + cohortHeads() + '</div><div class="l">Apprentices on programme</div></div>' +
-      '<div class="mcard cool"><div class="n">' + COHORT.length + '</div><div class="l">Standards you deliver</div></div>' +
+      '<div class="mcard cool"><div class="n">' + openEvents().length + '</div><div class="l">Your events outstanding</div></div>' +
     '</div>' +
 
     '<div class="grouphead"><h2>Needs your attention</h2><div class="rule"></div></div>' +
@@ -442,23 +498,6 @@ function dashView(){
     '<div class="grouphead"><h2>Next 90 days</h2><div class="rule"></div>' +
       '<button class="linkbtn" data-go="cal">Full calendar</button></div>' +
     '<div class="soonlist">' + soonHTML + '</div>' +
-
-    (forecast.length
-      ? '<div class="grouphead"><h2>Completion forecast</h2><div class="rule"></div></div>' +
-        '<p class="hint" style="max-width:66ch;margin:12px 0">Roughly how many apprentices reach gateway each year at your current cohort size, ' +
-        'assuming a steady intake and the register\'s typical duration. Useful for planning assessment capacity and next year\'s recruitment.</p>' +
-        '<table class="std" style="margin-top:4px"><thead><tr>' +
-          '<th>Standard</th><th>On programme</th><th class="hidecol">Duration</th><th>Completing per year</th>' +
-        '</tr></thead><tbody>' +
-        forecast.map(f => '<tr><td class="nm">L' + f.level + ' ' + f.name + '</td>' +
-          '<td class="num">' + f.count + '</td>' +
-          '<td class="num hidecol">' + f.months + ' months</td>' +
-          '<td class="num"><b>' + f.perYear + '</b></td></tr>').join('') +
-        '<tr class="totalrow"><td class="nm"><b>Total</b></td>' +
-          '<td class="num">' + cohortHeads() + '</td><td class="hidecol"></td>' +
-          '<td class="num"><b>' + forecast.reduce((t,f) => t + f.perYear, 0) + '</b></td></tr>' +
-        '</tbody></table>'
-      : '') +
 
     '<div class="grouphead"><h2>Your standards</h2><div class="rule"></div>' +
       '<button class="linkbtn" data-go="levy">Edit these</button></div>' +
@@ -536,8 +575,26 @@ function calView(){
     '<div class="key">' +
       '<span><i class="h"></i> Hard deadline or high risk</span>' +
       '<span><i class="m"></i> Confirmed change, plan for it</span>' +
-      '<span><i class="l"></i> For awareness</span></div>' +
+      '<span><i class="l"></i> For awareness</span>' +
+      '<span><i class="own"></i> Your own events</span></div>' +
     '<div class="calgrid" id="calgrid"></div>' +
+
+    '<div class="grouphead" style="margin-top:38px"><h2>Your own events</h2><div class="rule"></div></div>' +
+    '<p class="hint" style="max-width:66ch;margin:12px 0 16px">Inductions, progress review windows, open evenings, EPA bookings — ' +
+    'anything with a date that matters to you. They appear in the calendar above, on your dashboard, and in the board report.</p>' +
+
+    '<div class="eventadd">' +
+      '<div class="field"><label for="ev-title">What is it?</label>' +
+      '<input type="text" id="ev-title" placeholder="September induction, Business Administrator cohort"></div>' +
+      '<div class="field"><label for="ev-date">When?</label>' +
+      '<input type="date" id="ev-date"></div>' +
+      '<div class="field wide"><label for="ev-note">Note <span style="font-weight:400;color:var(--text-3)">(optional)</span></label>' +
+      '<input type="text" id="ev-note" placeholder="Room 4, 9am. Employer reps attending."></div>' +
+      '<button class="btn" id="ev-add">Add</button>' +
+    '</div>' +
+    '<div class="err" id="ev-err" hidden>Give it a name and a date.</div>' +
+
+    '<div id="eventlist"></div>' +
     '<div class="callist"><div class="grouphead"><h2>Every milestone in full</h2><div class="rule"></div></div><div id="cal"></div></div>' +
     '<div class="pagehead" style="margin-top:52px"><h1>On the horizon</h1>' +
     '<p>What is coming next. Confidence is marked so you can tell a confirmed date from a signalled direction.</p></div>' +
@@ -883,6 +940,301 @@ function wireLevy(){
   wirePicker('cohortpick', render);
 }
 
+/* Per-standard off-the-job figures the member enters. Kept alongside the
+   cohort so they survive tab switches; they belong in the database once
+   accounts are live. */
+let OTJ = {};
+try { OTJ = JSON.parse(sessionStorage.getItem('sr-otj') || '{}'); } catch(e){ OTJ = {}; }
+function saveOtj(){ try { sessionStorage.setItem('sr-otj', JSON.stringify(OTJ)); } catch(e){} }
+function otjFor(name){ return OTJ[name] || {}; }
+
+function otjView(){
+  const rows = COHORT.filter(c => c.count > 0).map((c, i) => {
+    const o = otjFor(c.name);
+    const p = otjPosition(c, o);
+    const reg = findStandard(c);
+
+    const stateCell = p.planned == null
+      ? '<span class="chg none">Not set</span>'
+      : p.state === 'illegal' ? '<span class="ctag stop">Below the 187h floor</span>'
+      : p.state === 'short'   ? '<span class="ctag stop">Short by ' + Math.abs(p.variance) + 'h</span>'
+      : p.state === 'tight'   ? '<span class="ctag warn">Only ' + p.variance + 'h spare</span>'
+      : '<span class="ctag new">+' + p.variance + 'h</span>';
+
+    return '<tr>' +
+      '<td class="nm">' + c.name +
+        '<small>Level ' + c.level + ' &middot; ' + c.count + ' apprentice' + (c.count === 1 ? '' : 's') +
+        ' &middot; ' + p.months + ' months' + (reg && reg.code ? ' &middot; ' + reg.code : '') + '</small></td>' +
+      '<td class="num"><input class="otjin" type="number" min="0" data-f="published" data-n="' + esc(c.name) + '" ' +
+        'value="' + (o.published || '') + '" placeholder="' + p.estimated + '" data-i="' + i + '"></td>' +
+      '<td class="num"><input class="otjin" type="number" min="0" data-f="rpl" data-n="' + esc(c.name) + '" ' +
+        'value="' + (o.rpl || '') + '" placeholder="0" data-i="' + i + '"></td>' +
+      '<td class="num" id="otj-req-' + i + '"><b>' + p.required + 'h</b>' +
+        (p.rplCapped ? '<small class="cap">capped at floor</small>' : '') + '</td>' +
+      '<td class="num"><input class="otjin" type="number" min="0" data-f="planned" data-n="' + esc(c.name) + '" ' +
+        'value="' + (o.planned || '') + '" placeholder="—" data-i="' + i + '"></td>' +
+      '<td id="otj-state-' + i + '">' + stateCell +
+        (p.weekly ? '<small class="cap">' + p.weekly.toFixed(1) + 'h a week average</small>' : '') + '</td>' +
+    '</tr>';
+  }).join('');
+
+  const positions = COHORT.filter(c => c.count > 0).map(c => otjPosition(c, otjFor(c.name)));
+  const problems = positions.filter(p => p.state === 'illegal' || p.state === 'short');
+  const unset = positions.filter(p => p.planned == null);
+  const usingEstimate = positions.filter(p => p.estimateUsed).length;
+
+  return '<div class="pagehead"><h1>Off-the-job training</h1>' +
+    '<p>Where each cohort stands against its published minimum. Enter the figure from the standard, ' +
+    'any recognised prior learning, and the hours you actually plan to deliver.</p></div>' +
+
+    '<div class="notice"><b>The rules changed for starts from 1 August 2025.</b> ' +
+    'The old six-hours-a-week calculation applies only to apprentices who started before that date. ' +
+    'Since then every standard carries its own published minimum, and from 1 August 2026 that figure appears ' +
+    'on the front of the standard on the Skills England website. You cannot work it out from the duration any more — ' +
+    'read it from the register, per standard and per version.</div>' +
+
+    '<div id="otjbanner">' +
+    (problems.length
+      ? '<div class="alert"><b>' + problems.length + ' cohort' + (problems.length === 1 ? '' : 's') +
+        ' will not meet the minimum</b> on the hours currently planned: ' +
+        problems.map(p => p.name).join(', ') + '. On audit, a programme delivering fewer hours than its published ' +
+        'minimum is a funding risk on every apprentice in it.</div>'
+      : positions.length && !unset.length
+        ? '<div class="okbox"><b>Every cohort meets its minimum</b> on the hours planned.</div>'
+        : '') +
+    '</div>' +
+
+    '<table class="std otj" style="margin-top:20px"><thead><tr>' +
+      '<th>Standard</th>' +
+      '<th>Published minimum</th>' +
+      '<th>Prior learning</th>' +
+      '<th>Required</th>' +
+      '<th>You plan</th>' +
+      '<th>Position</th>' +
+    '</tr></thead><tbody>' + (rows || '<tr><td colspan="6" class="cohortempty">No cohorts with apprentices on them yet.</td></tr>') + '</tbody></table>' +
+
+    (usingEstimate
+      ? '<div class="notice" style="margin-top:16px"><b>' + usingEstimate + ' of these are using an estimate, not the published figure.</b> ' +
+        'Where you have not entered a minimum, the grey number in the box is estimated from the method DWP documented for setting them — ' +
+        '20% of 75% of the typical duration. It reproduces the worked example in their guidance, but it is not authoritative. ' +
+        'Open each standard on the register and enter the real number before you rely on this.</div>'
+      : '') +
+
+    '<div class="grouphead" style="margin-top:34px"><h2>What counts, and what does not</h2><div class="rule"></div></div>' +
+    '<div class="readgrid" style="margin-top:14px">' +
+      '<div class="readcard"><a href="https://www.gov.uk/government/publications/apprenticeships-off-the-job-training/apprenticeship-off-the-job-training-guidance--2" target="_blank" rel="noopener">DWP off-the-job training guidance</a>' +
+        '<p>What can be counted, what must not be, and how it has to be evidenced. Includes the worked examples behind the published minimums.</p></div>' +
+      '<div class="readcard"><a href="https://skillsengland.education.gov.uk/apprenticeships/" target="_blank" rel="noopener">Skills England register</a>' +
+        '<p>The published minimum for each standard now sits on the front of the standard itself. Check the version your apprentice is on.</p></div>' +
+      '<div class="readcard"><a href="rules.html">The 2026/27 funding rules index</a>' +
+        '<p>Paragraphs 85, 90, 91 and 95.1 cover off-the-job, including the removal of Annex C and who is responsible for evidencing it.</p></div>' +
+    '</div>' +
+
+    '<div class="notice" style="margin-top:20px"><b>Three things worth knowing.</b> ' +
+    'Prior learning reduces the requirement but never below 187 hours — a programme under that is non-compliant whatever the RPL evidence says. ' +
+    'The provider is responsible for evidencing all of it, even where a subcontractor or the employer delivers it. ' +
+    'And standalone English and maths qualifications do not count as active learning.</div>';
+}
+
+function esc(s){ return String(s).replace(/"/g, '&quot;'); }
+
+/* =========================================================================
+   GOVERNANCE REPORT
+
+   A single page a programme lead can put in front of a board: position,
+   risks, money, compliance, and what is coming. Built from the same data as
+   every other view, laid out to print on A4 without anything clipping.
+   ========================================================================= */
+
+function reportView(){
+  const f = levyFigures(MEMBER.payroll, COHORT, YOUNG, MEMBER.levyPayer);
+  const attention = attentionItems();
+  const soon = comingUp(90);
+  const outstanding = openEvents().filter(e => { const d = -daysAgo(e.date); return d <= 90; })
+    .sort((a,b) => new Date(a.date) - new Date(b.date));
+  const positions = COHORT.filter(c => c.count > 0).map(c => otjPosition(c, otjFor(c.name)));
+  const otjProblems = positions.filter(p => p.state === 'illegal' || p.state === 'short');
+  const otjUnset = positions.filter(p => p.planned == null);
+  const defunded = COHORT.filter(c => { const r = findStandard(c); return r && /Defunded/i.test(r.status); });
+
+  const today = new Date().toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
+
+  return '<div class="pagehead noprint"><h1>Governance report</h1>' +
+    '<p>A one-page position for a board or governance meeting, built from your cohort, your levy figures and your compliance position. ' +
+    'Print it or save it as a PDF — the buttons and navigation are left out of the printed version.</p>' +
+    '<div class="addrow" style="margin-top:16px">' +
+      '<button class="btn" id="printit">Print or save as PDF</button>' +
+      '<span class="hint" style="align-self:center;margin:0">Choose &ldquo;Save as PDF&rdquo; as the destination to keep a copy</span>' +
+    '</div></div>' +
+
+    '<article class="report" id="report">' +
+
+      '<header class="rephead">' +
+        '<div><h1>Apprenticeship programme report</h1>' +
+        '<p class="repmeta">' + MEMBER.org + ' &middot; ' + today + '</p></div>' +
+        '<div class="repbrand">Skills <em>Radar</em><small>skillsradar.co.uk</small></div>' +
+      '</header>' +
+
+      '<section class="repsec">' +
+        '<h2>Position at a glance</h2>' +
+        '<div class="repgrid">' +
+          '<div class="repstat"><b>' + cohortHeads() + '</b><span>apprentices on programme</span></div>' +
+          '<div class="repstat"><b>' + COHORT.length + '</b><span>standards delivered</span></div>' +
+          '<div class="repstat"><b>' + positions.filter(p => p.state === 'ok' || p.state === 'tight').length + '/' + positions.length +
+            '</b><span>cohorts meeting off-the-job</span></div>' +
+          '<div class="repstat ' + (attention.filter(a => a.level === 'stop').length ? 'bad' : '') + '"><b>' +
+            attention.length + '</b><span>items needing attention</span></div>' +
+        '</div>' +
+      '</section>' +
+
+      '<section class="repsec">' +
+        '<h2>Funding position</h2>' +
+        '<table class="reptable"><tbody>' +
+          '<tr><td>Annual pay bill</td><td class="r">' + money(MEMBER.payroll) + '</td></tr>' +
+          '<tr><td>Levy funds available this year</td><td class="r">' + money(Math.round(f.available)) + '</td></tr>' +
+          '<tr><td>Drawn down against current cohort</td><td class="r">' + money(Math.round(f.annualDraw)) + '</td></tr>' +
+          (f.shortfall > 0
+            ? '<tr class="rtotal"><td>Shortfall beyond the levy</td><td class="r neg">' + money(Math.round(f.shortfall)) + '</td></tr>' +
+              '<tr><td>Of which government funds</td><td class="r">' + money(Math.round(f.govCost)) + '</td></tr>' +
+              '<tr class="rtotal"><td><b>Employer co-investment to budget</b></td><td class="r neg"><b>' + money(Math.round(f.youCost)) + '</b></td></tr>'
+            : '<tr class="rtotal"><td><b>Unused levy at current rate</b></td><td class="r"><b>' + money(Math.round(f.surplus)) + '</b></td></tr>' +
+              '<tr><td colspan="2" class="note">New funds expire after twelve months, so an unused balance is lost rather than carried.</td></tr>') +
+        '</tbody></table>' +
+        '<p class="repnote">Figures are an estimate based on the funding band maximum for each standard and a steady cohort. ' +
+        'Co-investment reflects the 2026/27 rules, under which government funds all training for apprentices aged 16 to 24 ' +
+        'and 75% for those aged 25 and over once a levy balance is exhausted.</p>' +
+      '</section>' +
+
+      '<section class="repsec">' +
+        '<h2>Compliance: off-the-job training</h2>' +
+        (positions.length
+          ? '<table class="reptable"><thead><tr><th>Standard</th><th class="r">Required</th><th class="r">Planned</th><th class="r">Position</th></tr></thead><tbody>' +
+            positions.map(p => '<tr><td>Level ' + p.level + ' ' + p.name +
+              (p.estimateUsed ? ' <span class="est">estimated minimum</span>' : '') + '</td>' +
+              '<td class="r">' + p.required + 'h</td>' +
+              '<td class="r">' + (p.planned != null ? p.planned + 'h' : '—') + '</td>' +
+              '<td class="r ' + (p.state === 'illegal' || p.state === 'short' ? 'neg' : '') + '">' +
+                (p.planned == null ? 'Not recorded'
+                  : p.state === 'illegal' ? 'Below the 187h floor'
+                  : p.state === 'short' ? 'Short by ' + Math.abs(p.variance) + 'h'
+                  : p.state === 'tight' ? 'Meets, ' + p.variance + 'h spare'
+                  : 'Meets, +' + p.variance + 'h') + '</td></tr>').join('') +
+            '</tbody></table>' +
+            (otjProblems.length
+              ? '<p class="repalert"><b>' + otjProblems.length + ' cohort' + (otjProblems.length === 1 ? ' does' : 's do') +
+                ' not meet the minimum on planned hours.</b> A programme delivering fewer hours than its published minimum is a funding risk on every apprentice in it.</p>'
+              : otjUnset.length
+                ? '<p class="repnote">' + otjUnset.length + ' cohort' + (otjUnset.length === 1 ? ' has' : 's have') +
+                  ' no planned hours recorded, so their position cannot be reported.</p>'
+                : '<p class="repnote">All cohorts meet their published minimum on planned hours.</p>')
+          : '<p class="repnote">No cohorts recorded.</p>') +
+      '</section>' +
+
+      '<section class="repsec">' +
+        '<h2>Risks and actions</h2>' +
+        (attention.length
+          ? '<ol class="replist">' + attention.map(a =>
+              '<li class="' + a.level + '"><b>' + a.title + '</b><span>' + a.detail + '</span></li>').join('') + '</ol>'
+          : '<p class="repnote">Nothing currently flagged against the standards delivered.</p>') +
+        (defunded.length
+          ? '<p class="repalert"><b>' + defunded.length + ' standard' + (defunded.length === 1 ? '' : 's') +
+            ' lose funding on 1 September 2026:</b> ' + defunded.map(d => 'Level ' + d.level + ' ' + d.name).join(', ') +
+            '. Existing apprentices remain funded to completion; no new starts are possible after that date.</p>'
+          : '') +
+      '</section>' +
+
+      '<section class="repsec">' +
+        '<h2>Next 90 days</h2>' +
+        (soon.length
+          ? '<table class="reptable"><tbody>' + soon.map(s =>
+              '<tr><td class="w">' + fmtLong(s.date) + '</td><td><b>' + s.title + '</b>' +
+              (s.mine ? ' <span class="est">your entry</span>' : '') +
+              '<br><span class="sub">' + s.action + '</span></td></tr>').join('') +
+            '</tbody></table>'
+          : '<p class="repnote">No dated deadlines in the next 90 days affecting the standards delivered.</p>') +
+        (outstanding.length
+          ? '<p class="repnote">' + outstanding.length + ' of these ' + (outstanding.length === 1 ? 'is' : 'are') +
+            ' your own entries, still outstanding.</p>'
+          : '') +
+      '</section>' +
+
+      '<section class="repsec">' +
+        '<h2>Cohort</h2>' +
+        '<table class="reptable"><thead><tr><th>Standard</th><th class="r">On programme</th><th class="r">Band</th><th class="r">Duration</th></tr></thead><tbody>' +
+        COHORT.map(c => {
+          const reg = findStandard(c);
+          return '<tr><td>Level ' + c.level + ' ' + c.name + '</td>' +
+            '<td class="r">' + c.count + '</td>' +
+            '<td class="r">' + money((reg && reg.funding) || c.funding) + '</td>' +
+            '<td class="r">' + ((reg && reg.months) || c.months || '—') + ' months</td></tr>';
+        }).join('') +
+        '<tr class="rtotal"><td><b>Total</b></td><td class="r"><b>' + cohortHeads() + '</b></td><td></td><td></td></tr>' +
+        '</tbody></table>' +
+        '<p class="repnote">Completion timing is not shown. It depends on each apprentice\'s actual start date, ' +
+        'which sits in the employer\'s Apprenticeship Service account rather than here.</p>' +
+      '</section>' +
+
+      '<footer class="repfoot">' +
+        '<p>Compiled by Skills Radar on ' + today + ' from the Skills England apprenticeship register and the ' +
+        'DWP apprenticeship funding rules for 2026 to 2027. Funding and off-the-job figures are planning estimates, ' +
+        'not a statement of account. Check the Apprenticeship Service and the published standard before acting on them.</p>' +
+      '</footer>' +
+    '</article>';
+}
+
+/* Typing recalculates the row and the banner in place. Redrawing the whole
+   view on each keystroke would throw focus out of the box being typed in. */
+function wireOtj(panel){
+  const live = COHORT.filter(c => c.count > 0);
+
+  function refresh(){
+    live.forEach((c, i) => {
+      const p = otjPosition(c, otjFor(c.name));
+
+      const req = document.getElementById('otj-req-' + i);
+      if(req) req.innerHTML = '<b>' + p.required + 'h</b>' +
+        (p.rplCapped ? '<small class="cap">capped at floor</small>' : '');
+
+      const st = document.getElementById('otj-state-' + i);
+      if(st){
+        st.innerHTML = (p.planned == null
+            ? '<span class="chg none">Not set</span>'
+            : p.state === 'illegal' ? '<span class="ctag stop">Below the 187h floor</span>'
+            : p.state === 'short'   ? '<span class="ctag stop">Short by ' + Math.abs(p.variance) + 'h</span>'
+            : p.state === 'tight'   ? '<span class="ctag warn">Only ' + p.variance + 'h spare</span>'
+            : '<span class="ctag new">+' + p.variance + 'h</span>') +
+          (p.weekly ? '<small class="cap">' + p.weekly.toFixed(1) + 'h a week average</small>' : '');
+      }
+    });
+
+    const positions = live.map(c => otjPosition(c, otjFor(c.name)));
+    const problems = positions.filter(p => p.state === 'illegal' || p.state === 'short');
+    const unset = positions.filter(p => p.planned == null);
+    const banner = document.getElementById('otjbanner');
+    if(banner){
+      banner.innerHTML = problems.length
+        ? '<div class="alert"><b>' + problems.length + ' cohort' + (problems.length === 1 ? '' : 's') +
+          ' will not meet the minimum</b> on the hours currently planned: ' +
+          problems.map(p => p.name).join(', ') + '. On audit, a programme delivering fewer hours than its published ' +
+          'minimum is a funding risk on every apprentice in it.</div>'
+        : (positions.length && !unset.length
+            ? '<div class="okbox"><b>Every cohort meets its minimum</b> on the hours planned.</div>'
+            : '');
+    }
+  }
+
+  panel.querySelectorAll('.otjin').forEach(inp => {
+    inp.addEventListener('input', () => {
+      const n = inp.dataset.n, f = inp.dataset.f;
+      OTJ[n] = OTJ[n] || {};
+      const v = parseInt(inp.value, 10);
+      if(isNaN(v) || v <= 0) delete OTJ[n][f]; else OTJ[n][f] = v;
+      saveOtj();
+      refresh();
+    });
+  });
+}
+
 function prefsView(){
   return '<div class="pagehead"><h1>Newsletter preferences</h1>' +
     '<p>What lands in your inbox, and how often. Changes here also reorder your feed and calendar.</p></div>' +
@@ -912,6 +1264,75 @@ function prefsView(){
       'Connect a mailing service — Buttondown, MailerLite, Kit or Mailchimp — and store these preferences server-side ' +
       'alongside real accounts. Right now they live only in this browser session.</div>' +
     '</div>';
+}
+
+function eventListHTML(){
+  if(!MYEVENTS.length){
+    return '<div class="okbox" style="margin-top:16px">Nothing added yet. Whatever you put here is yours — it never appears on the public site.</div>';
+  }
+
+  const sorted = MYEVENTS.slice().sort((a,b) => {
+    if(a.done !== b.done) return a.done ? 1 : -1;
+    return new Date(a.date) - new Date(b.date);
+  });
+
+  return '<div class="eventlist">' + sorted.map(e => {
+    const away = Math.ceil(-daysAgo(e.date));
+    const when = e.done ? 'Done'
+      : away < 0  ? Math.abs(away) + ' day' + (Math.abs(away) === 1 ? '' : 's') + ' ago'
+      : away === 0 ? 'Today'
+      : 'in ' + away + ' day' + (away === 1 ? '' : 's');
+    const overdue = !e.done && away < 0;
+
+    return '<div class="evrow' + (e.done ? ' done' : '') + (overdue ? ' overdue' : '') + '">' +
+      '<button class="evtick" data-tick="' + e.id + '" aria-label="' + (e.done ? 'Mark as not done' : 'Mark as done') + '">' +
+        (e.done ? '&#10003;' : '') + '</button>' +
+      '<div class="evmain">' +
+        '<h3>' + e.title + '</h3>' +
+        (e.note ? '<p>' + e.note + '</p>' : '') +
+      '</div>' +
+      '<div class="evwhen">' + fmtLong(e.date) + '<small>' + when + '</small></div>' +
+      '<button class="evdel" data-del="' + e.id + '" aria-label="Remove ' + e.title.replace(/"/g,'&quot;') + '">&times;</button>' +
+    '</div>';
+  }).join('') + '</div>';
+}
+
+function wireEvents(){
+  const list = document.getElementById('eventlist');
+  if(list) list.innerHTML = eventListHTML();
+
+  const add = document.getElementById('ev-add');
+  if(add){
+    add.addEventListener('click', () => {
+      const t = document.getElementById('ev-title').value.trim();
+      const d = document.getElementById('ev-date').value;
+      const n = document.getElementById('ev-note').value.trim();
+      if(!addEvent(t, d, n)){
+        document.getElementById('ev-err').hidden = false;
+        return;
+      }
+      document.getElementById('ev-err').hidden = true;
+      document.getElementById('ev-title').value = '';
+      document.getElementById('ev-date').value = '';
+      document.getElementById('ev-note').value = '';
+      render();
+    });
+  }
+
+  ['ev-title','ev-date'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el){
+      el.addEventListener('input', () => { document.getElementById('ev-err').hidden = true; });
+      el.addEventListener('keydown', e => { if(e.key === 'Enter') add.click(); });
+    }
+  });
+
+  if(list){
+    list.querySelectorAll('[data-tick]').forEach(b =>
+      b.addEventListener('click', () => { toggleEvent(b.dataset.tick); render(); }));
+    list.querySelectorAll('[data-del]').forEach(b =>
+      b.addEventListener('click', () => { removeEvent(b.dataset.del); render(); }));
+  }
 }
 
 /* ---------- Calendar internals ---------- */
@@ -1002,10 +1423,12 @@ function monthGrid(year, month, byDate){
     const evs = byDate[key];
     let cls = 'cday', bang = '';
     if(evs){
-      const worst = evs.some(e => e.urgency === 'high') ? 'high'
-                  : evs.some(e => e.urgency === 'medium') ? 'medium' : 'low';
-      cls += ' has ' + worst;
-      if(worst === 'high') bang = '<span class="bang">!</span>';
+      const onlyMine = evs.every(e => e.mine);
+      const worst = evs.some(e => e.urgency === 'high' && !e.mine) ? 'high'
+                  : evs.some(e => e.urgency === 'medium' && !e.mine) ? 'medium' : 'low';
+      cls += ' has ' + (onlyMine ? 'mine' : worst);
+      if(!onlyMine && worst === 'high') bang = '<span class="bang">!</span>';
+      if(evs.some(e => e.mine)) bang += '<span class="own"></span>';
     }
     if(isThisMonth && d === today.getDate()) cls += ' today';
     const attr = evs ? ' tabindex="0" data-key="' + key + '" role="button"' : '';
@@ -1032,12 +1455,23 @@ function render(){
       }));
   }
   if(view === 'feed')  panel.innerHTML = feedView();
-  if(view === 'cal'){  panel.innerHTML = calView(); buildCalendar(); }
+  if(view === 'cal'){  panel.innerHTML = calView(); buildCalendar(); wireEvents(); }
+  if(view === 'otj'){
+    panel.innerHTML = otjView();
+    wireOtj(panel);
+  }
+
   if(view === 'levy'){
     panel.innerHTML = levyView();
     renderLevy();
     wireLevy();
   }
+  if(view === 'report'){
+    panel.innerHTML = reportView();
+    const b = document.getElementById('printit');
+    if(b) b.addEventListener('click', () => window.print());
+  }
+
   if(view === 'prefs'){
     panel.innerHTML = prefsView();
     panel.querySelectorAll('.chipx').forEach(b =>

@@ -684,3 +684,154 @@ function unmatchedNote(entry){
     ? 'Not matched — did you mean ' + near.map(s => 'L' + s.level + ' ' + s.name).join(' or ') + '?'
     : 'Not on the register under this name';
 }
+
+/* =========================================================================
+   OFF-THE-JOB TRAINING
+
+   The rule: off-the-job training must average at least 6 hours a week across
+   the planned duration, for an apprentice working 30 hours or more. Part-time
+   apprentices are pro-rata on their contracted hours.
+
+   Where the authoritative number lives: Annex C was removed from the 2026/27
+   funding rules, and each standard's minimum volume is now published on the
+   Skills England register against that standard. The figure calculated here
+   is the 6-hours-a-week floor — a sound planning estimate, but the published
+   minimum for your standard is what an audit measures you against. Enter it
+   per standard where you know it, and this uses yours instead.
+   ========================================================================= */
+
+const OTJ_HOURS_PER_WEEK = 6;
+const WEEKS_PER_MONTH = 52 / 12;
+
+/* The minimum total for one apprentice on this standard. */
+function otjRequired(entry){
+  if(entry.otjRequired > 0) return { hours: entry.otjRequired, source: 'published' };
+  const months = entry.months || 12;
+  const weekly = entry.weeklyHours > 0 ? entry.weeklyHours : OTJ_HOURS_PER_WEEK;
+  return { hours: Math.round(months * WEEKS_PER_MONTH * weekly), source: 'calculated' };
+}
+
+/* Where a cohort should be by now, and where it actually is. */
+function otjPosition(entry){
+  const req     = otjRequired(entry);
+  const months  = entry.months || 12;
+  const elapsed = Math.min(entry.otjElapsed || 0, months);
+  const heads   = entry.count || 0;
+
+  const perApprentice   = req.hours;
+  const cohortRequired  = perApprentice * heads;
+  const expectedPer     = months > 0 ? Math.round(perApprentice * (elapsed / months)) : 0;
+  const cohortExpected  = expectedPer * heads;
+  const cohortDelivered = entry.otjDelivered || 0;
+
+  const variance = cohortDelivered - cohortExpected;
+  const pct = cohortExpected > 0 ? Math.round((cohortDelivered / cohortExpected) * 100) : null;
+
+  // What it takes to be back on plan by the end
+  const remainingMonths = Math.max(0, months - elapsed);
+  const remainingHours  = Math.max(0, cohortRequired - cohortDelivered);
+  const weeklyNeeded = (remainingMonths > 0 && heads > 0)
+    ? remainingHours / heads / (remainingMonths * WEEKS_PER_MONTH)
+    : null;
+
+  let state = 'unknown';
+  if(elapsed > 0 && cohortExpected > 0){
+    if(pct >= 100)     state = 'ahead';
+    else if(pct >= 90) state = 'ontrack';
+    else if(pct >= 75) state = 'behind';
+    else               state = 'risk';
+  }
+
+  return {
+    source: req.source,
+    perApprentice, cohortRequired, cohortExpected, cohortDelivered,
+    variance, pct, elapsed, months, heads,
+    remainingMonths, remainingHours, weeklyNeeded, state
+  };
+}
+
+function otjStateLabel(state){
+  if(state === 'ahead')   return { text:'Ahead of plan',   tone:'new' };
+  if(state === 'ontrack') return { text:'On track',        tone:'new' };
+  if(state === 'behind')  return { text:'Behind plan',     tone:'warn' };
+  if(state === 'risk')    return { text:'At risk',         tone:'stop' };
+  return { text:'Not yet entered', tone:'info' };
+}
+
+/* =========================================================================
+   OFF-THE-JOB TRAINING
+
+   The rules changed fundamentally for starts from 1 August 2025. The old
+   "6 hours a week" calculation applies only to apprentices who started
+   before that date. Since then each standard carries its own published
+   minimum number of hours, and from 1 August 2026 that figure appears on
+   the front of the standard on the Skills England website.
+
+   Two things follow that catch providers out:
+
+     1. You cannot infer the requirement from duration any more. The figure
+        is per standard and per version, and must be read from the register.
+     2. Prior learning reduces the requirement, but never below 187 hours.
+        A programme under 187 hours is non-compliant, full stop.
+
+   Where a published figure has not been entered, this estimates one using
+   the method DWP documented for setting them: 20% of 75% of the typical
+   duration, at the historical off-the-job equivalent. That reproduces the
+   worked example in the guidance (ST1398, 24 months, 418 hours) to within
+   a few hours — but it is an estimate, and the site says so everywhere it
+   is shown.
+   ========================================================================= */
+
+const OTJ_FLOOR = 187;          // below this, the programme is non-compliant
+const OTJ_HOURS_PER_MONTH = 17.4;  // derived from the documented method
+
+function otjEstimate(months){
+  if(!months || months <= 0) return null;
+  return Math.round(months * OTJ_HOURS_PER_MONTH);
+}
+
+/* Work out where a cohort stands.
+     published — the figure from the standard, or null to use the estimate
+     rpl       — hours of recognised prior learning
+     planned   — hours you actually plan to deliver  */
+function otjPosition(entry, opts){
+  opts = opts || {};
+  const reg = findStandard(entry);
+  const months = (reg && reg.months) || entry.months || 0;
+
+  const estimated = otjEstimate(months);
+  const published = opts.published != null && opts.published > 0 ? opts.published : null;
+  const base = published != null ? published : estimated;
+
+  if(base == null){
+    return { name: entry.name, level: entry.level, count: entry.count || 0,
+             months: months, unknown: true };
+  }
+
+  const rpl = Math.max(0, opts.rpl || 0);
+  const afterRpl = base - rpl;
+
+  // Prior learning cannot take the requirement below the floor
+  const required = Math.max(OTJ_FLOOR, afterRpl);
+  const rplCapped = afterRpl < OTJ_FLOOR && rpl > 0;
+
+  const planned = opts.planned != null && opts.planned > 0 ? opts.planned : null;
+  const variance = planned != null ? planned - required : null;
+
+  let state = 'unset';
+  if(planned != null){
+    if(planned < OTJ_FLOOR)      state = 'illegal';   // under the floor outright
+    else if(variance < 0)        state = 'short';
+    else if(variance < required * 0.05) state = 'tight';
+    else                         state = 'ok';
+  }
+
+  return {
+    name: entry.name, level: entry.level, count: entry.count || 0,
+    months: months, estimated: estimated, published: published,
+    base: base, rpl: rpl, rplCapped: rplCapped,
+    required: required, planned: planned, variance: variance,
+    state: state, estimateUsed: published == null,
+    weekly: planned ? (planned / ((months || 12) * 4.33)) : null
+  };
+}
