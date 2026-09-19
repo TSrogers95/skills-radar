@@ -139,7 +139,7 @@ document.getElementById('navslot').innerHTML = navHTML('members.html');
 
 function refreshBar(){
   const el = document.getElementById('orgmeta');
-  if(el) el.textContent = (MEMBER.levyPayer ? 'Levy payer' : 'Non-levy') + ' · ' +
+  if(el) el.textContent = (SETTINGS.levyPayer ? 'Levy payer' : 'Non-levy') + ' · ' +
     cohortHeads() + ' apprentices · ' + COHORT.length + ' standard' + (COHORT.length === 1 ? '' : 's');
 }
 
@@ -423,7 +423,7 @@ function attentionItems(){
   });
 
   // Money
-  const f = levyFigures(MEMBER.payroll, COHORT, YOUNG, MEMBER.levyPayer);
+  const f = levyFigures(SETTINGS.payroll, COHORT, youngCount(), SETTINGS.levyPayer);
   if(f.shortfall > 0 && f.youCost > 0){
     out.push({ level:'warn', title:'Budget around ' + money(Math.round(f.youCost)) + ' of co-investment this year',
       detail:'You draw down roughly ' + money(Math.round(f.annualDraw)) + ' against ' + money(Math.round(f.available)) +
@@ -616,7 +616,41 @@ function calView(){
    ========================================================================= */
 
 let COHORT = loadCohort();
-let YOUNG  = Math.round(cohortHeads() * 0.45);
+
+/* =========================================================================
+   WORKING SETTINGS
+
+   Payroll and the age split used to live in the levy calculator's input
+   boxes, read fresh each time and stored nowhere. That meant the dashboard
+   and the board report were still using the account's original figures while
+   the calculator showed the ones you had typed — so a report printed after
+   changing your pay bill was wrong.
+
+   One object now holds them, saved as you type and read by every view.
+   ========================================================================= */
+
+const SETTINGS = loadSettings();
+
+function loadSettings(){
+  const base = { payroll: MEMBER.payroll, young: null, levyPayer: MEMBER.levyPayer };
+  try {
+    const saved = JSON.parse(sessionStorage.getItem('sr-settings') || 'null');
+    if(saved) return Object.assign(base, saved);
+  } catch(e){}
+  return base;
+}
+
+function saveSettings(){
+  try { sessionStorage.setItem('sr-settings', JSON.stringify(SETTINGS)); } catch(e){}
+}
+
+/* Default the age split to just under half the cohort until someone sets it,
+   and never let it exceed the number of apprentices actually on programme. */
+function youngCount(){
+  const heads = cohortHeads();
+  if(SETTINGS.young == null) return Math.round(heads * 0.45);
+  return Math.min(SETTINGS.young, heads);
+}
 
 function loadCohort(){
   try {
@@ -769,7 +803,14 @@ function levyView(){
       '<p>The levy is 0.5% of your annual pay bill, less a £15,000 allowance, and is only due above £3m.</p></div>' +
       '<div class="levyform">' +
         '<div class="field"><label for="payroll">Annual pay bill</label>' +
-        '<input type="text" id="payroll" inputmode="numeric" value="' + MEMBER.payroll.toLocaleString('en-GB') + '"></div>' +
+        '<input type="text" id="payroll" inputmode="numeric" value="' + SETTINGS.payroll.toLocaleString('en-GB') + '"></div>' +
+        '<div class="field"><label>Do you pay the levy?</label>' +
+          '<div class="opts" id="levytoggle">' +
+            '<label class="opt' + (SETTINGS.levyPayer ? ' sel' : '') + '"><input type="radio" name="lp" value="yes"' +
+              (SETTINGS.levyPayer ? ' checked' : '') + '> Yes</label>' +
+            '<label class="opt' + (!SETTINGS.levyPayer ? ' sel' : '') + '"><input type="radio" name="lp" value="no"' +
+              (!SETTINGS.levyPayer ? ' checked' : '') + '> No</label>' +
+          '</div></div>' +
       '</div>' +
       '<div id="fundsin"></div>' +
     '</section>' +
@@ -798,7 +839,7 @@ function levyView(){
       '<div class="sliderbox">' +
         '<label for="young">Apprentices aged 16 to 24</label>' +
         '<div class="sliderrow">' +
-          '<input type="range" id="young" min="0" max="' + heads + '" value="' + Math.min(YOUNG, heads) + '">' +
+          '<input type="range" id="young" min="0" max="' + heads + '" value="' + youngCount() + '">' +
           '<output id="youngout"></output>' +
         '</div>' +
         '<div class="sliderends"><span>0</span><span id="youngmax"></span></div>' +
@@ -836,10 +877,14 @@ function renderLevy(){
   const slider = document.getElementById('young');
   slider.max = heads;
   if(+slider.value > heads) slider.value = heads;
-  YOUNG = +slider.value;
+
+  SETTINGS.payroll = payroll;
+  SETTINGS.young = +slider.value;
+  saveSettings();
+
   document.getElementById('youngmax').textContent = heads ? heads + ' (all of them)' : '0';
 
-  const f = levyFigures(payroll, COHORT, YOUNG, MEMBER.levyPayer);
+  const f = levyFigures(SETTINGS.payroll, COHORT, SETTINGS.young, SETTINGS.levyPayer);
 
   document.getElementById('youngout').textContent =
     f.young + ' of ' + heads + (heads ? '  ·  ' + Math.round(f.pctYoung * 100) + '%' : '');
@@ -930,6 +975,15 @@ function renderLevy(){
 function wireLevy(){
   document.getElementById('payroll').addEventListener('input', renderLevy);
   document.getElementById('young').addEventListener('input', renderLevy);
+
+  document.querySelectorAll('#levytoggle input').forEach(r =>
+    r.addEventListener('change', () => {
+      SETTINGS.levyPayer = r.value === 'yes';
+      saveSettings();
+      document.querySelectorAll('#levytoggle .opt').forEach(o =>
+        o.classList.toggle('sel', o.querySelector('input').checked));
+      renderLevy();
+    }));
 
   document.querySelectorAll('#cohortrows .cnt').forEach(inp => {
     inp.addEventListener('input', () => {
@@ -1140,7 +1194,7 @@ function wireDas(root){
    ========================================================================= */
 
 function reportView(){
-  const f = levyFigures(MEMBER.payroll, COHORT, YOUNG, MEMBER.levyPayer);
+  const f = levyFigures(SETTINGS.payroll, COHORT, youngCount(), SETTINGS.levyPayer);
   const attention = attentionItems();
   const soon = comingUp(90);
   const outstanding = openEvents().filter(e => { const d = -daysAgo(e.date); return d <= 90; })
@@ -1164,7 +1218,8 @@ function reportView(){
 
       '<header class="rephead">' +
         '<div><h1>Apprenticeship programme report</h1>' +
-        '<p class="repmeta">' + MEMBER.org + ' &middot; ' + today + '</p></div>' +
+        '<p class="repmeta">' + MEMBER.org + ' &middot; ' + today +
+        ' &middot; ' + (SETTINGS.levyPayer ? 'levy payer' : 'non-levy employer') + '</p></div>' +
         '<div class="repbrand">Skills <em>Radar</em><small>skillsradar.co.uk</small></div>' +
       '</header>' +
 
@@ -1183,7 +1238,7 @@ function reportView(){
       '<section class="repsec">' +
         '<h2>Funding position</h2>' +
         '<table class="reptable"><tbody>' +
-          '<tr><td>Annual pay bill</td><td class="r">' + money(MEMBER.payroll) + '</td></tr>' +
+          '<tr><td>Annual pay bill</td><td class="r">' + money(SETTINGS.payroll) + '</td></tr>' +
           '<tr><td>Levy funds available this year</td><td class="r">' + money(Math.round(f.available)) + '</td></tr>' +
           '<tr><td>Drawn down against current cohort</td><td class="r">' + money(Math.round(f.annualDraw)) + '</td></tr>' +
           (f.shortfall > 0

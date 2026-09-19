@@ -2151,3 +2151,101 @@ table.otj input.otjin.small{
   font-size:11px; color:var(--text-2); background:var(--paper);
   border:1px solid var(--line); padding:1.5px 7px;
 }
+
+/* =========================================================================
+   SECTION HEADERS — dark treatment
+
+   The lead column header on the feed reads better than the hairline rules
+   used everywhere else, so the same treatment is applied to every section
+   header on the site: solid ink ground, white type, count badge on the
+   right where there is one.
+   ========================================================================= */
+
+.grouphead{
+  background:var(--ink);
+  margin:34px 0 0;
+  padding:13px 18px;
+  gap:14px;
+  border:none;
+}
+.grouphead h2{
+  color:#FFFFFF; font-size:14.5px; font-weight:600;
+  letter-spacing:-0.005em; white-space:nowrap;
+}
+.grouphead .rule{
+  background:var(--ink-3); height:1px; opacity:0.85;
+}
+.grouphead .linkbtn{
+  color:#9DB0AD; margin-left:0; flex:none;
+}
+.grouphead .linkbtn:hover{ color:#FFFFFF; }
+
+/* the thing directly under a header should sit flush against it */
+.grouphead + table.std,
+.grouphead + .todolist,
+.grouphead + .soonlist,
+.grouphead + .readgrid,
+.grouphead + .eventlist,
+.grouphead + div > table.std{ margin-top:0 !important; }
+
+/* ---------- Section headers inside the calculator and report ---------- */
+
+.lhead h2{
+  background:var(--ink); color:#fff;
+  display:inline-block; padding:8px 15px;
+  font-size:15px; letter-spacing:-0.005em; margin:0 0 10px;
+}
+.lsection.costs .lhead h2{ font-size:17px; padding:10px 18px; }
+.lsection.costs .lhead{ border-bottom:none; padding-bottom:0; }
+
+.csub{
+  background:var(--ink-2); color:#fff;
+  display:inline-block; padding:6px 13px;
+  font-size:12.5px; margin:26px 0 11px;
+}
+
+/* ---------- Route and standards blocks ---------- */
+
+.routeblock > h2{
+  background:var(--ink); color:#fff;
+  padding:12px 18px; margin:0;
+  font-size:16px; letter-spacing:-0.01em;
+}
+.routeblock .sub{
+  background:var(--ink-2); color:#9DB0AD;
+  margin:0; padding:8px 18px; font-size:12px;
+}
+.routeblock table.std{ border-top:none; }
+.routeblock.common > h2::after{
+  background:#6ED0B6; color:var(--ink);
+}
+
+/* ---------- Column headers on the board ---------- */
+
+.colhead{ background:var(--ink); border-bottom-color:var(--ink); }
+.colhead h2{ color:#FFFFFF; }
+.colhead h2 em{ background:transparent; border-color:var(--ink-3); color:#9DB0AD; }
+.colhead p{ color:#8FA4A1; }
+.band:not(.lead) .colhead{ background:var(--ink-2); border-bottom-color:var(--ink-2); }
+
+/* ---------- Report keeps its quieter treatment in print ---------- */
+
+.repsec h2{
+  background:var(--ink); color:#fff; display:inline-block;
+  padding:7px 14px; border-bottom:none; letter-spacing:0.04em;
+}
+
+@media print{
+  .repsec h2{
+    background:#000; color:#fff;
+    -webkit-print-color-adjust:exact; print-color-adjust:exact;
+    padding:5pt 9pt;
+  }
+}
+
+@media (max-width:600px){
+  .grouphead{ padding:11px 14px; flex-wrap:wrap; }
+  .grouphead h2{ white-space:normal; }
+  .routeblock > h2{ padding:11px 14px; font-size:15px; }
+  .routeblock .sub{ padding:8px 14px; }
+}
