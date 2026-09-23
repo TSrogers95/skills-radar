@@ -440,6 +440,17 @@ function scoreMatch(query, fields){
     else if(words.some(w => o.includes(w))) score += 70;
   });
 
+  // a typical job title from the occupational maps. Someone searching
+  // "welder" should find the standard whose occupation lists that title,
+  // ranked below a standard actually called Welder.
+  (fields.jobTitles || []).forEach(t => {
+    const j = String(t).toLowerCase();
+    if(j === q) score += 450;
+    else if(j.startsWith(q)) score += 280;
+    else if(j.includes(q)) score += 180;
+    else if(words.some(w => new RegExp('\\b' + escapeRe(w)).test(j))) score += 60;
+  });
+
   // route, status and description are weak signals, not strong ones
   words.forEach(w => { if(extra.includes(w)) score += 8; });
 
@@ -1014,4 +1025,220 @@ function articleLinkLabel(item){
   if(id === 'no-epa')     return 'Why this matters';
   if(id === 'funding-bands') return 'About band changes';
   return 'Read the analysis';
+}
+
+/* =========================================================================
+   OCCUPATIONAL MAPS ENRICHMENT
+
+   occupations.js is written by the scheduled sync. It may not be there —
+   the site works without it, search is just less good. Everything below
+   degrades quietly rather than failing.
+   ========================================================================= */
+
+function haveOccupations(){
+  return typeof OCCUPATIONS !== 'undefined' && OCCUPATIONS && Object.keys(OCCUPATIONS).length > 0;
+}
+
+/* Match a standard to its occupation. The register and the maps use
+   different identifiers, so this goes on name within route. */
+let _occIndex = null;
+
+function occIndex(){
+  if(_occIndex) return _occIndex;
+  _occIndex = {};
+  if(!haveOccupations()) return _occIndex;
+  const norm = s => String(s).toLowerCase().replace(/[^a-z0-9]/g, '');
+  for(const code in OCCUPATIONS){
+    const o = OCCUPATIONS[code];
+    _occIndex[norm(o.name)] = o;
+  }
+  return _occIndex;
+}
+
+function occupationFor(standard){
+  if(!standard || !haveOccupations()) return null;
+  const norm = s => String(s).toLowerCase().replace(/[^a-z0-9]/g, '');
+  const idx = occIndex();
+  const n = norm(standard.name);
+
+  if(idx[n]) return idx[n];
+
+  // register names carry qualifiers the maps do not, e.g. "(integrated degree)"
+  const stripped = norm(standard.name.replace(/\s*\([^)]*\)\s*/g, ''));
+  if(idx[stripped]) return idx[stripped];
+
+  return null;
+}
+
+/* Everything extra worth searching on: pathway, cluster, job titles,
+   keywords and the technical education on the same occupation. */
+function occupationSearchText(standard){
+  const o = occupationFor(standard);
+  if(!o) return '';
+  return [
+    o.pathway || '', o.cluster || '',
+    (o.jobTitles || []).join(' '),
+    (o.keywords || []).join(' '),
+    (o.products || []).map(p => p.name).join(' ')
+  ].join(' ');
+}
+
+/* Pathways for display: the real ones from the maps if we have them,
+   otherwise whatever the register import picked up. */
+function pathwaysFor(standard){
+  const o = occupationFor(standard);
+  if(o && o.pathway) return [o.pathway].concat(o.cluster && o.cluster !== o.pathway ? [o.cluster] : []);
+  return standard.options || [];
+}
+
+function jobTitlesFor(standard){
+  const o = occupationFor(standard);
+  return (o && o.jobTitles) || [];
+}
+
+/* =========================================================================
+   LEVY FORECASTING
+
+   Built around the gaps the DfE research session identified in their own
+   prototype:
+
+     - Their "levy in" figure is based on what was paid in the 12 months
+       prior. The session flagged that as a weak forecast. This uses an
+       average monthly contribution the employer sets, so it reflects what
+       is actually going in rather than what went in last year.
+     - An alert when co-investment is approaching, stating the month it
+       starts — their prototype has this and it is the most useful thing
+       in it.
+     - Summary graphs of the levy trend — on their nice-to-have list.
+     - The ability to add forecast learners and see the effect on balance,
+       committed spend and expiry — also on their list, and the reason this
+       exists at all.
+
+   Everything here works from figures the employer enters. Nothing is
+   inferred from national averages, because a forecast built on someone
+   else's numbers is worse than no forecast.
+   ========================================================================= */
+
+/* Funds expire 12 months after they enter the account. The forecast tracks
+   each month's contribution separately so expiry can be shown month by
+   month rather than as a single balance. */
+
+function forecastLevy(opts){
+  const months      = opts.months || 24;
+  const monthlyIn   = opts.monthlyIn || 0;        // average contribution, employer's own figure
+  const opening     = opts.opening || 0;          // balance in the account today
+  const openingAge  = opts.openingAge || {};      // optional: month index -> amount expiring
+  const cohorts     = opts.cohorts || [];         // live and forecast learners
+  const levyPayer   = opts.levyPayer !== false;
+  const expiry      = LEVY_MODEL.expiryMonths || 12;
+
+  const start = opts.start ? new Date(opts.start) : new Date();
+  start.setDate(1);
+
+  // Money going in, tracked by the month it arrived so it can expire
+  const pots = [];
+  if(opening > 0){
+    // Spread the opening balance across the expiry window unless told
+    // otherwise, since funds already in the account are part-aged
+    const perMonth = opening / expiry;
+    for(let i = -expiry + 1; i <= 0; i++){
+      pots.push({ month: i, amount: openingAge[i] != null ? openingAge[i] : perMonth, spent: 0 });
+    }
+  }
+
+  const rows = [];
+  let expiredTotal = 0, coInvestTotal = 0, govTotal = 0;
+  let coInvestFrom = null;
+
+  for(let m = 0; m < months; m++){
+    const when = new Date(start.getFullYear(), start.getMonth() + m, 1);
+
+    if(monthlyIn > 0) pots.push({ month: m, amount: monthlyIn, spent: 0 });
+
+    // What this month's cohorts draw down
+    let draw = 0, drawUnder25 = 0;
+    cohorts.forEach(c => {
+      const begin = c.startMonth || 0;
+      const dur   = c.months || 12;
+      if(m < begin || m >= begin + dur) return;
+      const perMonth = (c.funding * c.count) / dur;
+      draw += perMonth;
+      if(c.under25) drawUnder25 += perMonth;
+    });
+
+    // Spend the oldest money first, which is what the account does
+    let need = draw, fromLevy = 0;
+    pots.sort((a, b) => a.month - b.month);
+    for(const p of pots){
+      if(need <= 0) break;
+      const available = p.amount - p.spent;
+      if(available <= 0) continue;
+      const take = Math.min(available, need);
+      p.spent += take; need -= take; fromLevy += take;
+    }
+
+    // Anything left is co-invested, at the rate for the apprentice's age
+    const shortfall = need;
+    let youPay = 0;
+    if(shortfall > 0){
+      const shareUnder = draw > 0 ? drawUnder25 / draw : 0;
+      const rates = levyPayer ? LEVY_MODEL.levyExhausted : LEVY_MODEL.nonLevy;
+      youPay = (shortfall * shareUnder * rates.under25) + (shortfall * (1 - shareUnder) * rates.over25);
+      if(coInvestFrom === null) coInvestFrom = { index: m, date: new Date(when) };
+    }
+    coInvestTotal += youPay;
+    govTotal += shortfall - youPay;
+
+    // Funds that reach their expiry month unspent are lost
+    let expiredThisMonth = 0;
+    pots.forEach(p => {
+      if(p.month + expiry === m + 1){
+        const left = p.amount - p.spent;
+        if(left > 0){ expiredThisMonth += left; p.spent = p.amount; }
+      }
+    });
+    expiredTotal += expiredThisMonth;
+
+    const balance = pots.reduce((t, p) => t + (p.amount - p.spent), 0);
+
+    rows.push({
+      index: m,
+      date: when,
+      label: when.toLocaleDateString('en-GB', { month: 'short', year: '2-digit' }),
+      in: monthlyIn,
+      draw: draw,
+      fromLevy: fromLevy,
+      shortfall: shortfall,
+      youPay: youPay,
+      expired: expiredThisMonth,
+      balance: balance
+    });
+  }
+
+  return {
+    rows: rows,
+    coInvestFrom: coInvestFrom,
+    coInvestTotal: coInvestTotal,
+    govTotal: govTotal,
+    expiredTotal: expiredTotal,
+    totalIn: monthlyIn * months + opening,
+    totalDraw: rows.reduce((t, r) => t + r.draw, 0),
+    closing: rows.length ? rows[rows.length - 1].balance : opening,
+    peak: rows.reduce((mx, r) => Math.max(mx, r.balance), 0)
+  };
+}
+
+/* A cohort the employer has not started yet — "what if we put twelve people
+   on Business Administrator in January". */
+function forecastCohort(standard, count, startMonth, under25){
+  return {
+    name: standard.name,
+    level: standard.level,
+    funding: standard.funding,
+    months: standard.months || 12,
+    count: count,
+    startMonth: startMonth,
+    under25: !!under25,
+    hypothetical: true
+  };
 }

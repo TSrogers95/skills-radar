@@ -105,6 +105,7 @@
         <span class="tabsep" aria-hidden="true"></span>
         <button data-view="otj">Off-the-job</button>
         <button data-view="levy">Levy</button>
+        <button data-view="forecast">Forecast</button>
         <span class="tabsep" aria-hidden="true"></span>
         <button data-view="report">Report</button>
         <button data-view="prefs">Newsletter</button>
@@ -123,6 +124,7 @@
   <div class="wrap">
     <p>Levy figures are estimates built from the rates in the current funding rules and the numbers you enter. They are a planning aid, not a statement of your account. Check your Apprenticeship Service account and the funding rules before making a financial decision. Incentives and grants change frequently — every one links to its source.</p>
   </div>
+    <div class="wrap"><div class="attribution"><a href="https://www.gov.uk/government/organisations/skills-england" target="_blank" rel="noopener" class="selogo"><img src="https://occupational-maps.skillsengland.education.gov.uk/media/cyropis5/skills-england_lesser_arms_landscape-se-logo-white.svg" alt="Skills England" width="150" height="40" loading="lazy"></a><p>Contains data from Skills England. &copy; Skills England 2026. This information is licensed under the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3" target="_blank" rel="noopener">Open Government Licence v3.0</a>. Funding rules content is Crown copyright, also under the Open Government Licence.</p></div></div>
 </footer>
 
 <script src="standards.js"></script>
@@ -718,8 +720,9 @@ function wirePicker(id, onAdd){
       .filter(s => !COHORT.some(c => c.name === s.name))
       .map(s => {
         let score = scoreMatch(q, {
-          name: s.name, code: s.code, options: s.options || [],
-          extra: s.status + ' ' + routeText(s.route)
+          name: s.name, code: s.code,
+          options: pathwaysFor(s), jobTitles: jobTitlesFor(s),
+          extra: s.status + ' ' + routeText(s.route) + ' ' + occupationSearchText(s)
         });
         if(routeKey && s.route === routeKey) score += 20;
         return { s: s, score: score };
@@ -743,7 +746,7 @@ function wirePicker(id, onAdd){
         '<span>' + (s.code || 'code to confirm') + ' · ' + money(s.funding) +
           (s.months ? ' · ' + s.months + ' months' : ' · unit') +
           (route ? ' · ' + route : '') +
-          (s.options && s.options.length ? ' · ' + s.options.length + ' pathways' : '') + '</span>' +
+          (pathwaysFor(s).length ? ' · ' + pathwaysFor(s)[0] : '') + '</span>' +
         (gone ? '<em class="warn">Losing funding September 2026</em>' : '') +
       '</button>';
     }).join('');
@@ -1384,6 +1387,306 @@ function wireOtj(panel){
   });
 }
 
+/* =========================================================================
+   FORECAST VIEW
+   ========================================================================= */
+
+let PLANNED = [];
+try { PLANNED = JSON.parse(sessionStorage.getItem('sr-planned') || '[]'); } catch(e){ PLANNED = []; }
+function savePlanned(){ try { sessionStorage.setItem('sr-planned', JSON.stringify(PLANNED)); } catch(e){} }
+
+function forecastInputs(){
+  const s = SETTINGS;
+  return {
+    monthlyIn: s.monthlyIn != null ? s.monthlyIn
+      : Math.round(Math.max(0, (s.payroll * LEVY_MODEL.rate - LEVY_MODEL.allowance)) / 12),
+    opening: s.opening != null ? s.opening : 0,
+    horizon: s.horizon || 24
+  };
+}
+
+function liveCohorts(){
+  return COHORT.filter(c => c.count > 0).map(c => {
+    const reg = findStandard(c);
+    return {
+      name: c.name, level: c.level,
+      funding: (reg && reg.funding) || c.funding,
+      months: (reg && reg.months) || c.months || 12,
+      count: c.count,
+      // assume they are part way through, spread across the programme
+      startMonth: -Math.round(((reg && reg.months) || c.months || 12) / 2),
+      under25: false
+    };
+  });
+}
+
+function allCohorts(){
+  const live = liveCohorts();
+  const youngShare = cohortHeads() ? youngCount() / cohortHeads() : 0;
+  live.forEach(c => { c.under25 = youngShare >= 0.5; });
+  return live.concat(PLANNED);
+}
+
+function runForecast(){
+  const i = forecastInputs();
+  return forecastLevy({
+    months: i.horizon,
+    monthlyIn: i.monthlyIn,
+    opening: i.opening,
+    cohorts: allCohorts(),
+    levyPayer: SETTINGS.levyPayer
+  });
+}
+
+function forecastView(){
+  const i = forecastInputs();
+  const f = runForecast();
+
+  const plannedRows = PLANNED.length
+    ? PLANNED.map((p, n) =>
+        '<tr><td class="nm">L' + p.level + ' ' + p.name +
+          '<small>' + p.months + ' months &middot; ' + money(p.funding) + ' band</small></td>' +
+          '<td class="num">' + p.count + '</td>' +
+          '<td class="num">' + monthName(p.startMonth) + '</td>' +
+          '<td class="num">' + (p.under25 ? 'Under 25' : '25 and over') + '</td>' +
+          '<td class="num">' + money(p.funding * p.count) + '</td>' +
+          '<td class="num"><button class="rm" data-plan="' + n + '" aria-label="Remove">&times;</button></td></tr>').join('')
+    : '<tr><td colspan="6" class="cohortempty">Nothing planned yet. Add a cohort below to see what it does to the forecast.</td></tr>';
+
+  return '<div class="pagehead"><h1>Levy forecast</h1>' +
+    '<p>Month by month, from figures you enter. Add cohorts you are thinking about and watch what happens to the balance, ' +
+    'the point co-investment starts, and how much expires unused.</p></div>' +
+
+    '<section class="lsection">' +
+      '<div class="lhead"><h2>1. What goes in</h2>' +
+      '<p>Use your average monthly contribution rather than last year\'s total. The DfE prototype forecasts from what was ' +
+      'paid in the previous twelve months, which is why it drifts when a pay bill changes.</p></div>' +
+      '<div class="levyform">' +
+        '<div class="field"><label for="f-in">Average monthly levy contribution</label>' +
+        '<input type="text" id="f-in" inputmode="numeric" value="' + i.monthlyIn.toLocaleString('en-GB') + '"></div>' +
+        '<div class="field"><label for="f-open">Balance in your account today</label>' +
+        '<input type="text" id="f-open" inputmode="numeric" value="' + i.opening.toLocaleString('en-GB') + '"></div>' +
+        '<div class="field"><label for="f-hz">Forecast period</label>' +
+        '<select id="f-hz">' +
+          [12,18,24,36].map(n => '<option value="' + n + '"' + (i.horizon === n ? ' selected' : '') + '>' + n + ' months</option>').join('') +
+        '</select></div>' +
+      '</div>' +
+      '<p class="hint" style="max-width:66ch">Both come from your Apprenticeship Service account. The forecast is only as good as these two numbers.</p>' +
+    '</section>' +
+
+    '<section class="lsection">' +
+      '<div class="lhead"><h2>2. Cohorts you are considering</h2>' +
+      '<p>Hypothetical learners. They are not saved to your account and do not appear anywhere else on the site.</p></div>' +
+      '<table class="std"><thead><tr>' +
+        '<th>Standard</th><th>How many</th><th>Starting</th><th>Age group</th><th>Commitment</th><th></th>' +
+      '</tr></thead><tbody>' + plannedRows + '</tbody></table>' +
+
+      '<div class="planadd">' +
+        pickerHTML('planpick') +
+        '<div class="planfields">' +
+          '<div class="field"><label for="p-count">How many</label><input type="number" id="p-count" min="1" value="10"></div>' +
+          '<div class="field"><label for="p-start">Starting in</label>' +
+            '<select id="p-start">' + [0,1,2,3,4,5,6,9,12,18].map(n =>
+              '<option value="' + n + '">' + monthName(n) + '</option>').join('') + '</select></div>' +
+          '<div class="field"><label for="p-age">Age group</label>' +
+            '<select id="p-age"><option value="1">16 to 24</option><option value="0">25 and over</option></select></div>' +
+        '</div>' +
+      '</div>' +
+      '<p class="hint">Search for the standard above, then set the numbers. It is added as soon as you pick one.</p>' +
+    '</section>' +
+
+    '<section class="lsection costs">' +
+      '<div class="lhead"><h2>What happens</h2><p>Over ' + i.horizon + ' months, on these figures.</p></div>' +
+      '<div id="fcout"></div>' +
+    '</section>';
+}
+
+function monthName(offset){
+  const d = new Date();
+  d.setDate(1);
+  d.setMonth(d.getMonth() + offset);
+  return d.toLocaleDateString('en-GB', { month: 'short', year: '2-digit' });
+}
+
+function renderForecast(){
+  const f = runForecast();
+  const i = forecastInputs();
+  const el = document.getElementById('fcout');
+  if(!el) return;
+
+  const alert = f.coInvestFrom
+    ? '<div class="alert"><b>Co-investment starts in ' +
+        f.coInvestFrom.date.toLocaleDateString('en-GB', { month:'long', year:'numeric' }) + '.</b> ' +
+        'From that month your levy balance no longer covers what you are drawing down, and you begin paying ' +
+        'a share directly. Over the ' + i.horizon + '-month window that comes to <b>' + money(Math.round(f.coInvestTotal)) +
+        '</b>, with government covering ' + money(Math.round(f.govTotal)) + '.</div>'
+    : '<div class="okbox"><b>No co-investment in this window.</b> Your levy covers everything you have committed to over the next ' +
+      i.horizon + ' months.</div>';
+
+  const expiry = f.expiredTotal > 0
+    ? '<div class="alert"><b>' + money(Math.round(f.expiredTotal)) + ' expires unused.</b> ' +
+      'Funds now expire twelve months after they enter your account. That is money lost, not carried forward. ' +
+      'Apprenticeship units, foundation apprenticeships and transfers are all ways to commit it first.</div>'
+    : '';
+
+  el.innerHTML =
+    '<div class="mgrid">' +
+      '<div class="mcard"><div class="n">' + money(Math.round(f.totalIn)) + '</div><div class="l">Levy in</div></div>' +
+      '<div class="mcard warm"><div class="n">' + money(Math.round(f.totalDraw)) + '</div><div class="l">Drawn down</div></div>' +
+      '<div class="mcard ' + (f.coInvestTotal > 0 ? 'bad' : 'cool') + '"><div class="n">' +
+        money(Math.round(f.coInvestTotal)) + '</div><div class="l">You pay</div></div>' +
+      '<div class="mcard ' + (f.expiredTotal > 0 ? 'bad' : 'cool') + '"><div class="n">' +
+        money(Math.round(f.expiredTotal)) + '</div><div class="l">Expires unused</div></div>' +
+    '</div>' +
+
+    alert + expiry +
+
+    '<h3 class="csub">Balance over time</h3>' +
+    chartHTML(f) +
+
+    '<h3 class="csub">Month by month</h3>' +
+    '<div style="max-height:400px;overflow-y:auto;border:1px solid var(--line)">' +
+    '<table class="std fctable"><thead><tr>' +
+      '<th>Month</th><th class="r">In</th><th class="r">Drawn</th><th class="r">From levy</th>' +
+      '<th class="r">You pay</th><th class="r">Expired</th><th class="r">Balance</th>' +
+    '</tr></thead><tbody>' +
+    f.rows.map(r => '<tr' + (r.youPay > 0 ? ' class="hascost"' : '') + '>' +
+      '<td class="nm">' + r.label + '</td>' +
+      '<td class="num">' + money(Math.round(r.in)) + '</td>' +
+      '<td class="num">' + money(Math.round(r.draw)) + '</td>' +
+      '<td class="num">' + money(Math.round(r.fromLevy)) + '</td>' +
+      '<td class="num' + (r.youPay > 0 ? ' neg' : '') + '">' + (r.youPay > 0 ? money(Math.round(r.youPay)) : '—') + '</td>' +
+      '<td class="num' + (r.expired > 0 ? ' neg' : '') + '">' + (r.expired > 0 ? money(Math.round(r.expired)) : '—') + '</td>' +
+      '<td class="num"><b>' + money(Math.round(r.balance)) + '</b></td></tr>').join('') +
+    '</tbody></table></div>' +
+
+    '<div class="addrow" style="margin-top:18px">' +
+      '<button class="btn" id="fcdl">Download estimates (CSV)</button>' +
+    '</div>' +
+
+    '<div class="notice" style="margin-top:18px"><b>How this is worked out.</b> ' +
+    'Money is spent oldest first, which is how the account behaves, so funds are used before they expire where possible. ' +
+    'Each cohort draws its funding band spread evenly across its duration. Existing cohorts are assumed to be roughly ' +
+    'half way through, since the site does not hold start dates — connecting your Apprenticeship Service account would fix that. ' +
+    'Co-investment is applied at the rate for the apprentice\'s age under the 2026/27 rules. ' +
+    'Treat it as a planning estimate against your own figures, not a statement of account.</div>';
+
+  const dl = document.getElementById('fcdl');
+  if(dl) dl.addEventListener('click', () => downloadForecast(f));
+}
+
+/* A plain SVG line chart. No library, so nothing to load and nothing to break. */
+function chartHTML(f){
+  const rows = f.rows;
+  if(!rows.length) return '';
+
+  const w = 900, h = 220, padL = 70, padR = 20, padT = 16, padB = 34;
+  const max = Math.max(1, f.peak, Math.max.apply(null, rows.map(r => r.draw)));
+  const x = i => padL + (i / Math.max(1, rows.length - 1)) * (w - padL - padR);
+  const y = v => padT + (1 - v / max) * (h - padT - padB);
+
+  const line = key => rows.map((r, i) => (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(r[key]).toFixed(1)).join(' ');
+  const area = 'M' + x(0).toFixed(1) + ' ' + (h - padB) + ' ' +
+    rows.map((r, i) => 'L' + x(i).toFixed(1) + ' ' + y(r.balance).toFixed(1)).join(' ') +
+    ' L' + x(rows.length - 1).toFixed(1) + ' ' + (h - padB) + ' Z';
+
+  const ticks = [0, 0.25, 0.5, 0.75, 1].map(p => {
+    const v = max * p;
+    return '<line x1="' + padL + '" y1="' + y(v).toFixed(1) + '" x2="' + (w - padR) + '" y2="' + y(v).toFixed(1) +
+      '" stroke="#E4E0D6" stroke-width="1"/>' +
+      '<text x="' + (padL - 8) + '" y="' + (y(v) + 4).toFixed(1) + '" text-anchor="end" font-size="10" fill="#8A9698">' +
+      money(Math.round(v)) + '</text>';
+  }).join('');
+
+  const labels = rows.map((r, i) =>
+    (i % Math.ceil(rows.length / 8) === 0 || i === rows.length - 1)
+      ? '<text x="' + x(i).toFixed(1) + '" y="' + (h - 10) + '" text-anchor="middle" font-size="10" fill="#8A9698">' + r.label + '</text>'
+      : '').join('');
+
+  const marker = f.coInvestFrom
+    ? '<line x1="' + x(f.coInvestFrom.index).toFixed(1) + '" y1="' + padT + '" x2="' + x(f.coInvestFrom.index).toFixed(1) +
+      '" y2="' + (h - padB) + '" stroke="#B3261E" stroke-width="1.5" stroke-dasharray="4 3"/>' +
+      '<text x="' + (x(f.coInvestFrom.index) + 6).toFixed(1) + '" y="' + (padT + 12) +
+      '" font-size="10.5" fill="#B3261E" font-weight="600">co-investment starts</text>'
+    : '';
+
+  return '<div class="chartwrap"><svg viewBox="0 0 ' + w + ' ' + h + '" role="img" ' +
+    'aria-label="Levy balance and monthly drawdown over the forecast period">' +
+    ticks +
+    '<path d="' + area + '" fill="#E4F1EE"/>' +
+    '<path d="' + line('balance') + '" fill="none" stroke="#10796A" stroke-width="2.2"/>' +
+    '<path d="' + line('draw') + '" fill="none" stroke="#A96A06" stroke-width="1.8" stroke-dasharray="5 3"/>' +
+    marker + labels +
+  '</svg>' +
+  '<div class="chartkey">' +
+    '<span><i style="background:#10796A"></i> Levy balance</span>' +
+    '<span><i style="background:#A96A06"></i> Monthly drawdown</span>' +
+    (f.coInvestFrom ? '<span><i style="background:#B3261E"></i> Co-investment begins</span>' : '') +
+  '</div></div>';
+}
+
+function downloadForecast(f){
+  const head = ['Month','Levy in','Drawn down','Paid from levy','You pay','Expired unused','Closing balance'];
+  const lines = [head.join(',')].concat(f.rows.map(r =>
+    [r.label, Math.round(r.in), Math.round(r.draw), Math.round(r.fromLevy),
+     Math.round(r.youPay), Math.round(r.expired), Math.round(r.balance)].join(',')));
+  lines.push('');
+  lines.push('Totals,' + Math.round(f.totalIn) + ',' + Math.round(f.totalDraw) + ',,' +
+             Math.round(f.coInvestTotal) + ',' + Math.round(f.expiredTotal) + ',' + Math.round(f.closing));
+  lines.push('');
+  lines.push('"Estimate only. Figures entered by the employer. Co-investment applied at 2026/27 rates."');
+
+  const blob = new Blob([lines.join('\n')], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'levy-forecast-' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function wireForecast(panel){
+  ['f-in','f-open'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.addEventListener('input', () => {
+      const v = parseFloat((el.value || '0').replace(/[^\d.]/g,'')) || 0;
+      if(id === 'f-in') SETTINGS.monthlyIn = v; else SETTINGS.opening = v;
+      saveSettings();
+      renderForecast();
+    });
+  });
+
+  const hz = document.getElementById('f-hz');
+  if(hz) hz.addEventListener('change', () => {
+    SETTINGS.horizon = +hz.value; saveSettings(); render();
+  });
+
+  wirePicker('planpick', function(){});
+  const input = document.getElementById('planpick-q');
+  const res = document.getElementById('planpick-res');
+  if(res){
+    // intercept the picker so a pick becomes a planned cohort rather than
+    // joining the member's actual standards
+    res.addEventListener('click', e => {
+      const btn = e.target.closest('.pickeritem');
+      if(!btn) return;
+      e.stopPropagation();
+      const s = STANDARDS.find(x => x.name === btn.dataset.name);
+      if(!s) return;
+      PLANNED.push(forecastCohort(s,
+        Math.max(1, parseInt(document.getElementById('p-count').value, 10) || 1),
+        +document.getElementById('p-start').value,
+        document.getElementById('p-age').value === '1'));
+      savePlanned();
+      if(input) input.value = '';
+      res.innerHTML = ''; res.classList.remove('on');
+      render();
+    }, true);
+  }
+
+  panel.querySelectorAll('[data-plan]').forEach(b =>
+    b.addEventListener('click', () => { PLANNED.splice(+b.dataset.plan, 1); savePlanned(); render(); }));
+}
+
 function prefsView(){
   return '<div class="pagehead"><h1>Newsletter preferences</h1>' +
     '<p>What lands in your inbox, and how often. Changes here also reorder your feed and calendar.</p></div>' +
@@ -1608,6 +1911,12 @@ function render(){
   if(view === 'otj'){
     panel.innerHTML = otjView();
     wireOtj(panel);
+  }
+
+  if(view === 'forecast'){
+    panel.innerHTML = forecastView();
+    renderForecast();
+    wireForecast(panel);
   }
 
   if(view === 'levy'){
