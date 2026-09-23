@@ -179,7 +179,7 @@ function routeList(a){
     '<p>Kept current from the register, so it reflects today rather than when this was written.</p>' +
     '<div class="onroutelist">' + a.onRoute.map(s =>
       '<div class="orrow"><div><b>L' + s.level + ' ' + s.name + '</b><span>' + s.changed + '</span></div>' +
-      (s.article ? '<a href="article.html?id=' + s.article + '">Open</a>' : '<span class="ornone">no separate page</span>') +
+      (s.article ? '<a href="a/' + s.article + '.html">Open</a>' : '<span class="ornone">no separate page</span>') +
       '</div>').join('') + '</div>' +
   '</section>';
 }
@@ -209,7 +209,7 @@ function related(a){
   return '<section class="relwrap">' +
     '<div class="grouphead"><h2>Read next</h2><div class="rule"></div></div>' +
     '<div class="relgrid">' + scored.map(r =>
-      '<a class="relcard" href="article.html?id=' + r.x.id + '">' +
+      '<a class="relcard" href="a/' + r.x.id + '.html">' +
         iconHTML(r.x.icon) +
         '<div><b>' + r.x.title + '</b><span>' + r.x.summary + '</span>' +
         '<em>' + r.x.tag + (r.x.compiled ? ' · compiled' : '') + '</em></div>' +

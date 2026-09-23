@@ -398,7 +398,7 @@ function attentionItems(){
       out.push({ level:'stop', title:'L' + c.level + ' ' + c.name + ' loses funding on 1 September 2026',
         detail: heads + ' apprentice' + (heads === 1 ? '' : 's') + ' on programme stay funded to completion, but you cannot start anyone new. ' +
           'Contracting takes six to eight weeks, so the practical deadline is earlier than the formal one.',
-        action:'Read what this means', href:'article.html?id=std-' + (reg.code || reg.name.toLowerCase().replace(/[^a-z0-9]+/g,'-')) });
+        action:'Read what this means', href:'a/std-.html' + (reg.code || reg.name.toLowerCase().replace(/[^a-z0-9]+/g,'-')) });
     }
 
     if(/waiting|pending/i.test(reg.epa || '')){
@@ -545,7 +545,7 @@ function feedView(){
       '<p>' + (u.short || firstClause(u.summary)) + '</p>' +
       '<span class="cdate">' + fmtShort(u.date) + ' ' + fmtYear(u.date) + '</span>' +
       '<div class="links" style="margin-top:8px">' +
-        (u.article ? '<a class="read" href="article.html?id=' + u.article + '">Detail</a>' : '') +
+        (u.article ? '<a class="read" href="a/' + u.article + '.html">Detail</a>' : '') +
         '<a href="' + u.url + '" target="_blank" rel="noopener">Source</a>' +
       '</div></div>';
   }
@@ -861,12 +861,12 @@ function levyView(){
     '<div class="readgrid" style="margin-top:16px">' +
       INCENTIVES.map(i => '<div class="readcard">' +
         (i.article
-          ? '<a href="article.html?id=' + i.article + '">' + i.name + '</a>'
+          ? '<a href="a/' + i.article + '.html">' + i.name + '</a>'
           : '<a href="' + i.url + '" target="_blank" rel="noopener">' + i.name + '</a>') +
         '<p><b style="color:var(--text)">' + i.amount + '</b> — ' + i.who + '.</p>' +
         '<p>' + i.detail + '</p>' +
         (i.article
-          ? '<div class="cardlinks"><a href="article.html?id=' + i.article + '">Read the detail</a>' +
+          ? '<div class="cardlinks"><a href="a/' + i.article + '.html">Read the detail</a>' +
             '<a href="' + i.url + '" target="_blank" rel="noopener">Official source</a></div>'
           : '') +
         '</div>').join('') +
@@ -1818,7 +1818,7 @@ function buildCalendar(){
       '<h4>' + m.title + '</h4>' +
       '<div class="reason">' + milestoneReason(m) + '</div>' +
       '<p>' + m.action + '</p>' +
-      (m.article ? '<a href="article.html?id=' + m.article + '">Read the full analysis &rarr;</a>' : '')
+      (m.article ? '<a href="a/' + m.article + '.html">Read the full analysis &rarr;</a>' : '')
     ).join('<hr style="border:none;border-top:1px solid var(--line);margin:13px 0">');
     pop.classList.add('on');
     const r = cell.getBoundingClientRect(), w = 340;
@@ -1849,7 +1849,7 @@ function buildCalendar(){
         '<div class="d">' + d.getDate() + ' ' + d.toLocaleDateString('en-GB',{month:'short'}) +
         '<small>' + d.getFullYear() + (past ? ' · passed' : '') + '</small></div>' +
         '<div><div class="who">' + m.who + ' · ' + milestoneReason(m) + '</div><h3>' + m.title + '</h3><p>' + m.action + '</p>' +
-        (m.article ? '<div class="links"><a class="read" href="article.html?id=' + m.article + '">Read the full analysis</a></div>' : '') +
+        (m.article ? '<div class="links"><a class="read" href="a/' + m.article + '.html">Read the full analysis</a></div>' : '') +
         '</div></div>';
     }).join('') + '</section>').join('');
 

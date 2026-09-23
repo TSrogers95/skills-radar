@@ -12,5 +12,8 @@
       "path": "/api/sync-occupations",
       "schedule": "0 5 * * 1"
     }
-  ]
+  ],
+  "buildCommand": "node build.js",
+  "outputDirectory": ".",
+  "cleanUrls": true
 }

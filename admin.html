@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Skills Radar</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="masthead">
+  <div class="wrap"><div id="heroblock"></div></div>
+</div>
+
+<div class="stickybar">
+  <div class="wrap inner">
+    <a class="mini" href="index.html">Skills <em>Radar</em></a>
+    <div id="navslot"></div>
+  </div>
+</div>
+
+<div class="wrap" id="gate">
+  <div class="signin" style="max-width:520px;margin:48px auto 60px;grid-template-columns:1fr">
+    <div class="signin-panel">
+      <div class="markrule" style="margin-bottom:20px">
+        <span class="tick" aria-hidden="true"><b></b><b></b><b></b></span>
+        <span class="lbl" style="color:var(--text-3)">Administration</span>
+        <span class="line" style="background:var(--line)"></span>
+      </div>
+      <h2>Sign in</h2>
+      <p>Site administration. Members, articles and traffic.</p>
+      <form id="gateform" novalidate>
+        <div class="field">
+          <label for="au">Username</label>
+          <input type="text" id="au" autocomplete="username" autocapitalize="off" spellcheck="false">
+        </div>
+        <div class="field">
+          <label for="ap">Password</label>
+          <div class="pwwrap">
+            <input type="password" id="ap" autocomplete="current-password">
+            <button type="button" class="peek" id="apeek" aria-label="Show password">Show</button>
+          </div>
+        </div>
+        <div class="err" id="aerr" hidden>Not recognised.</div>
+        <button class="btn" type="submit">Unlock</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div id="admin" hidden>
+  <div class="memberbar">
+    <div class="wrap inner">
+      <div class="who"><b>Administration</b><span id="whoami"></span></div>
+      <button class="linkbtn" id="signout">Sign out</button>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="wrap controlgrid">
+      <div class="tabs" id="atabs">
+        <button data-view="overview" class="active">Overview</button>
+        <button data-view="members">Members</button>
+        <span class="tabsep" aria-hidden="true"></span>
+        <button data-view="write">Write an article</button>
+        <button data-view="content">Content</button>
+        <span class="tabsep" aria-hidden="true"></span>
+        <button data-view="email">Email</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap"><div id="apanel"></div></div>
+</div>
+
+<footer>
+  <div class="wrap"><p id="foot"></p></div>
+</footer>
+
+<script src="standards.js"></script>
+<script src="otj-minimums.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script src="ui.js"></script>
+<script>
+
+document.getElementById('heroblock').innerHTML = titleBlockHTML('');
+document.getElementById('navslot').innerHTML = navHTML('');
+
+/* =========================================================================
+   THE GATE
+
+   Front-of-house only. The check runs in the browser, so anyone who opens
+   the page source can read the credentials below. It keeps the page out of
+   casual reach; it is not security.
+
+   This has to move server-side before it manages real members, because at
+   that point it is guarding other people's data rather than your own draft
+   articles. The accounts build plan covers it.
+   ========================================================================= */
+
+const ADMIN_USER = "tom.rogers";
+const ADMIN_PASS = "3333";
+
+function unlock(){
+  document.getElementById('gate').hidden = true;
+  document.getElementById('admin').hidden = false;
+  document.getElementById('whoami').textContent = ADMIN_USER + ' · signed in this session only';
+  try { sessionStorage.setItem('sr-adminarea','1'); } catch(e){}
+  render();
+}
+
+document.getElementById('gateform').addEventListener('submit', e => {
+  e.preventDefault();
+  const u = document.getElementById('au').value.trim().toLowerCase();
+  const p = document.getElementById('ap').value.trim();
+  if(u === ADMIN_USER && p === ADMIN_PASS) unlock();
+  else document.getElementById('aerr').hidden = false;
+});
+
+['au','ap'].forEach(id => document.getElementById(id)
+  .addEventListener('input', () => { document.getElementById('aerr').hidden = true; }));
+
+document.getElementById('apeek').addEventListener('click', () => {
+  const p = document.getElementById('ap'), shown = p.type === 'text';
+  p.type = shown ? 'password' : 'text';
+  document.getElementById('apeek').textContent = shown ? 'Show' : 'Hide';
+  p.focus();
+});
+
+document.getElementById('signout').addEventListener('click', () => {
+  try { sessionStorage.removeItem('sr-adminarea'); } catch(e){}
+  location.reload();
+});
+
+try { if(sessionStorage.getItem('sr-adminarea') === '1') unlock(); } catch(e){}
+
+/* =========================================================================
+   VIEWS
+   ========================================================================= */
+
+let view = 'overview';
+
+function render(){
+  const p = document.getElementById('apanel');
+  if(view === 'overview') p.innerHTML = overviewView();
+  if(view === 'members')  p.innerHTML = membersView();
+  if(view === 'content')  p.innerHTML = contentView();
+  if(view === 'email')    p.innerHTML = emailView();
+  if(view === 'write'){   p.innerHTML = writeView(); wireWrite(p); }
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+document.querySelectorAll('#atabs button').forEach(b =>
+  b.addEventListener('click', () => {
+    document.querySelectorAll('#atabs button').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    view = b.dataset.view;
+    render();
+  }));
+
+/* ---------- Overview ---------- */
+
+function overviewView(){
+  const arts = allArticles();
+  const feed = allUpdates();
+  const written = arts.filter(a => !a.compiled).length;
+
+  return '<div class="pagehead"><h1>Overview</h1>' +
+    '<p>What the site currently holds. Traffic and member figures arrive once accounts and analytics are connected.</p></div>' +
+
+    '<div class="mgrid">' +
+      '<div class="mcard"><div class="n">' + STANDARDS.length.toLocaleString('en-GB') + '</div><div class="l">Standards tracked</div></div>' +
+      '<div class="mcard warm"><div class="n">' + feed.length + '</div><div class="l">Items in the feed</div></div>' +
+      '<div class="mcard cool"><div class="n">' + arts.length + '</div><div class="l">Articles live</div></div>' +
+      '<div class="mcard"><div class="n">' + written + '</div><div class="l">Written by hand</div></div>' +
+    '</div>' +
+
+    '<div class="grouphead"><h2>Data freshness</h2><div class="rule"></div></div>' +
+    '<table class="std levytable"><tbody>' +
+      row('Written content', typeof DATA_UPDATED !== 'undefined' ? fmtLong(DATA_UPDATED) : 'unknown',
+          'DATA_UPDATED in data.js — set it by hand when you edit content') +
+      row('Standards register', typeof STANDARDS_UPDATED !== 'undefined' ? fmtLong(STANDARDS_UPDATED) : 'not stamped',
+          'Set by the importer and the weekly sync') +
+      row('Occupational maps', typeof OCCUPATIONS_UPDATED !== 'undefined' ? fmtLong(OCCUPATIONS_UPDATED) : 'not yet synced',
+          typeof OCCUPATIONS !== 'undefined' ? Object.keys(OCCUPATIONS).length + ' occupations' : 'run /api/sync-occupations') +
+      row('Off-the-job minimums', typeof OTJ_SOURCE !== 'undefined' ? OTJ_SOURCE.count + ' standards' : 'not loaded',
+          typeof OTJ_SOURCE !== 'undefined' ? OTJ_SOURCE.name : '') +
+    '</tbody></table>' +
+
+    '<div class="grouphead"><h2>Traffic</h2><div class="rule"></div></div>' +
+    '<div class="notice" style="margin-top:0"><b>Not connected yet.</b> ' +
+    'Traffic figures need an analytics provider. Two options, both quick: ' +
+    '<b>Vercel Analytics</b> is built into your hosting — enable it in the project dashboard and it starts collecting immediately, ' +
+    'no code and no cookie banner. <b>Plausible</b> costs around £7 a month, gives more detail, and is also cookie-free so it ' +
+    'avoids consent requirements. Google Analytics is free but brings a cookie banner and a good deal more paperwork with it.' +
+    '</div>' +
+    '<div class="readgrid" style="margin-top:14px">' +
+      '<div class="readcard"><a href="https://vercel.com/docs/analytics" target="_blank" rel="noopener">Vercel Analytics</a>' +
+        '<p>Enable in your project dashboard. Page views, top pages, referrers and devices.</p></div>' +
+      '<div class="readcard"><a href="https://plausible.io" target="_blank" rel="noopener">Plausible</a>' +
+        '<p>One script tag. More detail, goal tracking, and a public dashboard you can share.</p></div>' +
+      '<div class="readcard"><a href="https://search.google.com/search-console" target="_blank" rel="noopener">Google Search Console</a>' +
+        '<p>Free, and the one that matters for the article pages. Submit <code>sitemap.xml</code> once the build is live.</p></div>' +
+    '</div>';
+}
+
+function row(a, b, c){
+  return '<tr><td class="nm">' + a + '</td><td class="num big">' + b + '</td><td>' + c + '</td></tr>';
+}
+
+/* ---------- Members ---------- */
+
+function membersView(){
+  return '<div class="pagehead"><h1>Members</h1>' +
+    '<p>Nothing to manage yet — accounts are the next build.</p></div>' +
+
+    '<div class="notice" style="margin-top:0"><b>This page is a shell until accounts exist.</b> ' +
+    'There is no member list because there are no members: the sign-in on the members page is a demo gate with the ' +
+    'credentials in the page source. Nothing is stored, so there is nothing here to show, reset or email.</div>' +
+
+    '<div class="grouphead"><h2>What goes here once accounts are live</h2><div class="rule"></div></div>' +
+    '<div class="readgrid" style="margin-top:0">' +
+      card('Member list', 'Email, organisation, standards followed, signed up, last seen, subscription status. Read from Supabase.') +
+      card('Password resets', 'You will not build this. Supabase Auth sends the reset email itself — this page just links to the user.') +
+      card('Suspend or cancel', 'Set subscription status, or ban the account in Supabase Auth. Cancellations and refunds happen in Stripe.') +
+      card('Export a member&rsquo;s data', 'A saved query returning everything held about one person. This is a legal requirement, not a convenience.') +
+      card('Delete a member', 'One statement, cascading across every table. Test it before you need it.') +
+      card('Failed payments', 'Stripe handles the chasing emails. You need visibility of who is lapsing, not a billing screen.') +
+    '</div>' +
+
+    '<div class="notice" style="margin-top:20px"><b>One thing to decide before that build starts.</b> ' +
+    'The moment you hold a real email address you are a data controller under UK GDPR: privacy policy, stated lawful basis, ' +
+    'a route for access and deletion requests, and ICO registration. Worth settling the wording before the first sign-up, ' +
+    'not after.</div>';
+}
+
+function card(t, d){
+  return '<div class="readcard"><b style="font-family:var(--display);font-size:15px;display:block;margin-bottom:5px">' + t + '</b><p>' + d + '</p></div>';
+}
+
+/* ---------- Write an article ---------- */
+
+const ICON_KEYS = ['stop','coin','cap','book','clock','shop','blocks','check','handshake','desk','flame','layers','signpost'];
+
+function writeView(){
+  const routeOpts = '<option value="">Applies to every route</option>' +
+    Object.keys(ROUTES).map(k => '<option value="' + k + '">' + ROUTES[k].label + '</option>').join('');
+
+  return '<div class="pagehead"><h1>Write an article</h1>' +
+    '<p>Fill this in and it writes the entry for <code>data.js</code>. Once committed, the build generates its own page ' +
+    'at <code>/a/&lt;id&gt;.html</code> and adds it to the sitemap.</p></div>' +
+
+    '<div class="writegrid">' +
+      '<div class="form" style="margin:0;max-width:none">' +
+
+        '<div class="field"><label for="w-title">Headline</label>' +
+        '<p class="hint">Under about 65 characters so it is not cut off in search results.</p>' +
+        '<input type="text" id="w-title" placeholder="Sixteen standards lose funding from September 2026"></div>' +
+
+        '<div class="field"><label for="w-summary">One-sentence summary</label>' +
+        '<p class="hint">Used on the index, in search results and when the link is shared. Aim for 120 to 155 characters.</p>' +
+        '<textarea id="w-summary" rows="2" placeholder="Existing learners are safe, new starts are not."></textarea>' +
+        '<div class="counter" id="c-summary">0 characters</div></div>' +
+
+        '<div class="field"><label for="w-stand">Standfirst</label>' +
+        '<p class="hint">The line under the headline. One sentence that says why it matters.</p>' +
+        '<textarea id="w-stand" rows="2"></textarea></div>' +
+
+        '<div class="field"><label for="w-body">The article</label>' +
+        '<p class="hint">One paragraph per line, blank line between them. Aim for 200 to 300 words. ' +
+        'A structure that works: what changed, what it changed from, what follows.</p>' +
+        '<textarea id="w-body" rows="14"></textarea>' +
+        '<div class="counter" id="c-body">0 words</div></div>' +
+
+        '<div class="planfields">' +
+          '<div class="field"><label for="w-tag">Category</label>' +
+          '<select id="w-tag"><option>Funding rules</option><option>Levy</option><option>T-Levels</option><option>Standard</option></select></div>' +
+          '<div class="field"><label for="w-urg">Urgency</label>' +
+          '<select id="w-urg"><option value="high">Act now</option><option value="medium" selected>Plan ahead</option><option value="low">For information</option></select></div>' +
+          '<div class="field"><label for="w-date">Date</label>' +
+          '<input type="date" id="w-date"></div>' +
+          '<div class="field"><label for="w-icon">Symbol</label>' +
+          '<select id="w-icon">' + ICON_KEYS.map(k => '<option value="' + k + '">' + k + '</option>').join('') + '</select></div>' +
+        '</div>' +
+
+        '<div class="field"><label for="w-route">Route</label>' +
+        '<select id="w-route">' + routeOpts + '</select></div>' +
+
+        '<div class="field"><label for="w-id">Address</label>' +
+        '<p class="hint">Lowercase, hyphens, no spaces. Becomes <code>/a/&lt;this&gt;.html</code> and cannot be changed later without breaking links.</p>' +
+        '<input type="text" id="w-id" placeholder="generated from the headline"></div>' +
+
+        '<div class="field"><label>Sources</label>' +
+        '<p class="hint">At least one. Every article on the site links to where the facts came from.</p>' +
+        '<div id="w-sources"></div>' +
+        '<button class="btn small ghost" id="w-addsrc" type="button">Add another source</button></div>' +
+
+        '<button class="btn" id="w-gen">Generate the entry</button>' +
+      '</div>' +
+
+      '<div class="writepreview">' +
+        '<div class="lhead"><h2>Preview</h2></div>' +
+        '<div id="w-preview"><p class="hint">Start typing and it appears here as it will look.</p></div>' +
+      '</div>' +
+    '</div>' +
+
+    '<div id="w-out"></div>';
+}
+
+function sourceRow(i){
+  return '<div class="srcrow">' +
+    '<input type="text" class="w-slabel" placeholder="GOV.UK — Apprenticeship funding rules" data-i="' + i + '">' +
+    '<input type="text" class="w-surl" placeholder="https://www.gov.uk/..." data-i="' + i + '">' +
+  '</div>';
+}
+
+function wireWrite(panel){
+  document.getElementById('w-sources').innerHTML = sourceRow(0) + sourceRow(1);
+  document.getElementById('w-date').value = new Date().toISOString().slice(0,10);
+
+  document.getElementById('w-addsrc').addEventListener('click', () => {
+    const n = document.querySelectorAll('.srcrow').length;
+    document.getElementById('w-sources').insertAdjacentHTML('beforeend', sourceRow(n));
+  });
+
+  const slug = s => String(s).toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-').slice(0, 60);
+
+  const title = document.getElementById('w-title');
+  const idBox = document.getElementById('w-id');
+  let idTouched = false;
+  idBox.addEventListener('input', () => { idTouched = true; });
+  title.addEventListener('input', () => {
+    if(!idTouched) idBox.value = slug(title.value);
+    preview();
+  });
+
+  ['w-summary','w-stand','w-body','w-tag','w-urg','w-date','w-route','w-icon']
+    .forEach(id => document.getElementById(id).addEventListener('input', preview));
+
+  document.getElementById('w-summary').addEventListener('input', () => {
+    const n = document.getElementById('w-summary').value.length;
+    const el = document.getElementById('c-summary');
+    el.textContent = n + ' characters' + (n > 155 ? ' — will be cut off in search results' : n < 60 && n > 0 ? ' — could say more' : '');
+    el.className = 'counter' + (n > 155 ? ' over' : '');
+  });
+
+  document.getElementById('w-body').addEventListener('input', () => {
+    const w = document.getElementById('w-body').value.trim().split(/\s+/).filter(Boolean).length;
+    const el = document.getElementById('c-body');
+    el.textContent = w + ' words' + (w > 340 ? ' — long for this site' : w < 200 && w > 0 ? ' — thin, most articles run 200 to 300' : '');
+    el.className = 'counter' + (w > 340 || (w < 200 && w > 0) ? ' over' : '');
+  });
+
+  document.getElementById('w-gen').addEventListener('click', generate);
+  preview();
+}
+
+function collect(){
+  const val = id => (document.getElementById(id).value || '').trim();
+  const body = val('w-body').split(/\n\s*\n/).map(p => p.replace(/\s*\n\s*/g, ' ').trim()).filter(Boolean);
+
+  const sources = [];
+  document.querySelectorAll('.srcrow').forEach(r => {
+    const label = r.querySelector('.w-slabel').value.trim();
+    const url = r.querySelector('.w-surl').value.trim();
+    if(label && url) sources.push({ label: label, url: url });
+  });
+
+  return {
+    id: val('w-id'), title: val('w-title'), summary: val('w-summary'),
+    standfirst: val('w-stand'), body: body, tag: val('w-tag'),
+    urgency: val('w-urg'), date: val('w-date'), route: val('w-route'),
+    icon: val('w-icon'), sources: sources
+  };
+}
+
+function preview(){
+  const a = collect();
+  const el = document.getElementById('w-preview');
+  if(!a.title && !a.body.length){
+    el.innerHTML = '<p class="hint">Start typing and it appears here as it will look.</p>';
+    return;
+  }
+  const route = a.route && ROUTES[a.route] ? ROUTES[a.route] : null;
+  el.innerHTML =
+    '<div class="ptags">' +
+      '<span class="tag ' + tagClass(a.tag) + '">' + (a.tag || 'Category') + '</span>' +
+      urgencyTag(a.urgency) +
+      (route ? '<span class="tag t-standard">' + route.label + '</span>' : '') +
+    '</div>' +
+    '<h1 style="font-family:var(--display);font-size:24px;font-weight:600;letter-spacing:-0.02em;line-height:1.2;margin:0 0 12px">' +
+      (a.title || 'Your headline') + '</h1>' +
+    (a.standfirst ? '<p class="pstand" style="font-size:15.5px;margin-bottom:18px">' + a.standfirst + '</p>' : '') +
+    '<div class="pbody">' + a.body.map(p => '<p style="font-size:14.5px">' + p + '</p>').join('') + '</div>' +
+    (a.id ? '<div class="hint" style="margin-top:14px">Will publish at <code>/a/' + a.id + '.html</code></div>' : '');
+}
+
+function generate(){
+  const a = collect();
+  const problems = [];
+  if(!a.id) problems.push('an address');
+  if(!a.title) problems.push('a headline');
+  if(!a.summary) problems.push('a summary');
+  if(!a.standfirst) problems.push('a standfirst');
+  if(!a.body.length) problems.push('at least one paragraph');
+  if(!a.sources.length) problems.push('at least one source');
+
+  const existing = allArticles().some(x => x.id === a.id);
+  if(existing) problems.push('an address that is not already taken (' + a.id + ' exists)');
+
+  const out = document.getElementById('w-out');
+  if(problems.length){
+    out.innerHTML = '<div class="alert" style="margin-top:22px"><b>Still needed:</b> ' + problems.join(', ') + '.</div>';
+    out.scrollIntoView({ behavior:'smooth', block:'nearest' });
+    return;
+  }
+
+  const q = v => JSON.stringify(String(v));
+  const code =
+    'ARTICLES.push({\n' +
+    '  id: ' + q(a.id) + ',\n' +
+    '  icon: ' + q(a.icon) + ', tag: ' + q(a.tag) + ', urgency: ' + q(a.urgency) + ', route: ' + q(a.route) + ',\n' +
+    '  date: ' + q(a.date) + ',\n' +
+    '  title: ' + q(a.title) + ',\n' +
+    '  summary: ' + q(a.summary) + ',\n' +
+    '  standfirst: ' + q(a.standfirst) + ',\n' +
+    '  body: [\n' + a.body.map(p => '    ' + q(p)).join(',\n') + '\n  ],\n' +
+    '  sources: [\n' + a.sources.map(s => '    { label: ' + q(s.label) + ', url: ' + q(s.url) + ' }').join(',\n') + '\n  ]\n' +
+    '});';
+
+  out.innerHTML =
+    '<div class="lsection costs" style="margin-top:26px">' +
+      '<div class="lhead"><h2>Add this to data.js</h2>' +
+      '<p>Paste it at the end of the file, below the other <code>ARTICLES.push</code> blocks. ' +
+      'Then set <code>DATA_UPDATED</code> to today so the site shows the right review date.</p></div>' +
+      '<pre class="codeout">' + code.replace(/</g,'&lt;') + '</pre>' +
+      '<div class="addrow" style="margin-top:14px">' +
+        '<button class="btn small" id="w-copy">Copy</button>' +
+        '<button class="btn small ghost" id="w-dl">Download as a file</button>' +
+      '</div>' +
+      '<div class="notice" style="margin-top:16px"><b>What happens next.</b> ' +
+      'Commit the change and Vercel runs the build, which generates <code>/a/' + a.id + '.html</code> as a real page ' +
+      'with its own title, description and structured data, and adds it to <code>sitemap.xml</code>. ' +
+      'Nothing else to do.</div>' +
+    '</div>';
+
+  document.getElementById('w-copy').addEventListener('click', () => {
+    navigator.clipboard.writeText(code);
+    document.getElementById('w-copy').textContent = 'Copied';
+    setTimeout(() => { document.getElementById('w-copy').textContent = 'Copy'; }, 1600);
+  });
+
+  document.getElementById('w-dl').addEventListener('click', () => {
+    const blob = new Blob([code + '\n'], { type: 'text/javascript' });
+    const el = document.createElement('a');
+    el.href = URL.createObjectURL(blob);
+    el.download = 'article-' + a.id + '.js';
+    el.click();
+    URL.revokeObjectURL(el.href);
+  });
+
+  out.scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+/* ---------- Content ---------- */
+
+function contentView(){
+  const arts = allArticles().slice().sort((a,b) => new Date(b.date) - new Date(a.date));
+  const written = arts.filter(a => !a.compiled);
+  const compiled = arts.filter(a => a.compiled);
+
+  return '<div class="pagehead"><h1>Content</h1>' +
+    '<p>Everything published. Written pieces are yours to edit in <code>data.js</code>; compiled ones regenerate from the register ' +
+    'and cannot be edited directly.</p></div>' +
+
+    '<div class="mgrid">' +
+      '<div class="mcard"><div class="n">' + arts.length + '</div><div class="l">Total articles</div></div>' +
+      '<div class="mcard cool"><div class="n">' + written.length + '</div><div class="l">Written by hand</div></div>' +
+      '<div class="mcard warm"><div class="n">' + compiled.length + '</div><div class="l">Compiled</div></div>' +
+      '<div class="mcard"><div class="n">' + allUpdates().filter(u => !u.article).length + '</div><div class="l">Feed items with no article</div></div>' +
+    '</div>' +
+
+    '<div class="grouphead"><h2>Written articles</h2><div class="rule"></div></div>' +
+    '<table class="std"><thead><tr><th>Article</th><th>Category</th><th>Date</th><th>Address</th></tr></thead><tbody>' +
+    written.map(a => '<tr><td class="nm">' + a.title + '<small>' + a.summary + '</small></td>' +
+      '<td>' + a.tag + '</td><td class="num">' + fmtLong(a.date) + '</td>' +
+      '<td><a class="stdlink" href="a/' + a.id + '.html">/a/' + a.id + '</a></td></tr>').join('') +
+    '</tbody></table>' +
+
+    '<div class="notice" style="margin-top:20px"><b>Editing a written article.</b> ' +
+    'Open <code>data.js</code> on GitHub, find the block with that id, change it and commit. The build regenerates its page. ' +
+    'Changing the id changes the address and breaks any link already shared — rename only if you mean to.</div>';
+}
+
+/* ---------- Email ---------- */
+
+function emailView(){
+  return '<div class="pagehead"><h1>Email</h1>' +
+    '<p>Sending to members needs two things this site does not have yet: members, and a mailing service.</p></div>' +
+
+    '<div class="notice" style="margin-top:0"><b>Nothing can send from here.</b> ' +
+    'A static site cannot deliver email — there is no server to send it. The newsletter form on the members page collects ' +
+    'preferences and shows them back to you, but nothing is stored and nothing goes out.</div>' +
+
+    '<div class="grouphead"><h2>What to connect</h2><div class="rule"></div></div>' +
+    '<div class="readgrid" style="margin-top:0">' +
+      '<div class="readcard"><a href="https://buttondown.com" target="_blank" rel="noopener">Buttondown</a>' +
+        '<p>Simplest of the three. Free to 100 subscribers, built for writing rather than marketing. Good fit for a weekly policy note.</p></div>' +
+      '<div class="readcard"><a href="https://www.mailerlite.com" target="_blank" rel="noopener">MailerLite</a>' +
+        '<p>Free to 1,000 subscribers. Segmenting by route or standard is straightforward, which is what a tailored newsletter needs.</p></div>' +
+      '<div class="readcard"><a href="https://resend.com" target="_blank" rel="noopener">Resend</a>' +
+        '<p>Already used by the scheduled jobs for your own alerts. Sending to members from it means writing the sending logic yourself.</p></div>' +
+    '</div>' +
+
+    '<div class="notice" style="margin-top:20px"><b>Before the first send.</b> ' +
+    'Every marketing email needs a working unsubscribe link, your organisation&rsquo;s name and a postal address — that is PECR, ' +
+    'not good manners. The tick box on the members form for not receiving emails has to actually be honoured, which means ' +
+    'the preference has to be stored somewhere, which means accounts first.</div>';
+}
+
+document.getElementById('foot').textContent =
+  'Administration. This page is excluded from search engines and from the sitemap.';
+
+</script>
+</body>
+</html>

@@ -87,7 +87,7 @@ document.getElementById('heroblock').innerHTML = titleBlockHTML('');
 document.getElementById('navslot').innerHTML = navHTML('articles.html');
 
 function rowHTML(a){
-  return '<a class="arow" href="article.html?id=' + a.id + '">' +
+  return '<a class="arow" href="a/' + a.id + '.html">' +
       iconHTML(a.icon) +
       '<div>' +
         '<h3>' + a.title + '</h3>' +
@@ -164,7 +164,7 @@ let currentFilter = 'all', currentQuery = '';
 if(location.hash){
   const target = location.hash.slice(1);
   if(allArticles().some(a => a.id === target)){
-    location.replace('article.html?id=' + encodeURIComponent(target));
+    location.replace('a/' + encodeURIComponent(target) + '.html');
   }
 }
 

@@ -1,0 +1,9 @@
+{
+  "name": "skills-radar",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Apprenticeship funding, standards and T-Level policy tracking",
+  "scripts": {
+    "build": "node build.js"
+  }
+}
