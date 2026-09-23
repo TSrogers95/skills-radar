@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign in or join — Skills Radar</title>
+<meta name="description" content="Create a Skills Radar account for a personal compliance calendar, a feed filtered to your standards, and levy forecasting.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="masthead">
+  <div class="wrap"><div id="heroblock"></div></div>
+</div>
+
+<div class="stickybar">
+  <div class="wrap inner">
+    <a class="mini" href="index.html">Skills <em>Radar</em></a>
+    <div id="navslot"></div>
+  </div>
+</div>
+
+<div class="wrap"><div id="panel"></div></div>
+
+<footer>
+  <div class="wrap">
+    <p>We store your email, organisation and the standards you follow, so the site can tell you what affects you.
+    You can export or delete everything at any time. Payment is handled by Stripe — card details never reach this site.</p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="config.js"></script>
+<script src="standards.js"></script>
+<script src="otj-minimums.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script src="ui.js"></script>
+<script src="auth.js"></script>
+<script>
+
+document.getElementById('heroblock').innerHTML = titleBlockHTML('');
+document.getElementById('navslot').innerHTML = navHTML('members.html');
+
+const panel = document.getElementById('panel');
+const q = new URLSearchParams(location.search);
+
+/* =========================================================================
+   ROUTING
+
+   One page handling join, sign in, forgotten password and setting a new
+   one, because they are the same journey and splitting them across four
+   files makes the flow harder to follow than it needs to be.
+   ========================================================================= */
+
+async function boot(){
+  if(!accountsLive()){
+    panel.innerHTML = notConnected();
+    return;
+  }
+
+  // Supabase sends people back here after a reset email
+  if(q.get('reset') === '1' || location.hash.indexOf('type=recovery') > -1){
+    return show('newpassword');
+  }
+  if(q.get('verified') === '1'){
+    return show('signin', 'Email confirmed. Sign in to carry on.');
+  }
+
+  const user = await currentUser();
+  if(user){
+    const sub = await getSubscription();
+    if(hasAccess(sub)) location.replace('members.html');
+    else show('pay');
+    return;
+  }
+
+  show(q.get('join') === '1' ? 'join' : 'signin');
+}
+
+function show(view, message){
+  if(view === 'join')        panel.innerHTML = joinView(message);
+  if(view === 'signin')      panel.innerHTML = signinView(message);
+  if(view === 'forgot')      panel.innerHTML = forgotView(message);
+  if(view === 'newpassword') panel.innerHTML = newPasswordView(message);
+  if(view === 'pay')         { payView(message); return; }
+  wire(view);
+}
+
+function msg(text, kind){
+  return text ? '<div class="' + (kind || 'okbox') + '" style="margin-bottom:18px">' + text + '</div>' : '';
+}
+
+/* ---------- Join ---------- */
+
+function joinView(message){
+  return '<div class="pagehead centred"><h1>Join Skills Radar</h1>' +
+    '<p>' + MEMBERSHIP.price + ' ' + MEMBERSHIP.period + '. ' + MEMBERSHIP.blurb + '</p></div>' +
+
+    '<div class="joinlayout">' +
+      '<div class="benefits">' +
+        benefit('Your own compliance calendar', 'Twelve months of deadlines, filtered to the standards you deliver, with the action each one requires.') +
+        benefit('A feed built around your provision', 'Changes to your programmes on one side, the funding rules that apply to everyone on the other.') +
+        benefit('Levy forecasting', 'Month by month against your own pay bill, with the point co-investment starts and what expires unused.') +
+        benefit('Off-the-job position', 'Published minimums for 713 standards, against the hours you actually plan to deliver.') +
+      '</div>' +
+
+      '<div class="signin-panel joinpanel">' +
+        msg(message) +
+        '<h2>Create an account</h2>' +
+        '<p>' + MEMBERSHIP.price + ' ' + MEMBERSHIP.period + ', cancel any time.</p>' +
+
+        '<form id="form" novalidate>' +
+          field('email', 'Work email', 'email', 'you@organisation.co.uk') +
+          field('org', 'Organisation', 'text', 'Your college, provider or employer') +
+          '<div class="field"><label for="password">Password</label>' +
+            '<p class="hint">At least eight characters.</p>' +
+            '<div class="pwwrap"><input type="password" id="password" autocomplete="new-password">' +
+            '<button type="button" class="peek" id="peek">Show</button></div></div>' +
+
+          '<label class="announce" style="margin-bottom:18px">' +
+            '<input type="checkbox" id="optout">' +
+            '<span><b>I do not want to receive emails</b>' +
+            'Leave this unticked to get the newsletter and alerts about changes to your standards. ' +
+            'Either way we will still email you about your account and your payment, because we have to.</span>' +
+          '</label>' +
+
+          '<div class="err" id="err" hidden></div>' +
+          '<button class="btn" type="submit" id="go">Create account</button>' +
+        '</form>' +
+
+        '<div class="demo" style="margin-top:22px">' +
+          '<span>Already a member?</span>' +
+          '<button type="button" class="fill" id="toSignin">Sign in</button>' +
+        '</div>' +
+
+        '<p class="hint" style="margin-top:16px">By joining you agree we may store your email, organisation and the ' +
+        'standards you follow. You can export or delete all of it at any time.</p>' +
+      '</div>' +
+    '</div>';
+}
+
+function benefit(t, d){ return '<div class="benefit"><h3>' + t + '</h3><p>' + d + '</p></div>'; }
+
+function field(id, label, type, ph){
+  return '<div class="field"><label for="' + id + '">' + label + '</label>' +
+    '<input type="' + type + '" id="' + id + '" placeholder="' + ph + '" autocomplete="' +
+    (type === 'email' ? 'email' : 'organization') + '"></div>';
+}
+
+/* ---------- Sign in ---------- */
+
+function signinView(message){
+  return '<div class="pagehead centred"><h1>Sign in</h1>' +
+    '<p>Your calendar, your feed, your levy position.</p></div>' +
+    '<div class="signin" style="max-width:480px;margin:0 auto 60px;grid-template-columns:1fr">' +
+      '<div class="signin-panel">' +
+        msg(message) +
+        '<form id="form" novalidate>' +
+          field('email', 'Email', 'email', 'you@organisation.co.uk') +
+          '<div class="field"><label for="password">Password</label>' +
+            '<div class="pwwrap"><input type="password" id="password" autocomplete="current-password">' +
+            '<button type="button" class="peek" id="peek">Show</button></div></div>' +
+          '<div class="err" id="err" hidden></div>' +
+          '<button class="btn" type="submit" id="go">Sign in</button>' +
+        '</form>' +
+        '<div class="demo" style="margin-top:20px">' +
+          '<button type="button" class="fill" id="toForgot">Forgotten your password?</button>' +
+          '<button type="button" class="fill" id="toJoin" style="margin-left:auto">Create an account</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+}
+
+/* ---------- Forgotten password ---------- */
+
+function forgotView(message){
+  return '<div class="pagehead centred"><h1>Reset your password</h1>' +
+    '<p>We will email you a link. It expires in an hour.</p></div>' +
+    '<div class="signin" style="max-width:480px;margin:0 auto 60px;grid-template-columns:1fr">' +
+      '<div class="signin-panel">' +
+        msg(message) +
+        '<form id="form" novalidate>' +
+          field('email', 'Email', 'email', 'you@organisation.co.uk') +
+          '<div class="err" id="err" hidden></div>' +
+          '<button class="btn" type="submit" id="go">Send the link</button>' +
+        '</form>' +
+        '<div class="demo" style="margin-top:20px">' +
+          '<button type="button" class="fill" id="toSignin">Back to sign in</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+}
+
+/* ---------- New password ---------- */
+
+function newPasswordView(message){
+  return '<div class="pagehead centred"><h1>Choose a new password</h1>' +
+    '<p>At least eight characters.</p></div>' +
+    '<div class="signin" style="max-width:480px;margin:0 auto 60px;grid-template-columns:1fr">' +
+      '<div class="signin-panel">' +
+        msg(message) +
+        '<form id="form" novalidate>' +
+          '<div class="field"><label for="password">New password</label>' +
+            '<div class="pwwrap"><input type="password" id="password" autocomplete="new-password">' +
+            '<button type="button" class="peek" id="peek">Show</button></div></div>' +
+          '<div class="err" id="err" hidden></div>' +
+          '<button class="btn" type="submit" id="go">Save it</button>' +
+        '</form>' +
+      '</div>' +
+    '</div>';
+}
+
+/* ---------- Payment ---------- */
+
+async function payView(message){
+  const profile = await getProfile();
+  const sub = await getSubscription();
+  const cancelled = q.get('cancelled') === '1';
+
+  panel.innerHTML = '<div class="pagehead centred"><h1>One more step</h1>' +
+    '<p>Your account exists. Membership is ' + MEMBERSHIP.price + ' ' + MEMBERSHIP.period + '.</p></div>' +
+
+    '<div class="signin" style="max-width:560px;margin:0 auto 60px;grid-template-columns:1fr">' +
+      '<div class="signin-panel">' +
+        msg(message) +
+        (cancelled ? msg('Checkout was cancelled. Nothing has been charged.', 'notice') : '') +
+        (sub && sub.status === 'past_due'
+          ? msg('Your last payment did not go through. Stripe will try again, and you keep access meanwhile. ' +
+                'Updating your card now avoids losing it.', 'notice') : '') +
+
+        '<h2>' + MEMBERSHIP.price + ' ' + MEMBERSHIP.period + '</h2>' +
+        '<p>Signed in as ' + (profile ? profile.email : '') + '</p>' +
+
+        '<ul class="paylist">' +
+          '<li>Compliance calendar filtered to your standards</li>' +
+          '<li>A feed showing only what affects you</li>' +
+          '<li>Levy forecasting with hypothetical cohorts</li>' +
+          '<li>Off-the-job position against published minimums</li>' +
+          '<li>A board report you can print</li>' +
+        '</ul>' +
+
+        '<div class="err" id="err" hidden></div>' +
+        '<button class="btn" id="pay">Continue to payment</button>' +
+        (sub && sub.stripe_customer_id ? '<button class="btn ghost" id="manage" style="margin-top:10px;width:100%">Manage billing</button>' : '') +
+
+        '<p class="hint" style="margin-top:16px">Payment is taken by Stripe. Card details never touch this site. ' +
+        'Cancel any time from your billing page — it takes two clicks and no email.</p>' +
+
+        '<div class="demo" style="margin-top:20px">' +
+          '<button type="button" class="fill" id="out">Sign out</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+
+  document.getElementById('pay').addEventListener('click', async () => {
+    const b = document.getElementById('pay');
+    b.disabled = true; b.textContent = 'Opening Stripe…';
+    try { await startCheckout(); }
+    catch(e){ fail(e.message); b.disabled = false; b.textContent = 'Continue to payment'; }
+  });
+
+  const manage = document.getElementById('manage');
+  if(manage) manage.addEventListener('click', async () => {
+    try { await openBilling(); } catch(e){ fail(e.message); }
+  });
+
+  document.getElementById('out').addEventListener('click', async () => {
+    await signOut(); location.href = 'account.html';
+  });
+}
+
+/* ---------- Wiring ---------- */
+
+function fail(text){
+  const e = document.getElementById('err');
+  if(e){ e.textContent = text; e.hidden = false; }
+}
+
+function wire(view){
+  const peek = document.getElementById('peek');
+  if(peek) peek.addEventListener('click', () => {
+    const p = document.getElementById('password'), shown = p.type === 'text';
+    p.type = shown ? 'password' : 'text';
+    peek.textContent = shown ? 'Show' : 'Hide';
+    p.focus();
+  });
+
+  const jump = { toSignin: 'signin', toJoin: 'join', toForgot: 'forgot' };
+  Object.keys(jump).forEach(id => {
+    const b = document.getElementById(id);
+    if(b) b.addEventListener('click', () => show(jump[id]));
+  });
+
+  const form = document.getElementById('form');
+  if(!form) return;
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const go = document.getElementById('go');
+    const was = go.textContent;
+    go.disabled = true; go.textContent = 'Working…';
+    document.getElementById('err').hidden = true;
+
+    try {
+      const email = (document.getElementById('email') || {}).value;
+      const pass  = (document.getElementById('password') || {}).value;
+
+      if(view === 'join'){
+        if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) throw new Error('Enter a valid email address.');
+        if(!pass || pass.length < 8) throw new Error('Passwords need at least eight characters.');
+        await signUp(email.trim(), pass, document.getElementById('org').value.trim(),
+                     document.getElementById('optout').checked);
+        panel.innerHTML = '<div class="pagehead centred"><h1>Check your email</h1>' +
+          '<p>We have sent a confirmation link to ' + email.trim() + '. ' +
+          'Click it, then come back and sign in. If it does not arrive within a few minutes, check your spam folder.</p></div>';
+        return;
+      }
+
+      if(view === 'signin'){
+        await signIn(email.trim(), pass);
+        const sub = await getSubscription();
+        location.href = hasAccess(sub) ? 'members.html' : 'account.html';
+        return;
+      }
+
+      if(view === 'forgot'){
+        await requestReset(email.trim());
+        panel.innerHTML = '<div class="pagehead centred"><h1>Check your email</h1>' +
+          '<p>If there is an account for ' + email.trim() + ', a reset link is on its way. It expires in an hour.</p></div>';
+        return;
+      }
+
+      if(view === 'newpassword'){
+        if(!pass || pass.length < 8) throw new Error('Passwords need at least eight characters.');
+        await setPassword(pass);
+        show('signin', 'Password changed. Sign in with the new one.');
+        return;
+      }
+
+    } catch(err){
+      fail(friendly(err.message));
+      go.disabled = false; go.textContent = was;
+    }
+  });
+}
+
+/* Supabase errors are accurate but unhelpful to read. */
+function friendly(m){
+  const s = String(m || '');
+  if(/Invalid login/i.test(s)) return 'That email and password do not match an account.';
+  if(/already registered/i.test(s)) return 'There is already an account with that email. Try signing in.';
+  if(/Email not confirmed/i.test(s)) return 'Confirm your email first — check for the link we sent.';
+  if(/rate limit|too many/i.test(s)) return 'Too many attempts. Wait a minute and try again.';
+  return s;
+}
+
+/* ---------- Not connected ---------- */
+
+function notConnected(){
+  return '<div class="pagehead centred"><h1>Accounts are not connected yet</h1>' +
+    '<p>The code is here; the services are not plugged in.</p></div>' +
+    '<div class="notice centred" style="max-width:640px"><b>What is missing.</b> ' +
+    '<code>config.js</code> still has placeholder values. Create a Supabase project, paste the URL and anon key in, ' +
+    'run <code>schema.sql</code>, and add the Stripe keys to Vercel. The setup guide walks through it. ' +
+    'Until then the members page keeps working with its demo gate.</div>';
+}
+
+boot();
+recordView();
+
+</script>
+</body>
+</html>

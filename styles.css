@@ -2416,3 +2416,24 @@ a.arow:hover .go{ opacity:1; }
   .writegrid{ grid-template-columns:1fr; }
   .writepreview{ position:static; max-height:none; }
 }
+
+/* ---------- Account pages ---------- */
+
+.paylist{ list-style:none; padding:0; margin:18px 0 22px; }
+.paylist li{
+  font-size:14px; color:var(--text-2); padding:8px 0 8px 26px;
+  position:relative; line-height:1.5; border-bottom:1px solid var(--line);
+}
+.paylist li:last-child{ border-bottom:none; }
+.paylist li::before{
+  content:'✓'; position:absolute; left:0; top:8px;
+  color:var(--low); font-weight:600;
+}
+
+.signin-panel h2{ margin-bottom:6px; }
+.demo .fill{ margin-left:0; }
+.btn.ghost{ background:var(--surface); color:var(--text); border:1px solid var(--line-strong); }
+
+@media (max-width:900px){
+  .joinlayout .benefits{ grid-template-columns:1fr 1fr; }
+}

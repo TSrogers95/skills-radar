@@ -81,11 +81,14 @@
   <div class="wrap"><p id="foot"></p></div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="config.js"></script>
 <script src="standards.js"></script>
 <script src="otj-minimums.js"></script>
 <script src="data.js"></script>
 <script src="app.js"></script>
 <script src="ui.js"></script>
+<script src="auth.js"></script>
 <script>
 
 document.getElementById('heroblock').innerHTML = titleBlockHTML('');
@@ -103,24 +106,78 @@ document.getElementById('navslot').innerHTML = navHTML('');
    articles. The accounts build plan covers it.
    ========================================================================= */
 
+/* Two modes. Connected: sign in with the Supabase account whose profile has
+   is_admin set, and every request carries that session token which the
+   server verifies. Not connected: the demo password, which is fine while it
+   guards your own drafts and unacceptable once it guards members. */
+
 const ADMIN_USER = "tom.rogers";
 const ADMIN_PASS = "3333";
+
+let ADMIN_SESSION = null;
 
 function unlock(){
   document.getElementById('gate').hidden = true;
   document.getElementById('admin').hidden = false;
-  document.getElementById('whoami').textContent = ADMIN_USER + ' · signed in this session only';
+  document.getElementById('whoami').textContent = ADMIN_SESSION
+    ? ADMIN_SESSION.email
+    : ADMIN_USER + ' · demo mode, no live data';
   try { sessionStorage.setItem('sr-adminarea','1'); } catch(e){}
   render();
 }
 
-document.getElementById('gateform').addEventListener('submit', e => {
+document.getElementById('gateform').addEventListener('submit', async e => {
   e.preventDefault();
-  const u = document.getElementById('au').value.trim().toLowerCase();
+  const u = document.getElementById('au').value.trim();
   const p = document.getElementById('ap').value.trim();
-  if(u === ADMIN_USER && p === ADMIN_PASS) unlock();
-  else document.getElementById('aerr').hidden = false;
+  const err = document.getElementById('aerr');
+
+  if(accountsLive()){
+    try {
+      await signIn(u, p);
+      const profile = await getProfile();
+      if(!profile || !profile.is_admin){
+        await signOut();
+        err.textContent = 'That account is not an administrator.';
+        err.hidden = false;
+        return;
+      }
+      ADMIN_SESSION = { email: profile.email, id: profile.id };
+      unlock();
+    } catch(ex){
+      err.textContent = 'Those details were not recognised.';
+      err.hidden = false;
+    }
+    return;
+  }
+
+  if(u.toLowerCase() === ADMIN_USER && p === ADMIN_PASS) unlock();
+  else { err.textContent = 'Not recognised.'; err.hidden = false; }
 });
+
+/* Signed calls to the admin endpoints. */
+async function adminFetch(what){
+  if(!accountsLive()) return null;
+  const c = supabase();
+  const { data } = await c.auth.getSession();
+  if(!data || !data.session) return null;
+  const res = await fetch('/api/admin-data?what=' + what, {
+    headers: { 'Authorization': 'Bearer ' + data.session.access_token }
+  });
+  if(!res.ok) return null;
+  return res.json();
+}
+
+async function adminAction(body){
+  const c = supabase();
+  const { data } = await c.auth.getSession();
+  const res = await fetch('/api/admin-action', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + data.session.access_token },
+    body: JSON.stringify(body)
+  });
+  return res.json();
+}
 
 ['au','ap'].forEach(id => document.getElementById(id)
   .addEventListener('input', () => { document.getElementById('aerr').hidden = true; }));
@@ -132,8 +189,9 @@ document.getElementById('apeek').addEventListener('click', () => {
   p.focus();
 });
 
-document.getElementById('signout').addEventListener('click', () => {
+document.getElementById('signout').addEventListener('click', async () => {
   try { sessionStorage.removeItem('sr-adminarea'); } catch(e){}
+  if(accountsLive()) await signOut();
   location.reload();
 });
 
@@ -147,8 +205,8 @@ let view = 'overview';
 
 function render(){
   const p = document.getElementById('apanel');
-  if(view === 'overview') p.innerHTML = overviewView();
-  if(view === 'members')  p.innerHTML = membersView();
+  if(view === 'overview'){ p.innerHTML = overviewView(); loadTraffic(p); }
+  if(view === 'members'){ p.innerHTML = membersView(); loadMembers(p); }
   if(view === 'content')  p.innerHTML = contentView();
   if(view === 'email')    p.innerHTML = emailView();
   if(view === 'write'){   p.innerHTML = writeView(); wireWrite(p); }
@@ -193,7 +251,8 @@ function overviewView(){
     '</tbody></table>' +
 
     '<div class="grouphead"><h2>Traffic</h2><div class="rule"></div></div>' +
-    '<div class="notice" style="margin-top:0"><b>Not connected yet.</b> ' +
+    '<div id="traffic"></div>' +
+    '<div class="notice" style="margin-top:0"><b>Want more than page counts?</b> ' +
     'Traffic figures need an analytics provider. Two options, both quick: ' +
     '<b>Vercel Analytics</b> is built into your hosting — enable it in the project dashboard and it starts collecting immediately, ' +
     'no code and no cookie banner. <b>Plausible</b> costs around £7 a month, gives more detail, and is also cookie-free so it ' +
@@ -209,6 +268,34 @@ function overviewView(){
     '</div>';
 }
 
+async function loadTraffic(panel){
+  const el = document.getElementById('traffic');
+  if(!el) return;
+  if(!accountsLive()){
+    el.innerHTML = '<p class="hint">Page views are recorded once Supabase is connected. No cookies, no identifiers — path and day only.</p>';
+    return;
+  }
+  const out = await adminFetch('traffic');
+  if(!out){ el.innerHTML = '<p class="hint">Could not load traffic.</p>'; return; }
+
+  el.innerHTML =
+    '<div class="mgrid" style="margin-top:0">' +
+      '<div class="mcard"><div class="n">' + out.total.toLocaleString('en-GB') + '</div><div class="l">Views, last 30 days</div></div>' +
+      '<div class="mcard cool"><div class="n">' + out.days.length + '</div><div class="l">Days with traffic</div></div>' +
+      '<div class="mcard warm"><div class="n">' + out.paths.length + '</div><div class="l">Pages visited</div></div>' +
+      '<div class="mcard"><div class="n">' + out.referrers.length + '</div><div class="l">Referring sites</div></div>' +
+    '</div>' +
+    (out.paths.length
+      ? '<table class="std" style="margin-top:12px"><thead><tr><th>Page</th><th>Views</th></tr></thead><tbody>' +
+        out.paths.slice(0,12).map(p => '<tr><td class="nm">' + p[0] + '</td><td class="num">' + p[1] + '</td></tr>').join('') +
+        '</tbody></table>' : '<p class="hint">Nothing recorded yet.</p>') +
+    (out.referrers.length
+      ? '<div class="grouphead"><h2>Where they came from</h2><div class="rule"></div></div>' +
+        '<table class="std"><tbody>' + out.referrers.map(r =>
+          '<tr><td class="nm">' + r[0] + '</td><td class="num">' + r[1] + '</td></tr>').join('') + '</tbody></table>'
+      : '');
+}
+
 function row(a, b, c){
   return '<tr><td class="nm">' + a + '</td><td class="num big">' + b + '</td><td>' + c + '</td></tr>';
 }
@@ -216,12 +303,99 @@ function row(a, b, c){
 /* ---------- Members ---------- */
 
 function membersView(){
-  return '<div class="pagehead"><h1>Members</h1>' +
-    '<p>Nothing to manage yet — accounts are the next build.</p></div>' +
+  if(!accountsLive()){
+    return '<div class="pagehead"><h1>Members</h1><p>Not connected yet.</p></div>' +
+      '<div class="notice" style="margin-top:0"><b>No member list because there are no members.</b> ' +
+      '<code>config.js</code> still has placeholder values. Once Supabase is connected this page reads the real list.</div>' +
+      whatGoesHere();
+  }
 
-    '<div class="notice" style="margin-top:0"><b>This page is a shell until accounts exist.</b> ' +
-    'There is no member list because there are no members: the sign-in on the members page is a demo gate with the ' +
-    'credentials in the page source. Nothing is stored, so there is nothing here to show, reset or email.</div>' +
+  return '<div class="pagehead"><h1>Members</h1>' +
+    '<p>Everyone signed up, with their subscription status.</p></div>' +
+    '<div id="memberlist"><p class="hint">Loading…</p></div>';
+}
+
+async function loadMembers(panel){
+  if(!accountsLive()) return;
+  const out = await adminFetch('members');
+  const el = document.getElementById('memberlist');
+  if(!el) return;
+
+  if(!out || !out.members){
+    el.innerHTML = '<div class="alert">Could not load the member list. Check you are signed in as an administrator.</div>';
+    return;
+  }
+
+  const m = out.members;
+  const paying = m.filter(x => ['active','trialing'].indexOf(x.subscription.status) > -1).length;
+  const lapsed = m.filter(x => ['past_due','canceled'].indexOf(x.subscription.status) > -1).length;
+
+  el.innerHTML =
+    '<div class="mgrid">' +
+      '<div class="mcard"><div class="n">' + m.length + '</div><div class="l">Accounts</div></div>' +
+      '<div class="mcard cool"><div class="n">' + paying + '</div><div class="l">Paying</div></div>' +
+      '<div class="mcard warm"><div class="n">' + lapsed + '</div><div class="l">Lapsed or failing</div></div>' +
+      '<div class="mcard"><div class="n">' + m.filter(x => x.email_opt_out).length + '</div><div class="l">Opted out of email</div></div>' +
+    '</div>' +
+
+    '<div class="grouphead"><h2>All members</h2><div class="rule"></div></div>' +
+    '<table class="std"><thead><tr><th>Member</th><th>Joined</th><th>Status</th><th>Email</th><th></th></tr></thead><tbody>' +
+    m.map(x => '<tr>' +
+      '<td class="nm">' + (x.org_name || '&mdash;') + '<small>' + x.email + (x.is_admin ? ' · admin' : '') + '</small></td>' +
+      '<td class="num">' + fmtLong(x.created_at.slice(0,10)) + '</td>' +
+      '<td>' + statusTag(x.subscription) + '</td>' +
+      '<td>' + (x.email_opt_out ? '<span class="chg none">opted out</span>' : '<span class="chg yes">yes</span>') + '</td>' +
+      '<td class="num">' +
+        '<button class="linkbtn" data-reset="' + x.email + '" data-uid="' + x.id + '">Reset</button> ' +
+        '<button class="linkbtn" data-export="' + x.id + '">Export</button> ' +
+        '<button class="linkbtn" data-del="' + x.id + '" data-em="' + x.email + '">Delete</button>' +
+      '</td></tr>').join('') +
+    '</tbody></table>' +
+    '<div id="actionout"></div>';
+
+  wireMemberActions(el);
+}
+
+function statusTag(s){
+  const map = { active:'new', trialing:'new', past_due:'warn', canceled:'stop', none:'info' };
+  const label = { active:'Paying', trialing:'Trial', past_due:'Payment failing', canceled:'Cancelled', none:'Not subscribed' };
+  return '<span class="ctag ' + (map[s.status] || 'info') + '">' + (label[s.status] || s.status) + '</span>' +
+    (s.cancel_at_period_end ? '<small class="cap">ending at period end</small>' : '');
+}
+
+function wireMemberActions(el){
+  const say = (text, kind) => {
+    document.getElementById('actionout').innerHTML =
+      '<div class="' + (kind || 'okbox') + '" style="margin-top:16px">' + text + '</div>';
+  };
+
+  el.querySelectorAll('[data-reset]').forEach(b => b.addEventListener('click', async () => {
+    const out = await adminAction({ action:'reset', email: b.dataset.reset, userId: b.dataset.uid });
+    say(out.message || out.error, out.ok ? 'okbox' : 'alert');
+  }));
+
+  el.querySelectorAll('[data-export]').forEach(b => b.addEventListener('click', async () => {
+    const out = await adminAction({ action:'export', userId: b.dataset.export });
+    if(out.error) return say(out.error, 'alert');
+    const blob = new Blob([JSON.stringify(out, null, 2)], { type:'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'member-' + b.dataset.export + '.json';
+    a.click();
+    say('Exported. That file is everything held about them — send it as-is for a subject access request.');
+  }));
+
+  el.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', async () => {
+    if(!confirm('Delete the account for ' + b.dataset.em + '?\n\nThis removes their profile, standards, events and history. ' +
+      'It cannot be undone, and it does NOT cancel their Stripe subscription — do that first.')) return;
+    const out = await adminAction({ action:'delete', userId: b.dataset.del });
+    say(out.message || out.error, out.ok ? 'okbox' : 'alert');
+    if(out.ok) render();
+  }));
+}
+
+function whatGoesHere(){
+  return '' +
 
     '<div class="grouphead"><h2>What goes here once accounts are live</h2><div class="rule"></div></div>' +
     '<div class="readgrid" style="margin-top:0">' +

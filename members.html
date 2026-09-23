@@ -60,7 +60,7 @@
         <h2>Members sign in</h2>
         <p>Your calendar, your feed, your levy position.</p>
 
-        <form id="loginform" novalidate>
+        <form id="loginform" novalidate data-demo="1">
           <div class="field">
             <label for="u">Username</label>
             <input type="text" id="u" autocomplete="username" autocapitalize="off" spellcheck="false" placeholder="Your username">
@@ -127,11 +127,14 @@
     <div class="wrap"><div class="attribution"><a href="https://www.gov.uk/government/organisations/skills-england" target="_blank" rel="noopener" class="selogo"><img src="https://occupational-maps.skillsengland.education.gov.uk/media/cyropis5/skills-england_lesser_arms_landscape-se-logo-white.svg" alt="Skills England" width="150" height="40" loading="lazy"></a><p>Contains data from Skills England. &copy; Skills England 2026. This information is licensed under the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3" target="_blank" rel="noopener">Open Government Licence v3.0</a>. Funding rules content is Crown copyright, also under the Open Government Licence.</p></div></div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="config.js"></script>
 <script src="standards.js"></script>
 <script src="otj-minimums.js"></script>
 <script src="data.js"></script>
 <script src="app.js"></script>
 <script src="ui.js"></script>
+<script src="auth.js"></script>
 <script>
 
 document.getElementById('heroblock').innerHTML = titleBlockHTML('');
@@ -184,8 +187,9 @@ document.getElementById('fill').addEventListener('click', () => {
   document.getElementById('loginerr').hidden = true;
 }));
 
-document.getElementById('signout').addEventListener('click', () => {
+document.getElementById('signout').addEventListener('click', async () => {
   try { sessionStorage.removeItem('sr-member'); } catch(e){}
+  if(accountsLive()){ await signOut(); location.href = 'account.html'; return; }
   location.reload();
 });
 
@@ -226,22 +230,29 @@ function saveEvents(){ try { sessionStorage.setItem('sr-events', JSON.stringify(
 
 function addEvent(title, date, note){
   if(!title || !date) return false;
-  MYEVENTS.push({
+  const e = {
     id: 'ev' + Date.now() + Math.floor(Math.random() * 1000),
     title: title, date: date, note: note || '', done: false
-  });
+  };
+  MYEVENTS.push(e);
   saveEvents();
+  if(ACCOUNT) saveEvent({ title: e.title, date: e.date, note: e.note, done: false })
+    .then(id => { if(id) e.id = id; });
   return true;
 }
 
 function toggleEvent(id){
   const e = MYEVENTS.find(x => x.id === id);
-  if(e){ e.done = !e.done; saveEvents(); }
+  if(!e) return;
+  e.done = !e.done;
+  saveEvents();
+  if(ACCOUNT && typeof e.id === 'number') saveEvent(e);
 }
 
 function removeEvent(id){
   MYEVENTS = MYEVENTS.filter(x => x.id !== id);
   saveEvents();
+  if(ACCOUNT && typeof id === 'number') deleteEvent(id);
 }
 
 /* Outstanding = not ticked off. Past dates still count as outstanding,
@@ -681,8 +692,10 @@ function addStandard(name){
 }
 
 function removeStandard(i){
+  const gone = COHORT[i];
   COHORT.splice(i, 1);
   saveCohort();
+  if(ACCOUNT && gone && gone.dbId) deleteStandard(gone.dbId);
 }
 
 /* ---------- Search-to-add ----------
@@ -884,6 +897,7 @@ function renderLevy(){
   SETTINGS.payroll = payroll;
   SETTINGS.young = +slider.value;
   saveSettings();
+  queueSave();
 
   document.getElementById('youngmax').textContent = heads ? heads + ' (all of them)' : '0';
 
@@ -992,6 +1006,7 @@ function wireLevy(){
     inp.addEventListener('input', () => {
       COHORT[+inp.dataset.i].count = Math.max(0, parseInt(inp.value, 10) || 0);
       saveCohort();
+      queueSave();
       renderLevy();
     });
   });
@@ -1382,6 +1397,7 @@ function wireOtj(panel){
       const v = parseInt(inp.value, 10);
       if(isNaN(v) || v <= 0) delete OTJ[n][f]; else OTJ[n][f] = v;
       saveOtj();
+      queueSave();
       refresh();
     });
   });
@@ -1960,7 +1976,32 @@ document.querySelectorAll('#mtabs button').forEach(btn => {
   });
 });
 
-try { if(sessionStorage.getItem('sr-member') === '1') unlock(); } catch(err){}
+(async function start(){
+  const mode = await checkAccess();
+  if(mode === 'redirect') return;
+
+  if(mode === 'member'){
+    await loadAccount();
+    document.getElementById('public').hidden = true;
+    document.getElementById('members').hidden = false;
+    refreshBar();
+    render();
+    const bar = document.querySelector('.memberbar .inner');
+    if(bar && !document.getElementById('billing')){
+      bar.insertAdjacentHTML('beforeend',
+        '<button class="linkbtn" id="billing" style="margin-left:14px">Billing</button>');
+      document.getElementById('billing').addEventListener('click', async () => {
+        try { await openBilling(); } catch(e){ alert(e.message); }
+      });
+    }
+    return;
+  }
+
+  // demo mode
+  try { if(sessionStorage.getItem('sr-member') === '1') unlock(); } catch(err){}
+})();
+
+recordView();
 
 </script>
 </body>
