@@ -26,7 +26,7 @@
 <div class="wrap">
   <div class="pagehead">
     <h1>Articles</h1>
-    <p>Written analysis of the policy changes, plus a compiled page for every standard with a significant change of its own — a defunding, a withdrawal, a funding band move, a pause or a new age restriction. Click any headline to read it.</p>
+    <p>Written analysis of the policy changes, plus a page for every standard with a significant change of its own — a defunding, a withdrawal, a funding band move, a pause or a new age restriction. Each has its own address, so you can send someone straight to the one that matters.</p>
   </div>
 </div>
 
@@ -86,10 +86,8 @@
 document.getElementById('heroblock').innerHTML = titleBlockHTML('');
 document.getElementById('navslot').innerHTML = navHTML('articles.html');
 
-let openId = null;
-
 function rowHTML(a){
-  return '<button class="arow" data-id="' + a.id + '" aria-expanded="' + (openId === a.id) + '">' +
+  return '<a class="arow" href="article.html?id=' + a.id + '">' +
       iconHTML(a.icon) +
       '<div>' +
         '<h3>' + a.title + '</h3>' +
@@ -101,39 +99,8 @@ function rowHTML(a){
           (a.route && ROUTES[a.route] ? '<span class="tag t-standard">' + ROUTES[a.route].label + '</span>' : '') +
         '</div>' +
       '</div>' +
-      '<div class="when">' + fmtLong(a.date) + '</div>' +
-    '</button>' +
-    (openId === a.id ? bodyHTML(a) : '');
-}
-
-function bodyHTML(a){
-  const sources = a.sources.map(s =>
-    '<a href="' + s.url + '" target="_blank" rel="noopener">' + s.label + ' &rarr;</a>').join('');
-  const related = READING.filter(r => r.tags.indexOf(a.tag) > -1).slice(0,3).map(r =>
-    '<a href="' + r.url + '" target="_blank" rel="noopener">' + r.name + ' &rarr;</a>').join('');
-
-  return '<div class="abody" id="' + a.id + '">' +
-    '<p class="standfirst">' + a.standfirst + '</p>' +
-    a.body.map(p => '<p>' + p + '</p>').join('') +
-    (a.onRoute && a.onRoute.length
-      ? '<div class="onroute"><h4>Every changed standard on this route — ' + a.onRoute.length + '</h4>' +
-        '<p>Kept current from the register, so it reflects today rather than when this was written.</p>' +
-        '<div class="onroutelist">' + a.onRoute.map(s =>
-          '<div class="orrow">' +
-            '<div><b>L' + s.level + ' ' + s.name + '</b>' +
-              '<span>' + s.changed + '</span></div>' +
-            (s.article ? '<a href="#' + s.article + '">Open</a>' : '<span class="ornone">no separate page</span>') +
-          '</div>').join('') + '</div></div>'
-      : '') +
-    (a.compiled
-      ? '<div class="notice" style="margin:4px 0 0"><b>This page is compiled, not written.</b> ' +
-        'Every figure in it comes from this standard\'s own record on the Skills England register. ' +
-        'The guidance is general to this type of change rather than specific to your provision — ' +
-        'check the source before acting on it.</div>'
-      : '') +
-    '<div class="sources"><h4>Sources</h4>' + sources + '</div>' +
-    (related ? '<div class="sources"><h4>Related reading</h4>' + related + '</div>' : '') +
-    '</div>';
+      '<div class="when">' + fmtLong(a.date) + '<span class="go">Read &rarr;</span></div>' +
+    '</a>';
 }
 
 function render(filter, query){
@@ -181,17 +148,6 @@ function render(filter, query){
     (query ? ' matching \u201c' + query + '\u201d' : ', ' + written + ' written and ' + (items.length - written) + ' compiled per standard');
   list.innerHTML = items.map(rowHTML).join('');
 
-  list.querySelectorAll('.arow').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const id = btn.dataset.id;
-      openId = (openId === id) ? null : id;
-      render(currentFilter, currentQuery);
-      if(openId){
-        const el = document.querySelector('[data-id="' + openId + '"]');
-        if(el) el.scrollIntoView({ block:'nearest' });
-      }
-    });
-  });
 }
 
 document.getElementById('readgrid').innerHTML = READING.map(r =>
@@ -203,12 +159,24 @@ document.getElementById('readgrid').innerHTML = READING.map(r =>
 
 let currentFilter = 'all', currentQuery = '';
 
-if(location.hash) openId = location.hash.slice(1);
-render(currentFilter, currentQuery);
-if(openId){
-  const el = document.getElementById(openId);
-  if(el) setTimeout(() => el.scrollIntoView({ block:'center' }), 80);
+/* An old-style link — articles.html#defunding-16 — still works: it now
+   forwards to the article's own page rather than expanding a row. */
+if(location.hash){
+  const target = location.hash.slice(1);
+  if(allArticles().some(a => a.id === target)){
+    location.replace('article.html?id=' + encodeURIComponent(target));
+  }
 }
+
+/* A route filter can arrive from a breadcrumb on an article page. */
+const fromRoute = (new RegExp('[?&]route=([^&#]*)').exec(location.search) || [])[1];
+if(fromRoute && ROUTES[fromRoute]){
+  currentQuery = ROUTES[fromRoute].label;
+  const box = document.getElementById('search');
+  if(box) box.value = currentQuery;
+}
+
+render(currentFilter, currentQuery);
 
 document.querySelectorAll('#tabs button').forEach(btn => {
   btn.addEventListener('click', () => {

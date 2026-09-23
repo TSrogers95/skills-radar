@@ -150,7 +150,7 @@ function renderReadings(){
 function changeCell(s){
   if(!s.changed) return '<span class="chg none">No change since ' + fmtLong(s.since) + '</span>';
 
-  const link = s.article ? ' <a href="articles.html#' + s.article + '">Why</a>' : '';
+  const link = s.article ? ' <a href="article.html?id=' + s.article + '">Why</a>' : '';
   return changeTagHTML(s.changed, s.status) +
     '<div class="chg ' + (isDefunded(s) ? 'stop' : 'yes') + '" style="margin-top:5px">' + s.changed + '</div>' +
     '<span class="chg none">' + fmtLong(s.since) + '</span>' + link;

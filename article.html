@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Article — Skills Radar</title>
+<meta name="description" content="Analysis of a change to apprenticeship funding, standards or T-Level policy.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="masthead">
+  <div class="wrap"><div id="heroblock"></div></div>
+</div>
+
+<div class="stickybar">
+  <div class="wrap inner">
+    <a class="mini" href="index.html">Skills <em>Radar</em></a>
+    <div id="navslot"></div>
+  </div>
+</div>
+
+<div class="wrap">
+  <nav class="crumbs" id="crumbs"></nav>
+  <div id="piece"></div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <p id="licence"></p>
+  </div>
+</footer>
+
+<script src="standards.js"></script>
+<script src="otj-minimums.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script src="ui.js"></script>
+<script>
+
+document.getElementById('heroblock').innerHTML = titleBlockHTML('');
+document.getElementById('navslot').innerHTML = navHTML('articles.html');
+
+/* =========================================================================
+   ONE ARTICLE, ONE ADDRESS
+
+   Every article now has its own page at article.html?id=… rather than being
+   an accordion row inside a long list. That means a link to a specific
+   change can be sent to a colleague, bookmarked, or put in an email, and it
+   opens on that piece rather than on a list they then have to search.
+
+   It is one file rather than 196 because the content lives in data. The
+   trade-off is that search engines see a single page — if organic search
+   becomes important, a build step generating real static files is the next
+   move, and nothing here would need rewriting to do it.
+   ========================================================================= */
+
+function param(name){
+  const m = new RegExp('[?&]' + name + '=([^&#]*)').exec(location.search);
+  return m ? decodeURIComponent(m[1].replace(/\+/g, ' ')) : '';
+}
+
+const ALL = allArticles();
+const id  = param('id') || location.hash.slice(1);
+const article = ALL.find(a => a.id === id);
+
+if(!article){
+  document.title = 'Article not found — Skills Radar';
+  document.getElementById('crumbs').innerHTML =
+    '<a href="articles.html">Articles</a><span>&rsaquo;</span><b>Not found</b>';
+  document.getElementById('piece').innerHTML =
+    '<div class="empty" style="margin-top:26px"><b>That article does not exist.</b>' +
+    (id ? 'Nothing is filed under &ldquo;' + esc(id) + '&rdquo;. ' : '') +
+    'It may have been renamed, or the standard it covered may no longer have a recorded change. ' +
+    '<a href="articles.html">Browse everything</a> instead.</div>';
+} else {
+  render(article);
+}
+
+function esc(s){ return String(s).replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c])); }
+
+function render(a){
+  document.title = a.title + ' — Skills Radar';
+  const meta = document.querySelector('meta[name=description]');
+  if(meta) meta.setAttribute('content', a.summary || a.standfirst || '');
+
+  const route = a.route && ROUTES[a.route] ? ROUTES[a.route] : null;
+
+  document.getElementById('crumbs').innerHTML =
+    '<a href="articles.html">Articles</a><span>&rsaquo;</span>' +
+    (route ? '<a href="articles.html?route=' + a.route + '">' + route.label + '</a><span>&rsaquo;</span>' : '') +
+    '<b>' + a.tag + '</b>';
+
+  const standard = a.standardCode || a.standardName
+    ? STANDARDS.find(s => (a.standardCode && s.code === a.standardCode) || s.name === a.standardName)
+    : null;
+
+  document.getElementById('piece').innerHTML =
+    '<article class="piece ' + a.urgency + '">' +
+
+      '<div class="ptags">' +
+        '<span class="tag ' + tagClass(a.tag) + '">' + a.tag + '</span>' +
+        urgencyTag(a.urgency) +
+        (route ? '<span class="tag t-standard">' + route.label + '</span>' : '') +
+        (a.compiled ? '<span class="tag t-info">Compiled from the register</span>' : '') +
+        '<span class="pdate">' + fmtLong(a.date) + '</span>' +
+      '</div>' +
+
+      '<h1>' + a.title + '</h1>' +
+      '<p class="pstand">' + a.standfirst + '</p>' +
+
+      (standard ? factBox(standard) : '') +
+
+      '<div class="pbody">' + a.body.map(p => '<p>' + p + '</p>').join('') + '</div>' +
+
+      (a.compiled
+        ? '<div class="notice"><b>This page is compiled, not written.</b> ' +
+          'Every figure in it comes from this standard&rsquo;s own record on the Skills England register. ' +
+          'The guidance is general to this type of change rather than specific to your provision — ' +
+          'check the source before acting on it.</div>'
+        : '') +
+
+      (a.onRoute && a.onRoute.length ? routeList(a) : '') +
+
+      '<div class="psources">' +
+        '<h2>Sources</h2>' +
+        a.sources.map(s => '<a href="' + s.url + '" target="_blank" rel="noopener">' + s.label + ' &nearr;</a>').join('') +
+        (typeof READING !== 'undefined'
+          ? READING.filter(r => r.tags.indexOf(a.tag) > -1).slice(0, 3).map(r =>
+              '<a href="' + r.url + '" target="_blank" rel="noopener">' + r.name + ' &nearr;</a>').join('')
+          : '') +
+      '</div>' +
+
+      shareBox(a) +
+    '</article>' +
+
+    related(a);
+
+  const copy = document.getElementById('copylink');
+  if(copy) copy.addEventListener('click', () => {
+    navigator.clipboard.writeText(location.href.split('#')[0]);
+    copy.textContent = 'Link copied';
+    setTimeout(() => { copy.textContent = 'Copy link'; }, 1600);
+  });
+}
+
+/* The standard's own figures, where the article is about one. */
+function factBox(s){
+  const otj = typeof otjMinimum === 'function' ? otjMinimum(s) : null;
+  const facts = [
+    ['Level', s.level],
+    ['Duration', s.months ? s.months + ' months' : 'delivered as a unit'],
+    ['Maximum funding', money(s.funding)],
+    ['Reference', s.code || 'not confirmed'],
+    ['Version', s.version],
+    ['Status', s.status],
+    ['Assessment', s.epa || 'Assigned']
+  ];
+  if(otj) facts.push(['Off-the-job minimum', otj + ' hours']);
+
+  const path = typeof pathwaysFor === 'function' ? pathwaysFor(s) : [];
+  const jobs = typeof jobTitlesFor === 'function' ? jobTitlesFor(s) : [];
+
+  return '<aside class="factbox">' +
+    '<h2>' + s.name + '</h2>' +
+    '<dl>' + facts.map(f => '<div><dt>' + f[0] + '</dt><dd>' + f[1] + '</dd></div>').join('') + '</dl>' +
+    (path.length ? '<div class="fbextra"><b>Pathway</b> ' + path.join(' &middot; ') + '</div>' : '') +
+    (jobs.length ? '<div class="fbextra"><b>Typical job titles</b> ' + jobs.slice(0, 8).join(', ') + '</div>' : '') +
+    '<a class="fblink" href="' + standardURL(s) + '" target="_blank" rel="noopener">View on the Skills England register &nearr;</a>' +
+  '</aside>';
+}
+
+function routeList(a){
+  return '<section class="onroute">' +
+    '<h2>Every changed standard on this route — ' + a.onRoute.length + '</h2>' +
+    '<p>Kept current from the register, so it reflects today rather than when this was written.</p>' +
+    '<div class="onroutelist">' + a.onRoute.map(s =>
+      '<div class="orrow"><div><b>L' + s.level + ' ' + s.name + '</b><span>' + s.changed + '</span></div>' +
+      (s.article ? '<a href="article.html?id=' + s.article + '">Open</a>' : '<span class="ornone">no separate page</span>') +
+      '</div>').join('') + '</div>' +
+  '</section>';
+}
+
+function shareBox(a){
+  return '<div class="sharebox">' +
+    '<button class="btn small" id="copylink">Copy link</button>' +
+    '<a class="btn small ghost" href="articles.html">All articles</a>' +
+    '<span class="hint">This page has its own address — send it to a colleague and it opens here.</span>' +
+  '</div>';
+}
+
+/* Same route first, then same tag. Never the piece you are reading. */
+function related(a){
+  const pool = ALL.filter(x => x.id !== a.id);
+  const scored = pool.map(x => {
+    let s = 0;
+    if(a.route && x.route === a.route) s += 10;
+    if(x.tag === a.tag) s += 5;
+    if(x.urgency === 'high') s += 2;
+    if(!x.compiled) s += 3;
+    return { x: x, s: s };
+  }).filter(r => r.s > 0).sort((p, q) => q.s - p.s || new Date(q.x.date) - new Date(p.x.date)).slice(0, 6);
+
+  if(!scored.length) return '';
+
+  return '<section class="relwrap">' +
+    '<div class="grouphead"><h2>Read next</h2><div class="rule"></div></div>' +
+    '<div class="relgrid">' + scored.map(r =>
+      '<a class="relcard" href="article.html?id=' + r.x.id + '">' +
+        iconHTML(r.x.icon) +
+        '<div><b>' + r.x.title + '</b><span>' + r.x.summary + '</span>' +
+        '<em>' + r.x.tag + (r.x.compiled ? ' · compiled' : '') + '</em></div>' +
+      '</a>').join('') + '</div>' +
+  '</section>';
+}
+
+document.getElementById('licence').innerHTML =
+  'Analysis reflects the position at the date shown. Skills Radar is not a substitute for the funding rules themselves — ' +
+  'check the source before acting on a compliance deadline.';
+
+</script>
+</body>
+</html>
