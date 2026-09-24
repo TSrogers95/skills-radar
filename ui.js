@@ -45,23 +45,34 @@ function backdropHTML(){
    does not, because repeating it on each one turns it into furniture people
    stop seeing. */
 function ctaHTML(){
-  /* Read from config.js if it is there, fall back if it is not. A missing
-     config should never be able to take the whole masthead down — which is
-     exactly what happened when this was written assuming it. */
-  const price = (typeof MEMBERSHIP !== 'undefined' && MEMBERSHIP.price) ? MEMBERSHIP.price : '£5';
+  const price = (typeof MEMBERSHIP !== 'undefined' && MEMBERSHIP.price) ? MEMBERSHIP.price : '\u00A35';
   const period = (typeof MEMBERSHIP !== 'undefined' && MEMBERSHIP.period) ? MEMBERSHIP.period : 'a month';
 
+  /* The argument, in the site's own numbers rather than adjectives. Counted
+     live so it can never drift from what the site actually holds. */
+  let standards = 0, changes = 0;
+  try {
+    standards = (typeof STANDARDS !== 'undefined') ? STANDARDS.length : 0;
+    changes = (typeof allUpdates === 'function') ? allUpdates().length : 0;
+  } catch(e){}
+
+  const hook = (standards && changes)
+    ? standards.toLocaleString('en-GB') + ' standards. ' + changes + ' changes on the board right now. ' +
+      '<em>Almost none of them are your problem.</em>'
+    : 'Most of what changes in this sector is not your problem. <em>Some of it very much is.</em>';
+
   return '<div class="herocta">' +
-    '<div class="ctamain">' +
-      '<a class="ctabtn" href="account.html?join=1">Become a member</a>' +
-      '<span class="ctaprice">' + price + ' ' + period + '</span>' +
-      '<a class="ctalink" href="account.html">Sign in</a>' +
+    '<div class="ctacopy">' +
+      '<p class="ctahook">' + hook + '</p>' +
+      '<p class="ctasub">Tell us which standards you deliver and we will tell you what moved, ' +
+      'what it costs, and what you have to do about it.</p>' +
     '</div>' +
-    '<ul class="ctawhat">' +
-      '<li><b>A feed that is only yours</b>Changes to the standards you deliver, not all 378.</li>' +
-      '<li><b>The newsletter</b>What moved this week and what it means, written not generated.</li>' +
-      '<li><b>Levy forecasting</b>Month by month against your own figures, including cohorts you are only considering.</li>' +
-    '</ul>' +
+    '<div class="ctaact">' +
+      '<a class="ctabtn" href="account.html?join=1">' +
+        '<b>Become a member</b><span>' + price + ' ' + period + ' &middot; cancel any time</span>' +
+      '</a>' +
+      '<a class="ctalink" href="account.html">Already a member? Sign in</a>' +
+    '</div>' +
   '</div>';
 }
 
@@ -133,10 +144,12 @@ function urgencyTag(u){
    changes the height of the whole document, so the page shifts under your
    finger mid-scroll, which can re-trigger the very threshold that caused it.
 
-   It now does nothing to the layout at all. The masthead scrolls away like
-   any other content, and the bar fades in once it has gone. Only opacity and
-   transform change, both of which the browser handles on the compositor
-   without touching layout — so it stays smooth on a phone.
+   It now does nothing to the layout at all. The bar is fixed rather than
+   sticky, so it takes up no space until it is needed — that is what removed
+   the pale band that used to sit under the masthead. The masthead scrolls
+   away like any other content and the bar slides down over the top. Only
+   transform and opacity change, both of which the browser handles on the
+   compositor without recalculating layout, so it stays smooth on a phone.
 */
 
 function wireCollapse(){
