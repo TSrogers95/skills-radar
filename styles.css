@@ -2858,3 +2858,7 @@ a.arow:hover .go{ opacity:1; }
 .skiplink:focus{ left:8px; top:8px; outline:2px solid var(--ink); outline-offset:2px; }
 
 main:focus{ outline:none; }
+
+/* ---------- Admin: email list actions ---------- */
+
+.mailbtns{ display:flex; gap:8px; flex:none; align-self:center; flex-wrap:wrap; }

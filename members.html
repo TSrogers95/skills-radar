@@ -10,14 +10,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 <!-- generated:meta -->
-<link rel="canonical" href="https://skills-radar.vercel.app/members.html">
+<link rel="canonical" href="https://skills-radar.co.uk/members.html">
 <meta name="robots" content="noindex, follow">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Skills Radar">
 <meta property="og:locale" content="en_GB">
 <meta property="og:title" content="Members — Skills Radar">
 <meta property="og:description" content="A personal compliance calendar, a feed filtered to the standards you deliver, levy modelling and a tailored newsletter.">
-<meta property="og:url" content="https://skills-radar.vercel.app/members.html">
+<meta property="og:url" content="https://skills-radar.co.uk/members.html">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Members — Skills Radar">
 <meta name="twitter:description" content="A personal compliance calendar, a feed filtered to the standards you deliver, levy modelling and a tailored newsletter.">
@@ -1925,6 +1925,8 @@ function wireAccount(panel){
 }
 
 function prefsView(){
+  /* Set once here rather than repeated through the view. */
+  const from = (typeof CONTACT !== 'undefined' && CONTACT.email) ? CONTACT.email : 'us';
   return '<div class="pagehead"><h1>Newsletter preferences</h1>' +
     '<p>What lands in your inbox, and how often. Changes here also reorder your feed and calendar.</p></div>' +
     '<div class="form" style="max-width:640px;margin-top:8px">' +

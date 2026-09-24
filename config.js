@@ -39,7 +39,8 @@ const MEMBERSHIP = {
 
 const CONTACT = {
   org:     "Skills Radar",
-  email:   "hello@skillsradar.co.uk",      // general and data requests
-  privacy: "hello@skillsradar.co.uk",      // can be the same address
-  address: ""                               // a postal address is required on marketing email
+  site:    "https://skills-radar.co.uk",
+  email:   "hello@skills-radar.co.uk",     // general enquiries and data requests
+  privacy: "hello@skills-radar.co.uk",     // can be the same address
+  address: ""                               // PECR requires a postal address on marketing email
 };

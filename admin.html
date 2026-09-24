@@ -74,7 +74,7 @@
         <button data-view="content">Content</button>
         <button data-view="import">Import data</button>
         <span class="tabsep" aria-hidden="true"></span>
-        <button data-view="email">Email</button>
+        <button data-view="email">Email lists</button>
       </div>
     </div>
   </div>
@@ -229,7 +229,7 @@ function render(){
   if(view === 'overview'){ p.innerHTML = overviewView(); loadTraffic(p); }
   if(view === 'members'){ p.innerHTML = membersView(); loadMembers(p); }
   if(view === 'content'){ p.innerHTML = contentView(); wireRemove(p); }
-  if(view === 'email')    p.innerHTML = emailView();
+  if(view === 'email'){   p.innerHTML = emailView(); loadEmails(); }
   if(view === 'write'){   p.innerHTML = writeView(); wireWrite(p); }
   if(view === 'import')   renderImportTool(p);
   window.scrollTo({ top:0, behavior:'smooth' });
@@ -779,30 +779,156 @@ function removeArticle(id){
   document.getElementById('removeout').scrollIntoView({ behavior:'smooth', block:'nearest' });
 }
 
-/* ---------- Email ---------- */
+/* ---------- Email lists ----------
+
+   The site does not send. It exports, and you paste the list into whatever
+   you use to write the newsletter. That is deliberate: a static site has no
+   server to send from, and a mailing service will do it better anyway.
+
+   Two lists, and the distinction is legal rather than cosmetic. The
+   newsletter list excludes anyone who ticked the box at sign-up. The full
+   list is everyone, and may only be used for things about their account —
+   a payment failing, a change to the terms. Sending marketing to the full
+   list would breach PECR.
+*/
 
 function emailView(){
-  return '<div class="pagehead"><h1>Email</h1>' +
-    '<p>Sending to members needs two things this site does not have yet: members, and a mailing service.</p></div>' +
+  if(!accountsLive()){
+    return '<div class="pagehead"><h1>Email lists</h1><p>Not connected yet.</p></div>' +
+      '<div class="notice" style="margin-top:0"><b>Nothing to export.</b> ' +
+      '<code>config.js</code> still has placeholder values, so there are no members to list.</div>';
+  }
 
-    '<div class="notice" style="margin-top:0"><b>Nothing can send from here.</b> ' +
-    'A static site cannot deliver email — there is no server to send it. The newsletter form on the members page collects ' +
-    'preferences and shows them back to you, but nothing is stored and nothing goes out.</div>' +
+  return '<div class="pagehead"><h1>Email lists</h1>' +
+    '<p>Download the addresses and send from wherever you write the newsletter. ' +
+    'Nothing is sent from this site.</p></div>' +
+    '<div id="maillists"><p class="hint">Loading…</p></div>';
+}
 
-    '<div class="grouphead"><h2>What to connect</h2><div class="rule"></div></div>' +
-    '<div class="readgrid" style="margin-top:0">' +
-      '<div class="readcard"><a href="https://buttondown.com" target="_blank" rel="noopener">Buttondown</a>' +
-        '<p>Simplest of the three. Free to 100 subscribers, built for writing rather than marketing. Good fit for a weekly policy note.</p></div>' +
-      '<div class="readcard"><a href="https://www.mailerlite.com" target="_blank" rel="noopener">MailerLite</a>' +
-        '<p>Free to 1,000 subscribers. Segmenting by route or standard is straightforward, which is what a tailored newsletter needs.</p></div>' +
-      '<div class="readcard"><a href="https://resend.com" target="_blank" rel="noopener">Resend</a>' +
-        '<p>Already used by the scheduled jobs for your own alerts. Sending to members from it means writing the sending logic yourself.</p></div>' +
+async function loadEmails(){
+  const el = document.getElementById('maillists');
+  if(!el || !accountsLive()) return;
+
+  const out = await adminFetch('members');
+  if(!out || !out.members){
+    el.innerHTML = '<div class="alert">Could not load the member list.</div>';
+    return;
+  }
+
+  const all = out.members;
+  const optedIn = all.filter(m => !m.email_opt_out);
+  const optedOut = all.filter(m => m.email_opt_out);
+  const paying = optedIn.filter(m => ['active','trialing'].indexOf(m.subscription.status) > -1);
+
+  el.innerHTML =
+    '<div class="mgrid">' +
+      '<div class="mcard cool"><div class="n">' + optedIn.length + '</div><div class="l">Newsletter list</div></div>' +
+      '<div class="mcard"><div class="n">' + paying.length + '</div><div class="l">Of those, paying</div></div>' +
+      '<div class="mcard warm"><div class="n">' + optedOut.length + '</div><div class="l">Opted out</div></div>' +
+      '<div class="mcard"><div class="n">' + all.length + '</div><div class="l">All accounts</div></div>' +
     '</div>' +
 
-    '<div class="notice" style="margin-top:20px"><b>Before the first send.</b> ' +
-    'Every marketing email needs a working unsubscribe link, your organisation&rsquo;s name and a postal address — that is PECR, ' +
-    'not good manners. The tick box on the members form for not receiving emails has to actually be honoured, which means ' +
-    'the preference has to be stored somewhere, which means accounts first.</div>';
+    '<div class="grouphead"><h2>Newsletter list</h2><div class="rule"></div></div>' +
+    '<div class="todolist">' +
+      '<div class="todo watch"><div class="todotext"><h3>' + optedIn.length + ' addresses</h3>' +
+      '<p>Everyone who has not opted out. This is the list to use for the newsletter and for anything else ' +
+      'that counts as marketing.</p></div>' +
+      '<div class="mailbtns">' +
+        '<button class="todoact" data-dl="news-csv">CSV</button>' +
+        '<button class="todoact" data-dl="news-copy">Copy addresses</button>' +
+      '</div></div>' +
+
+      '<div class="todo stop"><div class="todotext"><h3>All accounts — ' + all.length + ' addresses</h3>' +
+      '<p>Everyone, including the ' + optedOut.length + ' who opted out. Use this only for messages about ' +
+      'someone&rsquo;s account: a payment failing, a change to the terms, the site closing. ' +
+      'Sending marketing to this list would breach PECR.</p></div>' +
+      '<div class="mailbtns">' +
+        '<button class="todoact" data-dl="all-csv">CSV</button>' +
+      '</div></div>' +
+    '</div>' +
+
+    '<div id="mailout"></div>' +
+
+    '<div class="grouphead"><h2>Members</h2><div class="rule"></div></div>' +
+    '<div style="max-height:360px;overflow-y:auto;border:1px solid var(--line)">' +
+    '<table class="std"><thead><tr><th>Email</th><th>Organisation</th><th>Newsletter</th><th>Status</th></tr></thead><tbody>' +
+    all.map(m => '<tr><td class="nm">' + m.email + '</td>' +
+      '<td>' + (m.org_name || '&mdash;') + '</td>' +
+      '<td>' + (m.email_opt_out
+        ? '<span class="ctag stop">opted out</span>'
+        : '<span class="ctag new">' + (m.frequency || 'weekly') + '</span>') + '</td>' +
+      '<td>' + statusTag(m.subscription) + '</td></tr>').join('') +
+    '</tbody></table></div>' +
+
+    '<div class="grouphead"><h2>Sending it</h2><div class="rule"></div></div>' +
+    '<div class="readgrid" style="margin-top:0">' +
+      '<div class="readcard"><a href="https://buttondown.com" target="_blank" rel="noopener">Buttondown</a>' +
+        '<p>Free to 100 subscribers. Built for writing rather than marketing, which suits a weekly policy note. ' +
+        'Paste the CSV straight in.</p></div>' +
+      '<div class="readcard"><a href="https://www.mailerlite.com" target="_blank" rel="noopener">MailerLite</a>' +
+        '<p>Free to 1,000. Worth it if you want to segment by route or standard later.</p></div>' +
+      '<div class="readcard"><a href="https://mail.google.com" target="_blank" rel="noopener">Your inbox</a>' +
+        '<p>Under about thirty members, BCC from ' + (typeof CONTACT !== 'undefined' ? CONTACT.email : 'your address') +
+        ' is perfectly respectable and costs nothing.</p></div>' +
+    '</div>' +
+
+    '<div class="notice" style="margin-top:20px"><b>What every newsletter has to carry.</b> ' +
+    'A working unsubscribe link, your organisation&rsquo;s name, and a postal address. That is PECR, not etiquette. ' +
+    'When somebody unsubscribes at the mailing service, tick their opt-out here too — otherwise the next export ' +
+    'puts them straight back on the list.</div>';
+
+  wireEmail(el, optedIn, all);
+}
+
+function wireEmail(el, optedIn, all){
+  const csv = rows => {
+    const head = 'email,organisation,newsletter,status,joined';
+    const body = rows.map(m => [
+      m.email,
+      '"' + String(m.org_name || '').replace(/"/g, '""') + '"',
+      m.email_opt_out ? 'opted-out' : (m.frequency || 'weekly'),
+      m.subscription.status,
+      m.created_at.slice(0, 10)
+    ].join(','));
+    return [head].concat(body).join('\n');
+  };
+
+  const download = (text, name, type) => {
+    const blob = new Blob([text], { type: type || 'text/csv' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  };
+
+  const stamp = new Date().toISOString().slice(0, 10);
+
+  el.querySelectorAll('[data-dl]').forEach(b => b.addEventListener('click', () => {
+    const what = b.dataset.dl;
+
+    if(what === 'news-csv'){
+      download(csv(optedIn), 'skills-radar-newsletter-' + stamp + '.csv');
+      note(optedIn.length + ' addresses downloaded. Opted-out members are not in this file.');
+    }
+    if(what === 'all-csv'){
+      download(csv(all), 'skills-radar-all-accounts-' + stamp + '.csv');
+      note('All ' + all.length + ' accounts downloaded, including opt-outs. Account messages only.');
+    }
+    if(what === 'news-copy'){
+      const list = optedIn.map(m => m.email).join(', ');
+      navigator.clipboard.writeText(list);
+      b.textContent = 'Copied';
+      setTimeout(() => { b.textContent = 'Copy addresses'; }, 1600);
+      note(optedIn.length + ' addresses copied, comma separated. Paste into the BCC field — never To or Cc, ' +
+        'or every member sees every other member&rsquo;s address.');
+    }
+  }));
+
+  function note(text){
+    document.getElementById('mailout').innerHTML =
+      '<div class="okbox" style="margin-top:16px">' + text + '</div>';
+  }
 }
 
 document.getElementById('foot').textContent =

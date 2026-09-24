@@ -16,7 +16,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const SITE = process.env.SITE_URL || 'https://skills-radar.vercel.app';
+const SITE = process.env.SITE_URL || 'https://skills-radar.co.uk';
 const OUT  = 'a';
 
 /* ---------- Load the data the same way a browser would ---------- */
