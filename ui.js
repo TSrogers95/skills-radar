@@ -45,10 +45,16 @@ function backdropHTML(){
    does not, because repeating it on each one turns it into furniture people
    stop seeing. */
 function ctaHTML(){
+  /* Read from config.js if it is there, fall back if it is not. A missing
+     config should never be able to take the whole masthead down — which is
+     exactly what happened when this was written assuming it. */
+  const price = (typeof MEMBERSHIP !== 'undefined' && MEMBERSHIP.price) ? MEMBERSHIP.price : '£5';
+  const period = (typeof MEMBERSHIP !== 'undefined' && MEMBERSHIP.period) ? MEMBERSHIP.period : 'a month';
+
   return '<div class="herocta">' +
     '<div class="ctamain">' +
       '<a class="ctabtn" href="account.html?join=1">Become a member</a>' +
-      '<span class="ctaprice">' + MEMBERSHIP.price + ' ' + MEMBERSHIP.period + '</span>' +
+      '<span class="ctaprice">' + price + ' ' + period + '</span>' +
       '<a class="ctalink" href="account.html">Sign in</a>' +
     '</div>' +
     '<ul class="ctawhat">' +
@@ -60,6 +66,11 @@ function ctaHTML(){
 }
 
 function titleBlockHTML(stampHTML, withCta){
+  let cta = '';
+  if(withCta){
+    try { cta = ctaHTML(); }
+    catch(e){ console.error('call to action could not render:', e.message); }
+  }
   return '<div class="titleblock">' + backdropHTML() +
     '<div class="markrule">' +
       '<span class="pulse" aria-hidden="true"></span>' +
@@ -73,7 +84,7 @@ function titleBlockHTML(stampHTML, withCta){
       '</div>' +
       (stampHTML ? '<div class="stamp">' + stampHTML + '</div>' : '') +
     '</div>' +
-    (withCta ? ctaHTML() : '') +
+    cta +
   '</div>';
 }
 

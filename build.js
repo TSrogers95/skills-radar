@@ -199,6 +199,7 @@ function page(a, api){
   </div>
 </footer>
 
+<script src="../config.js"></script>
 <script src="../standards.js"></script>
 <script src="../otj-minimums.js"></script>
 <script src="../data.js"></script>
