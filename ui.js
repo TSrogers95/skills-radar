@@ -88,17 +88,15 @@ function ctaHTML(){
     changes = (typeof allUpdates === 'function') ? allUpdates().length : 0;
   } catch(e){}
 
-  const hook = (standards && changes)
-    ? 'Tell us what you deliver, and this whole site becomes <em>yours</em>.'
-    : 'Tell us what you deliver, and this whole site becomes <em>yours</em>.';
+  const hook = 'Create an account and build a <em>personalised feed</em>.';
 
   const sub = (standards && changes)
-    ? 'Your feed shows changes to your standards and the funding rules that apply to you. ' +
-      'Your calendar carries your deadlines. Your levy forecast runs on your own figures. ' +
-      'Out of ' + standards.toLocaleString('en-GB') + ' standards and ' + changes +
-      ' live changes, you see the ones that matter to you — plus a weekly newsletter explaining what moved and why.'
-    : 'Your feed, your calendar, your levy forecast — built around the standards you actually deliver, ' +
-      'with a weekly newsletter explaining what moved and why.';
+    ? 'Choose the standards you deliver from all ' + standards.toLocaleString('en-GB') +
+      ' on the register. Your feed then shows changes to those, alongside the funding rules that apply to everyone. ' +
+      'A weekly newsletter explains what moved and why, and the levy forecast runs on figures you enter yourself.'
+    : 'Choose the standards you deliver, and your feed shows changes to those alongside the funding rules that ' +
+      'apply to everyone. A weekly newsletter explains what moved and why, and the levy forecast runs on figures ' +
+      'you enter yourself.';
 
   return '<div class="herocta">' +
     '<div class="ctacopy">' +
