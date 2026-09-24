@@ -14,34 +14,43 @@
 
 let sb = null;
 
-function supabase(){
+/* The Supabase library publishes itself as window.supabase. This file used
+   to declare `function supabase()`, which at global scope IS window.supabase
+   — so our own function silently overwrote the library and every call to
+   createClient failed. The library reference is now grabbed the instant this
+   script runs, and our accessor is called sbClient so nothing can collide. */
+const SUPABASE_LIB = (typeof window !== 'undefined' && window.supabase &&
+                      typeof window.supabase.createClient === 'function')
+  ? window.supabase : null;
+
+function sbClient(){
   if(sb) return sb;
   if(typeof SUPABASE_URL === 'undefined' || !SUPABASE_URL || SUPABASE_URL.indexOf('YOUR-') === 0){
     return null;                      // not configured yet
   }
-  if(typeof window.supabase === 'undefined'){
+  if(!SUPABASE_LIB){
     console.error('The Supabase library did not load. Check the script tag.');
     return null;
   }
-  sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  sb = SUPABASE_LIB.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
   });
   return sb;
 }
 
-function accountsLive(){ return supabase() !== null; }
+function accountsLive(){ return sbClient() !== null; }
 
 /* ---------- Session ---------- */
 
 async function currentUser(){
-  const c = supabase();
+  const c = sbClient();
   if(!c) return null;
   const { data } = await c.auth.getUser();
   return data ? data.user : null;
 }
 
 async function signUp(email, password, orgName, optOut){
-  const c = supabase();
+  const c = sbClient();
   if(!c) throw new Error('Accounts are not connected yet.');
 
   const { data, error } = await c.auth.signUp({
@@ -57,7 +66,7 @@ async function signUp(email, password, orgName, optOut){
 }
 
 async function signIn(email, password){
-  const c = supabase();
+  const c = sbClient();
   if(!c) throw new Error('Accounts are not connected yet.');
   const { data, error } = await c.auth.signInWithPassword({ email: email, password: password });
   if(error) throw error;
@@ -65,12 +74,12 @@ async function signIn(email, password){
 }
 
 async function signOut(){
-  const c = supabase();
+  const c = sbClient();
   if(c) await c.auth.signOut();
 }
 
 async function requestReset(email){
-  const c = supabase();
+  const c = sbClient();
   if(!c) throw new Error('Accounts are not connected yet.');
   const { error } = await c.auth.resetPasswordForEmail(email, {
     redirectTo: window.location.origin + '/account.html?reset=1'
@@ -79,7 +88,7 @@ async function requestReset(email){
 }
 
 async function setPassword(password){
-  const c = supabase();
+  const c = sbClient();
   if(!c) throw new Error('Accounts are not connected yet.');
   const { error } = await c.auth.updateUser({ password: password });
   if(error) throw error;
@@ -88,7 +97,7 @@ async function setPassword(password){
 /* ---------- Profile ---------- */
 
 async function getProfile(){
-  const c = supabase();
+  const c = sbClient();
   const user = await currentUser();
   if(!c || !user) return null;
   const { data, error } = await c.from('profiles').select('*').eq('id', user.id).single();
@@ -97,7 +106,7 @@ async function getProfile(){
 }
 
 async function saveProfile(patch){
-  const c = supabase();
+  const c = sbClient();
   const user = await currentUser();
   if(!c || !user) return null;
   patch.updated_at = new Date().toISOString();
@@ -108,7 +117,7 @@ async function saveProfile(patch){
 /* ---------- Subscription ---------- */
 
 async function getSubscription(){
-  const c = supabase();
+  const c = sbClient();
   const user = await currentUser();
   if(!c || !user) return null;
   const { data } = await c.from('subscriptions').select('*').eq('user_id', user.id).maybeSingle();
@@ -133,7 +142,7 @@ function hasAccess(sub, profile){
 /* ---------- Cohort ---------- */
 
 async function loadStandards(){
-  const c = supabase();
+  const c = sbClient();
   const user = await currentUser();
   if(!c || !user) return [];
   const { data } = await c.from('member_standards').select('*').eq('user_id', user.id).order('id');
@@ -147,7 +156,7 @@ async function loadStandards(){
 }
 
 async function saveStandard(s){
-  const c = supabase();
+  const c = sbClient();
   const user = await currentUser();
   if(!c || !user) return null;
 
@@ -172,7 +181,7 @@ async function saveStandard(s){
 }
 
 async function deleteStandard(dbId){
-  const c = supabase();
+  const c = sbClient();
   if(!c || !dbId) return;
   await c.from('member_standards').delete().eq('id', dbId);
 }
@@ -180,7 +189,7 @@ async function deleteStandard(dbId){
 /* ---------- Events ---------- */
 
 async function loadEvents(){
-  const c = supabase();
+  const c = sbClient();
   const user = await currentUser();
   if(!c || !user) return [];
   const { data } = await c.from('member_events').select('*').eq('user_id', user.id).order('event_date');
@@ -188,7 +197,7 @@ async function loadEvents(){
 }
 
 async function saveEvent(e){
-  const c = supabase();
+  const c = sbClient();
   const user = await currentUser();
   if(!c || !user) return null;
   if(e.id){
@@ -202,7 +211,7 @@ async function saveEvent(e){
 }
 
 async function deleteEvent(id){
-  const c = supabase();
+  const c = sbClient();
   if(c && id) await c.from('member_events').delete().eq('id', id);
 }
 
@@ -211,7 +220,7 @@ async function deleteEvent(id){
 /* Sends the member to Stripe Checkout. Card details never touch this site —
    Stripe hosts the payment page, handles 3-D Secure, and sends them back. */
 async function startCheckout(){
-  const c = supabase();
+  const c = sbClient();
   const { data } = await c.auth.getSession();
   if(!data || !data.session) throw new Error('Sign in first.');
 
@@ -232,7 +241,7 @@ async function startCheckout(){
 /* Stripe's own portal: change card, download invoices, cancel. Building any
    of that yourself would be work for a worse result. */
 async function openBilling(){
-  const c = supabase();
+  const c = sbClient();
   const { data } = await c.auth.getSession();
   if(!data || !data.session) throw new Error('Sign in first.');
 
@@ -255,7 +264,7 @@ async function openBilling(){
 /* Path and day only. No identifiers, no cookies, nothing that needs a
    consent banner. */
 async function recordView(){
-  const c = supabase();
+  const c = sbClient();
   if(!c) return;
   try {
     const ref = document.referrer && document.referrer.indexOf(location.host) === -1
@@ -274,7 +283,7 @@ async function recordView(){
    ========================================================================= */
 
 async function exportMyData(){
-  const c = supabase();
+  const c = sbClient();
   const user = await currentUser();
   if(!c || !user) throw new Error('Not signed in.');
 
@@ -299,7 +308,7 @@ async function exportMyData(){
 }
 
 async function deleteMyAccount(){
-  const c = supabase();
+  const c = sbClient();
   const { data } = await c.auth.getSession();
   if(!data || !data.session) throw new Error('Not signed in.');
 

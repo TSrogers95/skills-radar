@@ -15,7 +15,6 @@
 
 
 <div class="masthead">
-  <main id="main" tabindex="-1">
 <div class="wrap"><div id="heroblock"></div></div>
 </div>
 
@@ -25,6 +24,7 @@
     <div id="navslot"></div>
   </div>
 </div>
+<main id="main" tabindex="-1">
 
 <div class="wrap" id="gate">
   <div class="signin" style="max-width:520px;margin:48px auto 60px;grid-template-columns:1fr">
@@ -166,7 +166,7 @@ document.getElementById('gateform').addEventListener('submit', async e => {
 /* Signed calls to the admin endpoints. */
 async function adminFetch(what){
   if(!accountsLive()) return null;
-  const c = supabase();
+  const c = sbClient();
   const { data } = await c.auth.getSession();
   if(!data || !data.session) return null;
   const res = await fetch('/api/admin-data?what=' + what, {
@@ -177,7 +177,7 @@ async function adminFetch(what){
 }
 
 async function adminAction(body){
-  const c = supabase();
+  const c = sbClient();
   const { data } = await c.auth.getSession();
   const res = await fetch('/api/admin-action', {
     method: 'POST',
