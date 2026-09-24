@@ -28,7 +28,6 @@
 
 
 <div class="masthead">
-  <main id="main" tabindex="-1">
 <div class="wrap"><div id="heroblock"></div></div>
 </div>
 
@@ -38,6 +37,7 @@
     <div id="navslot"></div>
   </div>
 </div>
+<main id="main" tabindex="-1">
 
 <div class="wrap"><div id="panel"></div></div>
 
@@ -75,6 +75,9 @@ const q = new URLSearchParams(location.search);
    ========================================================================= */
 
 async function boot(){
+  if(typeof window.supabase === 'undefined'){
+    throw new Error('The Supabase library did not load. Check the script tag at the foot of the page, and that nothing is blocking cdn.jsdelivr.net.');
+  }
   if(!accountsLive()){
     panel.innerHTML = notConnected();
     return;
@@ -397,7 +400,20 @@ function notConnected(){
     'Until then the members page keeps working with its demo gate.</div>';
 }
 
-boot();
+/* An async boot with no catch is how you end up looking at a blank page: the
+   promise rejects, nothing is rendered, and the only trace is in the console.
+   Show the failure instead. */
+boot().catch(err => {
+  console.error('account boot failed:', err);
+  panel.innerHTML =
+    '<div class="pagehead centred"><h1>Something went wrong</h1>' +
+    '<p>The sign-in page could not start.</p></div>' +
+    '<div class="alert centred" style="max-width:620px"><b>' + String(err && err.message || err) + '</b></div>' +
+    '<div class="notice centred" style="max-width:620px">' +
+    'Most often this is the Supabase URL or key in <code>config.js</code>, or a redirect URL that has not been ' +
+    'added under Authentication → URL Configuration. Reload once first — a slow network can cause it too.</div>';
+});
+
 recordView();
 
 </script>
