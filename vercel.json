@@ -1,5 +1,6 @@
 {
   "buildCommand": "node build.js",
+  "outputDirectory": ".",
   "cleanUrls": true,
   "crons": [
     { "path": "/api/check-sources", "schedule": "0 7 * * 1" },
