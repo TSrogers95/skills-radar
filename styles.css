@@ -2464,11 +2464,6 @@ a.arow:hover .go{ opacity:1; }
   border-bottom:1px solid #2A5049; padding-bottom:2px;
 }
 .ctalink:hover{ color:#fff; border-bottom-color:#6ED0B6; }
-.ctanote{
-  flex-basis:100%; margin:4px 0 0;
-  font-size:13px; color:#7FA79F; line-height:1.55; max-width:62ch;
-}
-
 @media (max-width:640px){
   .herocta{ gap:14px; margin-top:22px; padding-top:20px; }
   .ctabtn{ width:100%; text-align:center; }
@@ -2838,4 +2833,14 @@ a.arow:hover .go{ opacity:1; }
 @media (prefers-reduced-motion: reduce){
   .ctaring .ring{ animation:none; stroke-dashoffset:0; }
   .ctascribble{ animation:none; opacity:1; }
+}
+
+
+/* ---------- Annotation: belt and braces ----------
+   The markup is not generated below 1000px (see roomToScribble in ui.js).
+   These are here so that if it ever is — a cached page, a resize after
+   load — it still cannot appear where there is no room for it. */
+
+@media (max-width:999px){
+  .ctascribble, .ctaring .ring{ display:none !important; }
 }

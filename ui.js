@@ -44,6 +44,15 @@ function backdropHTML(){
 /* The home page carries a call to action under the hero; every other page
    does not, because repeating it on each one turns it into furniture people
    stop seeing. */
+/* Marginalia needs a margin. Below this width there is no room beside the
+   button, so the annotation is not built at all rather than built and
+   hidden — a stylesheet that does not load, or one rule overridden by
+   another, cannot then leave it stranded on a phone. */
+function roomToScribble(){
+  if(typeof window === 'undefined' || !window.matchMedia) return false;
+  return window.matchMedia('(min-width: 1000px)').matches;
+}
+
 /* Hand-drawn annotation. Two overlapping wobbly strokes rather than a clean
    ellipse, because a perfect circle reads as a border and a slightly wrong
    one reads as someone having drawn on the page. Same trick on the arrow. */
@@ -80,24 +89,28 @@ function ctaHTML(){
   } catch(e){}
 
   const hook = (standards && changes)
-    ? standards.toLocaleString('en-GB') + ' standards. ' + changes + ' changes on the board right now. ' +
-      '<em>Almost none of them are your problem.</em>'
-    : 'Most of what changes in this sector is not your problem. <em>Some of it very much is.</em>';
+    ? 'Tell us what you deliver, and this whole site becomes <em>yours</em>.'
+    : 'Tell us what you deliver, and this whole site becomes <em>yours</em>.';
+
+  const sub = (standards && changes)
+    ? 'Your feed shows changes to your standards and the funding rules that apply to you. ' +
+      'Your calendar carries your deadlines. Your levy forecast runs on your own figures. ' +
+      'Out of ' + standards.toLocaleString('en-GB') + ' standards and ' + changes +
+      ' live changes, you see the ones that matter to you — plus a weekly newsletter explaining what moved and why.'
+    : 'Your feed, your calendar, your levy forecast — built around the standards you actually deliver, ' +
+      'with a weekly newsletter explaining what moved and why.';
 
   return '<div class="herocta">' +
     '<div class="ctacopy">' +
       '<p class="ctahook">' + hook + '</p>' +
-      '<p class="ctasub">Tell us which standards you deliver and we will tell you what moved, ' +
-      'what it costs, and what you have to do about it.</p>' +
+      '<p class="ctasub">' + sub + '</p>' +
     '</div>' +
 
     '<div class="ctaact">' +
-      '<div class="ctascribble" aria-hidden="true">' +
-        '<span class="ctanote">this bit</span>' +
-        scribbleArrow() +
-      '</div>' +
+      (roomToScribble() ? '<div class="ctascribble" aria-hidden="true">' +
+        '<span class="ctanote">this bit</span>' + scribbleArrow() + '</div>' : '') +
       '<div class="ctaring">' +
-        scribbleRing() +
+        (roomToScribble() ? scribbleRing() : '') +
         '<a class="ctabtn" href="account.html?join=1">' +
           '<b>Become a member</b><span>' + price + ' ' + period + ' &middot; cancel any time</span>' +
         '</a>' +
