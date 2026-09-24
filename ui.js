@@ -44,6 +44,29 @@ function backdropHTML(){
 /* The home page carries a call to action under the hero; every other page
    does not, because repeating it on each one turns it into furniture people
    stop seeing. */
+/* Hand-drawn annotation. Two overlapping wobbly strokes rather than a clean
+   ellipse, because a perfect circle reads as a border and a slightly wrong
+   one reads as someone having drawn on the page. Same trick on the arrow. */
+function scribbleRing(){
+  return '<svg class="ring" viewBox="0 0 260 86" aria-hidden="true" preserveAspectRatio="none">' +
+    '<path d="M131 6 C74 4 14 17 9 43 C4 69 66 81 130 81 C194 81 253 71 251 44 C249 18 190 7 128 8" ' +
+      'fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" opacity="0.85"/>' +
+    '<path d="M126 11 C72 11 18 22 14 44 C11 66 70 77 131 76 C192 75 246 67 245 45 C244 24 196 12 137 11" ' +
+      'fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.45"/>' +
+  '</svg>';
+}
+
+function scribbleArrow(){
+  return '<svg class="arrow" viewBox="0 0 150 92" aria-hidden="true">' +
+    '<path d="M6 8 C30 3 62 10 84 28 C102 43 110 58 114 76" ' +
+      'fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>' +
+    '<path d="M101 62 C106 70 111 76 115 80" ' +
+      'fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>' +
+    '<path d="M124 63 C121 72 118 78 115 81" ' +
+      'fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>' +
+  '</svg>';
+}
+
 function ctaHTML(){
   const price = (typeof MEMBERSHIP !== 'undefined' && MEMBERSHIP.price) ? MEMBERSHIP.price : '\u00A35';
   const period = (typeof MEMBERSHIP !== 'undefined' && MEMBERSHIP.period) ? MEMBERSHIP.period : 'a month';
@@ -67,10 +90,18 @@ function ctaHTML(){
       '<p class="ctasub">Tell us which standards you deliver and we will tell you what moved, ' +
       'what it costs, and what you have to do about it.</p>' +
     '</div>' +
+
     '<div class="ctaact">' +
-      '<a class="ctabtn" href="account.html?join=1">' +
-        '<b>Become a member</b><span>' + price + ' ' + period + ' &middot; cancel any time</span>' +
-      '</a>' +
+      '<div class="ctascribble" aria-hidden="true">' +
+        '<span class="ctanote">this bit</span>' +
+        scribbleArrow() +
+      '</div>' +
+      '<div class="ctaring">' +
+        scribbleRing() +
+        '<a class="ctabtn" href="account.html?join=1">' +
+          '<b>Become a member</b><span>' + price + ' ' + period + ' &middot; cancel any time</span>' +
+        '</a>' +
+      '</div>' +
       '<a class="ctalink" href="account.html">Already a member? Sign in</a>' +
     '</div>' +
   '</div>';

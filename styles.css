@@ -2759,3 +2759,83 @@ a.arow:hover .go{ opacity:1; }
   .ctasub{ font-size:13px; }
   .ctabtn{ padding:15px 24px; }
 }
+
+/* =========================================================================
+   CALL TO ACTION — the hand-drawn bit
+
+   A wobbly ring round the button and a little arrow with a note, as if
+   somebody has marked up a printout. It is decorative, so it is hidden from
+   screen readers, drops away on narrow screens where there is no room for
+   it, and the animation stops for anyone who has asked for less motion.
+   ========================================================================= */
+
+.ctaact{ position:relative; }
+
+/* ---------- The ring ---------- */
+
+.ctaring{ position:relative; display:block; }
+
+.ctaring .ring{
+  position:absolute;
+  left:-14px; right:-14px; top:-11px; bottom:-11px;
+  width:calc(100% + 28px); height:calc(100% + 22px);
+  color:#F2B858;
+  pointer-events:none;
+  overflow:visible;
+  /* drawn on, rather than simply present */
+  stroke-dasharray:1100;
+  stroke-dashoffset:1100;
+  animation:draw 1.1s cubic-bezier(0.4, 0, 0.2, 1) .45s forwards;
+}
+@keyframes draw{ to { stroke-dashoffset:0; } }
+
+.ctaring .ring path{ vector-effect:non-scaling-stroke; }
+
+/* ---------- The arrow and its note ---------- */
+
+.ctascribble{
+  position:absolute;
+  left:-104px; top:-30px;
+  width:112px; height:96px;
+  color:#F2B858;
+  pointer-events:none;
+  opacity:0;
+  animation:fadein .5s ease 1.25s forwards;
+}
+@keyframes fadein{ to { opacity:1; } }
+
+.ctascribble .arrow{
+  position:absolute; right:-6px; bottom:-6px;
+  width:96px; height:72px;
+  transform:rotate(-4deg);
+  overflow:visible;
+}
+
+.ctanote{
+  position:absolute; left:0; top:0;
+  font-family:'Caveat', 'Bricolage Grotesque', cursive;
+  font-size:26px; font-weight:600; line-height:1;
+  color:#F2B858;
+  transform:rotate(-7deg);
+  white-space:nowrap;
+}
+
+/* ---------- Give the ring somewhere to live ---------- */
+
+.herocta{ overflow:visible; }
+.ctaact{ padding-top:2px; }
+
+/* No room for marginalia on a narrow screen, and it would collide with the
+   copy. The button carries itself. */
+@media (max-width:900px){
+  .ctascribble{ display:none; }
+  .ctaring .ring{ left:-8px; right:-8px; width:calc(100% + 16px); }
+}
+@media (max-width:860px){
+  .ctaring .ring{ display:none; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .ctaring .ring{ animation:none; stroke-dashoffset:0; }
+  .ctascribble{ animation:none; opacity:1; }
+}
