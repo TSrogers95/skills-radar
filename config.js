@@ -14,8 +14,8 @@
    the demo gate on the members page.
    ========================================================================= */
 
-const SUPABASE_URL      = "YOUR-PROJECT-URL";      // https://xxxx.supabase.co
-const SUPABASE_ANON_KEY = "YOUR-ANON-KEY";
+const SUPABASE_URL      = "https://supabase.com/dashboard/project/tjbsnbwrppmywxnwvsrv/settings/general";      // https://xxxx.supabase.co
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqYnNuYndycHBteXd4bnd2c3J2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAxOTI3OTgsImV4cCI6MjEwNTc2ODc5OH0.eQpyKHs81xy43Zh4fsWYQeY2GzjSACdTCTwXWb56FsM";
 
 /* What membership costs, shown on the sign-up page. The actual charge is
    whatever the Stripe price is set to — this is only the wording. */
