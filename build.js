@@ -204,6 +204,7 @@ function page(a, api){
 <script src="../data.js"></script>
 <script src="../app.js"></script>
 <script src="../ui.js"></script>
+<script defer src="/_vercel/insights/script.js"></script>
 <script>
   document.getElementById('heroblock').innerHTML = titleBlockHTML('');
   document.getElementById('navslot').innerHTML = navHTML('articles.html').replace(/href="/g, 'href="../');
@@ -283,7 +284,9 @@ function sitemap(articles){
     { loc: '/articles.html', pri: '0.9', freq: 'daily' },
     { loc: '/standards.html', pri: '0.9', freq: 'weekly' },
     { loc: '/rules.html', pri: '0.8', freq: 'weekly' },
-    { loc: '/members.html', pri: '0.5', freq: 'monthly' }
+    { loc: '/members.html', pri: '0.5', freq: 'monthly' },
+    { loc: '/privacy.html', pri: '0.3', freq: 'yearly' },
+    { loc: '/terms.html', pri: '0.3', freq: 'yearly' }
   ];
 
   const today = new Date().toISOString().slice(0, 10);
@@ -302,8 +305,8 @@ function sitemap(articles){
 function robots(){
   return `User-agent: *
 Allow: /
-Disallow: /import.html
 Disallow: /admin.html
+Disallow: /account.html
 
 Sitemap: ${SITE}/sitemap.xml
 `;

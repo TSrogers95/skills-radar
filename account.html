@@ -73,7 +73,8 @@ async function boot(){
   const user = await currentUser();
   if(user){
     const sub = await getSubscription();
-    if(hasAccess(sub)) location.replace('members.html');
+    const profile = await getProfile();
+    if(hasAccess(sub, profile)) location.replace('members.html');
     else show('pay');
     return;
   }
@@ -323,7 +324,8 @@ function wire(view){
       if(view === 'signin'){
         await signIn(email.trim(), pass);
         const sub = await getSubscription();
-        location.href = hasAccess(sub) ? 'members.html' : 'account.html';
+        const profile = await getProfile();
+        location.href = hasAccess(sub, profile) ? 'members.html' : 'account.html';
         return;
       }
 
@@ -373,5 +375,12 @@ boot();
 recordView();
 
 </script>
+
+<!-- Vercel Web Analytics. The @vercel/analytics package with the /next import
+     is for Next.js apps; this is a plain static site, so it uses the script
+     Vercel serves at /_vercel/insights/script.js instead. It only responds on
+     a Vercel deployment, so it does nothing locally. No cookies, no
+     identifiers, no consent banner needed. -->
+<script defer src="/_vercel/insights/script.js"></script>
 </body>
 </html>

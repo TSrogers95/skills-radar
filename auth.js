@@ -115,12 +115,52 @@ async function getSubscription(){
   return data;
 }
 
-/* Paid access means an active or trialing subscription. past_due keeps
-   access for now, because Stripe retries failed payments for a while and
-   locking someone out on the first failure is a good way to lose them. */
-function hasAccess(sub){
+/* Access means a live subscription, or complimentary access granted on the
+   profile. past_due keeps access, because Stripe retries failed payments for
+   a while and locking someone out on the first failure is a good way to lose
+   them.
+
+   comp_access exists so you can hand someone the full product without taking
+   money — your own demo account, a prospect on trial, a journalist. It is set
+   in the database, never from the browser. */
+function hasAccess(sub, profile){
+  if(profile && profile.comp_access) return true;
   if(!sub) return false;
   return ['active', 'trialing', 'past_due'].indexOf(sub.status) > -1;
+}
+
+/* Everything held about the signed-in member, for their own export. */
+async function exportMyData(){
+  const c = supabase();
+  const user = await currentUser();
+  if(!c || !user) throw new Error('Sign in first.');
+
+  const [profile, standards, events, sub] = await Promise.all([
+    c.from('profiles').select('*').eq('id', user.id).single(),
+    c.from('member_standards').select('*').eq('user_id', user.id),
+    c.from('member_events').select('*').eq('user_id', user.id),
+    c.from('subscriptions').select('*').eq('user_id', user.id).maybeSingle()
+  ]);
+
+  return {
+    exported: new Date().toISOString(),
+    note: 'Everything Skills Radar holds about your account. Payment records are held by Stripe and are not included here — request those from Stripe or ask us.',
+    account: { id: user.id, email: user.email, created: user.created_at },
+    profile: profile.data,
+    standards: standards.data,
+    calendar: events.data,
+    subscription: sub.data
+  };
+}
+
+/* Erase the account. Cascades through every table. Irreversible. */
+async function deleteMyAccount(){
+  const c = supabase();
+  const user = await currentUser();
+  if(!c || !user) throw new Error('Sign in first.');
+  const { error } = await c.rpc('delete_own_account');
+  if(error) throw error;
+  await c.auth.signOut();
 }
 
 /* ---------- Cohort ---------- */
@@ -255,4 +295,54 @@ async function recordView(){
       ? new URL(document.referrer).hostname : null;
     await c.from('page_views').insert({ path: location.pathname, referrer: ref });
   } catch(e){}
+}
+
+/* =========================================================================
+   A MEMBER'S OWN DATA
+
+   Export and erasure, exercised by the person themselves. Both are rights
+   under UK GDPR — Article 15 for access, Article 17 for erasure — and
+   putting them behind an email request makes them slower for the member and
+   more work for you.
+   ========================================================================= */
+
+async function exportMyData(){
+  const c = supabase();
+  const user = await currentUser();
+  if(!c || !user) throw new Error('Not signed in.');
+
+  const [profile, standards, events, sub, audit] = await Promise.all([
+    c.from('profiles').select('*').eq('id', user.id).maybeSingle(),
+    c.from('member_standards').select('*').eq('user_id', user.id),
+    c.from('member_events').select('*').eq('user_id', user.id),
+    c.from('subscriptions').select('*').eq('user_id', user.id).maybeSingle(),
+    c.from('account_events').select('*').eq('user_id', user.id).order('created_at', { ascending: false })
+  ]);
+
+  return {
+    exported_at: new Date().toISOString(),
+    note: 'Everything Skills Radar holds about this account. Payment records are held separately by Stripe.',
+    account: { id: user.id, email: user.email, created_at: user.created_at },
+    profile: profile.data || null,
+    standards: standards.data || [],
+    calendar_events: events.data || [],
+    subscription: sub.data || null,
+    account_history: audit.data || []
+  };
+}
+
+async function deleteMyAccount(){
+  const c = supabase();
+  const { data } = await c.auth.getSession();
+  if(!data || !data.session) throw new Error('Not signed in.');
+
+  const res = await fetch('/api/delete-me', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + data.session.access_token }
+  });
+  const out = await res.json();
+  if(!res.ok) throw new Error(out.error || 'Deletion failed.');
+
+  await c.auth.signOut();
+  return out;
 }

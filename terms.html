@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terms of service — Skills Radar</title>
+<meta name="description" content="What membership includes, what it costs, how to cancel, and the limits of what Skills Radar can be relied on for.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="masthead">
+  <div class="wrap"><div id="heroblock"></div></div>
+</div>
+
+<div class="stickybar">
+  <div class="wrap inner">
+    <a class="mini" href="index.html">Skills <em>Radar</em></a>
+    <div id="navslot"></div>
+  </div>
+</div>
+
+<div class="wrap">
+  <article class="piece low legal">
+    <h1>Terms of service</h1>
+    <p class="pstand">What membership gets you, what it costs, and the limits of what this site can be relied on for.
+    Last updated <span id="updated"></span>.</p>
+
+    <h2>What membership includes</h2>
+    <p>A compliance calendar filtered to the standards you deliver, a feed showing changes that affect you, levy
+    forecasting against your own figures, an off-the-job position against published minimums, and a board report you
+    can print. The public parts of the site — the feed, articles, standards register and funding rules index — are free
+    and always will be.</p>
+
+    <h2>What it costs</h2>
+    <p><span id="price"></span>, taken monthly by Stripe until you cancel. We will tell you at least 30 days before any
+    price change, and you can cancel before it takes effect.</p>
+
+    <h2>Cancelling</h2>
+    <p>Cancel any time from your account page. It takes two clicks and needs no email or phone call. You keep access
+    until the end of the period you have paid for, and you are not charged again.</p>
+    <p>If you are an individual rather than a business, you also have a statutory right to cancel within 14 days of
+    joining for a full refund. Email us and we will process it.</p>
+
+    <h2>What this site is, and is not</h2>
+    <p>Skills Radar summarises and indexes published information about apprenticeship funding, standards and T-Levels.
+    It is a tool for finding and understanding what has changed. <b>It is not legal, financial or compliance advice,
+    and it does not replace the funding rules.</b></p>
+    <p>Every figure and every article links to its source, and where something is compiled automatically from a register
+    rather than written by a person, the page says so. Before you act on anything here — particularly a deadline, a
+    funding band, an off-the-job requirement or an eligibility rule — check it against the source we link to. Government
+    guidance changes, sometimes without notice, and there will be periods when this site is behind it.</p>
+    <p>Levy and off-the-job figures are estimates based on what you enter. They are a planning aid, not a statement of
+    your account. Your Apprenticeship Service account is the authority on what you actually hold and owe.</p>
+
+    <h2>Your responsibilities</h2>
+    <p>Keep your password to yourself. Membership is for one person — if colleagues need access, they need their own
+    accounts. Do not republish substantial parts of the site as your own, and do not scrape it.</p>
+
+    <h2>Our responsibilities</h2>
+    <p>We will make a reasonable effort to keep the site accurate and available, and to tell you when something
+    significant changes. We cannot promise it will never be wrong or never be down.</p>
+    <p>To the extent the law allows, our liability is limited to the amount you have paid us in the previous twelve
+    months. Nothing here limits liability for death, personal injury, or fraud, because it cannot.</p>
+
+    <h2>Ending your membership</h2>
+    <p>You can leave at any time. We can end a membership if it is being misused, and will refund any unused period if
+    we do.</p>
+
+    <h2>Governing law</h2>
+    <p>These terms are governed by the law of England and Wales.</p>
+
+    <h2>Getting in touch</h2>
+    <p>Email <a href="mailto:hello@skillsradar.co.uk">hello@skillsradar.co.uk</a>. For anything about your data, see the
+    <a href="privacy.html">privacy notice</a>.</p>
+  </article>
+</div>
+
+<footer>
+  <div class="wrap">
+    <p><a href="privacy.html">Privacy notice</a> · <a href="index.html">Back to the site</a></p>
+  </div>
+</footer>
+
+<script src="config.js"></script>
+<script src="standards.js"></script>
+<script src="otj-minimums.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script src="ui.js"></script>
+<script>
+document.getElementById('heroblock').innerHTML = titleBlockHTML('');
+document.getElementById('navslot').innerHTML = navHTML('');
+document.getElementById('updated').textContent = fmtLong(DATA_UPDATED);
+document.getElementById('price').textContent = MEMBERSHIP.price + ' ' + MEMBERSHIP.period;
+</script>
+
+<!-- Vercel Web Analytics. The @vercel/analytics package with the /next import
+     is for Next.js apps; this is a plain static site, so it uses the script
+     Vercel serves at /_vercel/insights/script.js instead. It only responds on
+     a Vercel deployment, so it does nothing locally. No cookies, no
+     identifiers, no consent banner needed. -->
+<script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

@@ -2437,3 +2437,126 @@ a.arow:hover .go{ opacity:1; }
 @media (max-width:900px){
   .joinlayout .benefits{ grid-template-columns:1fr 1fr; }
 }
+
+/* ---------- Hero subline and call to action ---------- */
+
+.herosub{
+  display:block; margin-top:8px;
+  font-size:0.87em; color:#8FAEA8; font-weight:400;
+}
+
+.herocta{
+  position:relative; z-index:2;
+  display:flex; align-items:center; gap:18px; flex-wrap:wrap;
+  margin-top:26px; padding-top:24px;
+  border-top:1px solid #1D3C38;
+}
+.ctabtn{
+  display:inline-block; text-decoration:none;
+  background:#6ED0B6; color:#07201C;
+  font-family:var(--sans); font-size:15px; font-weight:600;
+  padding:13px 26px; border-radius:2px;
+  transition:background .15s ease, transform .15s ease;
+}
+.ctabtn:hover{ background:#8CE0C8; transform:translateY(-1px); }
+.ctalink{
+  color:#A9C2BC; font-size:14px; text-decoration:none;
+  border-bottom:1px solid #2A5049; padding-bottom:2px;
+}
+.ctalink:hover{ color:#fff; border-bottom-color:#6ED0B6; }
+.ctanote{
+  flex-basis:100%; margin:4px 0 0;
+  font-size:13px; color:#7FA79F; line-height:1.55; max-width:62ch;
+}
+
+@media (max-width:640px){
+  .herocta{ gap:14px; margin-top:22px; padding-top:20px; }
+  .ctabtn{ width:100%; text-align:center; }
+}
+
+/* ---------- Forecast: adding a cohort ---------- */
+
+.planadd{ padding:0; border:none; background:none; margin-top:18px; }
+
+.planstep{
+  display:grid; grid-template-columns:38px 1fr; gap:16px;
+  background:var(--surface); border:1px solid var(--line);
+  border-left:3px solid var(--ink-3); padding:20px 22px; margin-bottom:8px;
+}
+.planstep.locked{ opacity:0.5; pointer-events:none; border-left-color:var(--line-strong); }
+.stepnum{
+  width:28px; height:28px; border-radius:50%;
+  background:var(--ink); color:#fff; display:flex;
+  align-items:center; justify-content:center;
+  font-family:var(--display); font-size:14px; font-weight:600;
+}
+.stepbody > label{
+  display:block; font-family:var(--display); font-size:15px;
+  font-weight:500; margin-bottom:12px;
+}
+.stepbody .picker{ margin-top:0; }
+.stepbody .picker > label{ display:none; }
+
+.chosen{
+  position:relative; background:var(--paper); border:1px solid var(--line);
+  padding:12px 42px 12px 15px; margin-bottom:16px; font-size:13.5px; color:var(--text-3);
+}
+.chosen b{ display:block; font-family:var(--display); font-size:15px; font-weight:500; color:var(--text); }
+.chosen span{ display:block; font-size:12.5px; color:var(--text-2); margin-top:3px; }
+.chosen em.warn{ font-style:normal; color:var(--high); }
+.chosen .chipx{ position:absolute; right:10px; top:50%; transform:translateY(-50%); }
+
+.planrow{ display:flex; gap:22px; flex-wrap:wrap; align-items:center; margin-bottom:16px; }
+
+.numbump{ display:flex; align-items:center; gap:0; }
+.numbump button{
+  width:34px; height:38px; cursor:pointer; font-size:17px; line-height:1;
+  border:1px solid var(--line-strong); background:var(--paper); color:var(--text);
+}
+.numbump button:hover{ background:var(--ink); color:#fff; border-color:var(--ink); }
+.numbump input{
+  width:64px; height:38px; text-align:center; border:1px solid var(--line-strong);
+  border-left:none; border-right:none; background:var(--surface);
+  font-family:var(--display); font-size:16px; font-weight:500; color:var(--text);
+}
+.numbump input:focus{ outline:none; box-shadow:0 0 0 3px rgba(22,48,47,0.08); position:relative; z-index:1; }
+.numbump span{ margin-left:10px; font-size:13px; color:var(--text-2); }
+
+.whenpick, .agepick{ display:flex; gap:0; }
+.whenpick button, .agepick button{
+  padding:9px 13px; cursor:pointer; font-family:var(--sans); font-size:13px;
+  border:1px solid var(--line-strong); border-right:none;
+  background:var(--surface); color:var(--text-2);
+}
+.whenpick button:last-child, .agepick button:last-child{ border-right:1px solid var(--line-strong); }
+.whenpick button:hover, .agepick button:hover{ background:var(--paper); }
+.whenpick button.on, .agepick button.on{
+  background:var(--ink); color:#fff; border-color:var(--ink); font-weight:500;
+}
+
+.planimpact{
+  display:flex; gap:26px; flex-wrap:wrap;
+  background:var(--paper); border-left:3px solid var(--low);
+  padding:14px 18px; margin-bottom:16px;
+}
+.planimpact:empty{ display:none; }
+.impactrow b{
+  display:block; font-family:var(--display); font-size:19px;
+  font-weight:600; letter-spacing:-0.02em; line-height:1;
+}
+.impactrow b.neg{ color:var(--high); }
+.impactrow b.pos{ color:var(--low); }
+.impactrow span{ display:block; font-size:12px; color:var(--text-2); margin-top:4px; }
+
+@media (max-width:620px){
+  .planrow{ gap:14px; }
+  .whenpick, .agepick{ flex-wrap:wrap; }
+  .planstep{ grid-template-columns:1fr; gap:10px; }
+  .stepnum{ margin-bottom:2px; }
+}
+
+/* ---------- Footer legal links ---------- */
+
+.legal{ font-size:12.5px; margin:0 0 14px; }
+.legal a{ color:#9DB0AD; text-decoration:none; border-bottom:1px solid #22443F; }
+.legal a:hover{ color:#fff; }

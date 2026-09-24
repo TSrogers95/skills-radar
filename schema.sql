@@ -27,6 +27,8 @@ create table if not exists profiles (
   frequency      text check (frequency in ('weekly','monthly')) default 'weekly',
   email_opt_out  boolean default false,       -- the tick box on sign-up
   is_admin       boolean default false,
+  comp_access    boolean default false,       -- free access: demos, press, your own account
+  deleted_at     timestamptz,                 -- soft delete, see below
   created_at     timestamptz default now(),
   updated_at     timestamptz default now()
 );
@@ -212,7 +214,41 @@ create policy "admins read views" on page_views
 create index if not exists page_views_day on page_views (day desc);
 
 
+-- ---------- Deletion ----------
+-- UK GDPR gives people the right to erasure. Deleting the auth user cascades
+-- through every table above, which is what "erasure" has to mean — not a flag
+-- saying ignore this row.
+--
+-- One exception, and it is a lawful one: records of a payment must be kept for
+-- HMRC for six years. Those live in Stripe, not here, and Stripe handles the
+-- retention. Nothing in this database needs keeping after a deletion request.
+--
+-- A member can delete their own account from the members page. An admin can
+-- delete anyone's. Both call the same function and both cascade.
+
+create or replace function delete_own_account()
+returns void
+language plpgsql
+security definer set search_path = public
+as $$
+begin
+  if auth.uid() is null then
+    raise exception 'Not signed in';
+  end if;
+  delete from auth.users where id = auth.uid();
+end;
+$$;
+
+revoke all on function delete_own_account() from public;
+grant execute on function delete_own_account() to authenticated;
+
+
 -- ---------- Make yourself an admin ----------
 -- Sign up through the site first, then run this with your own email:
 --
 --   update profiles set is_admin = true where email = 'you@example.com';
+--
+-- And to give an account free access without going through Stripe — your own
+-- demo account, a journalist, a trial for a prospect:
+--
+--   update profiles set comp_access = true where email = 'you@example.com';

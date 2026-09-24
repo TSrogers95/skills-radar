@@ -68,6 +68,7 @@
         <span class="tabsep" aria-hidden="true"></span>
         <button data-view="write">Write an article</button>
         <button data-view="content">Content</button>
+        <button data-view="import">Import data</button>
         <span class="tabsep" aria-hidden="true"></span>
         <button data-view="email">Email</button>
       </div>
@@ -89,6 +90,7 @@
 <script src="app.js"></script>
 <script src="ui.js"></script>
 <script src="auth.js"></script>
+<script src="import-tools.js"></script>
 <script>
 
 document.getElementById('heroblock').innerHTML = titleBlockHTML('');
@@ -207,9 +209,10 @@ function render(){
   const p = document.getElementById('apanel');
   if(view === 'overview'){ p.innerHTML = overviewView(); loadTraffic(p); }
   if(view === 'members'){ p.innerHTML = membersView(); loadMembers(p); }
-  if(view === 'content')  p.innerHTML = contentView();
+  if(view === 'content'){ p.innerHTML = contentView(); wireRemove(p); }
   if(view === 'email')    p.innerHTML = emailView();
   if(view === 'write'){   p.innerHTML = writeView(); wireWrite(p); }
+  if(view === 'import')   renderImportTool(p);
   window.scrollTo({ top:0, behavior:'smooth' });
 }
 
@@ -346,6 +349,8 @@ async function loadMembers(panel){
       '<td>' + statusTag(x.subscription) + '</td>' +
       '<td>' + (x.email_opt_out ? '<span class="chg none">opted out</span>' : '<span class="chg yes">yes</span>') + '</td>' +
       '<td class="num">' +
+        '<button class="linkbtn" data-comp="' + x.id + '" data-em="' + x.email + '">' +
+          (['active','trialing'].indexOf(x.subscription.status) > -1 ? 'Revoke' : 'Grant free') + '</button> ' +
         '<button class="linkbtn" data-reset="' + x.email + '" data-uid="' + x.id + '">Reset</button> ' +
         '<button class="linkbtn" data-export="' + x.id + '">Export</button> ' +
         '<button class="linkbtn" data-del="' + x.id + '" data-em="' + x.email + '">Delete</button>' +
@@ -368,6 +373,15 @@ function wireMemberActions(el){
     document.getElementById('actionout').innerHTML =
       '<div class="' + (kind || 'okbox') + '" style="margin-top:16px">' + text + '</div>';
   };
+
+  el.querySelectorAll('[data-comp]').forEach(b => b.addEventListener('click', async () => {
+    const granting = b.textContent.indexOf('Grant') === 0;
+    if(!confirm((granting ? 'Give ' : 'Remove ') + b.dataset.em +
+      (granting ? ' free access with no payment?' : "'s free access?"))) return;
+    const out = await adminAction({ action: granting ? 'comp' : 'uncomp', userId: b.dataset.comp });
+    say(out.message || out.error, out.ok ? 'okbox' : 'alert');
+    if(out.ok) render();
+  }));
 
   el.querySelectorAll('[data-reset]').forEach(b => b.addEventListener('click', async () => {
     const out = await adminAction({ action:'reset', email: b.dataset.reset, userId: b.dataset.uid });
@@ -661,15 +675,89 @@ function contentView(){
     '</div>' +
 
     '<div class="grouphead"><h2>Written articles</h2><div class="rule"></div></div>' +
-    '<table class="std"><thead><tr><th>Article</th><th>Category</th><th>Date</th><th>Address</th></tr></thead><tbody>' +
+    '<table class="std"><thead><tr><th>Article</th><th>Category</th><th>Date</th><th>Address</th><th></th></tr></thead><tbody>' +
     written.map(a => '<tr><td class="nm">' + a.title + '<small>' + a.summary + '</small></td>' +
       '<td>' + a.tag + '</td><td class="num">' + fmtLong(a.date) + '</td>' +
-      '<td><a class="stdlink" href="a/' + a.id + '.html">/a/' + a.id + '</a></td></tr>').join('') +
+      '<td><a class="stdlink" href="a/' + a.id + '.html">/a/' + a.id + '</a></td>' +
+      '<td class="num"><button class="rm" data-remove="' + a.id + '" title="Remove this article">&times;</button></td>' +
+      '</tr>').join('') +
     '</tbody></table>' +
+    '<div id="removeout"></div>' +
 
-    '<div class="notice" style="margin-top:20px"><b>Editing a written article.</b> ' +
+    '<div class="grouphead"><h2>Compiled pages</h2><div class="rule"></div></div>' +
+    '<div class="notice" style="margin-top:0"><b>These cannot be deleted from here, and that is deliberate.</b> ' +
+    'A compiled page exists because a standard has a recorded change. Remove the change in the register and the page ' +
+    'disappears on the next build; delete the page while the change is still there and the next build puts it back. ' +
+    'There are ' + compiled.length + ' of them.</div>' +
+
+    '<div class="notice" style="margin-top:14px"><b>Editing a written article.</b> ' +
     'Open <code>data.js</code> on GitHub, find the block with that id, change it and commit. The build regenerates its page. ' +
     'Changing the id changes the address and breaks any link already shared — rename only if you mean to.</div>';
+}
+
+/* ---------- Removing an article ----------
+
+   The site's content lives in data.js in the repo, so nothing here can
+   delete a file directly — and that is the right shape, because every change
+   should be a commit you can revert. This works out exactly what to remove
+   and what else points at it, so a deletion does not leave dead links behind.
+*/
+
+function wireRemove(panel){
+  panel.querySelectorAll('[data-remove]').forEach(b =>
+    b.addEventListener('click', () => removeArticle(b.dataset.remove)));
+}
+
+function removeArticle(id){
+  const article = allArticles().find(a => a.id === id);
+  if(!article) return;
+
+  // what would break
+  const feedRefs = allUpdates().filter(u => u.article === id);
+  const stdRefs  = STANDARDS.filter(s => s.article === id);
+  const msRefs   = MILESTONES.filter(m => m.article === id);
+  const incRefs  = (typeof INCENTIVES !== 'undefined' ? INCENTIVES : []).filter(i => i.article === id);
+  const total    = stdRefs.length + msRefs.length + incRefs.length;
+
+  document.getElementById('removeout').innerHTML =
+    '<div class="lsection costs" style="margin-top:24px">' +
+      '<div class="lhead"><h2>Remove &ldquo;' + article.title + '&rdquo;</h2>' +
+      '<p>Nothing has changed yet. This is what removing it involves.</p></div>' +
+
+      (total || feedRefs.length
+        ? '<div class="alert"><b>' + (total || feedRefs.length) + ' thing' + ((total || feedRefs.length) === 1 ? '' : 's') +
+          ' link to this article.</b> Remove the <code>article:</code> line from each, or they will point at a page ' +
+          'that no longer exists.' +
+          '<ul style="margin:10px 0 0;padding-left:18px;font-size:13px">' +
+            stdRefs.map(s => '<li>Standard: <b>' + s.name + '</b> — remove <code>article:"' + id + '"</code></li>').join('') +
+            msRefs.map(m => '<li>Milestone: <b>' + m.title + '</b></li>').join('') +
+            incRefs.map(i => '<li>Incentive: <b>' + i.name + '</b></li>').join('') +
+            (!total && feedRefs.length ? '<li>' + feedRefs.length + ' feed item' + (feedRefs.length === 1 ? '' : 's') +
+              ' resolve to it automatically — those will fall back to their route round-up, so nothing breaks.</li>' : '') +
+          '</ul></div>'
+        : '<div class="okbox"><b>Nothing links to it.</b> Safe to remove.</div>') +
+
+      '<div class="grouphead" style="margin-top:22px"><h2>How to remove it</h2><div class="rule"></div></div>' +
+      '<ol class="replist" style="margin-top:14px">' +
+        '<li><b>Open data.js on GitHub</b><span>Search for <code>id: "' + id + '"</code>.</span></li>' +
+        '<li><b>Delete that whole block</b><span>From the opening brace of the entry to the closing one, including the trailing comma.</span></li>' +
+        (total ? '<li><b>Remove the links listed above</b><span>Delete the <code>article:</code> property from each one.</span></li>' : '') +
+        '<li><b>Update the stamp</b><span>Set <code>DATA_UPDATED</code> to today.</span></li>' +
+        '<li><b>Commit</b><span>The build regenerates the site without it, and drops it from the sitemap. ' +
+        'The old page stops existing, so any link already shared will 404 — that is the cost of deleting rather than rewriting.</span></li>' +
+      '</ol>' +
+
+      '<div class="notice" style="margin-top:18px"><b>Consider rewriting instead.</b> ' +
+      'If the article is wrong rather than unwanted, editing it keeps the address alive for anyone who has already ' +
+      'bookmarked or shared it. Deleting is the right call for a duplicate or something published by mistake.</div>' +
+
+      '<button class="btn small ghost" id="cancelremove" style="margin-top:16px">Close</button>' +
+    '</div>';
+
+  document.getElementById('cancelremove').addEventListener('click', () => {
+    document.getElementById('removeout').innerHTML = '';
+  });
+  document.getElementById('removeout').scrollIntoView({ behavior:'smooth', block:'nearest' });
 }
 
 /* ---------- Email ---------- */
@@ -702,5 +790,12 @@ document.getElementById('foot').textContent =
   'Administration. This page is excluded from search engines and from the sitemap.';
 
 </script>
+
+<!-- Vercel Web Analytics. The @vercel/analytics package with the /next import
+     is for Next.js apps; this is a plain static site, so it uses the script
+     Vercel serves at /_vercel/insights/script.js instead. It only responds on
+     a Vercel deployment, so it does nothing locally. No cookies, no
+     identifiers, no consent banner needed. -->
+<script defer src="/_vercel/insights/script.js"></script>
 </body>
 </html>

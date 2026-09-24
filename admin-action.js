@@ -39,6 +39,32 @@ module.exports = async function handler(req, res){
       return res.status(200).json({ ok: true, message: 'Reset email sent to ' + email });
     }
 
+    /* Free access, for demonstrations, a trial, or putting right a payment
+       that went wrong. Written straight into the subscriptions table with a
+       marker price so it is obvious later that nobody paid for it. */
+    if(action === 'comp' || action === 'uncomp'){
+      if(!userId) return res.status(400).json({ error: 'No user given.' });
+
+      const row = action === 'comp'
+        ? { user_id: userId, status: 'active', price_id: 'comped', updated_at: new Date().toISOString() }
+        : { user_id: userId, status: 'none',   price_id: null,     updated_at: new Date().toISOString() };
+
+      await admin('subscriptions', {
+        method: 'POST',
+        prefer: 'resolution=merge-duplicates,return=minimal',
+        headers: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+        body: JSON.stringify(row)
+      });
+
+      await logEvent(userId, action === 'comp' ? 'free_access_granted' : 'free_access_revoked', { by: caller.id });
+      return res.status(200).json({
+        ok: true,
+        message: action === 'comp'
+          ? 'Free access granted. They can use the members area without paying. It shows as price_id "comped" so it is distinguishable from a real subscription.'
+          : 'Free access removed. They will be asked to pay on their next visit.'
+      });
+    }
+
     /* Everything held about one person, for a subject access request. */
     if(action === 'export'){
       if(!userId) return res.status(400).json({ error: 'No user given.' });

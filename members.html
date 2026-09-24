@@ -24,69 +24,8 @@
 </div>
 
 <!-- ============ PUBLIC LANDING ============ -->
-<div id="public">
-  <div class="wrap">
-    <div class="pagehead">
-      <h1>Skills Radar Members</h1>
-      <p>The public feed tells you what changed. Membership tells you what it means <em>for you</em> — filtered to the standards you actually deliver, with the dates in your own calendar and the funding modelled against your own payroll.</p>
-    </div>
+<div id="public" hidden></div>
 
-    <div class="joinlayout">
-      <div class="benefits">
-        <div class="benefit">
-          <h3>Your own compliance calendar</h3>
-          <p>Twelve months of deadlines, filtered to the standards you deliver. Each date carries the action it requires and who it lands on, so preparation starts weeks ahead rather than the week of.</p>
-        </div>
-        <div class="benefit">
-          <h3>A feed built around your provision</h3>
-          <p>Select every standard you deliver and the feed splits in two: changes to your programmes on one side, the funding rules that apply to everyone on the other.</p>
-        </div>
-        <div class="benefit">
-          <h3>Levy modelling against your payroll</h3>
-          <p>Enter your pay bill and cohort. See annual funds in, what your apprentices commit you to, and the point you tip into 25% co-investment — before it lands on an invoice.</p>
-        </div>
-        <div class="benefit">
-          <h3>A newsletter that is actually yours</h3>
-          <p>Weekly or monthly, built around your routes and standards. If something changes on a programme you run, it leads the email.</p>
-        </div>
-      </div>
-
-      <div class="signin-panel joinpanel">
-        <div class="markrule" style="margin-bottom:20px">
-          <span class="tick" aria-hidden="true"><b></b><b></b><b></b></span>
-          <span class="lbl" style="color:var(--text-3)">Sign in</span>
-          <span class="line" style="background:var(--line)"></span>
-        </div>
-        <h2>Members sign in</h2>
-        <p>Your calendar, your feed, your levy position.</p>
-
-        <form id="loginform" novalidate data-demo="1">
-          <div class="field">
-            <label for="u">Username</label>
-            <input type="text" id="u" autocomplete="username" autocapitalize="off" spellcheck="false" placeholder="Your username">
-          </div>
-          <div class="field">
-            <label for="p">Password</label>
-            <div class="pwwrap">
-              <input type="password" id="p" autocomplete="current-password" placeholder="Your password">
-              <button type="button" class="peek" id="peek" aria-label="Show password">Show</button>
-            </div>
-          </div>
-          <div class="err" id="loginerr" hidden>That username and password combination is not recognised.</div>
-          <button class="btn" type="submit" id="signinbtn">Sign in</button>
-        </form>
-
-        <div class="demo">
-          <b>Demo access</b>
-          <span>Username <code>test</code> &nbsp;·&nbsp; Password <code>test</code></span>
-          <button type="button" class="fill" id="fill">Fill it in</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ============ MEMBERS AREA ============ -->
 <div id="members" hidden>
 
   <div class="memberbar">
@@ -109,6 +48,7 @@
         <span class="tabsep" aria-hidden="true"></span>
         <button data-view="report">Report</button>
         <button data-view="prefs">Newsletter</button>
+        <button data-view="account">Your account</button>
       </div>
     </div>
   </div>
@@ -124,7 +64,8 @@
   <div class="wrap">
     <p>Levy figures are estimates built from the rates in the current funding rules and the numbers you enter. They are a planning aid, not a statement of your account. Check your Apprenticeship Service account and the funding rules before making a financial decision. Incentives and grants change frequently — every one links to its source.</p>
   </div>
-    <div class="wrap"><div class="attribution"><a href="https://www.gov.uk/government/organisations/skills-england" target="_blank" rel="noopener" class="selogo"><img src="https://occupational-maps.skillsengland.education.gov.uk/media/cyropis5/skills-england_lesser_arms_landscape-se-logo-white.svg" alt="Skills England" width="150" height="40" loading="lazy"></a><p>Contains data from Skills England. &copy; Skills England 2026. This information is licensed under the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3" target="_blank" rel="noopener">Open Government Licence v3.0</a>. Funding rules content is Crown copyright, also under the Open Government Licence.</p></div></div>
+    <div class="wrap"><p class="legal"><a href="privacy.html">Privacy notice</a> &middot; <a href="terms.html">Terms</a> &middot; <a href="account.html">Members</a></p>
+      <div class="attribution"><a href="https://www.gov.uk/government/organisations/skills-england" target="_blank" rel="noopener" class="selogo"><img src="https://occupational-maps.skillsengland.education.gov.uk/media/cyropis5/skills-england_lesser_arms_landscape-se-logo-white.svg" alt="Skills England" width="150" height="40" loading="lazy"></a><p>Contains data from Skills England. &copy; Skills England 2026. This information is licensed under the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3" target="_blank" rel="noopener">Open Government Licence v3.0</a>. Funding rules content is Crown copyright, also under the Open Government Licence.</p></div></div>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
@@ -148,47 +89,91 @@ function refreshBar(){
     cohortHeads() + ' apprentices · ' + COHORT.length + ' standard' + (COHORT.length === 1 ? '' : 's');
 }
 
-function unlock(){
-  document.getElementById('public').hidden = true;
-  document.getElementById('members').hidden = false;
-  document.getElementById('orgname').textContent = MEMBER.org;
-  refreshBar();
-  render();
+/* =========================================================================
+   ACCESS
+
+   The member must be signed in AND either have a live subscription or
+   complimentary access on their profile. Both are checked against the
+   database, never against anything the browser claims. Someone signed in
+   without access is sent to the payment step rather than shown an error.
+   ========================================================================= */
+
+let ACCOUNT = null;
+
+async function checkAccess(){
+  if(!accountsLive()){
+    document.body.innerHTML =
+      '<div class="wrap"><div class="pagehead centred" style="padding-top:60px">' +
+      '<h1>Accounts are not connected</h1>' +
+      '<p>This page needs Supabase. Add your project URL and anon key to <code>config.js</code>. ' +
+      'The setup guide walks through it.</p></div></div>';
+    return 'blocked';
+  }
+
+  const user = await currentUser();
+  if(!user){ location.replace('account.html'); return 'redirect'; }
+
+  const sub = await getSubscription();
+  const profile = await getProfile();
+  if(!hasAccess(sub, profile)){ location.replace('account.html'); return 'redirect'; }
+
+  ACCOUNT = { user: user, subscription: sub, profile: profile };
+  return 'member';
 }
 
-document.getElementById('loginform').addEventListener('submit', e => {
-  e.preventDefault();
-  const u = document.getElementById('u').value.trim().toLowerCase();
-  const p = document.getElementById('p').value.trim();
-  if(u === MEMBER.username && p === MEMBER.password){
-    try { sessionStorage.setItem('sr-member','1'); } catch(err){}
-    unlock();
-  } else {
-    document.getElementById('loginerr').hidden = false;
-  }
-});
+/* Pull their saved cohort, events and settings in place of the defaults. */
+async function loadAccount(){
+  if(!ACCOUNT) return;
+  try {
+    const saved = await loadStandards();
+    if(saved.length){
+      COHORT = saved.map(s => ({ ...s }));
+      saved.forEach(s => { if(s.otj && (s.otj.published || s.otj.rpl || s.otj.planned)) OTJ[s.name] = s.otj; });
+    }
+    const evs = await loadEvents();
+    if(evs.length) MYEVENTS = evs;
 
-document.getElementById('peek').addEventListener('click', () => {
-  const p = document.getElementById('p');
-  const shown = p.type === 'text';
-  p.type = shown ? 'password' : 'text';
-  document.getElementById('peek').textContent = shown ? 'Show' : 'Hide';
-  p.focus();
-});
+    const p = ACCOUNT.profile;
+    if(p){
+      if(p.payroll)    SETTINGS.payroll = p.payroll;
+      if(p.monthly_in) SETTINGS.monthlyIn = p.monthly_in;
+      if(p.opening)    SETTINGS.opening = p.opening;
+      if(p.young_count != null) SETTINGS.young = p.young_count;
+      SETTINGS.levyPayer = !!p.levy_payer;
+      MEMBER.org = p.org_name || p.email;
+      MEMBER.levyPayer = !!p.levy_payer;
+    }
+  } catch(e){ console.warn('could not load account data:', e.message); }
+}
 
-document.getElementById('fill').addEventListener('click', () => {
-  document.getElementById('u').value = MEMBER.username;
-  document.getElementById('p').value = MEMBER.password;
-  document.getElementById('loginerr').hidden = true;
-  document.getElementById('signinbtn').focus();
-});
+/* Write back what changed. Quiet on failure — someone typing into the
+   calculator should not be interrupted by a save error. */
+async function persist(){
+  if(!ACCOUNT) return;
+  try {
+    await saveProfile({
+      payroll: SETTINGS.payroll || null,
+      monthly_in: SETTINGS.monthlyIn || null,
+      opening: SETTINGS.opening || null,
+      young_count: SETTINGS.young,
+      levy_payer: !!SETTINGS.levyPayer
+    });
+    for(const c of COHORT){
+      c.otj = OTJ[c.name] || c.otj;
+      c.dbId = await saveStandard(c);
+    }
+  } catch(e){ console.warn('save failed:', e.message); }
+}
 
-['u','p'].forEach(id => document.getElementById(id).addEventListener('input', () => {
-  document.getElementById('loginerr').hidden = true;
-}));
+let persistTimer = null;
+function queueSave(){
+  if(!ACCOUNT) return;
+  clearTimeout(persistTimer);
+  persistTimer = setTimeout(persist, 1200);
+}
+
 
 document.getElementById('signout').addEventListener('click', async () => {
-  try { sessionStorage.removeItem('sr-member'); } catch(e){}
   if(accountsLive()){ await signOut(); location.href = 'account.html'; return; }
   location.reload();
 });
@@ -1497,18 +1482,40 @@ function forecastView(){
         '<th>Standard</th><th>How many</th><th>Starting</th><th>Age group</th><th>Commitment</th><th></th>' +
       '</tr></thead><tbody>' + plannedRows + '</tbody></table>' +
 
-      '<div class="planadd">' +
-        pickerHTML('planpick') +
-        '<div class="planfields">' +
-          '<div class="field"><label for="p-count">How many</label><input type="number" id="p-count" min="1" value="10"></div>' +
-          '<div class="field"><label for="p-start">Starting in</label>' +
-            '<select id="p-start">' + [0,1,2,3,4,5,6,9,12,18].map(n =>
-              '<option value="' + n + '">' + monthName(n) + '</option>').join('') + '</select></div>' +
-          '<div class="field"><label for="p-age">Age group</label>' +
-            '<select id="p-age"><option value="1">16 to 24</option><option value="0">25 and over</option></select></div>' +
+      '<div class="planadd" id="planadd">' +
+        '<div class="planstep" id="planstep1">' +
+          '<span class="stepnum">1</span>' +
+          '<div class="stepbody">' +
+            '<label>Which standard?</label>' +
+            pickerHTML('planpick') +
+          '</div>' +
+        '</div>' +
+        '<div class="planstep locked" id="planstep2">' +
+          '<span class="stepnum">2</span>' +
+          '<div class="stepbody">' +
+            '<label>How many, when, and how old?</label>' +
+            '<div class="chosen" id="planchosen">Pick a standard first</div>' +
+            '<div class="planrow">' +
+              '<div class="numbump">' +
+                '<button type="button" id="p-down" aria-label="Fewer">&minus;</button>' +
+                '<input type="number" id="p-count" min="1" max="500" value="10">' +
+                '<button type="button" id="p-up" aria-label="More">+</button>' +
+                '<span>apprentices</span>' +
+              '</div>' +
+              '<div class="whenpick" id="p-when">' +
+                [0,1,3,6,12].map((n, i) => '<button type="button" data-m="' + n + '"' +
+                  (i === 0 ? ' class="on"' : '') + '>' + (n === 0 ? 'Now' : monthName(n)) + '</button>').join('') +
+              '</div>' +
+              '<div class="agepick" id="p-agepick">' +
+                '<button type="button" data-age="1" class="on">16 to 24</button>' +
+                '<button type="button" data-age="0">25 and over</button>' +
+              '</div>' +
+            '</div>' +
+            '<div class="planimpact" id="planimpact"></div>' +
+            '<button class="btn" id="p-add" disabled>Add to the forecast</button>' +
+          '</div>' +
         '</div>' +
       '</div>' +
-      '<p class="hint">Search for the standard above, then set the numbers. It is added as soon as you pick one.</p>' +
     '</section>' +
 
     '<section class="lsection costs">' +
@@ -1676,31 +1683,227 @@ function wireForecast(panel){
     SETTINGS.horizon = +hz.value; saveSettings(); render();
   });
 
+  /* Two steps rather than four boxes. Pick a standard, then set the numbers
+     with the running cost visible, so the effect is obvious before it is
+     committed rather than after. */
+
+  let chosen = null, months = 0, under25 = true;
+
+  function refreshImpact(){
+    const el = document.getElementById('planimpact');
+    const add = document.getElementById('p-add');
+    if(!chosen){ if(add) add.disabled = true; return; }
+
+    const count = Math.max(1, parseInt(document.getElementById('p-count').value, 10) || 1);
+    const commitment = chosen.funding * count;
+
+    // what it does to the forecast, worked out before adding it
+    const before = runForecast();
+    const trial = forecastLevy({
+      months: forecastInputs().horizon,
+      monthlyIn: forecastInputs().monthlyIn,
+      opening: forecastInputs().opening,
+      cohorts: allCohorts().concat([forecastCohort(chosen, count, months, under25)]),
+      levyPayer: SETTINGS.levyPayer
+    });
+    const extraCost = trial.coInvestTotal - before.coInvestTotal;
+    const savedExpiry = before.expiredTotal - trial.expiredTotal;
+
+    el.innerHTML =
+      '<div class="impactrow"><b>' + money(commitment) + '</b><span>total commitment</span></div>' +
+      '<div class="impactrow"><b class="' + (extraCost > 0 ? 'neg' : '') + '">' +
+        (extraCost > 0 ? '+' + money(Math.round(extraCost)) : 'nothing') + '</b>' +
+        '<span>' + (extraCost > 0 ? 'added to what you pay' : 'costs you nothing — levy covers it') + '</span></div>' +
+      (savedExpiry > 100
+        ? '<div class="impactrow"><b class="pos">' + money(Math.round(savedExpiry)) + '</b><span>less expiring unused</span></div>'
+        : '') +
+      (chosen.months ? '<div class="impactrow"><b>' + chosen.months + '</b><span>months, ending ' +
+        monthName(months + chosen.months) + '</span></div>' : '');
+
+    if(add) add.disabled = false;
+  }
+
+  function choose(s){
+    chosen = s;
+    document.getElementById('planstep2').classList.remove('locked');
+    document.getElementById('planchosen').innerHTML =
+      '<b>L' + s.level + ' ' + s.name + '</b>' +
+      '<span>' + money(s.funding) + ' band · ' + (s.months || 12) + ' months' +
+      (/Defunded/i.test(s.status) ? ' · <em class="warn">losing funding September 2026</em>' : '') + '</span>' +
+      '<button type="button" class="chipx" id="p-clear" aria-label="Choose a different standard">&times;</button>';
+    document.getElementById('p-clear').addEventListener('click', clearChoice);
+    refreshImpact();
+  }
+
+  function clearChoice(){
+    chosen = null;
+    document.getElementById('planstep2').classList.add('locked');
+    document.getElementById('planchosen').textContent = 'Pick a standard first';
+    document.getElementById('planimpact').innerHTML = '';
+    document.getElementById('p-add').disabled = true;
+    const q = document.getElementById('planpick-q');
+    if(q){ q.value = ''; q.focus(); }
+  }
+
   wirePicker('planpick', function(){});
-  const input = document.getElementById('planpick-q');
   const res = document.getElementById('planpick-res');
   if(res){
-    // intercept the picker so a pick becomes a planned cohort rather than
-    // joining the member's actual standards
     res.addEventListener('click', e => {
       const btn = e.target.closest('.pickeritem');
       if(!btn) return;
       e.stopPropagation();
       const s = STANDARDS.find(x => x.name === btn.dataset.name);
       if(!s) return;
-      PLANNED.push(forecastCohort(s,
-        Math.max(1, parseInt(document.getElementById('p-count').value, 10) || 1),
-        +document.getElementById('p-start').value,
-        document.getElementById('p-age').value === '1'));
-      savePlanned();
-      if(input) input.value = '';
+      const q = document.getElementById('planpick-q');
+      if(q) q.value = '';
       res.innerHTML = ''; res.classList.remove('on');
-      render();
+      choose(s);
     }, true);
   }
 
+  const countBox = document.getElementById('p-count');
+  if(countBox) countBox.addEventListener('input', refreshImpact);
+
+  const bump = (id, by) => {
+    const b = document.getElementById(id);
+    if(b) b.addEventListener('click', () => {
+      countBox.value = Math.max(1, (parseInt(countBox.value, 10) || 1) + by);
+      refreshImpact();
+    });
+  };
+  bump('p-up', 1); bump('p-down', -1);
+
+  panel.querySelectorAll('#p-when button').forEach(b =>
+    b.addEventListener('click', () => {
+      panel.querySelectorAll('#p-when button').forEach(x => x.classList.remove('on'));
+      b.classList.add('on'); months = +b.dataset.m; refreshImpact();
+    }));
+
+  panel.querySelectorAll('#p-agepick button').forEach(b =>
+    b.addEventListener('click', () => {
+      panel.querySelectorAll('#p-agepick button').forEach(x => x.classList.remove('on'));
+      b.classList.add('on'); under25 = b.dataset.age === '1'; refreshImpact();
+    }));
+
+  const add = document.getElementById('p-add');
+  if(add) add.addEventListener('click', () => {
+    if(!chosen) return;
+    PLANNED.push(forecastCohort(chosen,
+      Math.max(1, parseInt(countBox.value, 10) || 1), months, under25));
+    savePlanned();
+    render();
+  });
+
   panel.querySelectorAll('[data-plan]').forEach(b =>
     b.addEventListener('click', () => { PLANNED.splice(+b.dataset.plan, 1); savePlanned(); render(); }));
+}
+
+/* =========================================================================
+   YOUR ACCOUNT
+
+   Export and deletion belong to the member, not only to an administrator.
+   Under UK GDPR a person has the right to a copy of their data and the right
+   to have it erased, and making them email someone to ask is both a worse
+   experience and more work for you.
+   ========================================================================= */
+
+function accountView(){
+  const p = ACCOUNT && ACCOUNT.profile;
+  const s = ACCOUNT && ACCOUNT.subscription;
+
+  return '<div class="pagehead"><h1>Your account</h1>' +
+    '<p>What we hold, what it costs, and how to take it away.</p></div>' +
+
+    '<div class="grouphead"><h2>Details</h2><div class="rule"></div></div>' +
+    '<table class="std levytable"><tbody>' +
+      '<tr><td class="nm">Email</td><td class="num big">' + (p ? p.email : '') + '</td>' +
+        '<td>Used to sign in, and to send what you have asked for</td></tr>' +
+      '<tr><td class="nm">Organisation</td><td class="num big">' + ((p && p.org_name) || 'not set') + '</td>' +
+        '<td>Shown on your board report</td></tr>' +
+      '<tr><td class="nm">Newsletter</td><td class="num big">' + (p && p.email_opt_out ? 'Opted out' : 'Subscribed') + '</td>' +
+        '<td>Change it on the Newsletter tab</td></tr>' +
+      '<tr><td class="nm">Membership</td><td class="num big">' + subLabel(s) + '</td><td>' +
+        (s && s.current_period_end ? 'Next renewal ' + fmtLong(s.current_period_end.slice(0,10)) : 'No renewal date') +
+        '</td></tr>' +
+    '</tbody></table>' +
+
+    '<div class="addrow" style="margin-top:18px">' +
+      '<button class="btn" id="acc-billing">Manage billing and cancel</button>' +
+      '<span class="hint" style="align-self:center;margin:0">Card, invoices and cancellation are handled by Stripe</span>' +
+    '</div>' +
+
+    '<div class="grouphead"><h2>Your data</h2><div class="rule"></div></div>' +
+    '<div class="todolist">' +
+      '<div class="todo watch"><div class="todotext"><h3>Download everything we hold</h3>' +
+      '<p>Your profile, the standards you follow, your calendar entries, your subscription record and your account ' +
+      'history, as a single file. This is the same export we would send if you asked formally.</p></div>' +
+      '<button class="todoact" id="acc-export">Download</button></div>' +
+
+      '<div class="todo stop"><div class="todotext"><h3>Delete your account</h3>' +
+      '<p>Removes your profile, your standards, your calendar entries and your history. It cannot be undone. ' +
+      'Cancel your membership first, or you will keep being charged for an account that no longer exists — ' +
+      'the billing button above does that.</p></div>' +
+      '<button class="todoact" id="acc-delete">Delete</button></div>' +
+    '</div>' +
+
+    '<div id="acc-out"></div>' +
+
+    '<div class="notice" style="margin-top:22px"><b>What happens to a deleted account.</b> ' +
+    'Everything listed above is removed immediately. Stripe keeps a record of payments taken, because tax law ' +
+    'requires it to be kept for six years — that is a legal obligation nobody can override, and it holds your email ' +
+    'and payment history, nothing else from this site. The <a href="privacy.html">privacy notice</a> sets out the detail.</div>';
+}
+
+function subLabel(s){
+  if(!s) return 'None';
+  const map = { active:'Active', trialing:'Trial', past_due:'Payment failing', canceled:'Cancelled', none:'Not subscribed' };
+  return (map[s.status] || s.status) + (s.cancel_at_period_end ? ' — ending at period end' : '');
+}
+
+function wireAccount(panel){
+  const say = (t, k) => {
+    const o = document.getElementById('acc-out');
+    if(o) o.innerHTML = '<div class="' + (k || 'okbox') + '" style="margin-top:18px">' + t + '</div>';
+  };
+
+  const b = document.getElementById('acc-billing');
+  if(b) b.addEventListener('click', async () => {
+    try { await openBilling(); } catch(e){ say(e.message, 'alert'); }
+  });
+
+  const ex = document.getElementById('acc-export');
+  if(ex) ex.addEventListener('click', async () => {
+    ex.disabled = true; ex.textContent = 'Preparing…';
+    try {
+      const data = await exportMyData();
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type:'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'skills-radar-my-data.json';
+      a.click();
+      URL.revokeObjectURL(a.href);
+      say('Downloaded. That file is everything this site holds about you.');
+    } catch(e){ say('Could not build the export: ' + e.message, 'alert'); }
+    ex.disabled = false; ex.textContent = 'Download';
+  });
+
+  const del = document.getElementById('acc-delete');
+  if(del) del.addEventListener('click', async () => {
+    const typed = prompt('This permanently deletes your account and everything in it.\n\nType DELETE to confirm.');
+    if(typed !== 'DELETE') return;
+    del.disabled = true; del.textContent = 'Deleting…';
+    try {
+      await deleteMyAccount();
+      document.body.innerHTML = '<div class="wrap"><div class="pagehead centred" style="padding-top:70px">' +
+        '<h1>Your account has been deleted</h1>' +
+        '<p>Everything we held about you is gone.</p>' +
+        '<p style="margin-top:18px"><a class="btn" href="index.html" style="text-decoration:none">Back to the site</a></p>' +
+        '</div></div>';
+    } catch(e){
+      say('Could not delete the account: ' + e.message + '. Email us and we will do it by hand.', 'alert');
+      del.disabled = false; del.textContent = 'Delete';
+    }
+  });
 }
 
 function prefsView(){
@@ -1947,6 +2150,11 @@ function render(){
     if(b) b.addEventListener('click', () => window.print());
   }
 
+  if(view === 'account'){
+    panel.innerHTML = accountView();
+    wireAccount(panel);
+  }
+
   if(view === 'prefs'){
     panel.innerHTML = prefsView();
     panel.querySelectorAll('.chipx').forEach(b =>
@@ -1980,6 +2188,17 @@ document.querySelectorAll('#mtabs button').forEach(btn => {
   const mode = await checkAccess();
   if(mode === 'redirect') return;
 
+  if(mode === 'unconfigured'){
+    document.getElementById('public').hidden = false;
+    const p = document.getElementById('public');
+    p.innerHTML = '<div class="wrap"><div class="pagehead centred"><h1>Members area</h1>' +
+      '<p>Accounts are not connected on this deployment.</p></div>' +
+      '<div class="notice centred" style="max-width:640px"><b>Nothing to sign in to yet.</b> ' +
+      '<code>config.js</code> still has placeholder values, so there is no account system running. ' +
+      'Follow SETUP-ACCOUNTS.md to connect Supabase and Stripe.</div></div>';
+    return;
+  }
+
   if(mode === 'member'){
     await loadAccount();
     document.getElementById('public').hidden = true;
@@ -1997,12 +2216,17 @@ document.querySelectorAll('#mtabs button').forEach(btn => {
     return;
   }
 
-  // demo mode
-  try { if(sessionStorage.getItem('sr-member') === '1') unlock(); } catch(err){}
 })();
 
 recordView();
 
 </script>
+
+<!-- Vercel Web Analytics. The @vercel/analytics package with the /next import
+     is for Next.js apps; this is a plain static site, so it uses the script
+     Vercel serves at /_vercel/insights/script.js instead. It only responds on
+     a Vercel deployment, so it does nothing locally. No cookies, no
+     identifiers, no consent banner needed. -->
+<script defer src="/_vercel/insights/script.js"></script>
 </body>
 </html>

@@ -3,7 +3,8 @@
    Builds the masthead and navigation so every page stays consistent.
    ========================================================================= */
 
-const HERO = "The intelligence platform for early careers professionals — spend less time interpreting guidance and more time building great programmes.";
+const HERO = "The intelligence platform for early-career programmes.";
+const HERO_SUB = "Spend less time interpreting guidance and more time building great programmes.";
 
 const PAGES = [
   { file: "index.html",      label: "Feed" },
@@ -40,7 +41,19 @@ function backdropHTML(){
   '</div>';
 }
 
-function titleBlockHTML(stampHTML){
+/* The home page carries a call to action under the hero; every other page
+   does not, because repeating it on each one turns it into furniture people
+   stop seeing. */
+function ctaHTML(){
+  return '<div class="herocta">' +
+    '<a class="ctabtn" href="account.html?join=1">Join for &pound;5 a month</a>' +
+    '<a class="ctalink" href="account.html">Already a member? Sign in</a>' +
+    '<p class="ctanote">A compliance calendar built around the standards you deliver, ' +
+    'a feed showing only what affects you, and levy forecasting against your own figures.</p>' +
+  '</div>';
+}
+
+function titleBlockHTML(stampHTML, withCta){
   return '<div class="titleblock">' + backdropHTML() +
     '<div class="markrule">' +
       '<span class="pulse" aria-hidden="true"></span>' +
@@ -50,10 +63,11 @@ function titleBlockHTML(stampHTML){
     '<div class="brandrow">' +
       '<div class="brandmain">' +
         '<h1 class="wordmark"><a href="index.html">Skills <em>Radar</em></a></h1>' +
-        '<p class="hero">' + HERO + '</p>' +
+        '<p class="hero">' + HERO + '<span class="herosub">' + HERO_SUB + '</span></p>' +
       '</div>' +
       (stampHTML ? '<div class="stamp">' + stampHTML + '</div>' : '') +
     '</div>' +
+    (withCta ? ctaHTML() : '') +
   '</div>';
 }
 
