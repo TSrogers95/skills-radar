@@ -935,7 +935,7 @@ function handleStats(file){
   reader.readAsText(file);
 }
 
-function num(v){
+function statNum(v){
   const s = String(v == null ? '' : v).replace(/[^\d.\-]/g, '');
   if(!s || s === '-') return null;
   const n = parseFloat(s);
@@ -971,9 +971,9 @@ function processStats(text, file){
     const a = agg[key] = agg[key] || { name: name, code: code, starts: 0, achieved: 0, rates: [] };
     if(name && !a.name) a.name = name;
 
-    const st = cols.starts !== undefined ? num(r[cols.starts]) : null;
-    const ac = cols.achieved !== undefined ? num(r[cols.achieved]) : null;
-    const rt = cols.rate !== undefined ? num(r[cols.rate]) : null;
+    const st = cols.starts !== undefined ? statNum(r[cols.starts]) : null;
+    const ac = cols.achieved !== undefined ? statNum(r[cols.achieved]) : null;
+    const rt = cols.rate !== undefined ? statNum(r[cols.rate]) : null;
 
     if(st != null) a.starts += st;
     if(ac != null) a.achieved += ac;

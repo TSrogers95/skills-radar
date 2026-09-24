@@ -128,6 +128,7 @@ function page(a, api){
 <script type="application/ld+json">${JSON.stringify(crumbs)}</script>
 </head>
 <body>
+<a class="skiplink" href="#main">Skip to content</a>
 
 <div class="masthead">
   <div class="wrap"><div id="heroblock"></div></div>
@@ -140,6 +141,7 @@ function page(a, api){
   </div>
 </div>
 
+<main id="main" tabindex="-1">
 <div class="wrap">
   <nav class="crumbs">
     <a href="../index.html">Skills Radar</a><span>&rsaquo;</span>
@@ -188,6 +190,7 @@ function page(a, api){
 
   ${relatedHTML(a, api)}
 </div>
+</main>
 
 <footer>
   <div class="wrap">
@@ -313,6 +316,87 @@ Sitemap: ${SITE}/sitemap.xml
 `;
 }
 
+/* =========================================================================
+   METADATA FOR THE MAIN PAGES
+
+   The article pages get their tags written when they are generated. The
+   hand-written pages had none — no canonical, nothing for a link preview.
+   Rather than hard-code a domain into ten files, this injects them at build
+   time from SITE_URL, so the address lives in one place and cannot drift.
+   ========================================================================= */
+
+const PAGES = [
+  { file: 'index.html',     loc: '/' },
+  { file: 'articles.html',  loc: '/articles.html' },
+  { file: 'standards.html', loc: '/standards.html' },
+  { file: 'rules.html',     loc: '/rules.html' },
+  { file: 'members.html',   loc: '/members.html' },
+  { file: 'account.html',   loc: '/account.html' },
+  { file: 'privacy.html',   loc: '/privacy.html' },
+  { file: 'terms.html',     loc: '/terms.html' }
+];
+
+const START = '<!-- generated:meta -->';
+const STOP  = '<!-- /generated:meta -->';
+
+function injectMeta(){
+  let done = 0;
+
+  PAGES.forEach(p => {
+    if(!fs.existsSync(p.file)) return;
+    let html = fs.readFileSync(p.file, 'utf8');
+
+    const title = (html.match(/<title>([\s\S]*?)<\/title>/) || [])[1] || 'Skills Radar';
+    const desc  = (html.match(/<meta name="description" content="([\s\S]*?)"/) || [])[1] || '';
+    const url   = SITE + (p.loc === '/' ? '/' : p.loc);
+
+    // a private page should not be indexed or previewed
+    const priv = p.file === 'members.html' || p.file === 'account.html';
+
+    const block = START + '\n' +
+      '<link rel="canonical" href="' + url + '">\n' +
+      (priv
+        ? '<meta name="robots" content="noindex, follow">\n'
+        : '<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">\n') +
+      '<meta property="og:type" content="website">\n' +
+      '<meta property="og:site_name" content="Skills Radar">\n' +
+      '<meta property="og:locale" content="en_GB">\n' +
+      '<meta property="og:title" content="' + esc(strip(title)) + '">\n' +
+      '<meta property="og:description" content="' + esc(strip(desc)) + '">\n' +
+      '<meta property="og:url" content="' + url + '">\n' +
+      '<meta name="twitter:card" content="summary">\n' +
+      '<meta name="twitter:title" content="' + esc(strip(title)) + '">\n' +
+      '<meta name="twitter:description" content="' + esc(strip(desc)) + '">\n' +
+      (p.loc === '/' ? siteSchema() : '') +
+      STOP;
+
+    // replace a previous run's block rather than stacking them up
+    const existing = new RegExp(START + '[\\s\\S]*?' + STOP);
+    html = existing.test(html)
+      ? html.replace(existing, block)
+      : html.replace('</head>', block + '\n</head>');
+
+    fs.writeFileSync(p.file, html);
+    done++;
+  });
+
+  console.log('Metadata written into ' + done + ' pages');
+}
+
+/* Tells a search engine what the site is, and gives it the search box. */
+function siteSchema(){
+  const ld = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'Skills Radar',
+    url: SITE + '/',
+    description: 'Tracking changes to apprenticeship funding rules, standards and T-Levels in England.',
+    inLanguage: 'en-GB',
+    publisher: { '@type': 'Organization', name: 'Skills Radar', url: SITE + '/' }
+  };
+  return '<script type="application/ld+json">' + JSON.stringify(ld) + '</script>\n';
+}
+
 /* ---------- Run ---------- */
 
 function run(){
@@ -330,6 +414,8 @@ function run(){
     fs.writeFileSync(path.join(OUT, a.id + '.html'), page(a, api));
     written++;
   });
+
+  injectMeta();
 
   fs.writeFileSync('sitemap.xml', sitemap(articles));
   fs.writeFileSync('robots.txt', robots());

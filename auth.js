@@ -129,39 +129,6 @@ function hasAccess(sub, profile){
   return ['active', 'trialing', 'past_due'].indexOf(sub.status) > -1;
 }
 
-/* Everything held about the signed-in member, for their own export. */
-async function exportMyData(){
-  const c = supabase();
-  const user = await currentUser();
-  if(!c || !user) throw new Error('Sign in first.');
-
-  const [profile, standards, events, sub] = await Promise.all([
-    c.from('profiles').select('*').eq('id', user.id).single(),
-    c.from('member_standards').select('*').eq('user_id', user.id),
-    c.from('member_events').select('*').eq('user_id', user.id),
-    c.from('subscriptions').select('*').eq('user_id', user.id).maybeSingle()
-  ]);
-
-  return {
-    exported: new Date().toISOString(),
-    note: 'Everything Skills Radar holds about your account. Payment records are held by Stripe and are not included here — request those from Stripe or ask us.',
-    account: { id: user.id, email: user.email, created: user.created_at },
-    profile: profile.data,
-    standards: standards.data,
-    calendar: events.data,
-    subscription: sub.data
-  };
-}
-
-/* Erase the account. Cascades through every table. Irreversible. */
-async function deleteMyAccount(){
-  const c = supabase();
-  const user = await currentUser();
-  if(!c || !user) throw new Error('Sign in first.');
-  const { error } = await c.rpc('delete_own_account');
-  if(error) throw error;
-  await c.auth.signOut();
-}
 
 /* ---------- Cohort ---------- */
 

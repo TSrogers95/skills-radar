@@ -2844,3 +2844,17 @@ a.arow:hover .go{ opacity:1; }
 @media (max-width:999px){
   .ctascribble, .ctaring .ring{ display:none !important; }
 }
+
+/* ---------- Skip link ----------
+   Off screen until focused, so a keyboard user can jump past the masthead
+   and navigation instead of tabbing through them on every page. */
+
+.skiplink{
+  position:absolute; left:-9999px; top:0; z-index:100;
+  background:#6ED0B6; color:#06211C;
+  font-family:var(--sans); font-size:14px; font-weight:600;
+  padding:12px 20px; text-decoration:none;
+}
+.skiplink:focus{ left:8px; top:8px; outline:2px solid var(--ink); outline-offset:2px; }
+
+main:focus{ outline:none; }
