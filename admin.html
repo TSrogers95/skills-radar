@@ -32,7 +32,8 @@
         <span class="line" style="background:var(--line)"></span>
       </div>
       <h2>Sign in</h2>
-      <p>Site administration. Members, articles and traffic.</p>
+      <p>Site administration. Members, articles, imports and traffic.</p>
+      <div id="modenote"></div>
       <form id="gateform" novalidate>
         <div class="field">
           <label for="au">Username</label>
@@ -121,9 +122,9 @@ let ADMIN_SESSION = null;
 function unlock(){
   document.getElementById('gate').hidden = true;
   document.getElementById('admin').hidden = false;
-  document.getElementById('whoami').textContent = ADMIN_SESSION
+  document.getElementById('whoami').innerHTML = ADMIN_SESSION
     ? ADMIN_SESSION.email
-    : ADMIN_USER + ' · demo mode, no live data';
+    : '<b class="warnpill">Not connected</b> config.js still has placeholder values';
   try { sessionStorage.setItem('sr-adminarea','1'); } catch(e){}
   render();
 }
@@ -197,6 +198,19 @@ document.getElementById('signout').addEventListener('click', async () => {
   location.reload();
 });
 
+/* Say plainly which mode this is, so "demo" is never a mystery. */
+(function(){
+  const note = document.getElementById('modenote');
+  if(!note) return;
+  note.innerHTML = accountsLive()
+    ? '<div class="okbox" style="margin-bottom:18px;font-size:13px"><b>Connected.</b> ' +
+      'Sign in with the account you made an administrator.</div>'
+    : '<div class="notice" style="margin-top:0;margin-bottom:18px;font-size:13px"><b>Not connected.</b> ' +
+      '<code>config.js</code> still has placeholder values, so there is no database to read. ' +
+      'The fallback password works and the import tools work, but Members, Traffic and Email will be empty. ' +
+      'Fill in your Supabase URL and anon key to switch this on.</div>';
+})();
+
 try { if(sessionStorage.getItem('sr-adminarea') === '1') unlock(); } catch(e){}
 
 /* =========================================================================
@@ -254,21 +268,21 @@ function overviewView(){
     '</tbody></table>' +
 
     '<div class="grouphead"><h2>Traffic</h2><div class="rule"></div></div>' +
-    '<div id="traffic"></div>' +
-    '<div class="notice" style="margin-top:0"><b>Want more than page counts?</b> ' +
-    'Traffic figures need an analytics provider. Two options, both quick: ' +
-    '<b>Vercel Analytics</b> is built into your hosting — enable it in the project dashboard and it starts collecting immediately, ' +
-    'no code and no cookie banner. <b>Plausible</b> costs around £7 a month, gives more detail, and is also cookie-free so it ' +
-    'avoids consent requirements. Google Analytics is free but brings a cookie banner and a good deal more paperwork with it.' +
+
+    '<div class="notice" style="margin-top:0"><b>Two sources, and they count different things.</b> ' +
+    'The figures below come from this site\'s own <code>page_views</code> table — every page load, no cookies, ' +
+    'no identifiers. <b>Vercel Web Analytics</b> runs alongside it and gives visitors rather than views, plus ' +
+    'devices, countries and referrers. Its data cannot be read from here, because Vercel does not expose it to ' +
+    'a page, so it lives in your Vercel dashboard.</div>' +
+
+    '<div class="addrow" style="margin:14px 0 18px">' +
+      '<a class="btn small" href="https://vercel.com/dashboard" target="_blank" rel="noopener" style="text-decoration:none">Open Vercel Analytics &nearr;</a>' +
+      '<a class="btn small ghost" href="https://search.google.com/search-console" target="_blank" rel="noopener" style="text-decoration:none">Search Console &nearr;</a>' +
+      '<span class="hint" style="align-self:center;margin:0">Analytics → your project. Enable it once in the dashboard if you have not.</span>' +
     '</div>' +
-    '<div class="readgrid" style="margin-top:14px">' +
-      '<div class="readcard"><a href="https://vercel.com/docs/analytics" target="_blank" rel="noopener">Vercel Analytics</a>' +
-        '<p>Enable in your project dashboard. Page views, top pages, referrers and devices.</p></div>' +
-      '<div class="readcard"><a href="https://plausible.io" target="_blank" rel="noopener">Plausible</a>' +
-        '<p>One script tag. More detail, goal tracking, and a public dashboard you can share.</p></div>' +
-      '<div class="readcard"><a href="https://search.google.com/search-console" target="_blank" rel="noopener">Google Search Console</a>' +
-        '<p>Free, and the one that matters for the article pages. Submit <code>sitemap.xml</code> once the build is live.</p></div>' +
-    '</div>';
+
+    '<div id="traffic"></div>' +
+    '';
 }
 
 async function loadTraffic(panel){

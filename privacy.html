@@ -31,7 +31,7 @@
 
     <h2>Who we are</h2>
     <p>Skills Radar is the data controller for the information described here. If you want to ask about any of it,
-    or exercise any of the rights below, email <a href="mailto:privacy@skillsradar.co.uk">privacy@skillsradar.co.uk</a>
+    or exercise any of the rights below, email <a href="mailto:<span class="contactemail">hello@skillsradar.co.uk</span>"><span class="contactemail">hello@skillsradar.co.uk</span></a>
     and we will answer within one month.</p>
 
     <h2>If you only read the site</h2>
@@ -107,6 +107,7 @@
   </div>
 </footer>
 
+<script src="config.js"></script>
 <script src="standards.js"></script>
 <script src="otj-minimums.js"></script>
 <script src="data.js"></script>
@@ -124,5 +125,14 @@ document.getElementById('updated').textContent = fmtLong(DATA_UPDATED);
      a Vercel deployment, so it does nothing locally. No cookies, no
      identifiers, no consent banner needed. -->
 <script defer src="/_vercel/insights/script.js"></script>
+<script>
+  /* One address, set in config.js, so there is no hunting through pages
+     when it changes. */
+  if(typeof CONTACT !== "undefined"){
+    document.querySelectorAll(".contactemail").forEach(function(el){
+      el.innerHTML = '<a href="mailto:' + CONTACT.email + '">' + CONTACT.email + '</a>';
+    });
+  }
+</script>
 </body>
 </html>

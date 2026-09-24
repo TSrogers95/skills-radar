@@ -74,7 +74,7 @@
     <p>These terms are governed by the law of England and Wales.</p>
 
     <h2>Getting in touch</h2>
-    <p>Email <a href="mailto:hello@skillsradar.co.uk">hello@skillsradar.co.uk</a>. For anything about your data, see the
+    <p>Email <a href="mailto:<span class="contactemail">hello@skillsradar.co.uk</span>"><span class="contactemail">hello@skillsradar.co.uk</span></a>. For anything about your data, see the
     <a href="privacy.html">privacy notice</a>.</p>
   </article>
 </div>
@@ -104,5 +104,14 @@ document.getElementById('price').textContent = MEMBERSHIP.price + ' ' + MEMBERSH
      a Vercel deployment, so it does nothing locally. No cookies, no
      identifiers, no consent banner needed. -->
 <script defer src="/_vercel/insights/script.js"></script>
+<script>
+  /* One address, set in config.js, so there is no hunting through pages
+     when it changes. */
+  if(typeof CONTACT !== "undefined"){
+    document.querySelectorAll(".contactemail").forEach(function(el){
+      el.innerHTML = '<a href="mailto:' + CONTACT.email + '">' + CONTACT.email + '</a>';
+    });
+  }
+</script>
 </body>
 </html>

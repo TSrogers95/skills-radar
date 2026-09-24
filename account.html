@@ -103,16 +103,24 @@ function joinView(message){
 
     '<div class="joinlayout">' +
       '<div class="benefits">' +
-        benefit('Your own compliance calendar', 'Twelve months of deadlines, filtered to the standards you deliver, with the action each one requires.') +
-        benefit('A feed built around your provision', 'Changes to your programmes on one side, the funding rules that apply to everyone on the other.') +
-        benefit('Levy forecasting', 'Month by month against your own pay bill, with the point co-investment starts and what expires unused.') +
-        benefit('Off-the-job position', 'Published minimums for 713 standards, against the hours you actually plan to deliver.') +
+        benefit('A feed that is only yours',
+          'There are 378 standards on this site and 180 recorded changes. Almost none of them are your problem. ' +
+          'Tell us what you deliver and the feed shows changes to those, alongside the funding rules that apply to everyone.') +
+        benefit('The newsletter',
+          'What actually moved this week, and what it means for the programmes you run. ' +
+          'Written, not generated. Weekly or monthly, and you can turn it off without losing your account.') +
+        benefit('Levy forecasting',
+          'Month by month against your own pay bill and your own cohorts. It names the month co-investment starts, ' +
+          'shows what expires unused, and lets you drop in apprentices you are only considering to see what they cost before you commit.') +
+        benefit('And the rest of it',
+          'Off-the-job position against the published minimum for each standard, a compliance calendar built around your provision, ' +
+          'and a board report you can print.') +
       '</div>' +
 
       '<div class="signin-panel joinpanel">' +
         msg(message) +
         '<h2>Create an account</h2>' +
-        '<p>' + MEMBERSHIP.price + ' ' + MEMBERSHIP.period + ', cancel any time.</p>' +
+        '<p>' + MEMBERSHIP.price + ' ' + MEMBERSHIP.period + '. Cancel in two clicks, no email required.</p>' +
 
         '<form id="form" novalidate>' +
           field('email', 'Work email', 'email', 'you@organisation.co.uk') +
@@ -237,10 +245,10 @@ async function payView(message){
         '<p>Signed in as ' + (profile ? profile.email : '') + '</p>' +
 
         '<ul class="paylist">' +
-          '<li>Compliance calendar filtered to your standards</li>' +
-          '<li>A feed showing only what affects you</li>' +
-          '<li>Levy forecasting with hypothetical cohorts</li>' +
-          '<li>Off-the-job position against published minimums</li>' +
+          '<li>A feed showing only what affects your standards</li>' +
+          '<li>The newsletter, weekly or monthly</li>' +
+          '<li>Levy forecasting against your own figures</li>' +
+          '<li>Off-the-job position and a compliance calendar</li>' +
           '<li>A board report you can print</li>' +
         '</ul>' +
 

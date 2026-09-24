@@ -24,3 +24,22 @@ const MEMBERSHIP = {
   period: "a month",
   blurb: "Cancel any time. No contract."
 };
+
+
+/* =========================================================================
+   CONTACT DETAILS
+
+   Used in the privacy notice, the terms and the footer. Change them here and
+   they change everywhere — there is no second place to remember.
+
+   You need a real address before you take a payment. Cloudflare Email
+   Routing forwards mail on your own domain to an inbox you already have,
+   for nothing. See GO-LIVE.md.
+   ========================================================================= */
+
+const CONTACT = {
+  org:     "Skills Radar",
+  email:   "hello@skillsradar.co.uk",      // general and data requests
+  privacy: "hello@skillsradar.co.uk",      // can be the same address
+  address: ""                               // a postal address is required on marketing email
+};

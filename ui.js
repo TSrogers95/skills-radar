@@ -46,10 +46,16 @@ function backdropHTML(){
    stop seeing. */
 function ctaHTML(){
   return '<div class="herocta">' +
-    '<a class="ctabtn" href="account.html?join=1">Join for &pound;5 a month</a>' +
-    '<a class="ctalink" href="account.html">Already a member? Sign in</a>' +
-    '<p class="ctanote">A compliance calendar built around the standards you deliver, ' +
-    'a feed showing only what affects you, and levy forecasting against your own figures.</p>' +
+    '<div class="ctamain">' +
+      '<a class="ctabtn" href="account.html?join=1">Become a member</a>' +
+      '<span class="ctaprice">' + MEMBERSHIP.price + ' ' + MEMBERSHIP.period + '</span>' +
+      '<a class="ctalink" href="account.html">Sign in</a>' +
+    '</div>' +
+    '<ul class="ctawhat">' +
+      '<li><b>A feed that is only yours</b>Changes to the standards you deliver, not all 378.</li>' +
+      '<li><b>The newsletter</b>What moved this week and what it means, written not generated.</li>' +
+      '<li><b>Levy forecasting</b>Month by month against your own figures, including cohorts you are only considering.</li>' +
+    '</ul>' +
   '</div>';
 }
 
@@ -109,45 +115,48 @@ function urgencyTag(u){
   return '<span class="tag t-info">For information</span>';
 }
 
-/* ---------- Collapse the hero on scroll ---------- */
+/* ---------- The sticky bar ----------
+
+   This used to animate the masthead's height as you scrolled, collapsing the
+   hero away. That is what made it feel glitchy: changing an element's height
+   changes the height of the whole document, so the page shifts under your
+   finger mid-scroll, which can re-trigger the very threshold that caused it.
+
+   It now does nothing to the layout at all. The masthead scrolls away like
+   any other content, and the bar fades in once it has gone. Only opacity and
+   transform change, both of which the browser handles on the compositor
+   without touching layout — so it stays smooth on a phone.
+*/
 
 function wireCollapse(){
-  const els = document.querySelectorAll('.collapsing');
-  if(!els.length) return;
-
-  function measure(){
-    els.forEach(el => {
-      if(el.classList.contains('hid')) return;
-      el.style.maxHeight = el.scrollHeight + 'px';
-    });
-  }
-  measure();
-  window.addEventListener('resize', measure);
-  // re-measure once webfonts land, or the height is wrong and it jumps
-  if(document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
-
-  // Hysteresis: collapse at 120px, only reopen below 40px. Without the gap
-  // the header flickers open and shut when you hover around the threshold.
   const bar = document.querySelector('.stickybar');
-  let hidden = false, ticking = false;
+  if(!bar) return;
+
+  const mast = document.querySelector('.masthead');
+  let shown = false, ticking = false;
+
+  /* Switch when the masthead has genuinely scrolled past, rather than at an
+     arbitrary pixel count, so it behaves the same on every page whatever the
+     header height. */
+  function threshold(){
+    return mast ? Math.max(80, mast.offsetHeight - 70) : 140;
+  }
 
   function update(){
     ticking = false;
-    const y = window.scrollY;
-    const should = hidden ? y > 40 : y > 120;
-    if(should === hidden) return;
-    hidden = should;
-    els.forEach(el => el.classList.toggle('hid', should));
-    // The wordmark only appears in the bar once the big one has scrolled away,
-    // so the title is never on screen twice.
-    if(bar) bar.classList.toggle('scrolled', should);
+    const past = window.scrollY > threshold();
+    if(past === shown) return;
+    shown = past;
+    bar.classList.toggle('scrolled', past);
   }
-
-  if(bar) bar.classList.remove('scrolled');
 
   window.addEventListener('scroll', () => {
     if(ticking) return;
     ticking = true;
     requestAnimationFrame(update);
   }, { passive: true });
+
+  window.addEventListener('resize', update, { passive: true });
+  update();
 }
+

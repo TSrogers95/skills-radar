@@ -2560,3 +2560,103 @@ a.arow:hover .go{ opacity:1; }
 .legal{ font-size:12.5px; margin:0 0 14px; }
 .legal a{ color:#9DB0AD; text-decoration:none; border-bottom:1px solid #22443F; }
 .legal a:hover{ color:#fff; }
+
+
+/* =========================================================================
+   STICKY BAR — smooth
+
+   Overrides the earlier collapsing-header rules. Nothing here changes
+   layout: the masthead scrolls away normally and the bar fades in over the
+   top, so there is no height animation to fight with the scroll.
+   ========================================================================= */
+
+.collapsing{ max-height:none !important; overflow:visible !important; opacity:1 !important; }
+.collapsing.hid{ max-height:none !important; opacity:1 !important; }
+
+.stickybar{
+  position:sticky; top:0; z-index:40;
+  opacity:0; visibility:hidden;
+  transform:translateY(-6px);
+  transition:opacity .22s ease, transform .22s ease, visibility 0s linear .22s;
+  will-change:opacity, transform;
+}
+.stickybar.scrolled{
+  opacity:1; visibility:visible; transform:translateY(0);
+  transition:opacity .22s ease, transform .22s ease, visibility 0s;
+}
+.stickybar .mini{ opacity:1; }
+
+@media (prefers-reduced-motion: reduce){
+  .stickybar{ transition:opacity .01s linear; transform:none; }
+  .stickybar.scrolled{ transform:none; }
+}
+
+/* =========================================================================
+   CALL TO ACTION — lighter, especially on a phone
+   ========================================================================= */
+
+.herocta{
+  position:relative; z-index:2;
+  margin-top:26px; padding-top:22px;
+  border-top:1px solid #1D3C38;
+}
+
+.ctamain{ display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+.ctabtn{
+  display:inline-block; text-decoration:none;
+  background:#6ED0B6; color:#07201C;
+  font-family:var(--sans); font-size:15px; font-weight:600;
+  padding:12px 24px; border-radius:2px;
+  transition:background .15s ease;
+}
+.ctabtn:hover{ background:#8CE0C8; }
+.ctaprice{ font-size:13.5px; color:#8FAEA8; }
+.ctalink{
+  font-size:13.5px; color:#A9C2BC; text-decoration:none;
+  border-bottom:1px solid #2A5049; padding-bottom:2px; margin-left:auto;
+}
+.ctalink:hover{ color:#fff; border-bottom-color:#6ED0B6; }
+
+.ctawhat{
+  list-style:none; padding:0; margin:20px 0 0;
+  display:grid; grid-template-columns:repeat(3,1fr); gap:20px;
+}
+.ctawhat li{
+  font-size:12.5px; color:#7FA79F; line-height:1.5;
+  padding-left:13px; border-left:1px solid #22443F;
+}
+.ctawhat b{
+  display:block; font-family:var(--display); font-size:14px;
+  font-weight:500; color:#D7E3E0; margin-bottom:3px; letter-spacing:-0.008em;
+}
+
+/* On a phone the three-up list is the thing that makes it feel heavy, so it
+   becomes one line of text rather than three blocks. */
+@media (max-width:720px){
+  .herocta{ margin-top:20px; padding-top:18px; }
+  .ctamain{ gap:12px; }
+  .ctabtn{ flex:1; text-align:center; padding:13px 18px; }
+  .ctaprice{ order:3; flex-basis:100%; }
+  .ctalink{ margin-left:0; }
+
+  .ctawhat{ display:block; margin-top:14px; }
+  .ctawhat li{
+    display:inline; padding:0; border:none;
+    font-size:12.5px; color:#7FA79F;
+  }
+  .ctawhat li b{ display:inline; font-family:var(--sans); font-size:12.5px; color:#A9C2BC; font-weight:500; }
+  .ctawhat li b::after{ content:''; }
+  .ctawhat li::after{ content:' · '; color:#3A5F59; }
+  .ctawhat li:last-child::after{ content:''; }
+  /* the explanatory half of each item is dropped, leaving three short labels */
+  .ctawhat li{ font-size:0; }
+  .ctawhat li b{ font-size:12.5px; }
+  .ctawhat li::after{ font-size:12.5px; }
+}
+
+/* ---------- Admin mode pill ---------- */
+
+.warnpill{
+  display:inline-block; background:var(--med-bg); color:var(--med);
+  font-size:11px; font-weight:600; padding:2px 8px; margin-right:7px;
+}
