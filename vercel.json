@@ -1,19 +1,9 @@
 {
-  "crons": [
-    {
-      "path": "/api/check-sources",
-      "schedule": "0 7 * * 1"
-    },
-    {
-      "path": "/api/sync-standards",
-      "schedule": "0 6 * * 1"
-    },
-    {
-      "path": "/api/sync-occupations",
-      "schedule": "0 5 * * 1"
-    }
-  ],
   "buildCommand": "node build.js",
-  "outputDirectory": ".",
-  "cleanUrls": true
+  "cleanUrls": true,
+  "crons": [
+    { "path": "/api/check-sources", "schedule": "0 7 * * 1" },
+    { "path": "/api/sync-standards", "schedule": "0 6 * * 1" },
+    { "path": "/api/sync-occupations", "schedule": "0 5 * * 1" }
+  ]
 }
