@@ -164,16 +164,38 @@ document.getElementById('gateform').addEventListener('submit', async e => {
 });
 
 /* Signed calls to the admin endpoints. */
+/* Returns the data, or an object with .failed explaining why. Swallowing the
+   reason and showing "could not load" turns a one-line fix into an hour of
+   guessing. */
 async function adminFetch(what){
-  if(!accountsLive()) return null;
+  if(!accountsLive()) return { failed: 'Accounts are not connected — config.js still has placeholders.' };
+
   const c = sbClient();
   const { data } = await c.auth.getSession();
-  if(!data || !data.session) return null;
-  const res = await fetch('/api/admin-data?what=' + what, {
-    headers: { 'Authorization': 'Bearer ' + data.session.access_token }
-  });
-  if(!res.ok) return null;
-  return res.json();
+  if(!data || !data.session) return { failed: 'Your session has expired. Sign in again.' };
+
+  let res;
+  try {
+    res = await fetch('/api/admin-data?what=' + what, {
+      headers: { 'Authorization': 'Bearer ' + data.session.access_token }
+    });
+  } catch(e){
+    return { failed: 'Could not reach /api/admin-data. Is the api folder deployed?' };
+  }
+
+  if(res.status === 404){
+    return { failed: 'The endpoint /api/admin-data does not exist. ' +
+      'Check admin-data.js is inside the api folder in your repo, and that the last deploy was green.' };
+  }
+
+  let out = null;
+  try { out = await res.json(); } catch(e){}
+
+  if(!res.ok){
+    return { failed: (out && out.error) || ('The server returned ' + res.status + '.'),
+             missing: out && out.missing };
+  }
+  return out;
 }
 
 async function adminAction(body){
@@ -298,7 +320,7 @@ async function loadTraffic(panel){
     return;
   }
   const out = await adminFetch('traffic');
-  if(!out){ el.innerHTML = '<p class="hint">Could not load traffic.</p>'; return; }
+  if(!out || out.failed || !out.paths){ el.innerHTML = failureHTML(out, 'traffic'); return; }
 
   el.innerHTML =
     '<div class="mgrid" style="margin-top:0">' +
@@ -322,6 +344,27 @@ function row(a, b, c){
   return '<tr><td class="nm">' + a + '</td><td class="num big">' + b + '</td><td>' + c + '</td></tr>';
 }
 
+/* A failure worth reading, with the fix attached where we know it. */
+function failureHTML(out, what){
+  const why = (out && out.failed) || 'No response from the server.';
+  const missing = out && out.missing;
+
+  return '<div class="alert"><b>Could not load ' + what + '.</b><br>' + why + '</div>' +
+    (missing
+      ? '<div class="notice" style="margin-top:14px"><b>How to fix this.</b> ' +
+        'In Vercel, open <b>Settings &rarr; Environment Variables</b> and add <code>' + missing + '</code>, ' +
+        'ticked for Production. ' +
+        (missing === 'SUPABASE_SERVICE_KEY'
+          ? 'Its value is in Supabase under <b>Settings &rarr; API</b>, labelled <b>service_role</b>. ' +
+            'That key bypasses every security rule, so it belongs in Vercel only — never in config.js.'
+          : 'Its value is in Supabase under <b>Settings &rarr; API</b>.') +
+        ' Then <b>redeploy</b> — variables only take effect on a new deployment.</div>'
+      : '<div class="notice" style="margin-top:14px"><b>Most likely causes.</b> ' +
+        'The three Supabase variables are not set in Vercel yet ' +
+        '(<code>SUPABASE_URL</code>, <code>SUPABASE_ANON_KEY</code>, <code>SUPABASE_SERVICE_KEY</code>), ' +
+        'or you added them without redeploying. Step 7 of the go-live guide covers it.</div>');
+}
+
 /* ---------- Members ---------- */
 
 function membersView(){
@@ -343,8 +386,8 @@ async function loadMembers(panel){
   const el = document.getElementById('memberlist');
   if(!el) return;
 
-  if(!out || !out.members){
-    el.innerHTML = '<div class="alert">Could not load the member list. Check you are signed in as an administrator.</div>';
+  if(!out || out.failed || !out.members){
+    el.innerHTML = failureHTML(out, 'the member list');
     return;
   }
 
@@ -810,8 +853,8 @@ async function loadEmails(){
   if(!el || !accountsLive()) return;
 
   const out = await adminFetch('members');
-  if(!out || !out.members){
-    el.innerHTML = '<div class="alert">Could not load the member list.</div>';
+  if(!out || out.failed || !out.members){
+    el.innerHTML = failureHTML(out, 'the email lists');
     return;
   }
 
