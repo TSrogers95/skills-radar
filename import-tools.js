@@ -164,11 +164,18 @@ const COLUMNS = {
   code:    ['reference', 'standard reference', 'ifate reference', 'st reference', 'code'],
   level:   ['level'],
   months:  ['typical duration', 'duration'],
-  funding: ['maximum funding', 'max funding', 'funding band', 'funding cap', 'funding'],
+  funding: ['maximum funding', 'max funding', 'funding band maximum', 'funding band',
+            'funding cap', 'maximum price', 'max price', 'band', 'funding'],
   version: ['version'],
   status:  ['status'],
   route:   ['route', 'sector'],
   approved:['approved for delivery', 'approved date', 'approval date'],
+  /* The date the register itself last changed this standard. If the export
+     has one, it can date changes without needing a previous import to
+     compare against — which matters, because a first import has nothing to
+     compare with. */
+  updated: ['last updated', 'last changed', 'date updated', 'updated',
+            'last modified', 'version date', 'revision date'],
   epao:    ['epao', 'assessment organisation', 'aao'],
   // Several standards carry options, pathways or occupational specialisms —
   // Mechatronics inside Engineering Technician, for instance. If the export
@@ -201,6 +208,11 @@ function matchColumns(header){
 /* =========================================================================
    TURNING ROWS INTO STANDARDS
    ========================================================================= */
+
+function fmtWhen(iso){
+  const d = new Date(iso);
+  return isNaN(d) ? '' : d.toLocaleDateString('en-GB', { month:'long', year:'numeric' });
+}
 
 function num(v){
   const n = String(v || '').replace(/[^\d.]/g, '');
@@ -245,6 +257,16 @@ function slugRoute(name){
 /* The CSV carries one row per version, including retired ones. We keep only
    the newest live version of each standard, which is what the site shows. */
 
+/* How long a standard counts as recently changed when we are going on the
+   register's own date rather than a comparison. */
+const RECENT_MONTHS = 12;
+
+function recentlyUpdated(iso){
+  if(!iso) return false;
+  const days = (Date.now() - new Date(iso).getTime()) / 86400000;
+  return days >= 0 && days <= RECENT_MONTHS * 31;
+}
+
 function build(rows, cols){
   const byCode = {};
   let skippedRetired = 0, skippedBlank = 0;
@@ -260,6 +282,7 @@ function build(rows, cols){
     if(/^retired|^withdrawn/i.test(status)){ skippedRetired++; return; }
 
     const opts = get('options');
+    const updated = toISO(get('updated'));
 
     const rec = {
       name:    name,
@@ -273,6 +296,7 @@ function build(rows, cols){
       status:  tidyStatus(status),
       route:   slugRoute(get('route')),
       since:   toISO(get('approved')),
+      updated: updated,
       epao:    get('epao')
     };
 
@@ -333,9 +357,14 @@ function merge(imported){
         common: false, name: r.name, code: r.code, level: r.level,
         months: r.months, funding: r.funding, route: r.route,
         epa: epa, status: r.status, version: r.version,
-        since: new Date().toISOString().slice(0,10),
+        since: r.updated || new Date().toISOString().slice(0,10),
         approved: r.since || '',
-        changed: ANNOUNCE_NEW ? 'New on the register' : '',
+        /* Three ways a standard new to this site can still be news:
+           the register says it changed recently, it is losing funding, or
+           you asked for new additions to be announced. */
+        changed: recentlyUpdated(r.updated)
+            ? 'Updated on the register ' + fmtWhen(r.updated)
+            : (ANNOUNCE_NEW ? 'New on the register' : ''),
         article: '',
         options: r.options || []
       });
@@ -477,6 +506,9 @@ function process(text, file){
 function show(rows, cols, built, m, file){
   const code = block(m.out);
   const noRoute = m.out.filter(s => !s.route).length;
+  const noBand = m.out.filter(s => !s.funding).length;
+  const noBaseline = (typeof STANDARDS === 'undefined' || !STANDARDS.length);
+  const withChange = m.out.filter(s => s.changed && s.changed.trim() !== '').length;
 
   /* Check the block actually parses before anything is offered for download.
      A single bad character used to produce a file that looked fine, uploaded
@@ -576,6 +608,27 @@ function show(rows, cols, built, m, file){
           'Each of these becomes an item in the feed automatically, with its urgency worked out from what changed.</p>'
         : '') +
     '</section>' +
+
+    (noBaseline
+      ? '<section class="lsection"><div class="alert"><b>There is nothing to compare against.</b> ' +
+        'The register currently loaded in this browser is empty, so every standard in your file looks new ' +
+        'and no changes can be detected by comparison. ' +
+        'If your live <code>standards.js</code> is broken, fix that first — otherwise this import will ' +
+        'produce a register with no change history at all.<br><br>' +
+        (withChange
+          ? '<b>The good news:</b> ' + withChange.toLocaleString('en-GB') + ' standards carry a recent date in ' +
+            'the file itself, so they will appear in the feed regardless.'
+          : '<b>And the file has no date column either</b>, so nothing will appear in the feed. ' +
+            'Tick &ldquo;announce standards that are new to the site&rdquo; above to populate it.') +
+        '</div></section>'
+      : '') +
+
+    (noBand === m.out.length && m.out.length
+      ? '<section class="lsection"><div class="alert"><b>No standard has a funding band.</b> ' +
+        'The funding column was not matched. Look at the column table above — if it says &ldquo;not found&rdquo; ' +
+        'next to <code>funding</code>, tell me the exact heading your file uses and it can be added. ' +
+        'The site will show every band as &ldquo;Not yet set&rdquo; until this is sorted.</div></section>'
+      : '') +
 
     (parseError
       ? '<section class="lsection"><div class="alert"><b>This file will not load, so it is not safe to upload.</b><br>' +
@@ -1098,6 +1151,27 @@ function showStats(rows, cols, list, file){
       '</tbody></table></div>' +
       (out.length > 40 ? '<p class="hint">Showing the top 40 of ' + out.length + ' matched.</p>' : '') +
     '</section>' +
+
+    (noBaseline
+      ? '<section class="lsection"><div class="alert"><b>There is nothing to compare against.</b> ' +
+        'The register currently loaded in this browser is empty, so every standard in your file looks new ' +
+        'and no changes can be detected by comparison. ' +
+        'If your live <code>standards.js</code> is broken, fix that first — otherwise this import will ' +
+        'produce a register with no change history at all.<br><br>' +
+        (withChange
+          ? '<b>The good news:</b> ' + withChange.toLocaleString('en-GB') + ' standards carry a recent date in ' +
+            'the file itself, so they will appear in the feed regardless.'
+          : '<b>And the file has no date column either</b>, so nothing will appear in the feed. ' +
+            'Tick &ldquo;announce standards that are new to the site&rdquo; above to populate it.') +
+        '</div></section>'
+      : '') +
+
+    (noBand === m.out.length && m.out.length
+      ? '<section class="lsection"><div class="alert"><b>No standard has a funding band.</b> ' +
+        'The funding column was not matched. Look at the column table above — if it says &ldquo;not found&rdquo; ' +
+        'next to <code>funding</code>, tell me the exact heading your file uses and it can be added. ' +
+        'The site will show every band as &ldquo;Not yet set&rdquo; until this is sorted.</div></section>'
+      : '') +
 
     (parseError
       ? '<section class="lsection"><div class="alert"><b>This file will not load, so it is not safe to upload.</b><br>' +
