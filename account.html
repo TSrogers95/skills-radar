@@ -370,7 +370,10 @@ async function payView(message){
     const b = document.getElementById('pay');
     b.disabled = true; b.textContent = 'Opening Stripe…';
     try { await startCheckout(); }
-    catch(e){ fail(e.message); b.disabled = false; b.textContent = 'Continue to payment'; }
+    catch(e){
+      fail(e.message + (e.fix ? ' — ' + e.fix : '') + (e.detail ? ' (' + e.detail + ')' : ''));
+      b.disabled = false; b.textContent = 'Continue to payment';
+    }
   });
 
   const manage = document.getElementById('manage');

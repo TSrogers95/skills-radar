@@ -233,8 +233,18 @@ async function startCheckout(){
     body: JSON.stringify({ returnTo: window.location.origin + '/members.html' })
   });
 
-  const out = await res.json();
-  if(!res.ok || !out.url) throw new Error(out.error || 'Could not start checkout.');
+  let out = null;
+  try { out = await res.json(); } catch(e){}
+
+  if(res.status === 404){
+    throw new Error('The payment endpoint is missing. Check create-checkout.js is inside the api folder.');
+  }
+  if(!res.ok || !out || !out.url){
+    const err = new Error((out && out.error) || 'Could not start checkout.');
+    err.fix = out && out.fix;
+    err.detail = out && out.detail;
+    throw err;
+  }
   window.location.href = out.url;
 }
 
