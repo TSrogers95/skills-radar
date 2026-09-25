@@ -44,13 +44,12 @@ function backdropHTML(){
 /* The home page carries a call to action under the hero; every other page
    does not, because repeating it on each one turns it into furniture people
    stop seeing. */
-/* Marginalia needs a margin. Below this width there is no room beside the
-   button, so the annotation is not built at all rather than built and
-   hidden — a stylesheet that does not load, or one rule overridden by
-   another, cannot then leave it stranded on a phone. */
+/* The ring is drawn only where there is room for it to sit outside the
+   button without colliding with anything. Not building it below that width
+   is safer than hiding it with CSS, which can be overridden or fail to load. */
 function roomToScribble(){
   if(typeof window === 'undefined' || !window.matchMedia) return false;
-  return window.matchMedia('(min-width: 1060px)').matches;
+  return window.matchMedia('(min-width: 861px)').matches;
 }
 
 /* Hand-drawn annotation. Two overlapping wobbly strokes rather than a clean
@@ -62,23 +61,6 @@ function scribbleRing(){
       'fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" opacity="0.85"/>' +
     '<path d="M126 11 C72 11 18 22 14 44 C11 66 70 77 131 76 C192 75 246 67 245 45 C244 24 196 12 137 11" ' +
       'fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.45"/>' +
-  '</svg>';
-}
-
-function scribbleArrow(){
-  /* The old arrow curved downward and its head pointed at the floor, which
-     read as an underline rather than a pointer. This one travels left to
-     right with a slight sag, and the head opens toward the button so the
-     direction is unmistakable. */
-  return '<svg class="arrow" viewBox="0 0 160 80" aria-hidden="true">' +
-    // the shaft, drawn slightly twice over so it looks drawn rather than plotted
-    '<path d="M10 14 C22 38 40 56 74 61 C101 65 122 63 140 59" ' +
-      'fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>' +
-    '<path d="M13 18 C26 40 44 57 76 62 C100 66 120 64 137 60" ' +
-      'fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>' +
-    // the head, two strokes meeting at the tip
-    '<path d="M124 48 L142 59" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>' +
-    '<path d="M126 70 L142 59" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>' +
   '</svg>';
 }
 
@@ -111,8 +93,6 @@ function ctaHTML(){
     '</div>' +
 
     '<div class="ctaact">' +
-      (roomToScribble() ? '<div class="ctascribble" aria-hidden="true">' +
-        '<span class="ctanote">start here</span>' + scribbleArrow() + '</div>' : '') +
       '<div class="ctaring">' +
         (roomToScribble() ? scribbleRing() : '') +
         '<a class="ctabtn" href="account.html?join=1">' +

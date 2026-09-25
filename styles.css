@@ -3311,3 +3311,15 @@ main:focus{ outline:none; }
 @media (max-width:1060px){
   .ctascribble{ display:none; }
 }
+
+
+/* ---------- Annotation: ring only ----------
+   The arrow and its note are gone. The ring on its own does the job without
+   telling people what to do. */
+
+.ctascribble, .ctanote{ display:none !important; }
+
+/* without the marginalia beside it, the ring fits at a narrower width again */
+@media (min-width:861px){
+  .ctaring .ring{ display:block; }
+}
