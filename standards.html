@@ -270,6 +270,10 @@ function render(filter, query){
     scored.sort((a,b) => b.score - a.score);
     list = scored.map(x => x.s);
     searchRanked = true;
+
+    /* Search covers the whole register, not just standards with a recorded
+       change. A standard that has not moved is still one you might deliver,
+       and it simply shows no change rather than being absent. */
   } else {
     searchRanked = false;
   }

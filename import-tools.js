@@ -390,7 +390,12 @@ function merge(imported){
    ========================================================================= */
 
 function render(s){
-  const q = v => '"' + String(v).replace(/\\/g,'\\\\').replace(/"/g,'\\"') + '"';
+  /* JSON.stringify rather than a hand-rolled escape. The previous version
+     handled quotes and backslashes but not newlines, and CSV fields often
+     contain them — one such name produced an unterminated string, which
+     stopped the whole file parsing and left the site with no register at
+     all. This cannot have that failure. */
+  const q = v => JSON.stringify(String(v == null ? '' : v));
   return '  { ' + (s.common ? 'common:true, ' : '') +
     'name:' + q(s.name) + ', code:' + q(s.code || '') +
     ', level:' + (s.level||0) + ', months:' + (s.months||0) + ', funding:' + (s.funding||0) +
@@ -553,12 +558,20 @@ function show(rows, cols, built, m, file){
         : '') +
     '</section>' +
 
+    (parseError
+      ? '<section class="lsection"><div class="alert"><b>This file will not load, so it is not safe to upload.</b><br>' +
+        parseError.replace(/</g,'&lt;') + '<br><br>' +
+        'Something in the CSV has produced invalid JavaScript. Tell me what the error says and it can be fixed — ' +
+        'do not upload this file, or the site will lose its register entirely.</div></section>'
+      : '<div class="okbox" style="margin-top:22px"><b>Checked.</b> ' +
+        'The generated file parses and holds ' + parsedCount.toLocaleString('en-GB') + ' standards.</div>') +
+
     '<section class="lsection">' +
       '<div class="lhead"><h2>4. Put it into the site</h2>' +
       '<p>Download the new register file, or copy just the standards block.</p></div>' +
       '<div class="addrow">' +
-        '<button class="btn" id="dl">Download standards.js</button>' +
-        '<button class="btn small" id="copy">Copy the standards block</button>' +
+        '<button class="btn" id="dl"' + (parseError ? ' disabled' : '') + '>Download standards.js</button>' +
+        '<button class="btn small" id="copy"' + (parseError ? ' disabled' : '') + '>Copy the standards block</button>' +
       '</div>' +
       '<div class="okbox" style="margin-bottom:14px"><b>The review date updates itself.</b> ' +
       'The download carries today\'s date as the register stamp, so the home page will read ' +
@@ -591,6 +604,16 @@ function show(rows, cols, built, m, file){
   }
 
   const full = header + code + '\n/* STANDARDS:END */\n';
+
+  /* Check the file we are about to hand over actually parses. A single bad
+     character used to produce a file that looked fine, uploaded fine, and
+     left the live site with no register at all. */
+  let parseError = null, parsedCount = 0;
+  try {
+    parsedCount = new Function(full + '; return STANDARDS.length;')();
+  } catch(err){
+    parseError = err.message;
+  }
 
   document.getElementById('dl').addEventListener('click', () => {
     const blob = new Blob([full], { type: 'text/javascript' });
@@ -1066,6 +1089,14 @@ function showStats(rows, cols, list, file){
       '</tbody></table></div>' +
       (out.length > 40 ? '<p class="hint">Showing the top 40 of ' + out.length + ' matched.</p>' : '') +
     '</section>' +
+
+    (parseError
+      ? '<section class="lsection"><div class="alert"><b>This file will not load, so it is not safe to upload.</b><br>' +
+        parseError.replace(/</g,'&lt;') + '<br><br>' +
+        'Something in the CSV has produced invalid JavaScript. Tell me what the error says and it can be fixed — ' +
+        'do not upload this file, or the site will lose its register entirely.</div></section>'
+      : '<div class="okbox" style="margin-top:22px"><b>Checked.</b> ' +
+        'The generated file parses and holds ' + parsedCount.toLocaleString('en-GB') + ' standards.</div>') +
 
     '<section class="lsection">' +
       '<div class="lhead"><h2>4. Put it into the site</h2>' +

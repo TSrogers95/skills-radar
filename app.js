@@ -388,14 +388,14 @@ function articleFor(s, defunded, dev){
 
    A change was previously "recent" forever, so the feed only ever grew.
 
-   Now: six months for an ordinary change, eighteen for a high-urgency one —
+   Now: six months for an ordinary change, twelve for a high-urgency one —
    a defunding is still worth seeing eleven months later, a version bump is
    not. Anything dated in the future is "upcoming" and stays there until the
    date passes, at which point it becomes recent on its own.
    ========================================================================= */
 
 const RECENT_DAYS = 183;          // six months
-const RECENT_DAYS_IMPORTANT = 548; // eighteen, for high urgency
+const RECENT_DAYS_IMPORTANT = 365; // twelve, for high urgency
 
 function stillRecent(date, urgency){
   const age = daysAgo(date);
