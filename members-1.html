@@ -1,0 +1,2402 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Members — Skills Radar</title>
+<meta name="description" content="A personal compliance calendar, a feed filtered to the standards you deliver, levy modelling and a tailored newsletter.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<!-- generated:meta -->
+<link rel="canonical" href="https://skills-radar.co.uk/members.html">
+<meta name="robots" content="noindex, follow">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Skills Radar">
+<meta property="og:locale" content="en_GB">
+<meta property="og:title" content="Members — Skills Radar">
+<meta property="og:description" content="A personal compliance calendar, a feed filtered to the standards you deliver, levy modelling and a tailored newsletter.">
+<meta property="og:url" content="https://skills-radar.co.uk/members.html">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Members — Skills Radar">
+<meta name="twitter:description" content="A personal compliance calendar, a feed filtered to the standards you deliver, levy modelling and a tailored newsletter.">
+<!-- /generated:meta -->
+</head>
+<body>
+<a class="skiplink" href="#main">Skip to content</a>
+
+
+<div class="masthead">
+<div class="wrap"><div id="heroblock"></div></div>
+</div>
+
+<div class="stickybar">
+  <div class="wrap inner">
+    <a class="mini" href="index.html">Skills <em>Radar</em></a>
+    <div id="navslot"></div>
+  </div>
+</div>
+<main id="main" tabindex="-1">
+
+<!-- ============ PUBLIC LANDING ============ -->
+<div id="public" hidden></div>
+
+<div id="members" hidden>
+
+  <div class="memberbar">
+    <div class="wrap inner">
+      <div class="who"><b id="orgname"></b><span id="orgmeta"></span></div>
+      <button class="linkbtn" id="signout">Sign out</button>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="wrap controlgrid">
+      <div class="tabs" id="mtabs">
+        <button data-view="dash" class="active">Dashboard</button>
+        <button data-view="cohort">My cohort</button>
+        <button data-view="forecast">Levy forecast</button>
+        <button data-view="cal">Calendar</button>
+        <span class="tabsep" aria-hidden="true"></span>
+        <button data-view="report">Report</button>
+        <button data-view="otj">Off-the-job</button>
+        <span class="tabsep" aria-hidden="true"></span>
+        <button data-view="prefs">Newsletter</button>
+        <button data-view="account">Your account</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div id="mpanel"></div>
+  </div>
+</div>
+
+<div class="cpop" id="pop" role="dialog" aria-live="polite"></div>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Levy figures are estimates built from the rates in the current funding rules and the numbers you enter. They are a planning aid, not a statement of your account. Check your Apprenticeship Service account and the funding rules before making a financial decision. Incentives and grants change frequently — every one links to its source.</p>
+  </div>
+    <div class="wrap"><p class="legal"><a href="privacy.html">Privacy notice</a> &middot; <a href="terms.html">Terms</a> &middot; <a href="account.html">Members</a></p>
+      <div class="attribution"><a href="https://www.gov.uk/government/organisations/skills-england" target="_blank" rel="noopener" class="selogo"><img src="https://occupational-maps.skillsengland.education.gov.uk/media/cyropis5/skills-england_lesser_arms_landscape-se-logo-white.svg" alt="Skills England" width="150" height="40" loading="lazy"></a><p>Contains data from Skills England. &copy; Skills England 2026. This information is licensed under the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3" target="_blank" rel="noopener">Open Government Licence v3.0</a>. Funding rules content is Crown copyright, also under the Open Government Licence.</p></div></div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="config.js"></script>
+<script src="standards.js"></script>
+<script src="defunded.js"></script>
+<script src="otj-minimums.js"></script>
+<script src="occupations.js" onerror="console.info('occupations.js not present yet — run /api/sync-occupations')"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script src="ui.js"></script>
+<script src="auth.js"></script>
+<script>
+
+document.getElementById('heroblock').innerHTML = titleBlockHTML('');
+document.getElementById('navslot').innerHTML = navHTML('members.html');
+
+/* ---------- Sign in ---------- */
+
+function refreshBar(){
+  const el = document.getElementById('orgmeta');
+  if(el) el.textContent = (SETTINGS.levyPayer ? 'Levy payer' : 'Non-levy') + ' · ' +
+    cohortHeads() + ' apprentices · ' + COHORT.length + ' standard' + (COHORT.length === 1 ? '' : 's');
+}
+
+/* =========================================================================
+   ACCESS
+
+   The member must be signed in AND either have a live subscription or
+   complimentary access on their profile. Both are checked against the
+   database, never against anything the browser claims. Someone signed in
+   without access is sent to the payment step rather than shown an error.
+   ========================================================================= */
+
+let ACCOUNT = null;
+
+/* If the register file is missing or broken, every lookup fails and the page
+   looks as though the member's cohort is wrong. Say what has actually
+   happened instead. */
+function registerHealth(){
+  if(typeof STANDARDS === 'undefined' || !Array.isArray(STANDARDS) || STANDARDS.length === 0){
+    return { ok: false, why: 'standards.js did not load, or contains no standards.' };
+  }
+  if(STANDARDS.length < 50){
+    return { ok: false, why: 'standards.js loaded but holds only ' + STANDARDS.length +
+      ' standards, which suggests the last import wrote a partial file.' };
+  }
+  return { ok: true, count: STANDARDS.length };
+}
+
+async function checkAccess(){
+  if(!accountsLive()){
+    document.body.innerHTML =
+      '<div class="wrap"><div class="pagehead centred" style="padding-top:60px">' +
+      '<h1>Accounts are not connected</h1>' +
+      '<p>This page needs Supabase. Add your project URL and anon key to <code>config.js</code>. ' +
+      'The setup guide walks through it.</p></div></div>';
+    return 'blocked';
+  }
+
+  const user = await currentUser();
+  if(!user){ location.replace('account.html'); return 'redirect'; }
+
+  let sub = await getSubscription();
+  let profile = await getProfile();
+
+  /* Coming back from Stripe. The payment has succeeded, but access is
+     granted by the webhook, which arrives separately and can take a few
+     seconds. Bouncing straight back to the payment page in that window tells
+     someone who has just paid that they have not — so wait, and say what is
+     happening while we do. */
+  if(new URLSearchParams(location.search).get('welcome') === '1' && !hasAccess(sub, profile)){
+    showConfirming();
+    for(let i = 0; i < 12 && !hasAccess(sub, profile); i++){
+      await new Promise(r => setTimeout(r, 2000));
+      sub = await getSubscription();
+      profile = await getProfile();
+    }
+    if(!hasAccess(sub, profile)){ showStuck(); return 'blocked'; }
+    history.replaceState({}, '', 'members.html');
+    location.reload();
+    return 'blocked';
+  }
+
+  if(!hasAccess(sub, profile)){ location.replace('account.html'); return 'redirect'; }
+
+  ACCOUNT = { user: user, subscription: sub, profile: profile };
+  return 'member';
+}
+
+/* Shown while the webhook catches up after a payment. */
+function showConfirming(){
+  document.body.innerHTML =
+    '<div class="wrap"><div class="waitbox">' +
+      '<div class="waitspin" aria-hidden="true"></div>' +
+      '<h1>Confirming your payment</h1>' +
+      '<p>Stripe has taken the payment. We are waiting for it to confirm, which usually takes a few seconds. ' +
+      'Please do not close this page.</p>' +
+    '</div></div>';
+}
+
+/* Shown when it does not arrive. Their money has gone; saying nothing is the
+   worst available response. */
+function showStuck(){
+  const email = (typeof CONTACT !== 'undefined' && CONTACT.email) ? CONTACT.email : '';
+  document.body.innerHTML =
+    '<div class="wrap"><div class="waitbox">' +
+      '<h1>Your payment went through, but access has not switched on</h1>' +
+      '<p>This one is on us. Stripe has your payment, and it confirms to us separately — occasionally that ' +
+      'confirmation is delayed or does not arrive.</p>' +
+      '<p><b>Try again in a minute.</b> If it still has not worked, email ' +
+      (email ? '<a href="mailto:' + email + '">' + email + '</a>' : 'us') +
+      ' and it will be put right the same day. You will not be charged twice and you will not have to pay again.</p>' +
+      '<div class="waitacts">' +
+        '<a class="btn" href="members.html">Try again</a>' +
+        '<a class="btn ghost" href="index.html">Back to the site</a>' +
+      '</div>' +
+    '</div></div>';
+}
+
+/* Pull their saved cohort, events and settings in place of the defaults. */
+async function loadAccount(){
+  if(!ACCOUNT) return;
+
+  /* Start from nothing rather than from the demo organisation. Someone
+     signing up should see their own account, empty, not somebody else's
+     figures they then have to work out how to clear. */
+  COHORT = [];
+  MYEVENTS = [];
+  OTJ = {};
+  SETTINGS.payroll = 0;
+  SETTINGS.monthlyIn = null;
+  SETTINGS.opening = null;
+  SETTINGS.young = null;
+  SETTINGS.levyPayer = false;
+  saveCohort(); saveEvents(); saveOtj(); saveSettings();
+
+  try {
+    const saved = await loadStandards();
+    if(saved.length){
+      COHORT = saved.map(s => ({ ...s }));
+      saved.forEach(s => { if(s.otj && (s.otj.published || s.otj.rpl || s.otj.planned)) OTJ[s.name] = s.otj; });
+    }
+    const evs = await loadEvents();
+    if(evs.length) MYEVENTS = evs;
+
+    const p = ACCOUNT.profile;
+    if(p){
+      if(p.payroll)    SETTINGS.payroll = p.payroll;
+      if(p.monthly_in) SETTINGS.monthlyIn = p.monthly_in;
+      if(p.opening)    SETTINGS.opening = p.opening;
+      if(p.young_count != null) SETTINGS.young = p.young_count;
+      SETTINGS.levyPayer = !!p.levy_payer;
+      MEMBER.org = p.org_name || p.email;
+      MEMBER.levyPayer = !!p.levy_payer;
+    }
+  } catch(e){ console.warn('could not load account data:', e.message); }
+}
+
+/* Write back what changed. Quiet on failure — someone typing into the
+   calculator should not be interrupted by a save error. */
+async function persist(){
+  if(!ACCOUNT) return;
+  try {
+    await saveProfile({
+      payroll: SETTINGS.payroll || null,
+      monthly_in: SETTINGS.monthlyIn || null,
+      opening: SETTINGS.opening || null,
+      young_count: SETTINGS.young,
+      levy_payer: !!SETTINGS.levyPayer
+    });
+    for(const c of COHORT){
+      c.otj = OTJ[c.name] || c.otj;
+      c.dbId = await saveStandard(c);
+    }
+  } catch(e){ console.warn('save failed:', e.message); }
+}
+
+let persistTimer = null;
+function queueSave(){
+  if(!ACCOUNT) return;
+  clearTimeout(persistTimer);
+  persistTimer = setTimeout(persist, 1200);
+}
+
+
+document.getElementById('signout').addEventListener('click', async () => {
+  if(accountsLive()){ await signOut(); location.href = 'account.html'; return; }
+  location.reload();
+});
+
+/* ---------- Matching updates to the member's own standards ---------- */
+
+function myStandardNames(){
+  return COHORT.map(s => s.name.toLowerCase());
+}
+
+function isMine(item){
+  if(isMyStandardOnly(item)) return true;
+  // funding rule and levy changes apply to everyone
+  return item.category === 'funding-rules' || item.category === 'levy';
+}
+
+/* Exact match on the standard, not a substring of the title.
+
+   The old test asked whether the item's title contained a cohort name
+   anywhere, so someone following "Engineering Technician" was shown
+   "Space Engineering Technician" and "Aerospace Engineering Technician" —
+   different standards that happen to end with the same words. */
+function isMyStandardOnly(item){
+  if(!item.standard) return false;
+
+  const norm = s => String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+
+  /* The feed records a standard as "Operations Manager, Level 5", so compare
+     the name and the level separately rather than the whole string. */
+  const bits = String(item.standard).split(/,\s*Level\s*/i);
+  const itemName = norm(bits[0]);
+  const itemLevel = bits[1] ? parseInt(bits[1], 10) : null;
+
+  return COHORT.some(c => {
+    const reg = findStandard(c);
+    const names = [norm(c.name)];
+    if(reg) names.push(norm(reg.name));
+
+    if(names.indexOf(itemName) === -1) return false;
+    // same name at a different level is a different standard
+    if(itemLevel != null && c.level && itemLevel !== c.level){
+      if(!reg || reg.level !== itemLevel) return false;
+    }
+    return true;
+  });
+}
+
+/* =========================================================================
+   YOUR OWN EVENTS
+
+   Inductions, reviews, open evenings, EPA windows — the dates that matter to
+   you but exist nowhere in policy. Added here, they sit alongside the policy
+   milestones in the calendar, on the dashboard and in the board report.
+
+   Stored per session for now; they belong in the database once accounts are
+   live, which is the same wait as the cohort and off-the-job figures.
+   ========================================================================= */
+
+let MYEVENTS = [];
+try { MYEVENTS = JSON.parse(sessionStorage.getItem('sr-events') || '[]'); } catch(e){ MYEVENTS = []; }
+function saveEvents(){ try { sessionStorage.setItem('sr-events', JSON.stringify(MYEVENTS)); } catch(e){} }
+
+function addEvent(title, date, note){
+  if(!title || !date) return false;
+  const e = {
+    id: 'ev' + Date.now() + Math.floor(Math.random() * 1000),
+    title: title, date: date, note: note || '', done: false
+  };
+  MYEVENTS.push(e);
+  saveEvents();
+  if(ACCOUNT) saveEvent({ title: e.title, date: e.date, note: e.note, done: false })
+    .then(id => { if(id) e.id = id; });
+  return true;
+}
+
+function toggleEvent(id){
+  const e = MYEVENTS.find(x => x.id === id);
+  if(!e) return;
+  e.done = !e.done;
+  saveEvents();
+  if(ACCOUNT && typeof e.id === 'number') saveEvent(e);
+}
+
+function removeEvent(id){
+  MYEVENTS = MYEVENTS.filter(x => x.id !== id);
+  saveEvents();
+  if(ACCOUNT && typeof id === 'number') deleteEvent(id);
+}
+
+/* Outstanding = not ticked off. Past dates still count as outstanding,
+   because an overdue induction is exactly the thing worth surfacing. */
+function openEvents(){ return MYEVENTS.filter(e => !e.done); }
+
+/* Shaped like a milestone so the calendar and report can treat them alike. */
+function eventsAsMilestones(){
+  return MYEVENTS.map(e => ({
+    date: e.date,
+    title: e.title,
+    action: e.note || 'Your own entry.',
+    who: 'Added by you',
+    urgency: e.done ? 'low' : 'medium',
+    scope: 'mine',
+    mine: true,
+    done: e.done,
+    id: e.id,
+    article: ''
+  }));
+}
+
+/* ---------- Which milestones actually apply to this member ---------- */
+
+function myMilestones(){
+  return policyMilestones().concat(eventsAsMilestones());
+}
+
+function policyMilestones(){
+  const mine = COHORT.map(s => s.name.toLowerCase());
+  return MILESTONES.filter(m => {
+    if(m.scope === 'all') return true;
+    if(m.scope === 'route')     return (m.routes || []).some(r => MEMBER.routes.indexOf(r) > -1);
+    if(m.scope === 'standards') return (m.standards || []).some(n => mine.indexOf(n.toLowerCase()) > -1);
+    return true;
+  });
+}
+
+function milestoneReason(m){
+  if(m.mine) return m.done ? 'Your event — done' : 'Your event';
+  const mine = COHORT.map(s => s.name.toLowerCase());
+  if(m.scope === 'standards'){
+    const hit = (m.standards || []).filter(n => mine.indexOf(n.toLowerCase()) > -1);
+    return hit.length ? 'Affects your ' + hit.join(' and ') : '';
+  }
+  if(m.scope === 'route'){
+    const hit = (m.routes || []).filter(r => MEMBER.routes.indexOf(r) > -1);
+    return hit.length ? 'On your ' + ROUTES[hit[0]].label + ' route' : '';
+  }
+  return 'Applies to everyone';
+}
+
+/* ---------- Levy maths ---------- */
+
+/* =========================================================================
+   LEVY MODEL
+
+   Funds in
+     levy      = 0.5% of the annual pay bill
+     available = levy − £15,000 allowance   (nil if the pay bill is under £3m)
+     no 10% top-up is added to new funds from 1 August 2026
+
+   Drawing down, per apprentice
+     80% of the price is paid to the provider in equal monthly instalments
+     across the planned duration; 20% is held back until completion.
+
+       monthly instalment = (price × 0.8) ÷ duration in months
+       annual draw        = monthly × 12, plus the completion payments
+                            falling due that year
+
+     Across a steady cohort those two come to price × (12 ÷ duration) per
+     apprentice per year, which is the figure used here.
+
+   Paying for a shortfall, new starts from 1 August 2026
+     levy payer, balance exhausted   16–24  government pays 100%
+                                     25+    employer pays 25%
+     employer does not pay the levy  16–24  government pays 100%
+                                     25+    employer pays 5%
+   ========================================================================= */
+
+function levyFigures(payroll, standards, under25, levyPayer){
+  const gross     = payroll * LEVY_MODEL.rate;
+  const available = payroll > LEVY_MODEL.threshold
+    ? Math.max(0, gross - LEVY_MODEL.allowance) : 0;
+  const monthlyIn = available / 12;
+
+  const lines = standards.map(s => {
+    const months  = s.months || 12;
+    const monthly = ((s.funding * 0.8) / months) * s.count;
+    const annual  = s.funding * (12 / months) * s.count;
+    return {
+      name: s.name, level: s.level, count: s.count,
+      funding: s.funding, months: months,
+      monthlyAll: monthly, annual: annual, total: s.funding * s.count
+    };
+  });
+
+  const heads      = lines.reduce((t, l) => t + l.count, 0);
+  const commitment = lines.reduce((t, l) => t + l.total, 0);
+  const annualDraw = lines.reduce((t, l) => t + l.annual, 0);
+  const monthlyOut = lines.reduce((t, l) => t + l.monthlyAll, 0);
+
+  const balance   = available - annualDraw;
+  const surplus   = balance > 0 ? balance : 0;
+  const shortfall = balance < 0 ? -balance : 0;
+
+  const young      = Math.min(under25, heads);
+  const pctYoung   = heads ? young / heads : 0;
+  const shortYoung = shortfall * pctYoung;
+  const shortOlder = shortfall - shortYoung;
+
+  const rates     = levyPayer ? LEVY_MODEL.levyExhausted : LEVY_MODEL.nonLevy;
+  const costYoung = shortYoung * rates.under25;
+  const costOlder = shortOlder * rates.over25;
+  const youCost   = costYoung + costOlder;
+  const govCost   = shortfall - youCost;
+
+  return {
+    gross, available, monthlyIn, lines, heads, commitment,
+    annualDraw, monthlyOut, surplus, shortfall,
+    young, older: heads - young, pctYoung,
+    shortYoung, shortOlder, costYoung, costOlder, youCost, govCost,
+    rates, liable: payroll > LEVY_MODEL.threshold
+  };
+}
+
+/* ---------- Views ---------- */
+
+/* =========================================================================
+   DASHBOARD
+
+   Deliberately not a second feed. The feed tab lists what has happened; this
+   answers a different question — what do I have to do, and what is coming.
+   Every item here is something with an action attached or a date to plan
+   against, drawn from the member's own cohort.
+   ========================================================================= */
+
+/* Things on this member's own standards that warrant doing something. */
+function attentionItems(){
+  const out = [];
+
+  COHORT.forEach(c => {
+    const reg = findStandard(c);
+    if(!reg){
+      out.push({ level:'warn', title:'L' + c.level + ' ' + c.name + ' is not matching the register',
+        detail: unmatchedNote(c) + ' Until it matches, changes to it will not reach your feed or calendar.',
+        action:'Fix the name', view:'cohort' });
+      return;
+    }
+
+    const heads = c.count || 0;
+
+    if(/Defunded/i.test(reg.status)){
+      out.push({ level:'stop', title:'L' + c.level + ' ' + c.name + ' loses funding on 1 September 2026',
+        detail: heads + ' apprentice' + (heads === 1 ? '' : 's') + ' on programme stay funded to completion, but you cannot start anyone new. ' +
+          'Contracting takes six to eight weeks, so the practical deadline is earlier than the formal one.',
+        action:'Read what this means', href:'a/std-.html' + (reg.code || reg.name.toLowerCase().replace(/[^a-z0-9]+/g,'-')) });
+    }
+
+    if(/waiting|pending/i.test(reg.epa || '')){
+      out.push({ level:'warn', title:'L' + c.level + ' ' + c.name + ' has no assessment organisation',
+        detail:'You can enrol and deliver, but nobody is currently appointed to assess. On a ' + (reg.months || c.months) +
+          '-month programme that is a real timing risk — ask how long appointment is expected to take against your planned end dates.',
+        action:'View on the register', href: standardURL(reg), external:true });
+    }
+
+    if(/development|notice period|paused|retirement/i.test(reg.status)){
+      out.push({ level:'watch', title:'L' + c.level + ' ' + c.name + ' is ' + reg.status.toLowerCase(),
+        detail: /paused/i.test(reg.status)
+          ? 'No new starts are possible while the pause holds. Existing apprentices continue.'
+          : 'A revision is in progress. You can still start apprentices on the current version, but treat curriculum plans as provisional.',
+        action:'View on the register', href: standardURL(reg), external:true });
+    }
+
+    if(reg.funding && c.funding && reg.funding !== c.funding){
+      out.push({ level:'warn', title:'L' + c.level + ' ' + c.name + ' band is now ' + money(reg.funding),
+        detail:'Your cohort is costed at ' + money(c.funding) + '. The band that applies is the one in force at each apprentice\'s start date, ' +
+          'so you may be running the same standard at two prices. Check your MIS.',
+        action:'Update your figures', view:'cohort' });
+    }
+  });
+
+  // Money
+  const f = levyFigures(SETTINGS.payroll, COHORT, youngCount(), SETTINGS.levyPayer);
+  if(f.shortfall > 0 && f.youCost > 0){
+    out.push({ level:'warn', title:'Budget around ' + money0(Math.round(f.youCost)) + ' of co-investment this year',
+      detail:'You draw down roughly ' + money0(Math.round(f.annualDraw)) + ' against ' + money0(Math.round(f.available)) +
+        ' coming in. Government covers ' + money0(Math.round(f.govCost)) + ' of the gap; the rest is yours.',
+      action:'Open the forecast', view:'forecast' });
+  } else if(f.surplus > 1000){
+    out.push({ level:'watch', title:money0(Math.round(f.surplus)) + ' of levy may expire unused',
+      detail:'New funds expire after twelve months rather than twenty-four, so an unspent balance is money lost rather than banked. ' +
+        'Units, foundation apprenticeships and transfers are all ways to commit it.',
+      action:'Open the forecast', view:'forecast' });
+  }
+
+  const order = { stop:0, warn:1, watch:2 };
+  return out.sort((a,b) => order[a.level] - order[b.level]);
+}
+
+/* Milestones in the next 90 days that apply to this member. */
+function comingUp(days){
+  return myMilestones()
+    .filter(m => { const d = -daysAgo(m.date); return d >= 0 && d <= days; })
+    .sort((a,b) => new Date(a.date) - new Date(b.date));
+}
+
+/* A completion forecast lived here. It has been removed rather than
+   corrected, because without each apprentice's actual start date any figure
+   is an assumption about a steady intake dressed up as a projection — not
+   something to put in front of a board.
+
+   Doing it properly needs start dates per apprentice. Those live in the
+   employer's Apprenticeship Service account, so the real answer is a DAS
+   connection rather than more arithmetic here. */
+
+/* What still needs filling in before the tools mean anything. */
+function setupSteps(){
+  return [
+    { done: COHORT.length > 0,
+      title: 'Add the standards you deliver',
+      why: 'Everything else follows from this. Your feed, your calendar and your compliance position are all filtered to these.',
+      action: 'Add standards', view: 'cohort' },
+    { done: cohortHeads() > 0,
+      title: 'Say how many apprentices are on each',
+      why: 'Needed for the levy figures and for the completion picture. An estimate is fine — you can change it whenever.',
+      action: 'Add numbers', view: 'cohort' },
+    { done: SETTINGS.payroll > 0,
+      title: 'Enter your annual pay bill',
+      why: 'Sets what goes into your levy account, and whether you pay the levy at all. Nothing is shared and you can remove it later.',
+      action: 'Open the forecast', view: 'forecast' },
+    { done: Object.keys(OTJ).length > 0,
+      title: 'Record your off-the-job hours',
+      why: 'The published minimum for each standard is already here. Add the hours you plan to deliver and it tells you where you stand.',
+      action: 'Open off-the-job', view: 'otj' }
+  ];
+}
+
+function setupView(){
+  const steps = setupSteps();
+  const done = steps.filter(s => s.done).length;
+
+  return '<div class="pagehead"><h1>Welcome' + (ACCOUNT && ACCOUNT.profile && ACCOUNT.profile.org_name
+      ? ', ' + ACCOUNT.profile.org_name : '') + '</h1>' +
+    '<p>Your account is empty, which is how it should start. Four things to add, and the site becomes yours. ' +
+    'None of it has to be exact and all of it can change.</p></div>' +
+
+    '<div class="setupbar"><div class="setupfill" style="width:' + Math.round(done / steps.length * 100) + '%"></div></div>' +
+    '<p class="setupcount">' + done + ' of ' + steps.length + ' done</p>' +
+
+    '<div class="setuplist">' +
+      steps.map((s, i) =>
+        '<div class="setupstep' + (s.done ? ' done' : '') + '">' +
+          '<span class="setupnum">' + (s.done ? '&#10003;' : (i + 1)) + '</span>' +
+          '<div class="setupbody"><h3>' + s.title + '</h3><p>' + s.why + '</p></div>' +
+          (s.done ? '<span class="setupdone">Done</span>'
+                  : '<button class="todoact" data-go="' + s.view + '">' + s.action + '</button>') +
+        '</div>').join('') +
+    '</div>' +
+
+    '<div class="notice" style="margin-top:24px"><b>Nothing here is published anywhere.</b> ' +
+    'Your standards, numbers and pay bill are yours alone. You can export the lot or delete the account outright ' +
+    'from <button class="linkbtn" data-go="account">your account page</button>, at any time.</div>';
+}
+
+function dashView(){
+  /* Until there is something to report on, the dashboard is the setup list. */
+  if(!COHORT.length) return setupView();
+
+  const attention = attentionItems();
+  const soon = comingUp(90);
+  const stops = attention.filter(a => a.level === 'stop').length;
+
+  const attentionHTML = attention.length
+    ? attention.map(a =>
+        '<div class="todo ' + a.level + '">' +
+          '<div class="todotext"><h3>' + a.title + '</h3><p>' + a.detail + '</p></div>' +
+          (a.href
+            ? '<a class="todoact" href="' + a.href + '"' + (a.external ? ' target="_blank" rel="noopener"' : '') + '>' + a.action + '</a>'
+            : '<button class="todoact" data-go="' + a.view + '">' + a.action + '</button>') +
+        '</div>').join('')
+    : '<div class="okbox">Nothing on your standards needs attention right now.</div>';
+
+  const soonHTML = soon.length
+    ? soon.map(m => {
+        const d = new Date(m.date), away = Math.ceil(-daysAgo(m.date));
+        return '<div class="soon ' + m.urgency + '">' +
+          '<div class="soondate">' + d.getDate() + ' ' + d.toLocaleDateString('en-GB',{month:'short'}) +
+            '<small>' + (away === 0 ? 'today' : 'in ' + away + ' day' + (away === 1 ? '' : 's')) + '</small></div>' +
+          '<div><h3>' + m.title + '</h3><p>' + m.action + '</p>' +
+          '<div class="who">' + milestoneReason(m) + '</div></div>' +
+        '</div>';
+      }).join('')
+    : '<div class="okbox">No deadlines in the next 90 days that touch your standards.</div>';
+
+  return '<div class="pagehead"><h1>' + MEMBER.org + '</h1>' +
+    '<p>What has changed on the standards you deliver, what needs doing, and what is coming.</p></div>' +
+
+    /* The feed leads. It is the reason someone opens this page, and it is
+       filtered live to whatever is in My cohort — add or remove a standard
+       there and this changes with it. */
+    '<div class="grouphead" style="margin-top:0"><h2>What has changed</h2><div class="rule"></div>' +
+      '<button class="linkbtn" data-go="cohort">Change what you follow</button></div>' +
+    feedBoardHTML() +
+
+    '<div class="mgrid" style="margin-top:34px">' +
+      '<div class="mcard ' + (stops ? 'bad' : '') + '"><div class="n">' + attention.length + '</div>' +
+        '<div class="l">Needing attention' + (stops ? ' — ' + stops + ' urgent' : '') + '</div></div>' +
+      '<div class="mcard warm"><div class="n">' + soon.length + '</div><div class="l">Deadlines in 90 days</div></div>' +
+      '<div class="mcard"><div class="n">' + cohortHeads() + '</div><div class="l">Apprentices on programme</div></div>' +
+      '<div class="mcard cool"><div class="n">' + openEvents().length + '</div><div class="l">Your events outstanding</div></div>' +
+    '</div>' +
+
+    '<div class="grouphead"><h2>Needs your attention</h2><div class="rule"></div></div>' +
+    '<div class="todolist">' + attentionHTML + '</div>' +
+
+    '<div class="grouphead"><h2>Next 90 days</h2><div class="rule"></div>' +
+      '<button class="linkbtn" data-go="cal">Full calendar</button></div>' +
+    '<div class="soonlist">' + soonHTML + '</div>' +
+
+    '<div class="grouphead"><h2>Your standards</h2><div class="rule"></div>' +
+      '<button class="linkbtn" data-go="cohort">Edit these</button></div>' +
+    '<table class="std" style="margin-top:0"><thead><tr>' +
+      '<th>Standard</th><th>Level</th><th>On programme</th><th>Band</th><th>Status</th>' +
+    '</tr></thead><tbody>' +
+    COHORT.map(s => {
+      const reg = findStandard(s);
+      const bad = reg && /Defunded/i.test(reg.status);
+      return '<tr class="' + (bad ? 'defunded' : '') + '">' +
+        '<td class="nm">' + (reg
+          ? '<a class="stdlink" href="' + standardURL(reg) + '" target="_blank" rel="noopener">' + reg.name + '</a>' +
+            '<small>' + (reg.code || 'code to confirm') + ' &middot; v' + reg.version + '</small>'
+          : s.name + '<small>' + unmatchedNote(s) + '</small>') + '</td>' +
+        '<td class="num">Level ' + s.level + '</td>' +
+        '<td class="num">' + s.count + '</td>' +
+        '<td class="num">' + band((reg && reg.funding) || s.funding) + '</td>' +
+        '<td>' + (reg
+          ? (reg.changed ? changeTagHTML(reg.changed, reg.status) : '<span class="chg none">' + reg.status + '</span>')
+          : '<span class="chg yes">Check the name</span>') + '</td></tr>';
+    }).join('') + '</tbody></table>' +
+
+    dasPanelHTML(true);
+}
+
+function feedBoardHTML(){
+  const feed = allUpdates().filter(isMine);
+
+  const mine = feed.filter(isMyStandardOnly)
+    .sort((a,b) => new Date(b.date) - new Date(a.date));
+  const general = feed.filter(u => !isMyStandardOnly(u))
+    .sort((a,b) => (a.pinned === b.pinned) ? new Date(b.date) - new Date(a.date) : (a.pinned ? -1 : 1));
+
+  function card(u, flag){
+    const tag = itemTagHTML(u);
+    return '<div class="card ' + u.urgency + '">' +
+      (flag ? '<span class="dotflag"></span>' : '') +
+      '<h3>' + u.title + '</h3>' +
+      '<div class="whatchanged"><span class="wclabel">What changed</span>' + tag + '</div>' +
+      '<p>' + (u.short || firstClause(u.summary)) + '</p>' +
+      '<span class="cdate">' + fmtShort(u.date) + ' ' + fmtYear(u.date) + '</span>' +
+      '<div class="links" style="margin-top:8px">' +
+        (u.article ? '<a class="read" href="a/' + u.article + '.html">Detail</a>' : '') +
+        '<a href="' + u.url + '" target="_blank" rel="noopener">Source</a>' +
+      '</div></div>';
+  }
+
+  function col(title, blurb, rows, lead, flag){
+    const body = rows.length
+      ? rows.map(r => card(r, flag)).join('')
+      : '<div class="colempty">Nothing here right now.</div>';
+    return '<section class="col' + (lead ? ' lead' : '') + '">' +
+      '<div class="colhead"><h2>' + title + ' <em>' + rows.length + '</em></h2><p>' + blurb + '</p></div>' +
+      '<div class="colbody">' + body + '</div></section>';
+  }
+
+  return '<p class="feedintro">' + feed.length + ' items, filtered from ' + allUpdates().length +
+      ' on the public feed. Changes to your standards on the left; the funding rules that apply whatever ' +
+      'you run on the right.</p>' +
+    '<div class="kanban two">' +
+      col('My standards', 'Changes to the ' + COHORT.length + ' programme' + (COHORT.length === 1 ? '' : 's') + ' you deliver.', mine, true, true) +
+      col('General funding rules', 'Funding rules and levy changes that apply to everyone.', general, false, false) +
+    '</div>';
+}
+
+let calScope = 'mine';
+
+function calView(){
+  const mine = myMilestones().length, all = MILESTONES.length;
+  return '<div class="pagehead"><h1>My calendar</h1>' +
+    '<p>Twelve months ahead, filtered to the ' + COHORT.length + ' standards you deliver and the ' +
+    'rules that apply to everyone. Coloured days carry a deadline — hover or tap for the detail.</p></div>' +
+    '<div class="scopeswitch">' +
+      '<button data-scope="mine"' + (calScope === 'mine' ? ' class="on"' : '') + '>Relevant to me <em>' + mine + '</em></button>' +
+      '<button data-scope="all"' + (calScope === 'all' ? ' class="on"' : '') + '>Everything <em>' + all + '</em></button>' +
+    '</div>' +
+    '<div class="key">' +
+      '<span><i class="h"></i> Hard deadline or high risk</span>' +
+      '<span><i class="m"></i> Confirmed change, plan for it</span>' +
+      '<span><i class="l"></i> For awareness</span>' +
+      '<span><i class="own"></i> Your own events</span></div>' +
+    '<div class="calgrid" id="calgrid"></div>' +
+
+    '<div class="grouphead" style="margin-top:38px"><h2>Your own events</h2><div class="rule"></div></div>' +
+    '<p class="hint" style="max-width:66ch;margin:12px 0 16px">Inductions, progress review windows, open evenings, EPA bookings — ' +
+    'anything with a date that matters to you. They appear in the calendar above, on your dashboard, and in the board report.</p>' +
+
+    '<div class="eventadd">' +
+      '<div class="field"><label for="ev-title">What is it?</label>' +
+      '<input type="text" id="ev-title" placeholder="September induction, Business Administrator cohort"></div>' +
+      '<div class="field"><label for="ev-date">When?</label>' +
+      '<input type="date" id="ev-date"></div>' +
+      '<div class="field wide"><label for="ev-note">Note <span style="font-weight:400;color:var(--text-3)">(optional)</span></label>' +
+      '<input type="text" id="ev-note" placeholder="Room 4, 9am. Employer reps attending."></div>' +
+      '<button class="btn" id="ev-add">Add</button>' +
+    '</div>' +
+    '<div class="err" id="ev-err" hidden>Give it a name and a date.</div>' +
+
+    '<div id="eventlist"></div>' +
+    '<div class="callist"><div class="grouphead"><h2>Every milestone in full</h2><div class="rule"></div></div><div id="cal"></div></div>' +
+    '<div class="pagehead" style="margin-top:52px"><h1>On the horizon</h1>' +
+    '<p>What is coming next. Confidence is marked so you can tell a confirmed date from a signalled direction.</p></div>' +
+    '<div id="horizon"></div>';
+}
+
+/* =========================================================================
+   MY STANDARDS
+
+   One editable list drives the whole members area — the dashboard, the feed,
+   the calendar and the levy calculator all read from it. Edits survive tab
+   switches within a session. Once accounts are live this saves to the
+   database instead of sessionStorage.
+   ========================================================================= */
+
+let COHORT = loadCohort();
+
+/* =========================================================================
+   WORKING SETTINGS
+
+   Payroll and the age split used to live in the levy calculator's input
+   boxes, read fresh each time and stored nowhere. That meant the dashboard
+   and the board report were still using the account's original figures while
+   the calculator showed the ones you had typed — so a report printed after
+   changing your pay bill was wrong.
+
+   One object now holds them, saved as you type and read by every view.
+   ========================================================================= */
+
+const SETTINGS = loadSettings();
+
+function loadSettings(){
+  const base = { payroll: MEMBER.payroll, young: null, levyPayer: MEMBER.levyPayer };
+  try {
+    const saved = JSON.parse(sessionStorage.getItem('sr-settings') || 'null');
+    if(saved) return Object.assign(base, saved);
+  } catch(e){}
+  return base;
+}
+
+function saveSettings(){
+  try { sessionStorage.setItem('sr-settings', JSON.stringify(SETTINGS)); } catch(e){}
+}
+
+/* Default the age split to just under half the cohort until someone sets it,
+   and never let it exceed the number of apprentices actually on programme. */
+function youngCount(){
+  const heads = cohortHeads();
+  if(SETTINGS.young == null) return Math.round(heads * 0.45);
+  return Math.min(SETTINGS.young, heads);
+}
+
+function loadCohort(){
+  try {
+    const saved = sessionStorage.getItem('sr-cohort');
+    if(saved) return JSON.parse(saved);
+  } catch(e){}
+  return MEMBER.standards.map(s => ({ ...s }));
+}
+
+function saveCohort(){
+  try { sessionStorage.setItem('sr-cohort', JSON.stringify(COHORT)); } catch(e){}
+}
+
+function cohortHeads(){ return COHORT.reduce((t,s) => t + (s.count || 0), 0); }
+
+function addStandard(name){
+  if(COHORT.some(c => c.name === name)) return false;
+  const s = STANDARDS.find(x => x.name === name);
+  if(!s) return false;
+  COHORT.push({
+    name: s.name, code: s.code, level: s.level,
+    funding: s.funding, months: s.months || 12, count: 1
+  });
+  saveCohort();
+  return true;
+}
+
+function removeStandard(i){
+  const gone = COHORT[i];
+  COHORT.splice(i, 1);
+  saveCohort();
+  if(ACCOUNT && gone && gone.dbId) deleteStandard(gone.dbId);
+}
+
+/* ---------- Search-to-add ----------
+   A type-ahead over every standard on the register, rather than a dropdown
+   of 378 options nobody can scan. */
+
+function pickerHTML(id){
+  return '<div class="picker" id="' + id + '">' +
+    '<label for="' + id + '-q">Add a standard</label>' +
+    '<div class="pickerbox">' +
+      '<input type="search" id="' + id + '-q" autocomplete="off" ' +
+        'placeholder="Search the register — try &ldquo;business admin&rdquo;, &ldquo;ST0070&rdquo;, &ldquo;nursing&rdquo;">' +
+      '<svg class="radar" id="' + id + '-r" viewBox="0 0 20 20" aria-hidden="true">' +
+        '<circle cx="10" cy="10" r="8.6" fill="none" stroke="#CBC5B6" stroke-width="1"/>' +
+        '<circle cx="10" cy="10" r="4.6" fill="none" stroke="#CBC5B6" stroke-width="1"/>' +
+        '<g class="sweep"><path d="M10 10 L10 1.4 A8.6 8.6 0 0 1 17.4 5.7 Z" fill="#10796A" fill-opacity="0.3"/>' +
+        '<line x1="10" y1="10" x2="10" y2="1.4" stroke="#10796A" stroke-width="1.4"/></g></svg>' +
+    '</div>' +
+    '<div class="pickerresults" id="' + id + '-res"></div>' +
+  '</div>';
+}
+
+function wirePicker(id, onAdd){
+  const input = document.getElementById(id + '-q');
+  const res   = document.getElementById(id + '-res');
+  const radar = document.getElementById(id + '-r');
+  if(!input) return;
+
+  function results(q){
+    if(!q || q.length < 2){ res.innerHTML = ''; res.classList.remove('on'); return; }
+    const routeKey = detectRoute(q);
+    const words = q.toLowerCase().split(/\s+/).filter(w => w.length > 1);
+
+    const hits = STANDARDS
+      .filter(s => !COHORT.some(c => c.name === s.name))
+      .map(s => {
+        let score = scoreMatch(q, {
+          name: s.name, code: s.code,
+          options: pathwaysFor(s), jobTitles: jobTitlesFor(s),
+          extra: s.status + ' ' + routeText(s.route) + ' ' + occupationSearchText(s)
+        });
+        if(routeKey && s.route === routeKey) score += 20;
+        return { s: s, score: score };
+      })
+      .filter(x => x.score > 0)
+      .sort((a,b) => b.score - a.score)
+      .slice(0, 8);
+
+    if(!hits.length){
+      res.innerHTML = '<div class="pickernone">Nothing on the register matches that.</div>';
+      res.classList.add('on');
+      return;
+    }
+
+    res.innerHTML = hits.map(x => {
+      const s = x.s;
+      const route = ROUTES[s.route] ? ROUTES[s.route].label : '';
+      const gone = /Defunded/i.test(s.status);
+      return '<button class="pickeritem" data-name="' + s.name.replace(/"/g,'&quot;') + '">' +
+        '<b>L' + s.level + ' ' + s.name + '</b>' +
+        '<span>' + (s.code || 'code to confirm') + ' · ' + money(s.funding) +
+          (s.months ? ' · ' + s.months + ' months' : ' · unit') +
+          (route ? ' · ' + route : '') +
+          (pathwaysFor(s).length ? ' · ' + pathwaysFor(s)[0] : '') + '</span>' +
+        (gone ? '<em class="warn">Losing funding September 2026</em>' : '') +
+      '</button>';
+    }).join('');
+    res.classList.add('on');
+
+    res.querySelectorAll('.pickeritem').forEach(b => {
+      b.addEventListener('click', () => {
+        if(addStandard(b.dataset.name)){
+          input.value = '';
+          res.innerHTML = '';
+          res.classList.remove('on');
+          onAdd();
+        }
+      });
+    });
+  }
+
+  let timer;
+  input.addEventListener('input', () => {
+    if(radar) radar.classList.add('on');
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      results(input.value.trim());
+      if(radar) radar.classList.remove('on');
+    }, 180);
+  });
+
+  input.addEventListener('keydown', e => {
+    if(e.key === 'Escape'){ input.value = ''; res.innerHTML = ''; res.classList.remove('on'); }
+  });
+
+  document.addEventListener('click', e => {
+    if(!document.getElementById(id) || document.getElementById(id).contains(e.target)) return;
+    res.classList.remove('on');
+  });
+}
+
+/* Per-standard off-the-job figures the member enters. Kept with the rest of
+   the member's state rather than inside a view, which is where these were
+   before and why they disappeared with it. */
+let OTJ = {};
+try { OTJ = JSON.parse(sessionStorage.getItem('sr-otj') || '{}'); } catch(e){ OTJ = {}; }
+function saveOtj(){ try { sessionStorage.setItem('sr-otj', JSON.stringify(OTJ)); } catch(e){} }
+function otjFor(name){ return OTJ[name] || {}; }
+
+/* =========================================================================
+   MY COHORT
+
+   Choosing what you deliver used to sit inside the levy calculator, which
+   made it look like a costing exercise. It is the more fundamental thing:
+   it decides the feed, the calendar, the compliance position and the
+   forecast. So it gets its own tab, and the calculators read from it.
+   ========================================================================= */
+
+/* The counters were written into the view once and never revisited, so
+   typing a new number changed the table and left the totals above it
+   showing the old figures. They are generated separately now and redrawn
+   on every keystroke — in place, so focus stays in the box being typed in. */
+/* A cohort entry that no longer matches the register — usually because an
+   import renamed the standard. Rather than a dead end, offer the closest
+   entries and repair it in one click. */
+function fixHTML(entry, i){
+  const near = typeof suggestStandards === 'function' ? suggestStandards(entry, 3) : [];
+  if(!near.length){
+    return '<small class="nomatch">Not on the register under this name. ' +
+      'Remove it and search for it again.</small>';
+  }
+  return '<small class="nomatch">Not matching the register &mdash; the name may have changed.</small>' +
+    '<div class="fixrow">' +
+      near.map(s => '<button class="fixbtn" data-fix="' + i + '" data-to="' + s.name.replace(/"/g,'&quot;') + '">' +
+        'L' + s.level + ' ' + s.name + '</button>').join('') +
+    '</div>';
+}
+
+function cohortStatsHTML(){
+  if(!COHORT.length) return '';
+  const defunded = COHORT.filter(c => { const r = findStandard(c); return r && /Defunded/i.test(r.status); });
+  return '<div class="mgrid">' +
+    '<div class="mcard cool"><div class="n">' + COHORT.length + '</div><div class="l">Standards</div></div>' +
+    '<div class="mcard"><div class="n">' + cohortHeads() + '</div><div class="l">Apprentices</div></div>' +
+    '<div class="mcard ' + (defunded.length ? 'bad' : '') + '"><div class="n">' + defunded.length +
+      '</div><div class="l">Losing funding</div></div>' +
+    '<div class="mcard warm"><div class="n">' + allUpdates().filter(isMyStandardOnly).length +
+      '</div><div class="l">Changes to them</div></div>' +
+  '</div>';
+}
+
+function cohortView(){
+  const heads = cohortHeads();
+  const defunded = COHORT.filter(c => { const r = findStandard(c); return r && /Defunded/i.test(r.status); });
+
+  const rows = COHORT.map((s, i) => {
+    const reg = findStandard(s);
+    const bad = reg && /Defunded/i.test(reg.status);
+    return '<tr class="' + (bad ? 'defunded' : '') + '">' +
+      '<td class="nm">' + (reg
+        ? '<a class="stdlink" href="' + standardURL(reg) + '" target="_blank" rel="noopener">' + reg.name + '</a>' +
+          '<small>' + (reg.code || 'code to confirm') + ' &middot; Level ' + s.level +
+          ' &middot; ' + (reg.months || s.months || 12) + ' months &middot; ' + money(reg.funding || s.funding) + '</small>'
+        : s.name + '<small>' + unmatchedNote(s) + '</small>') + '</td>' +
+      '<td class="num"><input class="cnt" type="number" min="0" data-i="' + i + '" value="' + (s.count || 0) + '"></td>' +
+      '<td>' + (reg
+        ? (reg.changed ? changeTagHTML(reg.changed, reg.status) : '<span class="chg none">' + reg.status + '</span>')
+        : '<span class="chg yes">Check the name</span>') + '</td>' +
+      '<td class="num"><button class="rm" data-i="' + i + '" aria-label="Remove ' + s.name.replace(/"/g,'&quot;') + '">&times;</button></td>' +
+    '</tr>';
+  }).join('');
+
+  const health = registerHealth();
+
+  return '<div class="pagehead"><h1>My cohort</h1>' +
+    (health.ok ? '' :
+      '<div class="alert" style="margin-top:14px"><b>The standards register is not loading properly.</b> ' +
+      health.why + ' Until that is fixed every standard below will show as unmatched, and the feed will be ' +
+      'nearly empty. Check <code>standards.js</code> is in your repo and that the last deployment was green.</div>') +
+    '<p>The standards you deliver, and how many apprentices are on each. Everything else on this site follows ' +
+    'from this list — your feed, your calendar, your compliance position and your forecast.</p></div>' +
+
+    '<div id="cohortstats">' + cohortStatsHTML() + '</div>' +
+
+    (defunded.length
+      ? '<div class="alert"><b>' + defunded.length + ' of these lose funding on 1 September 2026.</b> ' +
+        defunded.map(d => 'Level ' + d.level + ' ' + d.name).join(', ') + '. ' +
+        'Apprentices already on programme stay funded to completion; you cannot start anyone new after that date.</div>'
+      : '') +
+
+    '<div class="grouphead"><h2>What you deliver</h2><div class="rule"></div></div>' +
+    '<table class="std cohort"><thead><tr>' +
+      '<th>Standard</th><th>Apprentices</th><th>Status</th><th></th>' +
+    '</tr></thead><tbody id="cohortrows">' +
+      (rows || '<tr><td colspan="4" class="cohortempty">Nothing added yet. Search below to add the standards you deliver.</td></tr>') +
+    '</tbody></table>' +
+
+    '<div class="addpanel">' +
+      pickerHTML('cohortpick') +
+      '<p class="hint" style="margin:12px 0 0">Search by name, by reference number, or by what people call the job — ' +
+      'try &ldquo;business admin&rdquo;, &ldquo;ST0070&rdquo; or &ldquo;welder&rdquo;. Added as soon as you pick one.</p>' +
+    '</div>' +
+
+    '<div class="notice" style="margin-top:22px"><b>An estimate is fine.</b> ' +
+    'The numbers drive your forecast and your completion picture, not anything official. Change them whenever ' +
+    'the cohort changes — nothing is locked.</div>' +
+
+    dasPanelHTML(true);
+}
+
+function wireCohort(panel){
+  panel.querySelectorAll('#cohortrows .cnt').forEach(inp => {
+    inp.addEventListener('input', () => {
+      COHORT[+inp.dataset.i].count = Math.max(0, parseInt(inp.value, 10) || 0);
+      saveCohort(); queueSave(); refreshBar();
+
+      const stats = document.getElementById('cohortstats');
+      if(stats) stats.innerHTML = cohortStatsHTML();
+    });
+  });
+  panel.querySelectorAll('#cohortrows .rm').forEach(btn => {
+    btn.addEventListener('click', () => { removeStandard(+btn.dataset.i); render(); });
+  });
+
+  panel.querySelectorAll('#cohortrows .fixbtn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const c = COHORT[+btn.dataset.fix];
+      const s = STANDARDS.find(x => x.name === btn.dataset.to);
+      if(!c || !s) return;
+      c.name = s.name; c.code = s.code; c.level = s.level;
+      c.funding = s.funding; c.months = s.months;
+      saveCohort(); queueSave(); render();
+    });
+  });
+  wirePicker('cohortpick', render);
+}
+
+function otjView(){
+  const rows = COHORT.filter(c => c.count > 0).map((c, i) => {
+    const o = otjFor(c.name);
+    const p = otjPosition(c, o);
+    const reg = findStandard(c);
+
+    const stateCell = p.unknown ? '<span class="chg none">Needs a published figure</span>'
+      : p.planned == null
+      ? '<span class="chg none">Not set</span>'
+      : p.state === 'illegal' ? '<span class="ctag stop">Below the 187h floor</span>'
+      : p.state === 'short'   ? '<span class="ctag stop">Short by ' + Math.abs(p.variance) + 'h</span>'
+      : p.state === 'tight'   ? '<span class="ctag warn">Only ' + p.variance + 'h spare</span>'
+      : '<span class="ctag new">+' + p.variance + 'h</span>';
+
+    return '<tr>' +
+      '<td class="nm">' + c.name +
+        '<small>Level ' + c.level + ' &middot; ' + c.count + ' apprentice' + (c.count === 1 ? '' : 's') +
+        ' &middot; ' + p.months + ' months' + (reg && reg.code ? ' &middot; ' + reg.code : '') + '</small></td>' +
+      '<td class="num">' +
+        (p.official != null
+          ? '<span class="otjpub">' + p.official + 'h</span><small class="cap">from the annex</small>'
+          : '<span class="otjnone">Not published</span>') +
+        '<input class="otjin small" type="number" min="0" data-f="published" data-n="' + esc(c.name) + '" ' +
+          'value="' + (o.published || '') + '" placeholder="override" data-i="' + i + '">' +
+      '</td>' +
+      '<td class="num"><input class="otjin" type="number" min="0" data-f="rpl" data-n="' + esc(c.name) + '" ' +
+        'value="' + (o.rpl || '') + '" placeholder="0" data-i="' + i + '"></td>' +
+      '<td class="num" id="otj-req-' + i + '">' +
+        (p.unknown ? '<span class="otjnone">&mdash;</span>'
+                   : '<b>' + p.required + 'h</b>' + (p.rplCapped ? '<small class="cap">capped at floor</small>' : '')) + '</td>' +
+      '<td class="num"><input class="otjin" type="number" min="0" data-f="planned" data-n="' + esc(c.name) + '" ' +
+        'value="' + (o.planned || '') + '" placeholder="—" data-i="' + i + '"></td>' +
+      '<td id="otj-state-' + i + '">' + stateCell +
+        (p.weekly ? '<small class="cap">' + p.weekly.toFixed(1) + 'h a week average</small>' : '') + '</td>' +
+    '</tr>';
+  }).join('');
+
+  const positions = COHORT.filter(c => c.count > 0).map(c => otjPosition(c, otjFor(c.name)));
+  const problems = positions.filter(p => p.state === 'illegal' || p.state === 'short');
+  const unset = positions.filter(p => p.planned == null);
+  const missing = positions.filter(p => p.unknown).length;
+  const overridden = positions.filter(p => p.overridden).length;
+
+  return '<div class="pagehead"><h1>Off-the-job training</h1>' +
+    '<p>Where each cohort stands against its published minimum. Enter the figure from the standard, ' +
+    'any recognised prior learning, and the hours you actually plan to deliver.</p></div>' +
+
+    '<div class="notice"><b>The rules changed for starts from 1 August 2025.</b> ' +
+    'The old six-hours-a-week calculation applies only to apprentices who started before that date. ' +
+    'Since then every standard carries its own published minimum. The figures below come from ' +
+    (typeof OTJ_SOURCE !== 'undefined'
+      ? '<a href="' + OTJ_SOURCE.url + '" target="_blank" rel="noopener">' + OTJ_SOURCE.name + '</a>, covering ' + OTJ_SOURCE.count + ' standards. '
+      : 'the published annex. ') +
+    'From 1 August 2026 the same figure appears on the front of each standard on the Skills England register and can move independently, ' +
+    'so check yours and override below if it differs.</div>' +
+
+    '<div id="otjbanner">' +
+    (problems.length
+      ? '<div class="alert"><b>' + problems.length + ' cohort' + (problems.length === 1 ? '' : 's') +
+        ' will not meet the minimum</b> on the hours currently planned: ' +
+        problems.map(p => p.name).join(', ') + '. On audit, a programme delivering fewer hours than its published ' +
+        'minimum is a funding risk on every apprentice in it.</div>'
+      : positions.length && !unset.length
+        ? '<div class="okbox"><b>Every cohort meets its minimum</b> on the hours planned.</div>'
+        : '') +
+    '</div>' +
+
+    '<table class="std otj" style="margin-top:20px"><thead><tr>' +
+      '<th>Standard</th>' +
+      '<th>Published minimum</th>' +
+      '<th>Prior learning</th>' +
+      '<th>Required</th>' +
+      '<th>You plan</th>' +
+      '<th>Position</th>' +
+    '</tr></thead><tbody>' + (rows || '<tr><td colspan="6" class="cohortempty">No cohorts with apprentices on them yet.</td></tr>') + '</tbody></table>' +
+
+    (missing
+      ? '<div class="notice" style="margin-top:16px"><b>' + missing + ' of these has no published minimum on file.</b> ' +
+        'Read the figure from the front of the standard on the Skills England register and type it into the override box. ' +
+        'There is deliberately no estimate: across the published figures the hours per month of typical duration range from under 8 to over 77, ' +
+        'so guessing from duration would be misleading.</div>'
+      : '') +
+    (overridden
+      ? '<div class="notice" style="margin-top:16px"><b>' + overridden + ' figure' + (overridden === 1 ? ' has' : 's have') +
+        ' been overridden.</b> Your entered value is being used instead of the one on file. That is right if you have read a newer ' +
+        'figure from the register — the annex was a 2025/26 snapshot and each standard can now move independently.</div>'
+      : '') +
+
+    '<div class="grouphead" style="margin-top:34px"><h2>What counts, and what does not</h2><div class="rule"></div></div>' +
+    '<div class="readgrid" style="margin-top:14px">' +
+      '<div class="readcard"><a href="https://www.gov.uk/government/publications/apprenticeships-off-the-job-training/apprenticeship-off-the-job-training-guidance--2" target="_blank" rel="noopener">DWP off-the-job training guidance</a>' +
+        '<p>What can be counted, what must not be, and how it has to be evidenced. Includes the worked examples behind the published minimums.</p></div>' +
+      '<div class="readcard"><a href="https://skillsengland.education.gov.uk/apprenticeships/" target="_blank" rel="noopener">Skills England register</a>' +
+        '<p>The published minimum for each standard now sits on the front of the standard itself. Check the version your apprentice is on.</p></div>' +
+      '<div class="readcard"><a href="rules.html">The 2026/27 funding rules index</a>' +
+        '<p>Paragraphs 85, 90, 91 and 95.1 cover off-the-job, including the removal of Annex C and who is responsible for evidencing it.</p></div>' +
+    '</div>' +
+
+    '<div class="notice" style="margin-top:20px"><b>Three things worth knowing.</b> ' +
+    'Prior learning reduces the requirement but never below 187 hours — a programme under that is non-compliant whatever the RPL evidence says. ' +
+    'The provider is responsible for evidencing all of it, even where a subcontractor or the employer delivers it. ' +
+    'And standalone English and maths qualifications do not count as active learning.</div>';
+}
+
+function esc(s){ return String(s).replace(/"/g, '&quot;'); }
+
+/* =========================================================================
+   APPRENTICESHIP SERVICE CONNECTION
+
+   Everything on this page that is currently typed in by hand — cohort sizes,
+   standards, start dates, off-the-job hours actually delivered — already
+   exists in the employer's Apprenticeship Service account. Connecting to it
+   would replace the estimates with facts.
+
+   This panel is not wired up. DAS access needs an approved application and
+   the employer's own authorisation, so there is nothing to connect to yet.
+   It is presented as what it is rather than as a button that pretends.
+   ========================================================================= */
+
+const DAS_STATE_KEY = 'sr-das-interest';
+
+function dasConnected(){ return false; }   // no live connection exists yet
+
+function dasPanelHTML(compact){
+  let registered = false;
+  try { registered = sessionStorage.getItem(DAS_STATE_KEY) === '1'; } catch(e){}
+
+  const pulls = [
+    ['Apprentices on programme', 'live headcount per standard, instead of a number you maintain'],
+    ['Start and planned end dates', 'which makes a completion forecast real rather than an assumption'],
+    ['Standards and versions', 'exactly what each apprentice is enrolled on'],
+    ['Levy balance and transactions', 'actual funds in and drawn down, not a modelled estimate'],
+    ['Co-investment position', 'what you have actually been charged'],
+    ['Off-the-job hours recorded', 'delivered hours against the published minimum']
+  ];
+
+  if(compact){
+    return '<div class="dasmini">' +
+      '<div><b>Connect your Apprenticeship Service account</b>' +
+      '<span>Replace the figures you maintain by hand with live data from DAS.</span></div>' +
+      '<button class="btn small" data-go="forecast" id="dasmini-go">Find out more</button>' +
+    '</div>';
+  }
+
+  return '<section class="lsection das">' +
+    '<div class="lhead"><h2>Connect your Apprenticeship Service account</h2>' +
+    '<p>Most of what you type into this page already exists in your DAS account. Connecting it would replace the estimates with your actual position.</p></div>' +
+
+    '<div class="daswhat">' +
+      '<h3>What it would pull through</h3>' +
+      '<ul>' + pulls.map(p => '<li><b>' + p[0] + '</b><span>' + p[1] + '</span></li>').join('') + '</ul>' +
+    '</div>' +
+
+    '<div class="dasaction">' +
+      (registered
+        ? '<div class="okbox" style="margin:0"><b>Noted — you are on the list.</b> ' +
+          'We will get in touch when the connection is available. Nothing has been shared with anyone.</div>'
+        : '<button class="btn" id="dasbtn">Register your interest</button>' +
+          '<p class="hint" style="margin:10px 0 0">One click. It records that you want this, nothing more.</p>') +
+    '</div>' +
+
+    '<div class="notice" style="margin-top:20px"><b>Being straight about where this is.</b> ' +
+    'This is not connected, and the button above does not connect it. Reading an employer\'s DAS account needs an approved ' +
+    'application to the Apprenticeship Service and the employer\'s own authorisation each time — it is a proper integration, ' +
+    'not a switch. Registering interest tells us it is worth building, and gets you in the first group when it is. ' +
+    'Until then, the figures on this page are the ones you enter.</div>' +
+  '</section>';
+}
+
+function wireDas(root){
+  const b = root.querySelector('#dasbtn');
+  if(b) b.addEventListener('click', () => {
+    try { sessionStorage.setItem(DAS_STATE_KEY, '1'); } catch(e){}
+    render();
+  });
+}
+
+/* =========================================================================
+   GOVERNANCE REPORT
+
+   A single page a programme lead can put in front of a board: position,
+   risks, money, compliance, and what is coming. Built from the same data as
+   every other view, laid out to print on A4 without anything clipping.
+   ========================================================================= */
+
+function reportView(){
+  const f = levyFigures(SETTINGS.payroll, COHORT, youngCount(), SETTINGS.levyPayer);
+  const attention = attentionItems();
+  const soon = comingUp(90);
+  const outstanding = openEvents().filter(e => { const d = -daysAgo(e.date); return d <= 90; })
+    .sort((a,b) => new Date(a.date) - new Date(b.date));
+  const positions = COHORT.filter(c => c.count > 0).map(c => otjPosition(c, otjFor(c.name)));
+  const otjProblems = positions.filter(p => p.state === 'illegal' || p.state === 'short');
+  const otjUnset = positions.filter(p => p.planned == null);
+  const defunded = COHORT.filter(c => { const r = findStandard(c); return r && /Defunded/i.test(r.status); });
+
+  const today = new Date().toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
+
+  return '<div class="pagehead noprint"><h1>Governance report</h1>' +
+    '<p>A one-page position for a board or governance meeting, built from your cohort, your levy figures and your compliance position. ' +
+    'Print it or save it as a PDF — the buttons and navigation are left out of the printed version.</p>' +
+    '<div class="addrow" style="margin-top:16px">' +
+      '<button class="btn" id="printit">Print or save as PDF</button>' +
+      '<span class="hint" style="align-self:center;margin:0">Choose &ldquo;Save as PDF&rdquo; as the destination to keep a copy</span>' +
+    '</div></div>' +
+
+    '<article class="report" id="report">' +
+
+      '<header class="rephead">' +
+        '<div><h1>Apprenticeship programme report</h1>' +
+        '<p class="repmeta">' + MEMBER.org + ' &middot; ' + today +
+        ' &middot; ' + (SETTINGS.levyPayer ? 'levy payer' : 'non-levy employer') + '</p></div>' +
+        '<div class="repbrand">Skills <em>Radar</em><small>skillsradar.co.uk</small></div>' +
+      '</header>' +
+
+      '<section class="repsec">' +
+        '<h2>Position at a glance</h2>' +
+        '<div class="repgrid">' +
+          '<div class="repstat"><b>' + cohortHeads() + '</b><span>apprentices on programme</span></div>' +
+          '<div class="repstat"><b>' + COHORT.length + '</b><span>standards delivered</span></div>' +
+          '<div class="repstat"><b>' + positions.filter(p => p.state === 'ok' || p.state === 'tight').length + '/' + positions.length +
+            '</b><span>cohorts meeting off-the-job</span></div>' +
+          '<div class="repstat ' + (attention.filter(a => a.level === 'stop').length ? 'bad' : '') + '"><b>' +
+            attention.length + '</b><span>items needing attention</span></div>' +
+        '</div>' +
+      '</section>' +
+
+      '<section class="repsec">' +
+        '<h2>Funding position</h2>' +
+        '<table class="reptable"><tbody>' +
+          '<tr><td>Annual pay bill</td><td class="r">' + money0(SETTINGS.payroll) + '</td></tr>' +
+          '<tr><td>Levy funds available this year</td><td class="r">' + money0(Math.round(f.available)) + '</td></tr>' +
+          '<tr><td>Drawn down against current cohort</td><td class="r">' + money0(Math.round(f.annualDraw)) + '</td></tr>' +
+          (f.shortfall > 0
+            ? '<tr class="rtotal"><td>Shortfall beyond the levy</td><td class="r neg">' + money0(Math.round(f.shortfall)) + '</td></tr>' +
+              '<tr><td>Of which government funds</td><td class="r">' + money0(Math.round(f.govCost)) + '</td></tr>' +
+              '<tr class="rtotal"><td><b>Employer co-investment to budget</b></td><td class="r neg"><b>' + money0(Math.round(f.youCost)) + '</b></td></tr>'
+            : '<tr class="rtotal"><td><b>Unused levy at current rate</b></td><td class="r"><b>' + money0(Math.round(f.surplus)) + '</b></td></tr>' +
+              '<tr><td colspan="2" class="note">New funds expire after twelve months, so an unused balance is lost rather than carried.</td></tr>') +
+        '</tbody></table>' +
+        '<p class="repnote">Figures are an estimate based on the funding band maximum for each standard and a steady cohort. ' +
+        'Co-investment reflects the 2026/27 rules, under which government funds all training for apprentices aged 16 to 24 ' +
+        'and 75% for those aged 25 and over once a levy balance is exhausted.</p>' +
+      '</section>' +
+
+      '<section class="repsec">' +
+        '<h2>Compliance: off-the-job training</h2>' +
+        (positions.length
+          ? '<table class="reptable"><thead><tr><th>Standard</th><th class="r">Required</th><th class="r">Planned</th><th class="r">Position</th></tr></thead><tbody>' +
+            positions.map(p => '<tr><td>Level ' + p.level + ' ' + p.name +
+              (p.estimateUsed ? ' <span class="est">estimated minimum</span>' : '') + '</td>' +
+              '<td class="r">' + p.required + 'h</td>' +
+              '<td class="r">' + (p.planned != null ? p.planned + 'h' : '—') + '</td>' +
+              '<td class="r ' + (p.state === 'illegal' || p.state === 'short' ? 'neg' : '') + '">' +
+                (p.planned == null ? 'Not recorded'
+                  : p.state === 'illegal' ? 'Below the 187h floor'
+                  : p.state === 'short' ? 'Short by ' + Math.abs(p.variance) + 'h'
+                  : p.state === 'tight' ? 'Meets, ' + p.variance + 'h spare'
+                  : 'Meets, +' + p.variance + 'h') + '</td></tr>').join('') +
+            '</tbody></table>' +
+            (otjProblems.length
+              ? '<p class="repalert"><b>' + otjProblems.length + ' cohort' + (otjProblems.length === 1 ? ' does' : 's do') +
+                ' not meet the minimum on planned hours.</b> A programme delivering fewer hours than its published minimum is a funding risk on every apprentice in it.</p>'
+              : otjUnset.length
+                ? '<p class="repnote">' + otjUnset.length + ' cohort' + (otjUnset.length === 1 ? ' has' : 's have') +
+                  ' no planned hours recorded, so their position cannot be reported.</p>'
+                : '<p class="repnote">All cohorts meet their published minimum on planned hours.</p>')
+          : '<p class="repnote">No cohorts recorded.</p>') +
+      '</section>' +
+
+      '<section class="repsec">' +
+        '<h2>Risks and actions</h2>' +
+        (attention.length
+          ? '<ol class="replist">' + attention.map(a =>
+              '<li class="' + a.level + '"><b>' + a.title + '</b><span>' + a.detail + '</span></li>').join('') + '</ol>'
+          : '<p class="repnote">Nothing currently flagged against the standards delivered.</p>') +
+        (defunded.length
+          ? '<p class="repalert"><b>' + defunded.length + ' standard' + (defunded.length === 1 ? '' : 's') +
+            ' lose funding on 1 September 2026:</b> ' + defunded.map(d => 'Level ' + d.level + ' ' + d.name).join(', ') +
+            '. Existing apprentices remain funded to completion; no new starts are possible after that date.</p>'
+          : '') +
+      '</section>' +
+
+      '<section class="repsec">' +
+        '<h2>Next 90 days</h2>' +
+        (soon.length
+          ? '<table class="reptable"><tbody>' + soon.map(s =>
+              '<tr><td class="w">' + fmtLong(s.date) + '</td><td><b>' + s.title + '</b>' +
+              (s.mine ? ' <span class="est">your entry</span>' : '') +
+              '<br><span class="sub">' + s.action + '</span></td></tr>').join('') +
+            '</tbody></table>'
+          : '<p class="repnote">No dated deadlines in the next 90 days affecting the standards delivered.</p>') +
+        (outstanding.length
+          ? '<p class="repnote">' + outstanding.length + ' of these ' + (outstanding.length === 1 ? 'is' : 'are') +
+            ' your own entries, still outstanding.</p>'
+          : '') +
+      '</section>' +
+
+      '<section class="repsec">' +
+        '<h2>Cohort</h2>' +
+        '<table class="reptable"><thead><tr><th>Standard</th><th class="r">On programme</th><th class="r">Band</th><th class="r">Duration</th></tr></thead><tbody>' +
+        COHORT.map(c => {
+          const reg = findStandard(c);
+          return '<tr><td>Level ' + c.level + ' ' + c.name + '</td>' +
+            '<td class="r">' + c.count + '</td>' +
+            '<td class="r">' + money((reg && reg.funding) || c.funding) + '</td>' +
+            '<td class="r">' + ((reg && reg.months) || c.months || '—') + ' months</td></tr>';
+        }).join('') +
+        '<tr class="rtotal"><td><b>Total</b></td><td class="r"><b>' + cohortHeads() + '</b></td><td></td><td></td></tr>' +
+        '</tbody></table>' +
+        '<p class="repnote">Completion timing is not shown. It depends on each apprentice\'s actual start date, ' +
+        'which sits in the employer\'s Apprenticeship Service account rather than here.</p>' +
+      '</section>' +
+
+      '<footer class="repfoot">' +
+        '<p>Compiled by Skills Radar on ' + today + ' from the Skills England apprenticeship register and the ' +
+        'DWP apprenticeship funding rules for 2026 to 2027. Funding and off-the-job figures are planning estimates, ' +
+        'not a statement of account. Check the Apprenticeship Service and the published standard before acting on them.</p>' +
+      '</footer>' +
+    '</article>';
+}
+
+/* Typing recalculates the row and the banner in place. Redrawing the whole
+   view on each keystroke would throw focus out of the box being typed in. */
+function wireOtj(panel){
+  const live = COHORT.filter(c => c.count > 0);
+
+  function refresh(){
+    live.forEach((c, i) => {
+      const p = otjPosition(c, otjFor(c.name));
+
+      const req = document.getElementById('otj-req-' + i);
+      if(req) req.innerHTML = p.unknown
+        ? '<span class="otjnone">—</span>'
+        : '<b>' + p.required + 'h</b>' + (p.rplCapped ? '<small class="cap">capped at floor</small>' : '');
+
+      const st = document.getElementById('otj-state-' + i);
+      if(st){
+        st.innerHTML = (p.planned == null
+            ? '<span class="chg none">Not set</span>'
+            : p.state === 'illegal' ? '<span class="ctag stop">Below the 187h floor</span>'
+            : p.state === 'short'   ? '<span class="ctag stop">Short by ' + Math.abs(p.variance) + 'h</span>'
+            : p.state === 'tight'   ? '<span class="ctag warn">Only ' + p.variance + 'h spare</span>'
+            : '<span class="ctag new">+' + p.variance + 'h</span>') +
+          (p.weekly ? '<small class="cap">' + p.weekly.toFixed(1) + 'h a week average</small>' : '');
+      }
+    });
+
+    const positions = live.map(c => otjPosition(c, otjFor(c.name)));
+    const problems = positions.filter(p => p.state === 'illegal' || p.state === 'short');
+    const unset = positions.filter(p => p.planned == null);
+    const banner = document.getElementById('otjbanner');
+    if(banner){
+      banner.innerHTML = problems.length
+        ? '<div class="alert"><b>' + problems.length + ' cohort' + (problems.length === 1 ? '' : 's') +
+          ' will not meet the minimum</b> on the hours currently planned: ' +
+          problems.map(p => p.name).join(', ') + '. On audit, a programme delivering fewer hours than its published ' +
+          'minimum is a funding risk on every apprentice in it.</div>'
+        : (positions.length && !unset.length
+            ? '<div class="okbox"><b>Every cohort meets its minimum</b> on the hours planned.</div>'
+            : '');
+    }
+  }
+
+  panel.querySelectorAll('.otjin').forEach(inp => {
+    inp.addEventListener('input', () => {
+      const n = inp.dataset.n, f = inp.dataset.f;
+      OTJ[n] = OTJ[n] || {};
+      const v = parseInt(inp.value, 10);
+      if(isNaN(v) || v <= 0) delete OTJ[n][f]; else OTJ[n][f] = v;
+      saveOtj();
+      queueSave();
+      refresh();
+    });
+  });
+}
+
+/* =========================================================================
+   FORECAST VIEW
+   ========================================================================= */
+
+let PLANNED = [];
+try { PLANNED = JSON.parse(sessionStorage.getItem('sr-planned') || '[]'); } catch(e){ PLANNED = []; }
+function savePlanned(){ try { sessionStorage.setItem('sr-planned', JSON.stringify(PLANNED)); } catch(e){} }
+
+function forecastInputs(){
+  const s = SETTINGS;
+  return {
+    monthlyIn: s.monthlyIn != null ? s.monthlyIn
+      : Math.round(Math.max(0, (s.payroll * LEVY_MODEL.rate - LEVY_MODEL.allowance)) / 12),
+    opening: s.opening != null ? s.opening : 0,
+    horizon: s.horizon || 24
+  };
+}
+
+function liveCohorts(){
+  return COHORT.filter(c => c.count > 0).map(c => {
+    const reg = findStandard(c);
+    return {
+      name: c.name, level: c.level,
+      funding: (reg && reg.funding) || c.funding,
+      months: (reg && reg.months) || c.months || 12,
+      count: c.count,
+      // assume they are part way through, spread across the programme
+      startMonth: -Math.round(((reg && reg.months) || c.months || 12) / 2),
+      under25: false
+    };
+  });
+}
+
+function allCohorts(){
+  const live = liveCohorts();
+  const youngShare = cohortHeads() ? youngCount() / cohortHeads() : 0;
+  live.forEach(c => { c.under25 = youngShare >= 0.5; });
+  return live.concat(PLANNED);
+}
+
+function runForecast(){
+  const i = forecastInputs();
+  return forecastLevy({
+    months: i.horizon,
+    monthlyIn: i.monthlyIn,
+    opening: i.opening,
+    cohorts: allCohorts(),
+    levyPayer: SETTINGS.levyPayer
+  });
+}
+
+/* Same treatment as the cohort counters: generated separately so changing
+   the pay bill or the levy toggle moves these figures too, rather than only
+   the forecast underneath them. */
+function positionStatsHTML(){
+  const f = levyFigures(SETTINGS.payroll, COHORT, youngCount(), SETTINGS.levyPayer);
+  return '<div class="mgrid">' +
+    '<div class="mcard"><div class="n">' + money0(Math.round(f.available)) + '</div><div class="l">Levy available this year</div></div>' +
+    '<div class="mcard warm"><div class="n">' + money0(Math.round(f.annualDraw)) + '</div><div class="l">Drawn by your cohort</div></div>' +
+    '<div class="mcard ' + (f.youCost > 0 ? 'bad' : 'cool') + '"><div class="n">' +
+      money0(Math.round(f.youCost)) + '</div><div class="l">Your co-investment</div></div>' +
+    '<div class="mcard"><div class="n">' + cohortHeads() + '</div><div class="l">Apprentices</div></div>' +
+  '</div>';
+}
+
+function forecastView(){
+  const i = forecastInputs();
+  const f = runForecast();
+
+  const plannedRows = PLANNED.length
+    ? PLANNED.map((p, n) =>
+        '<tr><td class="nm">L' + p.level + ' ' + p.name +
+          '<small>' + p.months + ' months &middot; ' + money(p.funding) + ' band</small></td>' +
+          '<td class="num">' + p.count + '</td>' +
+          '<td class="num">' + monthName(p.startMonth) + '</td>' +
+          '<td class="num">' + (p.under25 ? 'Under 25' : '25 and over') + '</td>' +
+          '<td class="num">' + money0(p.funding * p.count) + '</td>' +
+          '<td class="num"><button class="rm" data-plan="' + n + '" aria-label="Remove">&times;</button></td></tr>').join('')
+    : '<tr><td colspan="6" class="cohortempty">Nothing planned yet. Add a cohort below to see what it does to the forecast.</td></tr>';
+
+  const now = levyFigures(SETTINGS.payroll, COHORT, youngCount(), SETTINGS.levyPayer);
+
+  return '<div class="pagehead"><h1>Levy forecast</h1>' +
+    '<p>Where you are now, and where the next ' + i.horizon + ' months take you. ' +
+    'Add cohorts you are thinking about to see what they would cost before you commit.</p></div>' +
+
+    (COHORT.length
+      ? '<div class="grouphead" style="margin-top:0"><h2>Your position today</h2><div class="rule"></div>' +
+          '<button class="linkbtn" data-go="cohort">Change your cohort</button></div>' +
+        '<div id="posstats">' + positionStatsHTML() + '</div>'
+      : '<div class="alert"><b>No cohort yet.</b> ' +
+        'The forecast runs on the standards you deliver. ' +
+        '<button class="linkbtn" data-go="cohort">Add them first</button>, then come back.</div>') +
+
+    '<section class="lsection">' +
+      '<div class="lhead"><h2>1. What goes in</h2>' +
+      '<p>Use your average monthly contribution rather than last year\'s total. The DfE prototype forecasts from what was ' +
+      'paid in the previous twelve months, which is why it drifts when a pay bill changes.</p></div>' +
+      '<div class="levyform">' +
+        '<div class="field"><label for="f-payroll">Annual pay bill</label>' +
+        '<input type="text" id="f-payroll" inputmode="numeric" value="' + (SETTINGS.payroll || 0).toLocaleString('en-GB') + '"></div>' +
+        '<div class="field"><label>Do you pay the levy?</label>' +
+          '<div class="opts" id="f-levytoggle">' +
+            '<label class="opt' + (SETTINGS.levyPayer ? ' sel' : '') + '"><input type="radio" name="flp" value="yes"' +
+              (SETTINGS.levyPayer ? ' checked' : '') + '> Yes</label>' +
+            '<label class="opt' + (!SETTINGS.levyPayer ? ' sel' : '') + '"><input type="radio" name="flp" value="no"' +
+              (!SETTINGS.levyPayer ? ' checked' : '') + '> No</label>' +
+          '</div></div>' +
+        '<div class="field"><label for="f-in">Average monthly levy contribution</label>' +
+        '<input type="text" id="f-in" inputmode="numeric" value="' + i.monthlyIn.toLocaleString('en-GB') + '"></div>' +
+        '<div class="field"><label for="f-open">Balance in your account today</label>' +
+        '<input type="text" id="f-open" inputmode="numeric" value="' + i.opening.toLocaleString('en-GB') + '"></div>' +
+        '<div class="field"><label for="f-hz">Forecast period</label>' +
+        '<select id="f-hz">' +
+          [12,18,24,36].map(n => '<option value="' + n + '"' + (i.horizon === n ? ' selected' : '') + '>' + n + ' months</option>').join('') +
+        '</select></div>' +
+      '</div>' +
+      '<p class="hint" style="max-width:66ch">Both come from your Apprenticeship Service account. The forecast is only as good as these two numbers.</p>' +
+    '</section>' +
+
+    '<section class="lsection">' +
+      '<div class="lhead"><h2>2. Cohorts you are considering</h2>' +
+      '<p>Hypothetical learners. They are not saved to your account and do not appear anywhere else on the site.</p></div>' +
+      '<table class="std"><thead><tr>' +
+        '<th>Standard</th><th>How many</th><th>Starting</th><th>Age group</th><th>Commitment</th><th></th>' +
+      '</tr></thead><tbody>' + plannedRows + '</tbody></table>' +
+
+      '<div class="planadd" id="planadd">' +
+        '<div class="planstep" id="planstep1">' +
+          '<span class="stepnum">1</span>' +
+          '<div class="stepbody">' +
+            '<label>Which standard?</label>' +
+            pickerHTML('planpick') +
+          '</div>' +
+        '</div>' +
+        '<div class="planstep locked" id="planstep2">' +
+          '<span class="stepnum">2</span>' +
+          '<div class="stepbody">' +
+            '<label>How many, when, and how old?</label>' +
+            '<div class="chosen" id="planchosen">Pick a standard first</div>' +
+            '<div class="planrow">' +
+              '<div class="numbump">' +
+                '<button type="button" id="p-down" aria-label="Fewer">&minus;</button>' +
+                '<input type="number" id="p-count" min="1" max="500" value="10">' +
+                '<button type="button" id="p-up" aria-label="More">+</button>' +
+                '<span>apprentices</span>' +
+              '</div>' +
+              '<div class="whenpick" id="p-when">' +
+                [0,1,3,6,12].map((n, i) => '<button type="button" data-m="' + n + '"' +
+                  (i === 0 ? ' class="on"' : '') + '>' + (n === 0 ? 'Now' : monthName(n)) + '</button>').join('') +
+              '</div>' +
+              '<div class="agepick" id="p-agepick">' +
+                '<button type="button" data-age="1" class="on">16 to 24</button>' +
+                '<button type="button" data-age="0">25 and over</button>' +
+              '</div>' +
+            '</div>' +
+            '<div class="planimpact" id="planimpact"></div>' +
+            '<button class="btn" id="p-add" disabled>Add to the forecast</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+    '</section>' +
+
+    '<section class="lsection costs">' +
+      '<div class="lhead"><h2>What happens</h2><p>Over ' + i.horizon + ' months, on these figures.</p></div>' +
+      '<div id="fcout"></div>' +
+    '</section>';
+}
+
+function monthName(offset){
+  const d = new Date();
+  d.setDate(1);
+  d.setMonth(d.getMonth() + offset);
+  return d.toLocaleDateString('en-GB', { month: 'short', year: '2-digit' });
+}
+
+function renderForecast(){
+  const pos = document.getElementById('posstats');
+  if(pos) pos.innerHTML = positionStatsHTML();
+
+  const f = runForecast();
+  const i = forecastInputs();
+  const el = document.getElementById('fcout');
+  if(!el) return;
+
+  const alert = f.coInvestFrom
+    ? '<div class="alert"><b>Co-investment starts in ' +
+        f.coInvestFrom.date.toLocaleDateString('en-GB', { month:'long', year:'numeric' }) + '.</b> ' +
+        'From that month your levy balance no longer covers what you are drawing down, and you begin paying ' +
+        'a share directly. Over the ' + i.horizon + '-month window that comes to <b>' + money0(Math.round(f.coInvestTotal)) +
+        '</b>, with government covering ' + money0(Math.round(f.govTotal)) + '.</div>'
+    : '<div class="okbox"><b>No co-investment in this window.</b> Your levy covers everything you have committed to over the next ' +
+      i.horizon + ' months.</div>';
+
+  const expiry = f.expiredTotal > 0
+    ? '<div class="alert"><b>' + money0(Math.round(f.expiredTotal)) + ' expires unused.</b> ' +
+      'Funds now expire twelve months after they enter your account. That is money lost, not carried forward. ' +
+      'Apprenticeship units, foundation apprenticeships and transfers are all ways to commit it first.</div>'
+    : '';
+
+  el.innerHTML =
+    '<div class="mgrid">' +
+      '<div class="mcard"><div class="n">' + money0(Math.round(f.totalIn)) + '</div><div class="l">Levy in</div></div>' +
+      '<div class="mcard warm"><div class="n">' + money0(Math.round(f.totalDraw)) + '</div><div class="l">Drawn down</div></div>' +
+      '<div class="mcard ' + (f.coInvestTotal > 0 ? 'bad' : 'cool') + '"><div class="n">' +
+        money0(Math.round(f.coInvestTotal)) + '</div><div class="l">You pay</div></div>' +
+      '<div class="mcard ' + (f.expiredTotal > 0 ? 'bad' : 'cool') + '"><div class="n">' +
+        money0(Math.round(f.expiredTotal)) + '</div><div class="l">Expires unused</div></div>' +
+    '</div>' +
+
+    alert + expiry +
+
+    '<h3 class="csub">Balance over time</h3>' +
+    chartHTML(f) +
+
+    '<h3 class="csub">Month by month</h3>' +
+    '<div style="max-height:400px;overflow-y:auto;border:1px solid var(--line)">' +
+    '<table class="std fctable"><thead><tr>' +
+      '<th>Month</th><th class="r">In</th><th class="r">Drawn</th><th class="r">From levy</th>' +
+      '<th class="r">You pay</th><th class="r">Expired</th><th class="r">Balance</th>' +
+    '</tr></thead><tbody>' +
+    f.rows.map(r => '<tr' + (r.youPay > 0 ? ' class="hascost"' : '') + '>' +
+      '<td class="nm">' + r.label + '</td>' +
+      '<td class="num">' + money0(Math.round(r.in)) + '</td>' +
+      '<td class="num">' + money0(Math.round(r.draw)) + '</td>' +
+      '<td class="num">' + money0(Math.round(r.fromLevy)) + '</td>' +
+      '<td class="num' + (r.youPay > 0 ? ' neg' : '') + '">' + (r.youPay > 0 ? money0(Math.round(r.youPay)) : '—') + '</td>' +
+      '<td class="num' + (r.expired > 0 ? ' neg' : '') + '">' + (r.expired > 0 ? money0(Math.round(r.expired)) : '—') + '</td>' +
+      '<td class="num"><b>' + money0(Math.round(r.balance)) + '</b></td></tr>').join('') +
+    '</tbody></table></div>' +
+
+    '<div class="addrow" style="margin-top:18px">' +
+      '<button class="btn" id="fcdl">Download estimates (CSV)</button>' +
+    '</div>' +
+
+    '<div class="notice" style="margin-top:18px"><b>How this is worked out.</b> ' +
+    'Money is spent oldest first, which is how the account behaves, so funds are used before they expire where possible. ' +
+    'Each cohort draws its funding band spread evenly across its duration. Existing cohorts are assumed to be roughly ' +
+    'half way through, since the site does not hold start dates — connecting your Apprenticeship Service account would fix that. ' +
+    'Co-investment is applied at the rate for the apprentice\'s age under the 2026/27 rules. ' +
+    'Treat it as a planning estimate against your own figures, not a statement of account.</div>';
+
+  const dl = document.getElementById('fcdl');
+  if(dl) dl.addEventListener('click', () => downloadForecast(f));
+}
+
+/* A plain SVG line chart. No library, so nothing to load and nothing to break. */
+function chartHTML(f){
+  const rows = f.rows;
+  if(!rows.length) return '';
+
+  const w = 900, h = 220, padL = 70, padR = 20, padT = 16, padB = 34;
+  const max = Math.max(1, f.peak, Math.max.apply(null, rows.map(r => r.draw)));
+  const x = i => padL + (i / Math.max(1, rows.length - 1)) * (w - padL - padR);
+  const y = v => padT + (1 - v / max) * (h - padT - padB);
+
+  const line = key => rows.map((r, i) => (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(r[key]).toFixed(1)).join(' ');
+  const area = 'M' + x(0).toFixed(1) + ' ' + (h - padB) + ' ' +
+    rows.map((r, i) => 'L' + x(i).toFixed(1) + ' ' + y(r.balance).toFixed(1)).join(' ') +
+    ' L' + x(rows.length - 1).toFixed(1) + ' ' + (h - padB) + ' Z';
+
+  const ticks = [0, 0.25, 0.5, 0.75, 1].map(p => {
+    const v = max * p;
+    return '<line x1="' + padL + '" y1="' + y(v).toFixed(1) + '" x2="' + (w - padR) + '" y2="' + y(v).toFixed(1) +
+      '" stroke="#E4E0D6" stroke-width="1"/>' +
+      '<text x="' + (padL - 8) + '" y="' + (y(v) + 4).toFixed(1) + '" text-anchor="end" font-size="10" fill="#8A9698">' +
+      money0(Math.round(v)) + '</text>';
+  }).join('');
+
+  const labels = rows.map((r, i) =>
+    (i % Math.ceil(rows.length / 8) === 0 || i === rows.length - 1)
+      ? '<text x="' + x(i).toFixed(1) + '" y="' + (h - 10) + '" text-anchor="middle" font-size="10" fill="#8A9698">' + r.label + '</text>'
+      : '').join('');
+
+  const marker = f.coInvestFrom
+    ? '<line x1="' + x(f.coInvestFrom.index).toFixed(1) + '" y1="' + padT + '" x2="' + x(f.coInvestFrom.index).toFixed(1) +
+      '" y2="' + (h - padB) + '" stroke="#B3261E" stroke-width="1.5" stroke-dasharray="4 3"/>' +
+      '<text x="' + (x(f.coInvestFrom.index) + 6).toFixed(1) + '" y="' + (padT + 12) +
+      '" font-size="10.5" fill="#B3261E" font-weight="600">co-investment starts</text>'
+    : '';
+
+  return '<div class="chartwrap"><svg viewBox="0 0 ' + w + ' ' + h + '" role="img" ' +
+    'aria-label="Levy balance and monthly drawdown over the forecast period">' +
+    ticks +
+    '<path d="' + area + '" fill="#E4F1EE"/>' +
+    '<path d="' + line('balance') + '" fill="none" stroke="#10796A" stroke-width="2.2"/>' +
+    '<path d="' + line('draw') + '" fill="none" stroke="#A96A06" stroke-width="1.8" stroke-dasharray="5 3"/>' +
+    marker + labels +
+  '</svg>' +
+  '<div class="chartkey">' +
+    '<span><i style="background:#10796A"></i> Levy balance</span>' +
+    '<span><i style="background:#A96A06"></i> Monthly drawdown</span>' +
+    (f.coInvestFrom ? '<span><i style="background:#B3261E"></i> Co-investment begins</span>' : '') +
+  '</div></div>';
+}
+
+function downloadForecast(f){
+  const head = ['Month','Levy in','Drawn down','Paid from levy','You pay','Expired unused','Closing balance'];
+  const lines = [head.join(',')].concat(f.rows.map(r =>
+    [r.label, Math.round(r.in), Math.round(r.draw), Math.round(r.fromLevy),
+     Math.round(r.youPay), Math.round(r.expired), Math.round(r.balance)].join(',')));
+  lines.push('');
+  lines.push('Totals,' + Math.round(f.totalIn) + ',' + Math.round(f.totalDraw) + ',,' +
+             Math.round(f.coInvestTotal) + ',' + Math.round(f.expiredTotal) + ',' + Math.round(f.closing));
+  lines.push('');
+  lines.push('"Estimate only. Figures entered by the employer. Co-investment applied at 2026/27 rates."');
+
+  const blob = new Blob([lines.join('\n')], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'levy-forecast-' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function wireForecast(panel){
+  const payroll = document.getElementById('f-payroll');
+  if(payroll) payroll.addEventListener('input', () => {
+    SETTINGS.payroll = parseFloat((payroll.value || '0').replace(/[^\d.]/g,'')) || 0;
+    MEMBER.payroll = SETTINGS.payroll;
+    saveSettings(); queueSave();
+    // the levy in follows the pay bill unless they have overridden it
+    if(SETTINGS.monthlyIn == null){
+      const el = document.getElementById('f-in');
+      if(el) el.value = forecastInputs().monthlyIn.toLocaleString('en-GB');
+    }
+    renderForecast();
+  });
+
+  document.querySelectorAll('#f-levytoggle input').forEach(r =>
+    r.addEventListener('change', () => {
+      SETTINGS.levyPayer = r.value === 'yes';
+      saveSettings(); queueSave();
+      document.querySelectorAll('#f-levytoggle .opt').forEach(o =>
+        o.classList.toggle('sel', o.querySelector('input').checked));
+      renderForecast();
+    }));
+
+  ['f-in','f-open'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.addEventListener('input', () => {
+      const v = parseFloat((el.value || '0').replace(/[^\d.]/g,'')) || 0;
+      if(id === 'f-in') SETTINGS.monthlyIn = v; else SETTINGS.opening = v;
+      saveSettings();
+      queueSave();          // and to the account, not just this session
+      renderForecast();
+    });
+  });
+
+  const hz = document.getElementById('f-hz');
+  if(hz) hz.addEventListener('change', () => {
+    SETTINGS.horizon = +hz.value; saveSettings(); queueSave(); render();
+  });
+
+  /* Two steps rather than four boxes. Pick a standard, then set the numbers
+     with the running cost visible, so the effect is obvious before it is
+     committed rather than after. */
+
+  let chosen = null, months = 0, under25 = true;
+
+  function refreshImpact(){
+    const el = document.getElementById('planimpact');
+    const add = document.getElementById('p-add');
+    if(!chosen){ if(add) add.disabled = true; return; }
+
+    const count = Math.max(1, parseInt(document.getElementById('p-count').value, 10) || 1);
+    const commitment = chosen.funding * count;
+
+    // what it does to the forecast, worked out before adding it
+    const before = runForecast();
+    const trial = forecastLevy({
+      months: forecastInputs().horizon,
+      monthlyIn: forecastInputs().monthlyIn,
+      opening: forecastInputs().opening,
+      cohorts: allCohorts().concat([forecastCohort(chosen, count, months, under25)]),
+      levyPayer: SETTINGS.levyPayer
+    });
+    const extraCost = trial.coInvestTotal - before.coInvestTotal;
+    const savedExpiry = before.expiredTotal - trial.expiredTotal;
+
+    el.innerHTML =
+      '<div class="impactrow"><b>' + money0(commitment) + '</b><span>total commitment</span></div>' +
+      '<div class="impactrow"><b class="' + (extraCost > 0 ? 'neg' : '') + '">' +
+        (extraCost > 0 ? '+' + money0(Math.round(extraCost)) : 'nothing') + '</b>' +
+        '<span>' + (extraCost > 0 ? 'added to what you pay' : 'costs you nothing — levy covers it') + '</span></div>' +
+      (savedExpiry > 100
+        ? '<div class="impactrow"><b class="pos">' + money0(Math.round(savedExpiry)) + '</b><span>less expiring unused</span></div>'
+        : '') +
+      (chosen.months ? '<div class="impactrow"><b>' + chosen.months + '</b><span>months, ending ' +
+        monthName(months + chosen.months) + '</span></div>' : '');
+
+    if(add) add.disabled = false;
+  }
+
+  function choose(s){
+    chosen = s;
+    document.getElementById('planstep2').classList.remove('locked');
+    document.getElementById('planchosen').innerHTML =
+      '<b>L' + s.level + ' ' + s.name + '</b>' +
+      '<span>' + money(s.funding) + ' band · ' + (s.months || 12) + ' months' +
+      (/Defunded/i.test(s.status) ? ' · <em class="warn">losing funding September 2026</em>' : '') + '</span>' +
+      '<button type="button" class="chipx" id="p-clear" aria-label="Choose a different standard">&times;</button>';
+    document.getElementById('p-clear').addEventListener('click', clearChoice);
+    refreshImpact();
+  }
+
+  function clearChoice(){
+    chosen = null;
+    document.getElementById('planstep2').classList.add('locked');
+    document.getElementById('planchosen').textContent = 'Pick a standard first';
+    document.getElementById('planimpact').innerHTML = '';
+    document.getElementById('p-add').disabled = true;
+    const q = document.getElementById('planpick-q');
+    if(q){ q.value = ''; q.focus(); }
+  }
+
+  wirePicker('planpick', function(){});
+  const res = document.getElementById('planpick-res');
+  if(res){
+    res.addEventListener('click', e => {
+      const btn = e.target.closest('.pickeritem');
+      if(!btn) return;
+      e.stopPropagation();
+      const s = STANDARDS.find(x => x.name === btn.dataset.name);
+      if(!s) return;
+      const q = document.getElementById('planpick-q');
+      if(q) q.value = '';
+      res.innerHTML = ''; res.classList.remove('on');
+      choose(s);
+    }, true);
+  }
+
+  const countBox = document.getElementById('p-count');
+  if(countBox) countBox.addEventListener('input', refreshImpact);
+
+  const bump = (id, by) => {
+    const b = document.getElementById(id);
+    if(b) b.addEventListener('click', () => {
+      countBox.value = Math.max(1, (parseInt(countBox.value, 10) || 1) + by);
+      refreshImpact();
+    });
+  };
+  bump('p-up', 1); bump('p-down', -1);
+
+  panel.querySelectorAll('#p-when button').forEach(b =>
+    b.addEventListener('click', () => {
+      panel.querySelectorAll('#p-when button').forEach(x => x.classList.remove('on'));
+      b.classList.add('on'); months = +b.dataset.m; refreshImpact();
+    }));
+
+  panel.querySelectorAll('#p-agepick button').forEach(b =>
+    b.addEventListener('click', () => {
+      panel.querySelectorAll('#p-agepick button').forEach(x => x.classList.remove('on'));
+      b.classList.add('on'); under25 = b.dataset.age === '1'; refreshImpact();
+    }));
+
+  const add = document.getElementById('p-add');
+  if(add) add.addEventListener('click', () => {
+    if(!chosen) return;
+    PLANNED.push(forecastCohort(chosen,
+      Math.max(1, parseInt(countBox.value, 10) || 1), months, under25));
+    savePlanned();
+    render();
+  });
+
+  panel.querySelectorAll('[data-plan]').forEach(b =>
+    b.addEventListener('click', () => { PLANNED.splice(+b.dataset.plan, 1); savePlanned(); render(); }));
+}
+
+/* =========================================================================
+   YOUR ACCOUNT
+
+   Export and deletion belong to the member, not only to an administrator.
+   Under UK GDPR a person has the right to a copy of their data and the right
+   to have it erased, and making them email someone to ask is both a worse
+   experience and more work for you.
+   ========================================================================= */
+
+function accountView(){
+  const p = ACCOUNT && ACCOUNT.profile;
+  const s = ACCOUNT && ACCOUNT.subscription;
+
+  return '<div class="pagehead"><h1>Your account</h1>' +
+    '<p>What we hold, what it costs, and how to take it away.</p></div>' +
+
+    '<div class="grouphead"><h2>Details</h2><div class="rule"></div></div>' +
+    '<table class="std levytable"><tbody>' +
+      '<tr><td class="nm">Email</td><td class="num big">' + (p ? p.email : '') + '</td>' +
+        '<td>Used to sign in, and to send what you have asked for</td></tr>' +
+      '<tr><td class="nm">Organisation</td><td class="num big">' + ((p && p.org_name) || 'not set') + '</td>' +
+        '<td>Shown on your board report</td></tr>' +
+      '<tr><td class="nm">Newsletter</td><td class="num big">' + (p && p.email_opt_out ? 'Opted out' : 'Subscribed') + '</td>' +
+        '<td>Change it on the Newsletter tab</td></tr>' +
+      '<tr><td class="nm">Membership</td><td class="num big">' + subLabel(s) + '</td><td>' +
+        (s && s.current_period_end ? 'Next renewal ' + fmtLong(s.current_period_end.slice(0,10)) : 'No renewal date') +
+        '</td></tr>' +
+    '</tbody></table>' +
+
+    '<div class="addrow" style="margin-top:18px">' +
+      '<button class="btn" id="acc-billing">Manage billing and cancel</button>' +
+      '<a class="btn ghost" href="mailto:' + contactAddress() +
+        '?subject=' + encodeURIComponent('Skills Radar — ' + ((p && p.org_name) || 'member enquiry')) +
+        '">Contact us</a>' +
+    '</div>' +
+    '<p class="hint" style="margin-top:10px">Card, invoices and cancellation are handled by Stripe. ' +
+    'For anything else, email us and you will get a reply from a person.</p>' +
+
+    '<div class="grouphead"><h2>Your data</h2><div class="rule"></div></div>' +
+    '<div class="todolist">' +
+      '<div class="todo watch"><div class="todotext"><h3>Download everything we hold</h3>' +
+      '<p>Your profile, the standards you follow, your calendar entries, your subscription record and your account ' +
+      'history, as a single file. This is the same export we would send if you asked formally.</p></div>' +
+      '<button class="todoact" id="acc-export">Download</button></div>' +
+
+      '<div class="todo stop"><div class="todotext"><h3>Delete your account</h3>' +
+      '<p>Removes your profile, your standards, your calendar entries and your history. It cannot be undone. ' +
+      'Cancel your membership first, or you will keep being charged for an account that no longer exists — ' +
+      'the billing button above does that.</p></div>' +
+      '<button class="todoact" id="acc-delete">Delete</button></div>' +
+    '</div>' +
+
+    '<div id="acc-out"></div>' +
+
+    '<div class="notice" style="margin-top:22px"><b>What happens to a deleted account.</b> ' +
+    'Everything listed above is removed immediately. Stripe keeps a record of payments taken, because tax law ' +
+    'requires it to be kept for six years — that is a legal obligation nobody can override, and it holds your email ' +
+    'and payment history, nothing else from this site. The <a href="privacy.html">privacy notice</a> sets out the detail.</div>';
+}
+
+function contactAddress(){
+  return (typeof CONTACT !== 'undefined' && CONTACT.email) ? CONTACT.email : 'hello@skills-radar.co.uk';
+}
+
+function subLabel(s){
+  if(!s) return 'None';
+  const map = { active:'Active', trialing:'Trial', past_due:'Payment failing', canceled:'Cancelled', none:'Not subscribed' };
+  return (map[s.status] || s.status) + (s.cancel_at_period_end ? ' — ending at period end' : '');
+}
+
+function wireAccount(panel){
+  const say = (t, k) => {
+    const o = document.getElementById('acc-out');
+    if(o) o.innerHTML = '<div class="' + (k || 'okbox') + '" style="margin-top:18px">' + t + '</div>';
+  };
+
+  const b = document.getElementById('acc-billing');
+  if(b) b.addEventListener('click', async () => {
+    try { await openBilling(); } catch(e){ say(e.message, 'alert'); }
+  });
+
+  const ex = document.getElementById('acc-export');
+  if(ex) ex.addEventListener('click', async () => {
+    ex.disabled = true; ex.textContent = 'Preparing…';
+    try {
+      const data = await exportMyData();
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type:'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'skills-radar-my-data.json';
+      a.click();
+      URL.revokeObjectURL(a.href);
+      say('Downloaded. That file is everything this site holds about you.');
+    } catch(e){ say('Could not build the export: ' + e.message, 'alert'); }
+    ex.disabled = false; ex.textContent = 'Download';
+  });
+
+  const del = document.getElementById('acc-delete');
+  if(del) del.addEventListener('click', async () => {
+    const typed = prompt('This permanently deletes your account and everything in it.\n\nType DELETE to confirm.');
+    if(typed !== 'DELETE') return;
+    del.disabled = true; del.textContent = 'Deleting…';
+    try {
+      await deleteMyAccount();
+      document.body.innerHTML = '<div class="wrap"><div class="pagehead centred" style="padding-top:70px">' +
+        '<h1>Your account has been deleted</h1>' +
+        '<p>Everything we held about you is gone.</p>' +
+        '<p style="margin-top:18px"><a class="btn" href="index.html" style="text-decoration:none">Back to the site</a></p>' +
+        '</div></div>';
+    } catch(e){
+      say('Could not delete the account: ' + e.message + '. Email us and we will do it by hand.', 'alert');
+      del.disabled = false; del.textContent = 'Delete';
+    }
+  });
+}
+
+function prefsView(){
+  /* Set once here rather than repeated through the view. */
+  const from = (typeof CONTACT !== 'undefined' && CONTACT.email) ? CONTACT.email : 'us';
+  return '<div class="pagehead"><h1>Newsletter preferences</h1>' +
+    '<p>What lands in your inbox, and how often. Changes here also reorder your feed and calendar.</p></div>' +
+    '<div class="form" style="max-width:640px;margin-top:8px">' +
+      '<div class="field"><label>How often</label>' +
+        '<p class="hint">The newsletter goes out monthly. Turning it off below does not affect emails about ' +
+        'your account or your payment, which we have to send.</p>' +
+        '<div class="cadence"><b>Monthly</b><span>Usually the first week of the month</span></div>' +
+      '</div>' +
+      '<div class="field"><label>Standards you deliver</label>' +
+        '<p class="hint">Changes to these lead your email and are flagged in your feed. This is the same list the calculator and calendar use.</p>' +
+        '<div class="chiplist">' +
+          (COHORT.length
+            ? COHORT.map((s, i) => '<span class="stdchip">L' + s.level + ' ' + s.name +
+                '<button class="chipx" data-i="' + i + '" aria-label="Remove ' + s.name.replace(/"/g,'&quot;') + '">&times;</button></span>').join('')
+            : '<span class="chipnone">None yet — search below to add the standards you deliver.</span>') +
+        '</div>' +
+        pickerHTML('prefspick') +
+      '</div>' +
+      '<div class="field"><label>Occupational routes</label>' +
+        '<div class="routegrid opts">' +
+          Object.keys(ROUTES).map(k => '<label class="opt' + (MEMBER.routes.indexOf(k) > -1 ? ' sel' : '') + '">' +
+            '<input type="checkbox"' + (MEMBER.routes.indexOf(k) > -1 ? ' checked' : '') + '> ' + ROUTES[k].label + '</label>').join('') +
+        '</div></div>' +
+      '<button class="btn" id="savep">Save preferences</button>' +
+      '<div class="notice" style="margin-top:20px"><b>Nothing sends yet.</b> A static site cannot deliver email. ' +
+      'Connect a mailing service — Buttondown, MailerLite, Kit or Mailchimp — and store these preferences server-side ' +
+      'alongside real accounts. Right now they live only in this browser session.</div>' +
+    '</div>';
+}
+
+function eventListHTML(){
+  if(!MYEVENTS.length){
+    return '<div class="okbox" style="margin-top:16px">Nothing added yet. Whatever you put here is yours — it never appears on the public site.</div>';
+  }
+
+  const sorted = MYEVENTS.slice().sort((a,b) => {
+    if(a.done !== b.done) return a.done ? 1 : -1;
+    return new Date(a.date) - new Date(b.date);
+  });
+
+  return '<div class="eventlist">' + sorted.map(e => {
+    const away = Math.ceil(-daysAgo(e.date));
+    const when = e.done ? 'Done'
+      : away < 0  ? Math.abs(away) + ' day' + (Math.abs(away) === 1 ? '' : 's') + ' ago'
+      : away === 0 ? 'Today'
+      : 'in ' + away + ' day' + (away === 1 ? '' : 's');
+    const overdue = !e.done && away < 0;
+
+    return '<div class="evrow' + (e.done ? ' done' : '') + (overdue ? ' overdue' : '') + '">' +
+      '<button class="evtick" data-tick="' + e.id + '" aria-label="' + (e.done ? 'Mark as not done' : 'Mark as done') + '">' +
+        (e.done ? '&#10003;' : '') + '</button>' +
+      '<div class="evmain">' +
+        '<h3>' + e.title + '</h3>' +
+        (e.note ? '<p>' + e.note + '</p>' : '') +
+      '</div>' +
+      '<div class="evwhen">' + fmtLong(e.date) + '<small>' + when + '</small></div>' +
+      '<button class="evdel" data-del="' + e.id + '" aria-label="Remove ' + e.title.replace(/"/g,'&quot;') + '">&times;</button>' +
+    '</div>';
+  }).join('') + '</div>';
+}
+
+function wireEvents(){
+  const list = document.getElementById('eventlist');
+  if(list) list.innerHTML = eventListHTML();
+
+  const add = document.getElementById('ev-add');
+  if(add){
+    add.addEventListener('click', () => {
+      const t = document.getElementById('ev-title').value.trim();
+      const d = document.getElementById('ev-date').value;
+      const n = document.getElementById('ev-note').value.trim();
+      if(!addEvent(t, d, n)){
+        document.getElementById('ev-err').hidden = false;
+        return;
+      }
+      document.getElementById('ev-err').hidden = true;
+      document.getElementById('ev-title').value = '';
+      document.getElementById('ev-date').value = '';
+      document.getElementById('ev-note').value = '';
+      render();
+    });
+  }
+
+  ['ev-title','ev-date'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el){
+      el.addEventListener('input', () => { document.getElementById('ev-err').hidden = true; });
+      el.addEventListener('keydown', e => { if(e.key === 'Enter') add.click(); });
+    }
+  });
+
+  if(list){
+    list.querySelectorAll('[data-tick]').forEach(b =>
+      b.addEventListener('click', () => { toggleEvent(b.dataset.tick); render(); }));
+    list.querySelectorAll('[data-del]').forEach(b =>
+      b.addEventListener('click', () => { removeEvent(b.dataset.del); render(); }));
+  }
+}
+
+/* ---------- Calendar internals ---------- */
+
+const DOW = ['M','T','W','T','F','S','S'];
+
+function buildCalendar(){
+  const source = calScope === 'mine' ? myMilestones() : MILESTONES;
+  const byDate = {};
+  source.forEach(m => { (byDate[m.date] = byDate[m.date] || []).push(m); });
+
+  document.querySelectorAll('.scopeswitch button').forEach(b =>
+    b.addEventListener('click', () => { calScope = b.dataset.scope; render(); }));
+
+  const start = new Date(); start.setDate(1);
+  let html = '';
+  for(let i = 0; i < 12; i++){
+    const d = new Date(start.getFullYear(), start.getMonth() + i, 1);
+    html += monthGrid(d.getFullYear(), d.getMonth(), byDate);
+  }
+  const grid = document.getElementById('calgrid');
+  if(!grid) return;
+  grid.innerHTML = html;
+
+  const pop = document.getElementById('pop');
+  function showPop(cell){
+    const evs = byDate[cell.dataset.key];
+    if(!evs) return;
+    pop.innerHTML = evs.map(m =>
+      '<div class="pd">' + fmtLong(m.date) + '</div><div class="who">' + m.who + '</div>' +
+      '<h4>' + m.title + '</h4>' +
+      '<div class="reason">' + milestoneReason(m) + '</div>' +
+      '<p>' + m.action + '</p>' +
+      (m.article ? '<a href="a/' + m.article + '.html">Read the full analysis &rarr;</a>' : '')
+    ).join('<hr style="border:none;border-top:1px solid var(--line);margin:13px 0">');
+    pop.classList.add('on');
+    const r = cell.getBoundingClientRect(), w = 340;
+    let left = Math.max(12, Math.min(r.left + r.width/2 - w/2, window.innerWidth - w - 12));
+    let top = r.bottom + 8;
+    if(top + pop.offsetHeight > window.innerHeight - 12) top = r.top - pop.offsetHeight - 8;
+    pop.style.left = left + 'px'; pop.style.top = Math.max(12, top) + 'px';
+  }
+  function hidePop(){ pop.classList.remove('on'); }
+
+  grid.querySelectorAll('.cday.has').forEach(cell => {
+    cell.addEventListener('mouseenter', () => showPop(cell));
+    cell.addEventListener('focus', () => showPop(cell));
+    cell.addEventListener('mouseleave', hidePop);
+    cell.addEventListener('blur', hidePop);
+    cell.addEventListener('click', e => { e.stopPropagation(); showPop(cell); });
+  });
+  document.addEventListener('click', hidePop);
+  window.addEventListener('scroll', hidePop, { passive:true });
+
+  const list = source.slice().sort((a,b) => new Date(a.date) - new Date(b.date));
+  const groups = {};
+  list.forEach(m => { const k = fmtMonthYear(m.date); (groups[k] = groups[k] || []).push(m); });
+  document.getElementById('cal').innerHTML = Object.keys(groups).map(k =>
+    '<section class="month"><h2>' + k + '</h2>' + groups[k].map(m => {
+      const past = daysAgo(m.date) > 0, d = new Date(m.date);
+      return '<div class="mile ' + m.urgency + (past ? ' past' : '') + '">' +
+        '<div class="d">' + d.getDate() + ' ' + d.toLocaleDateString('en-GB',{month:'short'}) +
+        '<small>' + d.getFullYear() + (past ? ' · passed' : '') + '</small></div>' +
+        '<div><div class="who">' + m.who + ' · ' + milestoneReason(m) + '</div><h3>' + m.title + '</h3><p>' + m.action + '</p>' +
+        (m.article ? '<div class="links"><a class="read" href="a/' + m.article + '.html">Read the full analysis</a></div>' : '') +
+        '</div></div>';
+    }).join('') + '</section>').join('');
+
+  document.getElementById('horizon').innerHTML = HORIZON.map(h =>
+    '<div class="horizon ' + h.risk + '"><div class="win">' + h.window + '</div><h3>' + h.title + '</h3>' +
+    '<div class="meta"><span class="conf ' + h.confidence + '">' +
+    (h.confidence === 'confirmed' ? 'Confirmed' : h.confidence === 'signalled' ? 'Signalled, not confirmed' : 'Speculative') +
+    '</span></div><p>' + h.detail + '</p>' +
+    '<div class="watch"><b>What to watch:</b> ' + h.watch + '</div></div>').join('');
+}
+
+function monthGrid(year, month, byDate){
+  const first = new Date(year, month, 1);
+  const startDow = (first.getDay() + 6) % 7;
+  const days = new Date(year, month + 1, 0).getDate();
+  const today = new Date();
+  const isThisMonth = today.getFullYear() === year && today.getMonth() === month;
+
+  let cells = '';
+  for(let i = 0; i < startDow; i++) cells += '<div class="cday out">0</div>';
+  for(let d = 1; d <= days; d++){
+    const key = year + '-' + String(month+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+    const evs = byDate[key];
+    let cls = 'cday', bang = '';
+    if(evs){
+      const onlyMine = evs.every(e => e.mine);
+      const worst = evs.some(e => e.urgency === 'high' && !e.mine) ? 'high'
+                  : evs.some(e => e.urgency === 'medium' && !e.mine) ? 'medium' : 'low';
+      cls += ' has ' + (onlyMine ? 'mine' : worst);
+      if(!onlyMine && worst === 'high') bang = '<span class="bang">!</span>';
+      if(evs.some(e => e.mine)) bang += '<span class="own"></span>';
+    }
+    if(isThisMonth && d === today.getDate()) cls += ' today';
+    const attr = evs ? ' tabindex="0" data-key="' + key + '" role="button"' : '';
+    cells += '<div class="' + cls + '"' + attr + '>' + d + bang + '</div>';
+  }
+  return '<div class="cmonth"><h3>' + first.toLocaleDateString('en-GB',{month:'long', year:'numeric'}) + '</h3>' +
+    '<div class="cdays">' + DOW.map(d => '<div class="cdow">' + d + '</div>').join('') + cells + '</div></div>';
+}
+
+/* ---------- Routing ---------- */
+
+let view = 'dash';
+
+/* Switching tab from a button anywhere in a view. */
+function goTo(to){
+  document.querySelectorAll('#mtabs button').forEach(x => x.classList.toggle('active', x.dataset.view === to));
+  view = to;
+  render();
+}
+
+function render(){
+  const panel = document.getElementById('mpanel');
+  if(view === 'dash'){
+    panel.innerHTML = dashView();
+    panel.querySelectorAll('[data-go]').forEach(b =>
+      b.addEventListener('click', () => goTo(b.dataset.go)));
+  }
+  if(view === 'cal'){  panel.innerHTML = calView(); buildCalendar(); wireEvents(); }
+  if(view === 'cohort'){
+    panel.innerHTML = cohortView();
+    wireCohort(panel);
+    wireDas(panel);
+    panel.querySelectorAll('[data-go]').forEach(b =>
+      b.addEventListener('click', () => goTo(b.dataset.go)));
+  }
+
+  if(view === 'otj'){
+    panel.innerHTML = otjView();
+    wireOtj(panel);
+  }
+
+  if(view === 'forecast'){
+    panel.innerHTML = forecastView();
+    renderForecast();
+    wireForecast(panel);
+    panel.querySelectorAll('[data-go]').forEach(b =>
+      b.addEventListener('click', () => goTo(b.dataset.go)));
+  }
+
+
+  if(view === 'report'){
+    panel.innerHTML = reportView();
+    const b = document.getElementById('printit');
+    if(b) b.addEventListener('click', () => window.print());
+  }
+
+  if(view === 'account'){
+    panel.innerHTML = accountView();
+    wireAccount(panel);
+  }
+
+  if(view === 'prefs'){
+    panel.innerHTML = prefsView();
+    panel.querySelectorAll('.chipx').forEach(b =>
+      b.addEventListener('click', () => { removeStandard(+b.dataset.i); render(); }));
+    wirePicker('prefspick', render);
+    panel.querySelectorAll('.opt input').forEach(i =>
+      i.addEventListener('change', () => {
+        i.closest('.opts').querySelectorAll('.opt').forEach(o =>
+          o.classList.toggle('sel', o.querySelector('input').checked));
+      }));
+    document.getElementById('savep').addEventListener('click', () => {
+      const b = document.getElementById('savep');
+      b.textContent = 'Saved for this session';
+      setTimeout(() => { b.textContent = 'Save preferences'; }, 2200);
+    });
+  }
+  refreshBar();
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+document.querySelectorAll('#mtabs button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#mtabs button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    view = btn.dataset.view;
+    render();
+  });
+});
+
+(async function start(){
+  const mode = await checkAccess();
+  if(mode === 'redirect') return;
+
+  if(mode === 'unconfigured'){
+    document.getElementById('public').hidden = false;
+    const p = document.getElementById('public');
+    p.innerHTML = '<div class="wrap"><div class="pagehead centred"><h1>Members area</h1>' +
+      '<p>Accounts are not connected on this deployment.</p></div>' +
+      '<div class="notice centred" style="max-width:640px"><b>Nothing to sign in to yet.</b> ' +
+      '<code>config.js</code> still has placeholder values, so there is no account system running. ' +
+      'Follow SETUP-ACCOUNTS.md to connect Supabase and Stripe.</div></div>';
+    return;
+  }
+
+  if(mode === 'member'){
+    await loadAccount();
+    document.getElementById('public').hidden = true;
+    document.getElementById('members').hidden = false;
+    refreshBar();
+    render();
+    const bar = document.querySelector('.memberbar .inner');
+    if(bar && !document.getElementById('billing')){
+      bar.insertAdjacentHTML('beforeend',
+        '<button class="linkbtn" id="billing" style="margin-left:14px">Billing</button>');
+      document.getElementById('billing').addEventListener('click', async () => {
+        try { await openBilling(); } catch(e){ alert(e.message); }
+      });
+    }
+    return;
+  }
+
+})().catch(err => {
+  console.error('members boot failed:', err);
+  const p = document.getElementById('public');
+  if(p){
+    p.hidden = false;
+    p.innerHTML = '<div class="wrap"><div class="pagehead centred"><h1>Something went wrong</h1>' +
+      '<p>The members area could not start.</p></div>' +
+      '<div class="alert centred" style="max-width:620px"><b>' + String(err && err.message || err) + '</b></div>' +
+      '<div class="notice centred" style="max-width:620px">Try reloading. If it persists, sign in again from ' +
+      '<a href="account.html">the account page</a>.</div></div>';
+  }
+});
+
+recordView();
+
+</script>
+
+<!-- Vercel Web Analytics. The @vercel/analytics package with the /next import
+     is for Next.js apps; this is a plain static site, so it uses the script
+     Vercel serves at /_vercel/insights/script.js instead. It only responds on
+     a Vercel deployment, so it does nothing locally. No cookies, no
+     identifiers, no consent banner needed. -->
+<script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>
