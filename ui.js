@@ -93,9 +93,9 @@ function ctaHTML(){
   const sub = (standards && changes)
     ? 'Choose the standards you deliver from all ' + standards.toLocaleString('en-GB') +
       ' on the register. Your feed then shows changes to those, alongside the funding rules that apply to everyone. ' +
-      'A weekly newsletter explains what moved and why, and the levy forecast runs on figures you enter yourself.'
+      'A monthly newsletter explains what moved and why, and the levy forecast runs on figures you enter yourself.'
     : 'Choose the standards you deliver, and your feed shows changes to those alongside the funding rules that ' +
-      'apply to everyone. A weekly newsletter explains what moved and why, and the levy forecast runs on figures ' +
+      'apply to everyone. A monthly newsletter explains what moved and why, and the levy forecast runs on figures ' +
       'you enter yourself.';
 
   return '<div class="herocta">' +
@@ -106,7 +106,7 @@ function ctaHTML(){
 
     '<div class="ctaact">' +
       (roomToScribble() ? '<div class="ctascribble" aria-hidden="true">' +
-        '<span class="ctanote">this bit</span>' + scribbleArrow() + '</div>' : '') +
+        '<span class="ctanote">start here</span>' + scribbleArrow() + '</div>' : '') +
       '<div class="ctaring">' +
         (roomToScribble() ? scribbleRing() : '') +
         '<a class="ctabtn" href="account.html?join=1">' +

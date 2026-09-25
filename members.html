@@ -55,14 +55,13 @@
     <div class="wrap controlgrid">
       <div class="tabs" id="mtabs">
         <button data-view="dash" class="active">Dashboard</button>
-        <button data-view="feed">My feed</button>
+        <button data-view="cohort">My cohort</button>
+        <button data-view="forecast">Levy forecast</button>
         <button data-view="cal">Calendar</button>
         <span class="tabsep" aria-hidden="true"></span>
-        <button data-view="otj">Off-the-job</button>
-        <button data-view="levy">Levy</button>
-        <button data-view="forecast">Forecast</button>
-        <span class="tabsep" aria-hidden="true"></span>
         <button data-view="report">Report</button>
+        <button data-view="otj">Off-the-job</button>
+        <span class="tabsep" aria-hidden="true"></span>
         <button data-view="prefs">Newsletter</button>
         <button data-view="account">Your account</button>
       </div>
@@ -1877,8 +1876,12 @@ function accountView(){
 
     '<div class="addrow" style="margin-top:18px">' +
       '<button class="btn" id="acc-billing">Manage billing and cancel</button>' +
-      '<span class="hint" style="align-self:center;margin:0">Card, invoices and cancellation are handled by Stripe</span>' +
+      '<a class="btn ghost" href="mailto:' + contactAddress() +
+        '?subject=' + encodeURIComponent('Skills Radar — ' + ((p && p.org_name) || 'member enquiry')) +
+        '">Contact us</a>' +
     '</div>' +
+    '<p class="hint" style="margin-top:10px">Card, invoices and cancellation are handled by Stripe. ' +
+    'For anything else, email us and you will get a reply from a person.</p>' +
 
     '<div class="grouphead"><h2>Your data</h2><div class="rule"></div></div>' +
     '<div class="todolist">' +
@@ -1900,6 +1903,10 @@ function accountView(){
     'Everything listed above is removed immediately. Stripe keeps a record of payments taken, because tax law ' +
     'requires it to be kept for six years — that is a legal obligation nobody can override, and it holds your email ' +
     'and payment history, nothing else from this site. The <a href="privacy.html">privacy notice</a> sets out the detail.</div>';
+}
+
+function contactAddress(){
+  return (typeof CONTACT !== 'undefined' && CONTACT.email) ? CONTACT.email : 'hello@skills-radar.co.uk';
 }
 
 function subLabel(s){
