@@ -3070,3 +3070,110 @@ main:focus{ outline:none; }
   margin:0 0 15px; padding-right:20px;
   font-size:12.5px; color:var(--text-2); line-height:1.6;
 }
+
+
+/* =========================================================================
+   SIGN-UP — one column
+
+   The form and the reasons were side by side, which left the form narrow on
+   a laptop and produced two cramped columns of prose. Both now run down the
+   middle at a readable width: form first, because that is what the page is
+   for, then the reasons underneath as full-width rows.
+   ========================================================================= */
+
+.joincol{ max-width:560px; margin:0 auto 64px; }
+
+.joinpanel{ padding:28px 30px 26px; }
+.joinpanel .field{ margin-bottom:18px; }
+.joinpanel .field > label{
+  display:block; font-size:14px; font-weight:500;
+  margin-bottom:7px; color:var(--text);
+}
+.joinpanel .field > label i{
+  font-style:italic; font-weight:400; color:var(--text-3); font-size:13px;
+}
+
+.joinpanel input[type="email"],
+.joinpanel input[type="text"],
+.joinpanel input[type="password"]{
+  width:100%; box-sizing:border-box;
+  font-family:var(--sans); font-size:16px;
+  padding:12px 14px; height:46px;
+  border:1px solid var(--line-strong); border-radius:2px;
+  background:var(--surface); color:var(--text);
+}
+.joinpanel input:focus{
+  outline:none; border-color:var(--ink-3);
+  box-shadow:0 0 0 3px rgba(22,48,47,0.10);
+}
+
+/* the opt-out is one row, not a panel within a panel */
+.joinpanel .optrow{
+  display:grid; grid-template-columns:22px 1fr; gap:12px;
+  align-items:start; cursor:pointer;
+  padding:15px 0 18px; margin:2px 0 4px;
+  border-top:1px solid var(--line); border-bottom:1px solid var(--line);
+}
+.joinpanel .opttext{ font-size:12.5px; color:var(--text-3); line-height:1.5; }
+.joinpanel .opttext b{
+  display:block; font-size:13.5px; font-weight:500;
+  color:var(--text); margin-bottom:2px;
+}
+
+/* ---------- What you get ---------- */
+
+.whatyouget{ margin-top:26px; }
+.whatyouget > h2{
+  background:var(--ink); color:#fff;
+  font-family:var(--display); font-size:14px; font-weight:600;
+  letter-spacing:0.02em; margin:0;
+  padding:12px 18px;
+}
+.whatyouget .benefit{
+  border:1px solid var(--line); border-top:none;
+  background:var(--surface);
+}
+.whatyouget .benefit summary{
+  padding:15px 18px; font-size:15px;
+}
+.whatyouget .benefit[open] summary{ border-bottom:1px solid var(--line); }
+.whatyouget .benefit p{
+  margin:0; padding:15px 18px 17px;
+  font-size:13.5px; line-height:1.65; color:var(--text-2);
+}
+.getfoot{
+  margin:0; padding:13px 18px;
+  border:1px solid var(--line); border-top:none;
+  background:var(--paper);
+  font-size:12px; color:var(--text-3); line-height:1.5;
+}
+
+@media (max-width:600px){
+  .joincol{ max-width:none; }
+  .joinpanel{ padding:22px 20px 20px; }
+  .whatyouget .benefit summary{ padding:14px 16px; font-size:14.5px; }
+  .whatyouget .benefit p{ padding:14px 16px 16px; }
+}
+
+/* ---------- Waiting for the webhook ---------- */
+
+.waitbox{
+  max-width:560px; margin:90px auto; text-align:center;
+  background:var(--surface); border:1px solid var(--line);
+  border-top:3px solid var(--low); padding:44px 40px 40px;
+}
+.waitbox h1{
+  font-family:var(--display); font-size:24px; font-weight:600;
+  letter-spacing:-0.02em; margin:0 0 14px; line-height:1.2;
+}
+.waitbox p{ font-size:15px; line-height:1.65; color:var(--text-2); margin:0 0 12px; }
+.waitacts{ display:flex; gap:10px; justify-content:center; margin-top:22px; flex-wrap:wrap; }
+.waitacts .btn{ text-decoration:none; }
+
+.waitspin{
+  width:34px; height:34px; margin:0 auto 22px;
+  border:3px solid var(--line); border-top-color:var(--low);
+  border-radius:50%; animation:spin 900ms linear infinite;
+}
+@keyframes spin{ to { transform:rotate(360deg); } }
+@media (prefers-reduced-motion: reduce){ .waitspin{ animation:none; } }

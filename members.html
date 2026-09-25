@@ -131,12 +131,61 @@ async function checkAccess(){
   const user = await currentUser();
   if(!user){ location.replace('account.html'); return 'redirect'; }
 
-  const sub = await getSubscription();
-  const profile = await getProfile();
+  let sub = await getSubscription();
+  let profile = await getProfile();
+
+  /* Coming back from Stripe. The payment has succeeded, but access is
+     granted by the webhook, which arrives separately and can take a few
+     seconds. Bouncing straight back to the payment page in that window tells
+     someone who has just paid that they have not — so wait, and say what is
+     happening while we do. */
+  if(new URLSearchParams(location.search).get('welcome') === '1' && !hasAccess(sub, profile)){
+    showConfirming();
+    for(let i = 0; i < 12 && !hasAccess(sub, profile); i++){
+      await new Promise(r => setTimeout(r, 2000));
+      sub = await getSubscription();
+      profile = await getProfile();
+    }
+    if(!hasAccess(sub, profile)){ showStuck(); return 'blocked'; }
+    history.replaceState({}, '', 'members.html');
+    location.reload();
+    return 'blocked';
+  }
+
   if(!hasAccess(sub, profile)){ location.replace('account.html'); return 'redirect'; }
 
   ACCOUNT = { user: user, subscription: sub, profile: profile };
   return 'member';
+}
+
+/* Shown while the webhook catches up after a payment. */
+function showConfirming(){
+  document.body.innerHTML =
+    '<div class="wrap"><div class="waitbox">' +
+      '<div class="waitspin" aria-hidden="true"></div>' +
+      '<h1>Confirming your payment</h1>' +
+      '<p>Stripe has taken the payment. We are waiting for it to confirm, which usually takes a few seconds. ' +
+      'Please do not close this page.</p>' +
+    '</div></div>';
+}
+
+/* Shown when it does not arrive. Their money has gone; saying nothing is the
+   worst available response. */
+function showStuck(){
+  const email = (typeof CONTACT !== 'undefined' && CONTACT.email) ? CONTACT.email : '';
+  document.body.innerHTML =
+    '<div class="wrap"><div class="waitbox">' +
+      '<h1>Your payment went through, but access has not switched on</h1>' +
+      '<p>This one is on us. Stripe has your payment, and it confirms to us separately — occasionally that ' +
+      'confirmation is delayed or does not arrive.</p>' +
+      '<p><b>Try again in a minute.</b> If it still has not worked, email ' +
+      (email ? '<a href="mailto:' + email + '">' + email + '</a>' : 'us') +
+      ' and it will be put right the same day. You will not be charged twice and you will not have to pay again.</p>' +
+      '<div class="waitacts">' +
+        '<a class="btn" href="members.html">Try again</a>' +
+        '<a class="btn ghost" href="index.html">Back to the site</a>' +
+      '</div>' +
+    '</div></div>';
 }
 
 /* Pull their saved cohort, events and settings in place of the defaults. */

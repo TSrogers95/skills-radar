@@ -121,10 +121,10 @@ function msg(text, kind){
 function joinView(message){
   const price = MEMBERSHIP.price, period = MEMBERSHIP.period;
 
-  return '<div class="pagehead centred"><h1>Join Skills Radar</h1>' +
+  return '<div class="pagehead centred"><h1>Create your account</h1>' +
     '<p>' + price + ' ' + period + '. Cancel any time from your own account page.</p></div>' +
 
-    '<div class="joinlayout">' +
+    '<div class="joincol">' +
 
       '<div class="signin-panel joinpanel">' +
         msg(message) +
@@ -136,14 +136,12 @@ function joinView(message){
             '<input type="email" id="email" name="email" autocomplete="email" ' +
               'inputmode="email" autocapitalize="off" spellcheck="false" ' +
               'placeholder="you@organisation.co.uk" required>' +
-            '<p class="fieldnote">Where the newsletter and your account emails go.</p>' +
           '</div>' +
 
           '<div class="field">' +
-            '<label for="org">Organisation <span class="opt">(optional)</span></label>' +
+            '<label for="org">Organisation <i>(optional)</i></label>' +
             '<input type="text" id="org" name="organization" autocomplete="organization" ' +
               'placeholder="Your college, provider or employer">' +
-            '<p class="fieldnote">Appears on the board report you can print.</p>' +
           '</div>' +
 
           '<div class="field">' +
@@ -156,23 +154,16 @@ function joinView(message){
             '<p class="fieldnote" id="pwnote">At least eight characters.</p>' +
           '</div>' +
 
-          '<div class="optbox">' +
-            '<label class="optrow" for="optout">' +
-              '<input type="checkbox" id="optout" name="optout">' +
-              '<span class="optmark" aria-hidden="true"></span>' +
-              '<span class="opttext">' +
-                '<b>Do not send me the newsletter</b>' +
-                'Leave this unticked to get the monthly note on what changed and why. ' +
-                'You can change it any time from your account.' +
-              '</span>' +
-            '</label>' +
-            '<p class="optfoot">We will still email you about your account and your payment. ' +
-            'That part is not optional for either of us.</p>' +
-          '</div>' +
+          '<label class="optrow" for="optout">' +
+            '<input type="checkbox" id="optout" name="optout">' +
+            '<span class="optmark" aria-hidden="true"></span>' +
+            '<span class="opttext"><b>Do not send me the monthly newsletter</b>' +
+            'You will still get emails about your account and your payment.</span>' +
+          '</label>' +
 
           '<div class="err" id="err" hidden></div>' +
           '<button class="btn wide" type="submit" id="go">Create account &middot; ' + price + ' ' + period + '</button>' +
-          '<p class="formfoot">Next you will confirm your email, then pay. ' +
+          '<p class="formfoot">Next you confirm your email, then pay. ' +
           'Card details are handled by Stripe and never reach this site.</p>' +
         '</form>' +
 
@@ -180,32 +171,28 @@ function joinView(message){
           '<button type="button" class="fill" id="toSignin">Sign in</button></div>' +
       '</div>' +
 
-      '<aside class="benefits">' +
-        '<h2 class="benefitshead">What you get</h2>' +
+      '<section class="whatyouget">' +
+        '<h2>What you get</h2>' +
         benefit('A feed that is only yours',
-          'Choose the standards you deliver and the feed shows changes to those, alongside the funding rules ' +
-          'that apply to everyone. There are 378 standards on the register and 180 live changes — you see the ' +
-          'handful that touch your provision, with what changed and what follows from it.') +
+          'There are 378 standards on the register and 180 live changes. Choose the ones you deliver and the ' +
+          'feed shows changes to those, alongside the funding rules that apply to everyone — with what changed, ' +
+          'what it changed from, and what follows.') +
         benefit('The monthly newsletter',
           'What moved and what it means, once a month. Written rather than generated, and focused on what you ' +
-          'actually have to do. Turn it off in one click without losing your account.') +
+          'have to do about it. Turn it off in one click without losing your account.') +
         benefit('Levy forecasting',
           'Month by month on your own pay bill and your own cohorts. It names the month co-investment starts, ' +
           'shows how much expires unused, and lets you drop in apprentices you are only considering to see what ' +
-          'they would cost before you commit to them.') +
+          'they would cost before committing.') +
         benefit('Compliance, in one place',
           'Off-the-job hours against the published minimum for each of 713 standards. A calendar of the deadlines ' +
-          'that apply to your provision. And a board report you can print, with your funding position and risks ' +
+          'that touch your provision. And a board report you can print, with your funding position and risks ' +
           'already written up.') +
-        '<p class="benefitsfoot">Your data is yours. Export or delete all of it at any time, from your own account page.</p>' +
-      '</aside>' +
+        '<p class="getfoot">Your data is yours. Export or delete all of it at any time, from your own account page.</p>' +
+      '</section>' +
     '</div>';
 }
 
-/* Headline always visible, detail on request. Four paragraphs of prose is
-   more than anyone reads while deciding; four headlines is about right, and
-   the detail is there for whoever wants it. Native details/summary, so it
-   works with a keyboard and a screen reader without any script. */
 function benefit(t, d){
   return '<details class="benefit">' +
     '<summary><span>' + t + '</span></summary>' +
@@ -305,7 +292,7 @@ async function payView(message){
 
         '<ul class="paylist">' +
           '<li>A feed showing only what affects your standards</li>' +
-          '<li>The newsletter, weekly or monthly</li>' +
+          '<li>The monthly newsletter</li>' +
           '<li>Levy forecasting against your own figures</li>' +
           '<li>Off-the-job position and a compliance calendar</li>' +
           '<li>A board report you can print</li>' +
@@ -315,8 +302,8 @@ async function payView(message){
         '<button class="btn" id="pay">Continue to payment</button>' +
         (sub && sub.stripe_customer_id ? '<button class="btn ghost" id="manage" style="margin-top:10px;width:100%">Manage billing</button>' : '') +
 
-        '<p class="hint" style="margin-top:16px">Payment is taken by Stripe. Card details never touch this site. ' +
-        'Cancel any time from your billing page — it takes two clicks and no email.</p>' +
+        '<p class="hint" style="margin-top:16px">Payment is taken by Stripe, so card details never touch this site. ' +
+        'Cancel any time from your billing page.</p>' +
 
         '<div class="demo" style="margin-top:20px">' +
           '<button type="button" class="fill" id="out">Sign out</button>' +
