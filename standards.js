@@ -801,25 +801,6 @@ const STANDARDS = [
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ];
 
 /* STANDARDS:END */
