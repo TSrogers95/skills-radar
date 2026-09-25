@@ -28,7 +28,6 @@
 
 
 <div class="masthead">
-  <main id="main" tabindex="-1">
 <div class="wrap"><div id="heroblock"></div></div>
 </div>
 
@@ -38,6 +37,7 @@
     <div id="navslot"></div>
   </div>
 </div>
+<main id="main" tabindex="-1">
 
 <!-- ============ PUBLIC LANDING ============ -->
 <div id="public" hidden></div>
@@ -142,6 +142,20 @@ async function checkAccess(){
 /* Pull their saved cohort, events and settings in place of the defaults. */
 async function loadAccount(){
   if(!ACCOUNT) return;
+
+  /* Start from nothing rather than from the demo organisation. Someone
+     signing up should see their own account, empty, not somebody else's
+     figures they then have to work out how to clear. */
+  COHORT = [];
+  MYEVENTS = [];
+  OTJ = {};
+  SETTINGS.payroll = 0;
+  SETTINGS.monthlyIn = null;
+  SETTINGS.opening = null;
+  SETTINGS.young = null;
+  SETTINGS.levyPayer = false;
+  saveCohort(); saveEvents(); saveOtj(); saveSettings();
+
   try {
     const saved = await loadStandards();
     if(saved.length){
@@ -472,7 +486,59 @@ function comingUp(days){
    employer's Apprenticeship Service account, so the real answer is a DAS
    connection rather than more arithmetic here. */
 
+/* What still needs filling in before the tools mean anything. */
+function setupSteps(){
+  return [
+    { done: COHORT.length > 0,
+      title: 'Add the standards you deliver',
+      why: 'Everything else follows from this. Your feed, your calendar and your compliance position are all filtered to these.',
+      action: 'Add standards', view: 'levy' },
+    { done: cohortHeads() > 0,
+      title: 'Say how many apprentices are on each',
+      why: 'Needed for the levy figures and for the completion picture. An estimate is fine — you can change it whenever.',
+      action: 'Add numbers', view: 'levy' },
+    { done: SETTINGS.payroll > 0,
+      title: 'Enter your annual pay bill',
+      why: 'Sets what goes into your levy account, and whether you pay the levy at all. Nothing is shared and you can remove it later.',
+      action: 'Open the calculator', view: 'levy' },
+    { done: Object.keys(OTJ).length > 0,
+      title: 'Record your off-the-job hours',
+      why: 'The published minimum for each standard is already here. Add the hours you plan to deliver and it tells you where you stand.',
+      action: 'Open off-the-job', view: 'otj' }
+  ];
+}
+
+function setupView(){
+  const steps = setupSteps();
+  const done = steps.filter(s => s.done).length;
+
+  return '<div class="pagehead"><h1>Welcome' + (ACCOUNT && ACCOUNT.profile && ACCOUNT.profile.org_name
+      ? ', ' + ACCOUNT.profile.org_name : '') + '</h1>' +
+    '<p>Your account is empty, which is how it should start. Four things to add, and the site becomes yours. ' +
+    'None of it has to be exact and all of it can change.</p></div>' +
+
+    '<div class="setupbar"><div class="setupfill" style="width:' + Math.round(done / steps.length * 100) + '%"></div></div>' +
+    '<p class="setupcount">' + done + ' of ' + steps.length + ' done</p>' +
+
+    '<div class="setuplist">' +
+      steps.map((s, i) =>
+        '<div class="setupstep' + (s.done ? ' done' : '') + '">' +
+          '<span class="setupnum">' + (s.done ? '&#10003;' : (i + 1)) + '</span>' +
+          '<div class="setupbody"><h3>' + s.title + '</h3><p>' + s.why + '</p></div>' +
+          (s.done ? '<span class="setupdone">Done</span>'
+                  : '<button class="todoact" data-go="' + s.view + '">' + s.action + '</button>') +
+        '</div>').join('') +
+    '</div>' +
+
+    '<div class="notice" style="margin-top:24px"><b>Nothing here is published anywhere.</b> ' +
+    'Your standards, numbers and pay bill are yours alone. You can export the lot or delete the account outright ' +
+    'from <button class="linkbtn" data-go="account">your account page</button>, at any time.</div>';
+}
+
 function dashView(){
+  /* Until there is something to report on, the dashboard is the setup list. */
+  if(!COHORT.length) return setupView();
+
   const attention = attentionItems();
   const soon = comingUp(90);
   const stops = attention.filter(a => a.level === 'stop').length;
@@ -1930,11 +1996,11 @@ function prefsView(){
   return '<div class="pagehead"><h1>Newsletter preferences</h1>' +
     '<p>What lands in your inbox, and how often. Changes here also reorder your feed and calendar.</p></div>' +
     '<div class="form" style="max-width:640px;margin-top:8px">' +
-      '<div class="field"><label>How often?</label>' +
-        '<div class="opts" id="freq">' +
-          '<label class="opt' + (MEMBER.frequency === 'weekly' ? ' sel' : '') + '"><input type="radio" name="f" value="weekly"' + (MEMBER.frequency === 'weekly' ? ' checked' : '') + '> Weekly</label>' +
-          '<label class="opt' + (MEMBER.frequency === 'monthly' ? ' sel' : '') + '"><input type="radio" name="f" value="monthly"' + (MEMBER.frequency === 'monthly' ? ' checked' : '') + '> Monthly</label>' +
-        '</div></div>' +
+      '<div class="field"><label>How often</label>' +
+        '<p class="hint">The newsletter goes out monthly. Turning it off below does not affect emails about ' +
+        'your account or your payment, which we have to send.</p>' +
+        '<div class="cadence"><b>Monthly</b><span>Usually the first week of the month</span></div>' +
+      '</div>' +
       '<div class="field"><label>Standards you deliver</label>' +
         '<p class="hint">Changes to these lead your email and are flagged in your feed. This is the same list the calculator and calendar use.</p>' +
         '<div class="chiplist">' +
@@ -2236,7 +2302,18 @@ document.querySelectorAll('#mtabs button').forEach(btn => {
     return;
   }
 
-})();
+})().catch(err => {
+  console.error('members boot failed:', err);
+  const p = document.getElementById('public');
+  if(p){
+    p.hidden = false;
+    p.innerHTML = '<div class="wrap"><div class="pagehead centred"><h1>Something went wrong</h1>' +
+      '<p>The members area could not start.</p></div>' +
+      '<div class="alert centred" style="max-width:620px"><b>' + String(err && err.message || err) + '</b></div>' +
+      '<div class="notice centred" style="max-width:620px">Try reloading. If it persists, sign in again from ' +
+      '<a href="account.html">the account page</a>.</div></div>';
+  }
+});
 
 recordView();
 

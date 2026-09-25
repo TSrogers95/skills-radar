@@ -1250,7 +1250,7 @@ const MEMBER = {
   levyPayer: true,
   payroll: 4500000,
   apprentices: 45,
-  frequency: "weekly",
+  frequency: "monthly",
   standards: [
     { name:"Business Administrator", code:"ST0070", level:3, funding:5000,  months:18, count:18 },
     { name:"Operations Manager",     code:"",       level:5, funding:7000,  months:18, count:9  },

@@ -24,7 +24,7 @@ create table if not exists profiles (
   opening        bigint,                      -- account balance when last entered
   young_count    integer,
   routes         text[] default '{}',
-  frequency      text check (frequency in ('weekly','monthly')) default 'weekly',
+  frequency      text check (frequency in ('weekly','monthly')) default 'monthly',
   email_opt_out  boolean default false,       -- the tick box on sign-up
   is_admin       boolean default false,
   comp_access    boolean default false,       -- free access: demos, press, your own account

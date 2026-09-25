@@ -899,7 +899,7 @@ async function loadEmails(){
       '<td>' + (m.org_name || '&mdash;') + '</td>' +
       '<td>' + (m.email_opt_out
         ? '<span class="ctag stop">opted out</span>'
-        : '<span class="ctag new">' + (m.frequency || 'weekly') + '</span>') + '</td>' +
+        : '<span class="ctag new">' + (m.frequency || 'monthly') + '</span>') + '</td>' +
       '<td>' + statusTag(m.subscription) + '</td></tr>').join('') +
     '</tbody></table></div>' +
 
@@ -929,7 +929,7 @@ function wireEmail(el, optedIn, all){
     const body = rows.map(m => [
       m.email,
       '"' + String(m.org_name || '').replace(/"/g, '""') + '"',
-      m.email_opt_out ? 'opted-out' : (m.frequency || 'weekly'),
+      m.email_opt_out ? 'opted-out' : (m.frequency || 'monthly'),
       m.subscription.status,
       m.created_at.slice(0, 10)
     ].join(','));

@@ -122,7 +122,7 @@ function joinView(message){
   const price = MEMBERSHIP.price, period = MEMBERSHIP.period;
 
   return '<div class="pagehead centred"><h1>Join Skills Radar</h1>' +
-    '<p>' + price + ' ' + period + '. Cancel in two clicks, no email required.</p></div>' +
+    '<p>' + price + ' ' + period + '. Cancel any time from your own account page.</p></div>' +
 
     '<div class="joinlayout">' +
 
@@ -132,7 +132,7 @@ function joinView(message){
         '<form id="form" novalidate autocomplete="on">' +
 
           '<div class="field">' +
-            '<label for="email">Work email</label>' +
+            '<label for="email">Email</label>' +
             '<input type="email" id="email" name="email" autocomplete="email" ' +
               'inputmode="email" autocapitalize="off" spellcheck="false" ' +
               'placeholder="you@organisation.co.uk" required>' +
@@ -140,7 +140,7 @@ function joinView(message){
           '</div>' +
 
           '<div class="field">' +
-            '<label for="org">Organisation <span class="opt">optional</span></label>' +
+            '<label for="org">Organisation <span class="opt">(optional)</span></label>' +
             '<input type="text" id="org" name="organization" autocomplete="organization" ' +
               'placeholder="Your college, provider or employer">' +
             '<p class="fieldnote">Appears on the board report you can print.</p>' +
@@ -162,7 +162,7 @@ function joinView(message){
               '<span class="optmark" aria-hidden="true"></span>' +
               '<span class="opttext">' +
                 '<b>Do not send me the newsletter</b>' +
-                'Leave this unticked to get the weekly note on what changed and why. ' +
+                'Leave this unticked to get the monthly note on what changed and why. ' +
                 'You can change it any time from your account.' +
               '</span>' +
             '</label>' +
@@ -183,23 +183,35 @@ function joinView(message){
       '<aside class="benefits">' +
         '<h2 class="benefitshead">What you get</h2>' +
         benefit('A feed that is only yours',
-          'Choose the standards you deliver and the feed shows changes to those, ' +
-          'alongside the funding rules that apply to everyone.') +
-        benefit('The newsletter',
-          'What moved this week and what it means. Written, not generated. Weekly or monthly.') +
+          'Choose the standards you deliver and the feed shows changes to those, alongside the funding rules ' +
+          'that apply to everyone. There are 378 standards on the register and 180 live changes — you see the ' +
+          'handful that touch your provision, with what changed and what follows from it.') +
+        benefit('The monthly newsletter',
+          'What moved and what it means, once a month. Written rather than generated, and focused on what you ' +
+          'actually have to do. Turn it off in one click without losing your account.') +
         benefit('Levy forecasting',
-          'Month by month on your own figures, with the point co-investment starts and what expires unused. ' +
-          'Drop in cohorts you are considering to see what they cost first.') +
+          'Month by month on your own pay bill and your own cohorts. It names the month co-investment starts, ' +
+          'shows how much expires unused, and lets you drop in apprentices you are only considering to see what ' +
+          'they would cost before you commit to them.') +
         benefit('Compliance, in one place',
-          'Off-the-job position against the published minimum for each standard, ' +
-          'a calendar of your deadlines, and a board report you can print.') +
-        '<p class="benefitsfoot">Your data is yours. Export or delete all of it at any time, ' +
-        'from your own account page.</p>' +
+          'Off-the-job hours against the published minimum for each of 713 standards. A calendar of the deadlines ' +
+          'that apply to your provision. And a board report you can print, with your funding position and risks ' +
+          'already written up.') +
+        '<p class="benefitsfoot">Your data is yours. Export or delete all of it at any time, from your own account page.</p>' +
       '</aside>' +
     '</div>';
 }
 
-function benefit(t, d){ return '<div class="benefit"><h3>' + t + '</h3><p>' + d + '</p></div>'; }
+/* Headline always visible, detail on request. Four paragraphs of prose is
+   more than anyone reads while deciding; four headlines is about right, and
+   the detail is there for whoever wants it. Native details/summary, so it
+   works with a keyboard and a screen reader without any script. */
+function benefit(t, d){
+  return '<details class="benefit">' +
+    '<summary><span>' + t + '</span></summary>' +
+    '<p>' + d + '</p>' +
+  '</details>';
+}
 
 function field(id, label, type, ph){
   return '<div class="field"><label for="' + id + '">' + label + '</label>' +
