@@ -333,7 +333,8 @@ function merge(imported){
         common: false, name: r.name, code: r.code, level: r.level,
         months: r.months, funding: r.funding, route: r.route,
         epa: epa, status: r.status, version: r.version,
-        since: r.since || new Date().toISOString().slice(0,10),
+        since: new Date().toISOString().slice(0,10),
+        approved: r.since || '',
         changed: ANNOUNCE_NEW ? 'New on the register' : '',
         article: '',
         options: r.options || []
@@ -360,7 +361,12 @@ function merge(imported){
         funding: r.funding || old.funding,
         route: r.route || old.route,
         epa: epa, status: r.status, version: r.version,
-        since: r.since || new Date().toISOString().slice(0,10),
+        /* The date a change was SPOTTED, not the date the standard was
+           approved. "since" drives how long an item stays in the feed, and
+           the approval date is often years old — using it made a six-month
+           window throw away changes found this morning. */
+        since: new Date().toISOString().slice(0,10),
+        approved: r.since || old.approved || '',
         changed: diffs.join('. '),
         options: (r.options && r.options.length) ? r.options : (old.options || [])
       });
@@ -401,7 +407,9 @@ function render(s){
     ', level:' + (s.level||0) + ', months:' + (s.months||0) + ', funding:' + (s.funding||0) +
     ', route:' + q(s.route || '') + ', epa:' + q(s.epa || 'Assigned') +
     ', status:' + q(s.status || 'Approved') + ', version:' + q(s.version || '1.0') +
-    ', since:' + q(s.since || '') + ', changed:' + q(s.changed || '') +
+    ', since:' + q(s.since || '') +
+    (s.approved ? ', approved:' + q(s.approved) : '') +
+    ', changed:' + q(s.changed || '') +
     (s.article ? ', article:' + q(s.article) : '') +
     (s.options && s.options.length ? ', options:[' + s.options.map(q).join(',') + ']' : '') + ' },';
 }
@@ -469,6 +477,17 @@ function process(text, file){
 function show(rows, cols, built, m, file){
   const code = block(m.out);
   const noRoute = m.out.filter(s => !s.route).length;
+
+  /* Check the block actually parses before anything is offered for download.
+     A single bad character used to produce a file that looked fine, uploaded
+     fine, and left the live site with no register at all. Declared here
+     because the summary below reports on it. */
+  let parseError = null, parsedCount = 0;
+  try {
+    parsedCount = new Function(code + '\n; return STANDARDS.length;')();
+  } catch(err){
+    parseError = err.message;
+  }
 
   const colTable = Object.keys(COLUMNS).map(f =>
     '<tr><td class="nm">' + f + '</td><td>' +
@@ -604,16 +623,6 @@ function show(rows, cols, built, m, file){
   }
 
   const full = header + code + '\n/* STANDARDS:END */\n';
-
-  /* Check the file we are about to hand over actually parses. A single bad
-     character used to produce a file that looked fine, uploaded fine, and
-     left the live site with no register at all. */
-  let parseError = null, parsedCount = 0;
-  try {
-    parsedCount = new Function(full + '; return STANDARDS.length;')();
-  } catch(err){
-    parseError = err.message;
-  }
 
   document.getElementById('dl').addEventListener('click', () => {
     const blob = new Blob([full], { type: 'text/javascript' });

@@ -208,6 +208,7 @@ function deriveUpdates(){
         derived: true,
         changeText: s.changed,
         rawStatus: s.status,
+        dated: !!s.approved,     // true once an import has stamped both dates
         summary: summary,
         url: standardURL(s)
       };
@@ -303,7 +304,7 @@ function allUpdates(){
   return allUpdatesUnfiltered().filter(u => {
     if(u.pinned) return true;             // hand-pinned stays regardless
     if(isFuture(u.date)) return true;     // upcoming, until the date passes
-    return stillRecent(u.date, u.urgency);
+    return stillRecent(u.date, u.urgency, hasChangeDate(u));
   });
 }
 
@@ -397,10 +398,25 @@ function articleFor(s, defunded, dev){
 const RECENT_DAYS = 183;          // six months
 const RECENT_DAYS_IMPORTANT = 365; // twelve, for high urgency
 
-function stillRecent(date, urgency){
+function stillRecent(date, urgency, trusted){
+  /* Before the importer was fixed, a standard's date was its approval date
+     rather than the date a change was found — often years old. Ageing those
+     out empties the feed of changes that were spotted this week. So an
+     untrusted date is kept: better a slightly long feed than a wrong one.
+     Once a fresh import has run, every changed standard carries a real
+     detection date and the window applies properly. */
+  if(trusted === false) return true;
+
   const age = daysAgo(date);
   if(age < 0) return true;         // not yet happened; handled as upcoming
   return age <= (urgency === 'high' ? RECENT_DAYS_IMPORTANT : RECENT_DAYS);
+}
+
+/* A date is trustworthy as a change date when the record distinguishes the
+   two — the importer now writes "approved" alongside "since". Where it does
+   not, the date is an approval date and cannot be used to age anything out. */
+function hasChangeDate(item){
+  return !!(item && item.dated);
 }
 
 /* =========================================================================
