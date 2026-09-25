@@ -120,9 +120,23 @@ function msg(text, kind){
 
 function joinView(message){
   const price = MEMBERSHIP.price, period = MEMBERSHIP.period;
+  const counts = siteCounts();
 
-  return '<div class="pagehead centred"><h1>Create your account</h1>' +
-    '<p>' + price + ' ' + period + '. Cancel any time from your own account page.</p></div>' +
+  return '<div class="joinhero">' +
+      '<div class="joinheroinner">' +
+        '<p class="joineyebrow">Membership</p>' +
+        '<h1>Stop reading ' + counts.changes + ' changes to find the ' +
+          '<em>three</em> that affect you</h1>' +
+        '<p class="joinlede">Tell us which standards you deliver. We will tell you what moved, ' +
+          'what it costs and what you have to do about it.</p>' +
+        '<div class="joinproof">' +
+          '<span><b>' + counts.standards + '</b>standards tracked</span>' +
+          '<span><b>' + counts.otj + '</b>off-the-job minimums</span>' +
+          '<span><b>' + price + '</b>' + period + ', cancel any time</span>' +
+        '</div>' +
+      '</div>' +
+      joinVisual(counts) +
+    '</div>' +
 
     '<div class="joincol">' +
 
@@ -163,8 +177,12 @@ function joinView(message){
 
           '<div class="err" id="err" hidden></div>' +
           '<button class="btn wide" type="submit" id="go">Create account &middot; ' + price + ' ' + period + '</button>' +
-          '<p class="formfoot">Next you confirm your email, then pay. ' +
-          'Card details are handled by Stripe and never reach this site.</p>' +
+          '<ul class="reassure">' +
+            '<li>Cancel any time, from your own account page</li>' +
+            '<li>Card details handled by Stripe, never stored here</li>' +
+            '<li>Export or delete everything we hold, whenever you like</li>' +
+          '</ul>' +
+          '<p class="formfoot">Next you confirm your email, then pay.</p>' +
         '</form>' +
 
         '<div class="demo"><span>Already a member?</span>' +
@@ -174,9 +192,9 @@ function joinView(message){
       '<section class="whatyouget">' +
         '<h2>What you get</h2>' +
         benefit('A feed that is only yours',
-          'There are 378 standards on the register and 180 live changes. Choose the ones you deliver and the ' +
-          'feed shows changes to those, alongside the funding rules that apply to everyone — with what changed, ' +
-          'what it changed from, and what follows.') +
+          'All ' + counts.standards + ' standards on the register are tracked here, with ' + counts.changes +
+          ' live changes between them. Choose the ones you deliver and the feed shows changes to those, ' +
+          'alongside the funding rules that apply to everyone — what changed, what it changed from, and what follows.') +
         benefit('The monthly newsletter',
           'What moved and what it means, once a month. Written rather than generated, and focused on what you ' +
           'have to do about it. Turn it off in one click without losing your account.') +
@@ -185,12 +203,49 @@ function joinView(message){
           'shows how much expires unused, and lets you drop in apprentices you are only considering to see what ' +
           'they would cost before committing.') +
         benefit('Compliance, in one place',
-          'Off-the-job hours against the published minimum for each of 713 standards. A calendar of the deadlines ' +
+          'Off-the-job hours against the published minimum for each of ' + counts.otj + ' standards. A calendar of the deadlines ' +
           'that touch your provision. And a board report you can print, with your funding position and risks ' +
           'already written up.') +
         '<p class="getfoot">Your data is yours. Export or delete all of it at any time, from your own account page.</p>' +
       '</section>' +
     '</div>';
+}
+
+/* Read from the data rather than written into the copy, so the numbers
+   cannot quietly go stale as the register grows. */
+/* A small, honest picture of what the product does: the whole feed on the
+   left, most of it greyed out, and the handful that are yours picked out.
+   It makes the argument faster than the paragraph next to it can. */
+function joinVisual(counts){
+  const rows = [
+    { mine:false }, { mine:true, label:'Funding band changed' }, { mine:false },
+    { mine:false }, { mine:true, label:'Losing funding Sept 2026' }, { mine:false },
+    { mine:false }, { mine:true, label:'New version 2.0' }, { mine:false }, { mine:false }
+  ];
+
+  return '<div class="joinvis" aria-hidden="true">' +
+    '<div class="joinvishead"><span class="dot"></span>Your feed</div>' +
+    '<div class="joinvisrows">' +
+      rows.map(r => r.mine
+        ? '<div class="vrow on"><span class="vbar"></span><span class="vtxt">' + r.label + '</span></div>'
+        : '<div class="vrow"><span class="vbar"></span><span class="vtxt"></span></div>').join('') +
+    '</div>' +
+    '<div class="joinvisfoot">3 of ' + counts.changes + ' need you</div>' +
+  '</div>';
+}
+
+function siteCounts(){
+  let standards = 0, changes = 0, otj = 0;
+  try {
+    standards = (typeof STANDARDS !== 'undefined') ? STANDARDS.length : 0;
+    changes = (typeof allUpdates === 'function') ? allUpdates().length : 0;
+    otj = (typeof OTJ_SOURCE !== 'undefined' && OTJ_SOURCE.count) ? OTJ_SOURCE.count : 0;
+  } catch(e){}
+  return {
+    standards: standards ? standards.toLocaleString('en-GB') : 'every',
+    changes: changes || 'the',
+    otj: otj ? otj.toLocaleString('en-GB') : 'every'
+  };
 }
 
 function benefit(t, d){

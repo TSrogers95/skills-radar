@@ -465,7 +465,7 @@ function attentionItems(){
     if(!reg){
       out.push({ level:'warn', title:'L' + c.level + ' ' + c.name + ' is not matching the register',
         detail: unmatchedNote(c) + ' Until it matches, changes to it will not reach your feed or calendar.',
-        action:'Fix the name', view:'levy' });
+        action:'Fix the name', view:'cohort' });
       return;
     }
 
@@ -497,7 +497,7 @@ function attentionItems(){
       out.push({ level:'warn', title:'L' + c.level + ' ' + c.name + ' band is now ' + money(reg.funding),
         detail:'Your cohort is costed at ' + money(c.funding) + '. The band that applies is the one in force at each apprentice\'s start date, ' +
           'so you may be running the same standard at two prices. Check your MIS.',
-        action:'Update your figures', view:'levy' });
+        action:'Update your figures', view:'cohort' });
     }
   });
 
@@ -507,12 +507,12 @@ function attentionItems(){
     out.push({ level:'warn', title:'Budget around ' + money(Math.round(f.youCost)) + ' of co-investment this year',
       detail:'You draw down roughly ' + money(Math.round(f.annualDraw)) + ' against ' + money(Math.round(f.available)) +
         ' coming in. Government covers ' + money(Math.round(f.govCost)) + ' of the gap; the rest is yours.',
-      action:'Open the calculator', view:'levy' });
+      action:'Open the forecast', view:'forecast' });
   } else if(f.surplus > 1000){
     out.push({ level:'watch', title:money(Math.round(f.surplus)) + ' of levy may expire unused',
       detail:'New funds expire after twelve months rather than twenty-four, so an unspent balance is money lost rather than banked. ' +
         'Units, foundation apprenticeships and transfers are all ways to commit it.',
-      action:'Open the calculator', view:'levy' });
+      action:'Open the forecast', view:'forecast' });
   }
 
   const order = { stop:0, warn:1, watch:2 };
@@ -541,15 +541,15 @@ function setupSteps(){
     { done: COHORT.length > 0,
       title: 'Add the standards you deliver',
       why: 'Everything else follows from this. Your feed, your calendar and your compliance position are all filtered to these.',
-      action: 'Add standards', view: 'levy' },
+      action: 'Add standards', view: 'cohort' },
     { done: cohortHeads() > 0,
       title: 'Say how many apprentices are on each',
       why: 'Needed for the levy figures and for the completion picture. An estimate is fine — you can change it whenever.',
-      action: 'Add numbers', view: 'levy' },
+      action: 'Add numbers', view: 'cohort' },
     { done: SETTINGS.payroll > 0,
       title: 'Enter your annual pay bill',
       why: 'Sets what goes into your levy account, and whether you pay the levy at all. Nothing is shared and you can remove it later.',
-      action: 'Open the calculator', view: 'levy' },
+      action: 'Open the forecast', view: 'forecast' },
     { done: Object.keys(OTJ).length > 0,
       title: 'Record your off-the-job hours',
       why: 'The published minimum for each standard is already here. Add the hours you plan to deliver and it tells you where you stand.',
@@ -615,8 +615,7 @@ function dashView(){
     : '<div class="okbox">No deadlines in the next 90 days that touch your standards.</div>';
 
   return '<div class="pagehead"><h1>' + MEMBER.org + '</h1>' +
-    '<p>What needs doing, and what is coming. The wider picture of everything that has changed is on ' +
-    '<button class="linkbtn" data-go="feed">your feed</button>.</p></div>' +
+    '<p>What needs doing, what is coming, and what has changed — all on one page.</p></div>' +
 
     '<div class="mgrid">' +
       '<div class="mcard ' + (stops ? 'bad' : '') + '"><div class="n">' + attention.length + '</div>' +
@@ -636,7 +635,7 @@ function dashView(){
     '<div class="soonlist">' + soonHTML + '</div>' +
 
     '<div class="grouphead"><h2>Your standards</h2><div class="rule"></div>' +
-      '<button class="linkbtn" data-go="levy">Edit these</button></div>' +
+      '<button class="linkbtn" data-go="cohort">Edit these</button></div>' +
     '<table class="std" style="margin-top:12px"><thead><tr>' +
       '<th>Standard</th><th>Level</th><th>On programme</th><th>Band</th><th>Status</th>' +
     '</tr></thead><tbody>' +
@@ -654,10 +653,16 @@ function dashView(){
         '<td>' + (reg
           ? (reg.changed ? changeTagHTML(reg.changed, reg.status) : '<span class="chg none">' + reg.status + '</span>')
           : '<span class="chg yes">Check the name</span>') + '</td></tr>';
-    }).join('') + '</tbody></table>';
+    }).join('') + '</tbody></table>' +
+
+    /* The feed lives here rather than on its own page. Someone checking in
+       wants one screen: what to do, what is coming, what has changed. */
+    '<div class="grouphead" style="margin-top:38px"><h2>What has changed</h2><div class="rule"></div>' +
+      '<button class="linkbtn" data-go="cohort">Change what you follow</button></div>' +
+    feedBoardHTML();
 }
 
-function feedView(){
+function feedBoardHTML(){
   const feed = allUpdates().filter(isMine);
 
   const mine = feed.filter(isMyStandardOnly)
@@ -688,11 +693,11 @@ function feedView(){
       '<div class="colbody">' + body + '</div></section>';
   }
 
-  return '<div class="pagehead"><h1>My feed</h1>' +
-    '<p>Split in two. On the left, changes to the ' + COHORT.length + ' standards you deliver. On the right, the funding rule and levy changes that apply whatever you run. ' +
-    feed.length + ' items, down from ' + allUpdates().length + ' on the public feed.</p></div>' +
+  return '<p class="feedintro">' + feed.length + ' items, filtered from ' + allUpdates().length +
+      ' on the public feed. Changes to your standards on the left; the funding rules that apply whatever ' +
+      'you run on the right.</p>' +
     '<div class="kanban two">' +
-      col('My standards', 'Changes to the ' + COHORT.length + ' programmes you deliver.', mine, true, true) +
+      col('My standards', 'Changes to the ' + COHORT.length + ' programme' + (COHORT.length === 1 ? '' : 's') + ' you deliver.', mine, true, true) +
       col('General funding rules', 'Funding rules and levy changes that apply to everyone.', general, false, false) +
     '</div>';
 }
@@ -915,234 +920,97 @@ function wirePicker(id, onAdd){
   });
 }
 
-function levyView(){
-  const heads = cohortHeads();
-
-  const rows = COHORT.map((s, i) =>
-    '<tr>' +
-      '<td class="nm">' + s.name +
-        '<small>Level ' + s.level + ' &middot; ' + s.months + ' months &middot; band ' + money(s.funding) + '</small></td>' +
-      '<td class="num"><input class="cnt" type="number" min="0" max="999" data-i="' + i + '" value="' + s.count + '" aria-label="Apprentices on ' + s.name + '"></td>' +
-      '<td class="num" id="mo-' + i + '">–</td>' +
-      '<td class="num" id="yr-' + i + '">–</td>' +
-      '<td class="num"><button class="rm" data-i="' + i + '" title="Remove ' + s.name.replace(/"/g,'&quot;') + '" aria-label="Remove ' + s.name.replace(/"/g,'&quot;') + '">&times;</button></td>' +
-    '</tr>').join('');
-
-  return '<div class="pagehead"><h1>Levy calculator</h1>' +
-    '<p>Enter your pay bill and exactly how many apprentices sit on each standard. Everything recalculates as you type. ' +
-    'This is a budgeting tool — it forecasts what your existing and planned cohort will cost, and is not a basis for deciding who to recruit.</p></div>' +
-
-    '<section class="lsection">' +
-      '<div class="lhead"><h2>1. Your pay bill</h2>' +
-      '<p>The levy is 0.5% of your annual pay bill, less a £15,000 allowance, and is only due above £3m.</p></div>' +
-      '<div class="levyform">' +
-        '<div class="field"><label for="payroll">Annual pay bill</label>' +
-        '<input type="text" id="payroll" inputmode="numeric" value="' + SETTINGS.payroll.toLocaleString('en-GB') + '"></div>' +
-        '<div class="field"><label>Do you pay the levy?</label>' +
-          '<div class="opts" id="levytoggle">' +
-            '<label class="opt' + (SETTINGS.levyPayer ? ' sel' : '') + '"><input type="radio" name="lp" value="yes"' +
-              (SETTINGS.levyPayer ? ' checked' : '') + '> Yes</label>' +
-            '<label class="opt' + (!SETTINGS.levyPayer ? ' sel' : '') + '"><input type="radio" name="lp" value="no"' +
-              (!SETTINGS.levyPayer ? ' checked' : '') + '> No</label>' +
-          '</div></div>' +
-      '</div>' +
-      '<div id="fundsin"></div>' +
-    '</section>' +
-
-    '<section class="lsection">' +
-      '<div class="lhead"><h2>2. Your cohort</h2>' +
-      '<p>How many apprentices you have on each standard. Add or remove standards to model a different mix.</p></div>' +
-      '<table class="std cohort"><thead><tr>' +
-        '<th>Standard</th><th>On programme</th><th>Monthly draw</th><th>Annual draw</th><th></th>' +
-      '</tr></thead><tbody id="cohortrows">' +
-        (rows || '<tr><td colspan="5" class="cohortempty">No standards yet. Search below to add the ones you deliver.</td></tr>') +
-      '</tbody>' +
-      '<tfoot><tr><td class="nm"><b>Total</b></td>' +
-        '<td class="num" id="t-heads">–</td>' +
-        '<td class="num" id="t-mo">–</td>' +
-        '<td class="num" id="t-yr">–</td><td></td></tr></tfoot>' +
-      '</table>' +
-      pickerHTML('cohortpick') +
-    '</section>' +
-
-    '<section class="lsection">' +
-      '<div class="lhead"><h2>3. The age profile of your cohort</h2>' +
-      '<p>Government funds training differently by age, so this changes what a shortfall costs. Since 1 August 2026, if your balance ' +
-      'runs out, government funds 100% of training for apprentices aged 16 to 24 and 75% for those aged 25 and over. ' +
-      'Enter your actual position so the forecast is accurate.</p></div>' +
-      '<div class="sliderbox">' +
-        '<label for="young">Apprentices aged 16 to 24</label>' +
-        '<div class="sliderrow">' +
-          '<input type="range" id="young" min="0" max="' + heads + '" value="' + youngCount() + '">' +
-          '<output id="youngout"></output>' +
-        '</div>' +
-        '<div class="sliderends"><span>0</span><span id="youngmax"></span></div>' +
-      '</div>' +
-    '</section>' +
-
-    '<section class="lsection costs">' +
-      '<div class="lhead"><h2>Your annual costs</h2>' +
-      '<p>What this cohort means for your budget over a year.</p></div>' +
-      '<div id="levyout"></div>' +
-    '</section>' +
-
-    dasPanelHTML(false) +
-
-    '<div class="grouphead" style="margin-top:44px"><h2>Incentives and grants worth checking</h2><div class="rule"></div></div>' +
-    '<div class="readgrid" style="margin-top:16px">' +
-      INCENTIVES.map(i => '<div class="readcard">' +
-        (i.article
-          ? '<a href="a/' + i.article + '.html">' + i.name + '</a>'
-          : '<a href="' + i.url + '" target="_blank" rel="noopener">' + i.name + '</a>') +
-        '<p><b style="color:var(--text)">' + i.amount + '</b> — ' + i.who + '.</p>' +
-        '<p>' + i.detail + '</p>' +
-        (i.article
-          ? '<div class="cardlinks"><a href="a/' + i.article + '.html">Read the detail</a>' +
-            '<a href="' + i.url + '" target="_blank" rel="noopener">Official source</a></div>'
-          : '') +
-        '</div>').join('') +
-    '</div>';
-}
-
-function renderLevy(){
-  const payroll = parseFloat((document.getElementById('payroll').value || '0').replace(/[^\d.]/g,'')) || 0;
-  const heads = cohortHeads();
-
-  const slider = document.getElementById('young');
-  slider.max = heads;
-  if(+slider.value > heads) slider.value = heads;
-
-  SETTINGS.payroll = payroll;
-  SETTINGS.young = +slider.value;
-  saveSettings();
-  queueSave();
-
-  document.getElementById('youngmax').textContent = heads ? heads + ' (all of them)' : '0';
-
-  const f = levyFigures(SETTINGS.payroll, COHORT, SETTINGS.young, SETTINGS.levyPayer);
-
-  document.getElementById('youngout').textContent =
-    f.young + ' of ' + heads + (heads ? '  ·  ' + Math.round(f.pctYoung * 100) + '%' : '');
-
-  /* Funds in */
-  document.getElementById('fundsin').innerHTML =
-    '<table class="std levytable"><tbody>' +
-    '<tr><td class="nm">Levy at 0.5%</td><td class="num big">' + money(Math.round(f.gross)) + '</td>' +
-      '<td>' + (f.liable
-        ? 'Your pay bill is above the £3m threshold, so the levy is due'
-        : 'Below the £3m threshold, so no levy is due and you count as a non-levy employer') + '</td></tr>' +
-    '<tr><td class="nm">Less annual allowance</td><td class="num big">−' + money(LEVY_MODEL.allowance) + '</td>' +
-      '<td>Every employer gets this</td></tr>' +
-    '<tr class="totalrow"><td class="nm"><b>Funds available per year</b></td>' +
-      '<td class="num big">' + money(Math.round(f.available)) + '</td>' +
-      '<td>About ' + money(Math.round(f.monthlyIn)) + ' a month into your account. No 10% top-up is added from 1 August 2026, and new funds expire after 12 months.</td></tr>' +
-    '</tbody></table>';
-
-  /* Per standard */
-  f.lines.forEach((l, i) => {
-    const mo = document.getElementById('mo-' + i);
-    const yr = document.getElementById('yr-' + i);
-    if(mo) mo.textContent = l.count ? money(Math.round(l.monthlyAll)) : '—';
-    if(yr) yr.textContent = l.count ? money(Math.round(l.annual)) : '—';
-  });
-  document.getElementById('t-heads').textContent = heads;
-  document.getElementById('t-mo').textContent = money(Math.round(f.monthlyOut));
-  document.getElementById('t-yr').textContent = money(Math.round(f.annualDraw));
-
-  /* Annual costs */
-  const gap = f.shortfall > 0;
-
-  const summary =
-    '<table class="std levytable"><tbody>' +
-    '<tr><td class="nm">Coming in</td><td class="num big">' + money(Math.round(f.available)) + '</td>' +
-      '<td>Levy funds available to you this year</td></tr>' +
-    '<tr><td class="nm">Going out</td><td class="num big">' + money(Math.round(f.annualDraw)) + '</td>' +
-      '<td>' + heads + ' apprentice' + (heads === 1 ? '' : 's') + ' drawing down across ' +
-      f.lines.filter(l => l.count).length + ' standard' + (f.lines.filter(l => l.count).length === 1 ? '' : 's') + '</td></tr>' +
-    '<tr class="totalrow"><td class="nm"><b>' + (gap ? 'Shortfall' : 'Surplus') + '</b></td>' +
-      '<td class="num big ' + (gap ? 'neg' : 'pos') + '">' + (gap ? '−' : '+') + money(Math.round(gap ? f.shortfall : f.surplus)) + '</td>' +
-      '<td>' + (gap ? 'Training costs beyond what your levy covers' : 'Funds you will not use at the current rate') + '</td></tr>' +
-    '</tbody></table>';
-
-  let verdict;
-  if(gap){
-    verdict =
-      '<h3 class="csub">What the shortfall actually costs you</h3>' +
-      '<table class="std levytable"><tbody>' +
-      '<tr><td class="nm">' + f.young + ' aged 16 to 24</td>' +
-        '<td class="num big pos">' + money(Math.round(f.costYoung)) + '</td>' +
-        '<td>' + money(Math.round(f.shortYoung)) + ' of the shortfall sits with this group. Government funds 100% of training and assessment up to the band maximum, even with your balance exhausted.</td></tr>' +
-      '<tr><td class="nm">' + f.older + ' aged 25 and over</td>' +
-        '<td class="num big neg">' + money(Math.round(f.costOlder)) + '</td>' +
-        '<td>' + money(Math.round(f.shortOlder)) + ' of the shortfall, co-invested at ' + (f.rates.over25 * 100) + '%. Government funds the remaining ' + (100 - f.rates.over25 * 100) + '%.</td></tr>' +
-      '<tr class="totalrow"><td class="nm"><b>You pay</b></td>' +
-        '<td class="num big neg">' + money(Math.round(f.youCost)) + '</td>' +
-        '<td>Government covers ' + money(Math.round(f.govCost)) + ' of the shortfall.</td></tr>' +
-      '</tbody></table>' +
-      (f.older > 0
-        ? '<div class="lawbox"><b>A note on how to use this figure.</b> ' +
-          'The split above exists because government funds training differently by age, not because apprentices of different ages ' +
-          'are worth different amounts to your organisation. Age is a protected characteristic under the Equality Act 2010, and ' +
-          'selecting or rejecting candidates on the basis of age is unlawful. Use this to forecast your training budget and to ' +
-          'make the case for it internally — not to shape who you recruit. ' +
-          'If your co-investment cost is uncomfortable, the levers that are open to you are the price you negotiate with your provider, ' +
-          'the mix of standards you offer, the timing of starts across funding years, and the incentives below.</div>'
-        : '<div class="okbox">Every apprentice in this cohort is aged 16 to 24, so government funds the whole shortfall and it costs you nothing.</div>');
-  } else {
-    verdict =
-      '<h3 class="csub">What to do with the surplus</h3>' +
-      '<div class="okbox"><b>' + money(Math.round(f.surplus)) + ' a year is going unused.</b> ' +
-      'New funds expire after 12 months rather than 24, so this is money you lose rather than money you bank. ' +
-      'Apprenticeship units and foundation apprenticeships are both fundable, and you can transfer up to 50% of your annual funds ' +
-      'to another employer — the transfer allowance now covers units as well as full apprenticeships.</div>';
-  }
-
-  document.getElementById('levyout').innerHTML = summary + verdict +
-    '<div class="notice" style="margin-top:18px"><b>How the drawdown is worked out.</b> ' +
-    'For each apprentice, 80% of the price is paid to the provider in equal monthly instalments across the planned duration, ' +
-    'and 20% is held back until completion. Across a steady cohort those come to the funding band divided by the duration in months, ' +
-    'multiplied by twelve. It assumes every apprentice runs to completion at the band maximum, which is the worst case — ' +
-    'withdrawals and prices negotiated below the band will both reduce it. The shortfall is split between age groups in proportion to headcount. ' +
-    'Treat it as a planning estimate and check your Apprenticeship Service account for actual figures. ' +
-    LEVY_MODEL.note + '</div>';
-}
-
-function wireLevy(){
-  document.getElementById('payroll').addEventListener('input', renderLevy);
-  document.getElementById('young').addEventListener('input', renderLevy);
-
-  document.querySelectorAll('#levytoggle input').forEach(r =>
-    r.addEventListener('change', () => {
-      SETTINGS.levyPayer = r.value === 'yes';
-      saveSettings();
-      document.querySelectorAll('#levytoggle .opt').forEach(o =>
-        o.classList.toggle('sel', o.querySelector('input').checked));
-      renderLevy();
-    }));
-
-  document.querySelectorAll('#cohortrows .cnt').forEach(inp => {
-    inp.addEventListener('input', () => {
-      COHORT[+inp.dataset.i].count = Math.max(0, parseInt(inp.value, 10) || 0);
-      saveCohort();
-      queueSave();
-      renderLevy();
-    });
-  });
-
-  document.querySelectorAll('#cohortrows .rm').forEach(btn => {
-    btn.addEventListener('click', () => { removeStandard(+btn.dataset.i); render(); });
-  });
-
-  wirePicker('cohortpick', render);
-}
-
-/* Per-standard off-the-job figures the member enters. Kept alongside the
-   cohort so they survive tab switches; they belong in the database once
-   accounts are live. */
+/* Per-standard off-the-job figures the member enters. Kept with the rest of
+   the member's state rather than inside a view, which is where these were
+   before and why they disappeared with it. */
 let OTJ = {};
 try { OTJ = JSON.parse(sessionStorage.getItem('sr-otj') || '{}'); } catch(e){ OTJ = {}; }
 function saveOtj(){ try { sessionStorage.setItem('sr-otj', JSON.stringify(OTJ)); } catch(e){} }
 function otjFor(name){ return OTJ[name] || {}; }
+
+/* =========================================================================
+   MY COHORT
+
+   Choosing what you deliver used to sit inside the levy calculator, which
+   made it look like a costing exercise. It is the more fundamental thing:
+   it decides the feed, the calendar, the compliance position and the
+   forecast. So it gets its own tab, and the calculators read from it.
+   ========================================================================= */
+
+function cohortView(){
+  const heads = cohortHeads();
+  const defunded = COHORT.filter(c => { const r = findStandard(c); return r && /Defunded/i.test(r.status); });
+
+  const rows = COHORT.map((s, i) => {
+    const reg = findStandard(s);
+    const bad = reg && /Defunded/i.test(reg.status);
+    return '<tr class="' + (bad ? 'defunded' : '') + '">' +
+      '<td class="nm">' + (reg
+        ? '<a class="stdlink" href="' + standardURL(reg) + '" target="_blank" rel="noopener">' + reg.name + '</a>' +
+          '<small>' + (reg.code || 'code to confirm') + ' &middot; Level ' + s.level +
+          ' &middot; ' + (reg.months || s.months || 12) + ' months &middot; ' + money(reg.funding || s.funding) + '</small>'
+        : s.name + '<small>' + unmatchedNote(s) + '</small>') + '</td>' +
+      '<td class="num"><input class="cnt" type="number" min="0" data-i="' + i + '" value="' + (s.count || 0) + '"></td>' +
+      '<td>' + (reg
+        ? (reg.changed ? changeTagHTML(reg.changed, reg.status) : '<span class="chg none">' + reg.status + '</span>')
+        : '<span class="chg yes">Check the name</span>') + '</td>' +
+      '<td class="num"><button class="rm" data-i="' + i + '" aria-label="Remove ' + s.name.replace(/"/g,'&quot;') + '">&times;</button></td>' +
+    '</tr>';
+  }).join('');
+
+  return '<div class="pagehead"><h1>My cohort</h1>' +
+    '<p>The standards you deliver, and how many apprentices are on each. Everything else on this site follows ' +
+    'from this list — your feed, your calendar, your compliance position and your forecast.</p></div>' +
+
+    (COHORT.length
+      ? '<div class="mgrid">' +
+          '<div class="mcard cool"><div class="n">' + COHORT.length + '</div><div class="l">Standards</div></div>' +
+          '<div class="mcard"><div class="n">' + heads + '</div><div class="l">Apprentices</div></div>' +
+          '<div class="mcard ' + (defunded.length ? 'bad' : '') + '"><div class="n">' + defunded.length +
+            '</div><div class="l">Losing funding</div></div>' +
+          '<div class="mcard warm"><div class="n">' + allUpdates().filter(isMyStandardOnly).length +
+            '</div><div class="l">Changes to them</div></div>' +
+        '</div>'
+      : '') +
+
+    (defunded.length
+      ? '<div class="alert"><b>' + defunded.length + ' of these lose funding on 1 September 2026.</b> ' +
+        defunded.map(d => 'Level ' + d.level + ' ' + d.name).join(', ') + '. ' +
+        'Apprentices already on programme stay funded to completion; you cannot start anyone new after that date.</div>'
+      : '') +
+
+    '<div class="grouphead"><h2>What you deliver</h2><div class="rule"></div></div>' +
+    '<table class="std cohort"><thead><tr>' +
+      '<th>Standard</th><th>Apprentices</th><th>Status</th><th></th>' +
+    '</tr></thead><tbody id="cohortrows">' +
+      (rows || '<tr><td colspan="4" class="cohortempty">Nothing added yet. Search below to add the standards you deliver.</td></tr>') +
+    '</tbody></table>' +
+
+    '<div class="addpanel">' +
+      pickerHTML('cohortpick') +
+      '<p class="hint" style="margin:12px 0 0">Search by name, by reference number, or by what people call the job — ' +
+      'try &ldquo;business admin&rdquo;, &ldquo;ST0070&rdquo; or &ldquo;welder&rdquo;. Added as soon as you pick one.</p>' +
+    '</div>' +
+
+    '<div class="notice" style="margin-top:22px"><b>An estimate is fine.</b> ' +
+    'The numbers drive your forecast and your completion picture, not anything official. Change them whenever ' +
+    'the cohort changes — nothing is locked.</div>' +
+
+    dasPanelHTML(true);
+}
+
+function wireCohort(panel){
+  panel.querySelectorAll('#cohortrows .cnt').forEach(inp => {
+    inp.addEventListener('input', () => {
+      COHORT[+inp.dataset.i].count = Math.max(0, parseInt(inp.value, 10) || 0);
+      saveCohort(); queueSave(); refreshBar();
+    });
+  });
+  panel.querySelectorAll('#cohortrows .rm').forEach(btn => {
+    btn.addEventListener('click', () => { removeStandard(+btn.dataset.i); render(); });
+  });
+  wirePicker('cohortpick', render);
+}
 
 function otjView(){
   const rows = COHORT.filter(c => c.count > 0).map((c, i) => {
@@ -1284,7 +1152,7 @@ function dasPanelHTML(compact){
     return '<div class="dasmini">' +
       '<div><b>Connect your Apprenticeship Service account</b>' +
       '<span>Replace the figures you maintain by hand with live data from DAS.</span></div>' +
-      '<button class="btn small" data-go="levy" id="dasmini-go">Find out more</button>' +
+      '<button class="btn small" data-go="forecast" id="dasmini-go">Find out more</button>' +
     '</div>';
   }
 
@@ -1587,15 +1455,40 @@ function forecastView(){
           '<td class="num"><button class="rm" data-plan="' + n + '" aria-label="Remove">&times;</button></td></tr>').join('')
     : '<tr><td colspan="6" class="cohortempty">Nothing planned yet. Add a cohort below to see what it does to the forecast.</td></tr>';
 
+  const now = levyFigures(SETTINGS.payroll, COHORT, youngCount(), SETTINGS.levyPayer);
+
   return '<div class="pagehead"><h1>Levy forecast</h1>' +
-    '<p>Month by month, from figures you enter. Add cohorts you are thinking about and watch what happens to the balance, ' +
-    'the point co-investment starts, and how much expires unused.</p></div>' +
+    '<p>Where you are now, and where the next ' + i.horizon + ' months take you. ' +
+    'Add cohorts you are thinking about to see what they would cost before you commit.</p></div>' +
+
+    (COHORT.length
+      ? '<div class="grouphead" style="margin-top:0"><h2>Your position today</h2><div class="rule"></div>' +
+          '<button class="linkbtn" data-go="cohort">Change your cohort</button></div>' +
+        '<div class="mgrid">' +
+          '<div class="mcard"><div class="n">' + money(Math.round(now.available)) + '</div><div class="l">Levy available this year</div></div>' +
+          '<div class="mcard warm"><div class="n">' + money(Math.round(now.annualDraw)) + '</div><div class="l">Drawn by your cohort</div></div>' +
+          '<div class="mcard ' + (now.youCost > 0 ? 'bad' : 'cool') + '"><div class="n">' +
+            money(Math.round(now.youCost)) + '</div><div class="l">Your co-investment</div></div>' +
+          '<div class="mcard"><div class="n">' + cohortHeads() + '</div><div class="l">Apprentices</div></div>' +
+        '</div>'
+      : '<div class="alert"><b>No cohort yet.</b> ' +
+        'The forecast runs on the standards you deliver. ' +
+        '<button class="linkbtn" data-go="cohort">Add them first</button>, then come back.</div>') +
 
     '<section class="lsection">' +
       '<div class="lhead"><h2>1. What goes in</h2>' +
       '<p>Use your average monthly contribution rather than last year\'s total. The DfE prototype forecasts from what was ' +
       'paid in the previous twelve months, which is why it drifts when a pay bill changes.</p></div>' +
       '<div class="levyform">' +
+        '<div class="field"><label for="f-payroll">Annual pay bill</label>' +
+        '<input type="text" id="f-payroll" inputmode="numeric" value="' + (SETTINGS.payroll || 0).toLocaleString('en-GB') + '"></div>' +
+        '<div class="field"><label>Do you pay the levy?</label>' +
+          '<div class="opts" id="f-levytoggle">' +
+            '<label class="opt' + (SETTINGS.levyPayer ? ' sel' : '') + '"><input type="radio" name="flp" value="yes"' +
+              (SETTINGS.levyPayer ? ' checked' : '') + '> Yes</label>' +
+            '<label class="opt' + (!SETTINGS.levyPayer ? ' sel' : '') + '"><input type="radio" name="flp" value="no"' +
+              (!SETTINGS.levyPayer ? ' checked' : '') + '> No</label>' +
+          '</div></div>' +
         '<div class="field"><label for="f-in">Average monthly levy contribution</label>' +
         '<input type="text" id="f-in" inputmode="numeric" value="' + i.monthlyIn.toLocaleString('en-GB') + '"></div>' +
         '<div class="field"><label for="f-open">Balance in your account today</label>' +
@@ -1801,6 +1694,28 @@ function downloadForecast(f){
 }
 
 function wireForecast(panel){
+  const payroll = document.getElementById('f-payroll');
+  if(payroll) payroll.addEventListener('input', () => {
+    SETTINGS.payroll = parseFloat((payroll.value || '0').replace(/[^\d.]/g,'')) || 0;
+    MEMBER.payroll = SETTINGS.payroll;
+    saveSettings(); queueSave();
+    // the levy in follows the pay bill unless they have overridden it
+    if(SETTINGS.monthlyIn == null){
+      const el = document.getElementById('f-in');
+      if(el) el.value = forecastInputs().monthlyIn.toLocaleString('en-GB');
+    }
+    renderForecast();
+  });
+
+  document.querySelectorAll('#f-levytoggle input').forEach(r =>
+    r.addEventListener('change', () => {
+      SETTINGS.levyPayer = r.value === 'yes';
+      saveSettings(); queueSave();
+      document.querySelectorAll('#f-levytoggle .opt').forEach(o =>
+        o.classList.toggle('sel', o.querySelector('input').checked));
+      renderForecast();
+    }));
+
   ['f-in','f-open'].forEach(id => {
     const el = document.getElementById(id);
     if(el) el.addEventListener('input', () => {
@@ -2248,20 +2163,29 @@ function monthGrid(year, month, byDate){
 
 let view = 'dash';
 
+/* Switching tab from a button anywhere in a view. */
+function goTo(to){
+  document.querySelectorAll('#mtabs button').forEach(x => x.classList.toggle('active', x.dataset.view === to));
+  view = to;
+  render();
+}
+
 function render(){
   const panel = document.getElementById('mpanel');
   if(view === 'dash'){
     panel.innerHTML = dashView();
     panel.querySelectorAll('[data-go]').forEach(b =>
-      b.addEventListener('click', () => {
-        const to = b.dataset.go;
-        document.querySelectorAll('#mtabs button').forEach(x => x.classList.toggle('active', x.dataset.view === to));
-        view = to;
-        render();
-      }));
+      b.addEventListener('click', () => goTo(b.dataset.go)));
   }
-  if(view === 'feed')  panel.innerHTML = feedView();
   if(view === 'cal'){  panel.innerHTML = calView(); buildCalendar(); wireEvents(); }
+  if(view === 'cohort'){
+    panel.innerHTML = cohortView();
+    wireCohort(panel);
+    wireDas(panel);
+    panel.querySelectorAll('[data-go]').forEach(b =>
+      b.addEventListener('click', () => goTo(b.dataset.go)));
+  }
+
   if(view === 'otj'){
     panel.innerHTML = otjView();
     wireOtj(panel);
@@ -2271,14 +2195,11 @@ function render(){
     panel.innerHTML = forecastView();
     renderForecast();
     wireForecast(panel);
+    panel.querySelectorAll('[data-go]').forEach(b =>
+      b.addEventListener('click', () => goTo(b.dataset.go)));
   }
 
-  if(view === 'levy'){
-    panel.innerHTML = levyView();
-    renderLevy();
-    wireLevy();
-    wireDas(panel);
-  }
+
   if(view === 'report'){
     panel.innerHTML = reportView();
     const b = document.getElementById('printit');
