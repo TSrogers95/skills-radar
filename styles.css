@@ -3498,3 +3498,15 @@ main:focus{ outline:none; }
   .demoact h2{ font-size:22px; }
   .demobtns .ctabtn, .demobtns .btn.ghost{ width:100%; text-align:center; }
 }
+
+/* ---------- Repairing an unmatched cohort entry ---------- */
+
+small.nomatch{ display:block; color:var(--high); font-size:11.5px; margin-top:3px; }
+.fixrow{ display:flex; gap:6px; flex-wrap:wrap; margin-top:7px; }
+.fixbtn{
+  font-family:var(--sans); font-size:12px; cursor:pointer;
+  background:var(--paper); border:1px solid var(--line-strong);
+  color:var(--text); padding:5px 10px; border-radius:2px;
+}
+.fixbtn:hover{ background:var(--ink); color:#fff; border-color:var(--ink); }
+.noband{ color:var(--text-3); font-style:italic; }

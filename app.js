@@ -289,11 +289,22 @@ function standardURL(s){
 
 /* The full feed: hand-written policy updates plus every recorded register
    change, with the curated version winning if both cover the same standard. */
-function allUpdates(){
+/* Everything, including changes too old for the feed. The standards page
+   and search use this so an older change is still findable. */
+function allUpdatesUnfiltered(){
   const curated = UPDATES.slice();
   const seen = new Set(curated.map(u => (u.standard || '').split(',')[0].trim()).filter(Boolean));
   const derived = deriveUpdates().filter(d => !seen.has(d.standard.split(',')[0].trim()));
   return curated.concat(derived);
+}
+
+/* What the feed shows: changes still current, and anything still ahead. */
+function allUpdates(){
+  return allUpdatesUnfiltered().filter(u => {
+    if(u.pinned) return true;             // hand-pinned stays regardless
+    if(isFuture(u.date)) return true;     // upcoming, until the date passes
+    return stillRecent(u.date, u.urgency);
+  });
 }
 
 /* =========================================================================
@@ -371,6 +382,26 @@ function articleFor(s, defunded, dev){
       '. Check the names in defunded.js against the register — they may have been renamed.');
   }
 })();
+
+/* =========================================================================
+   HOW LONG A CHANGE STAYS IN THE FEED
+
+   A change was previously "recent" forever, so the feed only ever grew.
+
+   Now: six months for an ordinary change, eighteen for a high-urgency one —
+   a defunding is still worth seeing eleven months later, a version bump is
+   not. Anything dated in the future is "upcoming" and stays there until the
+   date passes, at which point it becomes recent on its own.
+   ========================================================================= */
+
+const RECENT_DAYS = 183;          // six months
+const RECENT_DAYS_IMPORTANT = 548; // eighteen, for high urgency
+
+function stillRecent(date, urgency){
+  const age = daysAgo(date);
+  if(age < 0) return true;         // not yet happened; handled as upcoming
+  return age <= (urgency === 'high' ? RECENT_DAYS_IMPORTANT : RECENT_DAYS);
+}
 
 /* =========================================================================
    WHAT CHANGED — a two or three word label
@@ -884,7 +915,39 @@ function findStandard(entry){
   const within = STANDARDS.filter(s => norm(s.name).includes(n) && s.level === entry.level);
   if(within.length === 1) return within[0];
 
+  /* 5. The other direction. A cohort saved before a register import can hold
+        a name the register has since changed — usually by adding or dropping
+        a bracketed qualifier, as in "Project Manager (integrated degree)".
+        Compare with those stripped from both sides. */
+  const bare = s => norm(String(s).replace(/\s*\([^)]*\)\s*/g, ' '));
+  const nb = bare(name);
+  if(nb && nb !== n){
+    const loose = STANDARDS.filter(s => bare(s.name) === nb);
+    if(loose.length === 1) return loose[0];
+    const atLevel = loose.filter(s => s.level === entry.level);
+    if(atLevel.length === 1) return atLevel[0];
+  }
+
   return null;
+}
+
+/* The closest register entries to an unmatched cohort name, best first, so
+   a member can correct it rather than being told it is wrong. */
+function suggestStandards(entry, limit){
+  if(typeof STANDARDS === 'undefined') return [];
+  const q = String(entry.name || '');
+  if(!q) return [];
+
+  return STANDARDS
+    .map(s => {
+      let score = scoreMatch(q, { name: s.name, code: s.code, extra: '' });
+      if(entry.level && s.level === entry.level) score += 120;
+      return { s: s, score: score };
+    })
+    .filter(x => x.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, limit || 3)
+    .map(x => x.s);
 }
 
 /* What to show when a cohort entry cannot be matched. */

@@ -119,6 +119,20 @@ function refreshBar(){
 
 let ACCOUNT = null;
 
+/* If the register file is missing or broken, every lookup fails and the page
+   looks as though the member's cohort is wrong. Say what has actually
+   happened instead. */
+function registerHealth(){
+  if(typeof STANDARDS === 'undefined' || !Array.isArray(STANDARDS) || STANDARDS.length === 0){
+    return { ok: false, why: 'standards.js did not load, or contains no standards.' };
+  }
+  if(STANDARDS.length < 50){
+    return { ok: false, why: 'standards.js loaded but holds only ' + STANDARDS.length +
+      ' standards, which suggests the last import wrote a partial file.' };
+  }
+  return { ok: true, count: STANDARDS.length };
+}
+
 async function checkAccess(){
   if(!accountsLive()){
     document.body.innerHTML =
@@ -966,6 +980,22 @@ function otjFor(name){ return OTJ[name] || {}; }
    typing a new number changed the table and left the totals above it
    showing the old figures. They are generated separately now and redrawn
    on every keystroke — in place, so focus stays in the box being typed in. */
+/* A cohort entry that no longer matches the register — usually because an
+   import renamed the standard. Rather than a dead end, offer the closest
+   entries and repair it in one click. */
+function fixHTML(entry, i){
+  const near = typeof suggestStandards === 'function' ? suggestStandards(entry, 3) : [];
+  if(!near.length){
+    return '<small class="nomatch">Not on the register under this name. ' +
+      'Remove it and search for it again.</small>';
+  }
+  return '<small class="nomatch">Not matching the register &mdash; the name may have changed.</small>' +
+    '<div class="fixrow">' +
+      near.map(s => '<button class="fixbtn" data-fix="' + i + '" data-to="' + s.name.replace(/"/g,'&quot;') + '">' +
+        'L' + s.level + ' ' + s.name + '</button>').join('') +
+    '</div>';
+}
+
 function cohortStatsHTML(){
   if(!COHORT.length) return '';
   const defunded = COHORT.filter(c => { const r = findStandard(c); return r && /Defunded/i.test(r.status); });
@@ -1000,7 +1030,13 @@ function cohortView(){
     '</tr>';
   }).join('');
 
+  const health = registerHealth();
+
   return '<div class="pagehead"><h1>My cohort</h1>' +
+    (health.ok ? '' :
+      '<div class="alert" style="margin-top:14px"><b>The standards register is not loading properly.</b> ' +
+      health.why + ' Until that is fixed every standard below will show as unmatched, and the feed will be ' +
+      'nearly empty. Check <code>standards.js</code> is in your repo and that the last deployment was green.</div>') +
     '<p>The standards you deliver, and how many apprentices are on each. Everything else on this site follows ' +
     'from this list — your feed, your calendar, your compliance position and your forecast.</p></div>' +
 
@@ -1044,6 +1080,17 @@ function wireCohort(panel){
   });
   panel.querySelectorAll('#cohortrows .rm').forEach(btn => {
     btn.addEventListener('click', () => { removeStandard(+btn.dataset.i); render(); });
+  });
+
+  panel.querySelectorAll('#cohortrows .fixbtn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const c = COHORT[+btn.dataset.fix];
+      const s = STANDARDS.find(x => x.name === btn.dataset.to);
+      if(!c || !s) return;
+      c.name = s.name; c.code = s.code; c.level = s.level;
+      c.funding = s.funding; c.months = s.months;
+      saveCohort(); queueSave(); render();
+    });
   });
   wirePicker('cohortpick', render);
 }
