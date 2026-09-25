@@ -33,7 +33,7 @@ function load(){
     'var window={addEventListener:function(){},location:{}};var location={hash:"",search:""};' +
     'var navigator={};var sessionStorage={getItem:function(){return null},setItem:function(){},removeItem:function(){}};';
   return new Function(stub + src + '; return {allArticles:allArticles, ROUTES:ROUTES, STANDARDS:STANDARDS, ' +
-    'READING:(typeof READING!=="undefined"?READING:[]), fmtLong:fmtLong, money:money, ' +
+    'READING:(typeof READING!=="undefined"?READING:[]), fmtLong:fmtLong, money:money, band:band, ' +
     'tagClass:tagClass, urgencyTag:urgencyTag, iconHTML:iconHTML, standardURL:standardURL, ' +
     'otjMinimum:(typeof otjMinimum==="function"?otjMinimum:null), ' +
     'pathwaysFor:(typeof pathwaysFor==="function"?pathwaysFor:null), ' +
@@ -224,7 +224,7 @@ function factBox(s, api){
   const facts = [
     ['Level', s.level],
     ['Duration', s.months ? s.months + ' months' : 'delivered as a unit'],
-    ['Maximum funding', api.money(s.funding)],
+    ['Maximum funding', api.band(s.funding)],
     ['Reference', s.code || 'not confirmed'],
     ['Version', s.version],
     ['Status', s.status],
@@ -313,6 +313,7 @@ function robots(){
 Allow: /
 Disallow: /admin.html
 Disallow: /account.html
+Disallow: /demo.html
 
 Sitemap: ${SITE}/sitemap.xml
 `;

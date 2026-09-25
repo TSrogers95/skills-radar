@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skills Radar — a walk through</title>
+<meta name="description" content="A short walk through Skills Radar.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a class="skiplink" href="#main">Skip to content</a>
+
+<div class="masthead">
+  <div class="wrap"><div id="heroblock"></div></div>
+</div>
+
+<div class="stickybar">
+  <div class="wrap inner">
+    <a class="mini" href="index.html">Skills <em>Radar</em></a>
+    <div id="navslot"></div>
+  </div>
+</div>
+
+<main id="main" tabindex="-1">
+<div class="wrap">
+
+  <div class="pagehead centred">
+    <h1>A walk through Skills Radar</h1>
+    <p>Five minutes on what it tracks, how the feed narrows to your provision,
+    and what the levy forecast does with your own numbers.</p>
+  </div>
+
+  <div class="videowrap" id="video"></div>
+
+  <section class="demopoints">
+    <div class="demopoint">
+      <h3>The feed</h3>
+      <p>Every change to funding rules, standards and T-Levels, with what changed,
+      what it changed from, and what follows. Free to read without an account.</p>
+    </div>
+    <div class="demopoint">
+      <h3>Your cohort</h3>
+      <p>Choose the standards you deliver. The feed, the calendar and the compliance
+      position all narrow to those, and nothing else.</p>
+    </div>
+    <div class="demopoint">
+      <h3>Levy forecasting</h3>
+      <p>Month by month on your own pay bill. It names the month co-investment starts,
+      shows what expires unused, and prices cohorts you are only considering.</p>
+    </div>
+  </section>
+
+  <div class="demoact">
+    <h2>Try it yourself</h2>
+    <p>The feed, the standards register and every article are free to read.
+    A membership adds the personalised feed, the monthly newsletter and the levy forecast.</p>
+    <div class="demobtns">
+      <a class="ctabtn" href="account.html?join=1">Create an account</a>
+      <a class="btn ghost" href="index.html">Look round first</a>
+    </div>
+    <p class="demofoot" id="demoprice"></p>
+  </div>
+
+</div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>This page is not linked from the site and is excluded from search engines.
+    Share the address with anyone you would like to show it to.</p>
+    <p class="legal"><a href="privacy.html">Privacy notice</a> &middot;
+      <a href="terms.html">Terms</a> &middot;
+      <a href="account.html">Members</a></p>
+    <div class="attribution">
+      <a href="https://www.gov.uk/government/organisations/skills-england" target="_blank" rel="noopener" class="selogo"><img src="https://occupational-maps.skillsengland.education.gov.uk/media/cyropis5/skills-england_lesser_arms_landscape-se-logo-white.svg" alt="Skills England" width="150" height="40" loading="lazy"></a>
+      <p>Contains data from Skills England. &copy; Skills England 2026. This information is licensed under the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3" target="_blank" rel="noopener">Open Government Licence v3.0</a>.</p>
+    </div>
+  </div>
+</footer>
+
+<script src="config.js"></script>
+<script src="standards.js"></script>
+<script src="defunded.js"></script>
+<script src="otj-minimums.js"></script>
+<script src="occupations.js" onerror="void 0"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script src="ui.js"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script>
+
+document.getElementById('heroblock').innerHTML = titleBlockHTML('');
+document.getElementById('navslot').innerHTML = navHTML('');
+
+/* =========================================================================
+   THE VIDEO
+
+   Two ways to supply it, set in config.js under DEMO.
+
+   Hosted (recommended): put the video on YouTube as Unlisted, or on Vimeo,
+   and set DEMO.youtube or DEMO.vimeo to its id. The player streams, adapts
+   quality on a phone, and costs you no bandwidth.
+
+   Local file: drop the mp4 in your repo and set DEMO.file to its name. It
+   works, but a 60MB file is served in full to every viewer, and Vercel's
+   free tier allows 100GB a month — about 1,700 views. Fine for a handful of
+   demos, not for a link you share widely.
+   ========================================================================= */
+
+const D = (typeof DEMO !== 'undefined') ? DEMO : {};
+const box = document.getElementById('video');
+
+if(D.youtube){
+  box.innerHTML = '<div class="ratio"><iframe src="https://www.youtube-nocookie.com/embed/' + D.youtube +
+    '?rel=0&modestbranding=1" title="Skills Radar walkthrough" frameborder="0" ' +
+    'allow="accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture" ' +
+    'allowfullscreen loading="lazy"></iframe></div>';
+}
+else if(D.vimeo){
+  box.innerHTML = '<div class="ratio"><iframe src="https://player.vimeo.com/video/' + D.vimeo +
+    '" title="Skills Radar walkthrough" frameborder="0" allow="fullscreen; picture-in-picture" ' +
+    'allowfullscreen loading="lazy"></iframe></div>';
+}
+else if(D.file){
+  box.innerHTML = '<video controls preload="metadata" playsinline' +
+    (D.poster ? ' poster="' + D.poster + '"' : '') + '>' +
+    '<source src="' + D.file + '" type="video/mp4">' +
+    'Your browser cannot play this video. ' +
+    '<a href="' + D.file + '">Download it instead</a>.' +
+  '</video>';
+}
+else {
+  box.innerHTML = '<div class="notice" style="margin:0"><b>No video set yet.</b> ' +
+    'Open <code>config.js</code> and fill in the <code>DEMO</code> block — either a YouTube id ' +
+    '(upload as Unlisted), a Vimeo id, or the filename of an mp4 in your repo. ' +
+    'The rest of this page works either way.</div>';
+}
+
+const price = document.getElementById('demoprice');
+if(price && typeof MEMBERSHIP !== 'undefined'){
+  price.textContent = MEMBERSHIP.price + ' ' + MEMBERSHIP.period + '. Cancel any time from your own account page.';
+}
+
+</script>
+</body>
+</html>

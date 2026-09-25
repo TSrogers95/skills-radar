@@ -267,17 +267,40 @@ function myStandardNames(){
 }
 
 function isMine(item){
-  const mine = myStandardNames();
-  const hay = ((item.standard || '') + ' ' + item.title).toLowerCase();
-  if(mine.some(n => hay.includes(n))) return true;
+  if(isMyStandardOnly(item)) return true;
   // funding rule and levy changes apply to everyone
   return item.category === 'funding-rules' || item.category === 'levy';
 }
 
+/* Exact match on the standard, not a substring of the title.
+
+   The old test asked whether the item's title contained a cohort name
+   anywhere, so someone following "Engineering Technician" was shown
+   "Space Engineering Technician" and "Aerospace Engineering Technician" —
+   different standards that happen to end with the same words. */
 function isMyStandardOnly(item){
-  const mine = myStandardNames();
-  const hay = ((item.standard || '') + ' ' + item.title).toLowerCase();
-  return mine.some(n => hay.includes(n));
+  if(!item.standard) return false;
+
+  const norm = s => String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+
+  /* The feed records a standard as "Operations Manager, Level 5", so compare
+     the name and the level separately rather than the whole string. */
+  const bits = String(item.standard).split(/,\s*Level\s*/i);
+  const itemName = norm(bits[0]);
+  const itemLevel = bits[1] ? parseInt(bits[1], 10) : null;
+
+  return COHORT.some(c => {
+    const reg = findStandard(c);
+    const names = [norm(c.name)];
+    if(reg) names.push(norm(reg.name));
+
+    if(names.indexOf(itemName) === -1) return false;
+    // same name at a different level is a different standard
+    if(itemLevel != null && c.level && itemLevel !== c.level){
+      if(!reg || reg.level !== itemLevel) return false;
+    }
+    return true;
+  });
 }
 
 /* =========================================================================
@@ -505,12 +528,12 @@ function attentionItems(){
   // Money
   const f = levyFigures(SETTINGS.payroll, COHORT, youngCount(), SETTINGS.levyPayer);
   if(f.shortfall > 0 && f.youCost > 0){
-    out.push({ level:'warn', title:'Budget around ' + money(Math.round(f.youCost)) + ' of co-investment this year',
-      detail:'You draw down roughly ' + money(Math.round(f.annualDraw)) + ' against ' + money(Math.round(f.available)) +
-        ' coming in. Government covers ' + money(Math.round(f.govCost)) + ' of the gap; the rest is yours.',
+    out.push({ level:'warn', title:'Budget around ' + money0(Math.round(f.youCost)) + ' of co-investment this year',
+      detail:'You draw down roughly ' + money0(Math.round(f.annualDraw)) + ' against ' + money0(Math.round(f.available)) +
+        ' coming in. Government covers ' + money0(Math.round(f.govCost)) + ' of the gap; the rest is yours.',
       action:'Open the forecast', view:'forecast' });
   } else if(f.surplus > 1000){
-    out.push({ level:'watch', title:money(Math.round(f.surplus)) + ' of levy may expire unused',
+    out.push({ level:'watch', title:money0(Math.round(f.surplus)) + ' of levy may expire unused',
       detail:'New funds expire after twelve months rather than twenty-four, so an unspent balance is money lost rather than banked. ' +
         'Units, foundation apprenticeships and transfers are all ways to commit it.',
       action:'Open the forecast', view:'forecast' });
@@ -655,7 +678,7 @@ function dashView(){
           : s.name + '<small>' + unmatchedNote(s) + '</small>') + '</td>' +
         '<td class="num">Level ' + s.level + '</td>' +
         '<td class="num">' + s.count + '</td>' +
-        '<td class="num">' + money((reg && reg.funding) || s.funding) + '</td>' +
+        '<td class="num">' + band((reg && reg.funding) || s.funding) + '</td>' +
         '<td>' + (reg
           ? (reg.changed ? changeTagHTML(reg.changed, reg.status) : '<span class="chg none">' + reg.status + '</span>')
           : '<span class="chg yes">Check the name</span>') + '</td></tr>';
@@ -1255,14 +1278,14 @@ function reportView(){
       '<section class="repsec">' +
         '<h2>Funding position</h2>' +
         '<table class="reptable"><tbody>' +
-          '<tr><td>Annual pay bill</td><td class="r">' + money(SETTINGS.payroll) + '</td></tr>' +
-          '<tr><td>Levy funds available this year</td><td class="r">' + money(Math.round(f.available)) + '</td></tr>' +
-          '<tr><td>Drawn down against current cohort</td><td class="r">' + money(Math.round(f.annualDraw)) + '</td></tr>' +
+          '<tr><td>Annual pay bill</td><td class="r">' + money0(SETTINGS.payroll) + '</td></tr>' +
+          '<tr><td>Levy funds available this year</td><td class="r">' + money0(Math.round(f.available)) + '</td></tr>' +
+          '<tr><td>Drawn down against current cohort</td><td class="r">' + money0(Math.round(f.annualDraw)) + '</td></tr>' +
           (f.shortfall > 0
-            ? '<tr class="rtotal"><td>Shortfall beyond the levy</td><td class="r neg">' + money(Math.round(f.shortfall)) + '</td></tr>' +
-              '<tr><td>Of which government funds</td><td class="r">' + money(Math.round(f.govCost)) + '</td></tr>' +
-              '<tr class="rtotal"><td><b>Employer co-investment to budget</b></td><td class="r neg"><b>' + money(Math.round(f.youCost)) + '</b></td></tr>'
-            : '<tr class="rtotal"><td><b>Unused levy at current rate</b></td><td class="r"><b>' + money(Math.round(f.surplus)) + '</b></td></tr>' +
+            ? '<tr class="rtotal"><td>Shortfall beyond the levy</td><td class="r neg">' + money0(Math.round(f.shortfall)) + '</td></tr>' +
+              '<tr><td>Of which government funds</td><td class="r">' + money0(Math.round(f.govCost)) + '</td></tr>' +
+              '<tr class="rtotal"><td><b>Employer co-investment to budget</b></td><td class="r neg"><b>' + money0(Math.round(f.youCost)) + '</b></td></tr>'
+            : '<tr class="rtotal"><td><b>Unused levy at current rate</b></td><td class="r"><b>' + money0(Math.round(f.surplus)) + '</b></td></tr>' +
               '<tr><td colspan="2" class="note">New funds expire after twelve months, so an unused balance is lost rather than carried.</td></tr>') +
         '</tbody></table>' +
         '<p class="repnote">Figures are an estimate based on the funding band maximum for each standard and a steady cohort. ' +
@@ -1459,10 +1482,10 @@ function runForecast(){
 function positionStatsHTML(){
   const f = levyFigures(SETTINGS.payroll, COHORT, youngCount(), SETTINGS.levyPayer);
   return '<div class="mgrid">' +
-    '<div class="mcard"><div class="n">' + money(Math.round(f.available)) + '</div><div class="l">Levy available this year</div></div>' +
-    '<div class="mcard warm"><div class="n">' + money(Math.round(f.annualDraw)) + '</div><div class="l">Drawn by your cohort</div></div>' +
+    '<div class="mcard"><div class="n">' + money0(Math.round(f.available)) + '</div><div class="l">Levy available this year</div></div>' +
+    '<div class="mcard warm"><div class="n">' + money0(Math.round(f.annualDraw)) + '</div><div class="l">Drawn by your cohort</div></div>' +
     '<div class="mcard ' + (f.youCost > 0 ? 'bad' : 'cool') + '"><div class="n">' +
-      money(Math.round(f.youCost)) + '</div><div class="l">Your co-investment</div></div>' +
+      money0(Math.round(f.youCost)) + '</div><div class="l">Your co-investment</div></div>' +
     '<div class="mcard"><div class="n">' + cohortHeads() + '</div><div class="l">Apprentices</div></div>' +
   '</div>';
 }
@@ -1478,7 +1501,7 @@ function forecastView(){
           '<td class="num">' + p.count + '</td>' +
           '<td class="num">' + monthName(p.startMonth) + '</td>' +
           '<td class="num">' + (p.under25 ? 'Under 25' : '25 and over') + '</td>' +
-          '<td class="num">' + money(p.funding * p.count) + '</td>' +
+          '<td class="num">' + money0(p.funding * p.count) + '</td>' +
           '<td class="num"><button class="rm" data-plan="' + n + '" aria-label="Remove">&times;</button></td></tr>').join('')
     : '<tr><td colspan="6" class="cohortempty">Nothing planned yet. Add a cohort below to see what it does to the forecast.</td></tr>';
 
@@ -1591,25 +1614,25 @@ function renderForecast(){
     ? '<div class="alert"><b>Co-investment starts in ' +
         f.coInvestFrom.date.toLocaleDateString('en-GB', { month:'long', year:'numeric' }) + '.</b> ' +
         'From that month your levy balance no longer covers what you are drawing down, and you begin paying ' +
-        'a share directly. Over the ' + i.horizon + '-month window that comes to <b>' + money(Math.round(f.coInvestTotal)) +
-        '</b>, with government covering ' + money(Math.round(f.govTotal)) + '.</div>'
+        'a share directly. Over the ' + i.horizon + '-month window that comes to <b>' + money0(Math.round(f.coInvestTotal)) +
+        '</b>, with government covering ' + money0(Math.round(f.govTotal)) + '.</div>'
     : '<div class="okbox"><b>No co-investment in this window.</b> Your levy covers everything you have committed to over the next ' +
       i.horizon + ' months.</div>';
 
   const expiry = f.expiredTotal > 0
-    ? '<div class="alert"><b>' + money(Math.round(f.expiredTotal)) + ' expires unused.</b> ' +
+    ? '<div class="alert"><b>' + money0(Math.round(f.expiredTotal)) + ' expires unused.</b> ' +
       'Funds now expire twelve months after they enter your account. That is money lost, not carried forward. ' +
       'Apprenticeship units, foundation apprenticeships and transfers are all ways to commit it first.</div>'
     : '';
 
   el.innerHTML =
     '<div class="mgrid">' +
-      '<div class="mcard"><div class="n">' + money(Math.round(f.totalIn)) + '</div><div class="l">Levy in</div></div>' +
-      '<div class="mcard warm"><div class="n">' + money(Math.round(f.totalDraw)) + '</div><div class="l">Drawn down</div></div>' +
+      '<div class="mcard"><div class="n">' + money0(Math.round(f.totalIn)) + '</div><div class="l">Levy in</div></div>' +
+      '<div class="mcard warm"><div class="n">' + money0(Math.round(f.totalDraw)) + '</div><div class="l">Drawn down</div></div>' +
       '<div class="mcard ' + (f.coInvestTotal > 0 ? 'bad' : 'cool') + '"><div class="n">' +
-        money(Math.round(f.coInvestTotal)) + '</div><div class="l">You pay</div></div>' +
+        money0(Math.round(f.coInvestTotal)) + '</div><div class="l">You pay</div></div>' +
       '<div class="mcard ' + (f.expiredTotal > 0 ? 'bad' : 'cool') + '"><div class="n">' +
-        money(Math.round(f.expiredTotal)) + '</div><div class="l">Expires unused</div></div>' +
+        money0(Math.round(f.expiredTotal)) + '</div><div class="l">Expires unused</div></div>' +
     '</div>' +
 
     alert + expiry +
@@ -1625,12 +1648,12 @@ function renderForecast(){
     '</tr></thead><tbody>' +
     f.rows.map(r => '<tr' + (r.youPay > 0 ? ' class="hascost"' : '') + '>' +
       '<td class="nm">' + r.label + '</td>' +
-      '<td class="num">' + money(Math.round(r.in)) + '</td>' +
-      '<td class="num">' + money(Math.round(r.draw)) + '</td>' +
-      '<td class="num">' + money(Math.round(r.fromLevy)) + '</td>' +
-      '<td class="num' + (r.youPay > 0 ? ' neg' : '') + '">' + (r.youPay > 0 ? money(Math.round(r.youPay)) : '—') + '</td>' +
-      '<td class="num' + (r.expired > 0 ? ' neg' : '') + '">' + (r.expired > 0 ? money(Math.round(r.expired)) : '—') + '</td>' +
-      '<td class="num"><b>' + money(Math.round(r.balance)) + '</b></td></tr>').join('') +
+      '<td class="num">' + money0(Math.round(r.in)) + '</td>' +
+      '<td class="num">' + money0(Math.round(r.draw)) + '</td>' +
+      '<td class="num">' + money0(Math.round(r.fromLevy)) + '</td>' +
+      '<td class="num' + (r.youPay > 0 ? ' neg' : '') + '">' + (r.youPay > 0 ? money0(Math.round(r.youPay)) : '—') + '</td>' +
+      '<td class="num' + (r.expired > 0 ? ' neg' : '') + '">' + (r.expired > 0 ? money0(Math.round(r.expired)) : '—') + '</td>' +
+      '<td class="num"><b>' + money0(Math.round(r.balance)) + '</b></td></tr>').join('') +
     '</tbody></table></div>' +
 
     '<div class="addrow" style="margin-top:18px">' +
@@ -1668,7 +1691,7 @@ function chartHTML(f){
     return '<line x1="' + padL + '" y1="' + y(v).toFixed(1) + '" x2="' + (w - padR) + '" y2="' + y(v).toFixed(1) +
       '" stroke="#E4E0D6" stroke-width="1"/>' +
       '<text x="' + (padL - 8) + '" y="' + (y(v) + 4).toFixed(1) + '" text-anchor="end" font-size="10" fill="#8A9698">' +
-      money(Math.round(v)) + '</text>';
+      money0(Math.round(v)) + '</text>';
   }).join('');
 
   const labels = rows.map((r, i) =>
@@ -1783,12 +1806,12 @@ function wireForecast(panel){
     const savedExpiry = before.expiredTotal - trial.expiredTotal;
 
     el.innerHTML =
-      '<div class="impactrow"><b>' + money(commitment) + '</b><span>total commitment</span></div>' +
+      '<div class="impactrow"><b>' + money0(commitment) + '</b><span>total commitment</span></div>' +
       '<div class="impactrow"><b class="' + (extraCost > 0 ? 'neg' : '') + '">' +
-        (extraCost > 0 ? '+' + money(Math.round(extraCost)) : 'nothing') + '</b>' +
+        (extraCost > 0 ? '+' + money0(Math.round(extraCost)) : 'nothing') + '</b>' +
         '<span>' + (extraCost > 0 ? 'added to what you pay' : 'costs you nothing — levy covers it') + '</span></div>' +
       (savedExpiry > 100
-        ? '<div class="impactrow"><b class="pos">' + money(Math.round(savedExpiry)) + '</b><span>less expiring unused</span></div>'
+        ? '<div class="impactrow"><b class="pos">' + money0(Math.round(savedExpiry)) + '</b><span>less expiring unused</span></div>'
         : '') +
       (chosen.months ? '<div class="impactrow"><b>' + chosen.months + '</b><span>months, ending ' +
         monthName(months + chosen.months) + '</span></div>' : '');

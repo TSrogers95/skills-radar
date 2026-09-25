@@ -22,7 +22,28 @@ function fmtShort(d){ return new Date(d).toLocaleDateString('en-GB', { day:'nume
 function fmtLong(d){ return new Date(d).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' }); }
 function fmtYear(d){ return new Date(d).getFullYear(); }
 function fmtMonthYear(d){ return new Date(d).toLocaleDateString('en-GB', { month:'long', year:'numeric' }); }
-function money(n){ return '£' + n.toLocaleString('en-GB'); }
+/* A standard with no funding band is not free — it has not had one set.
+   That happens while a standard is in development, and for units and
+   foundation apprenticeships before approval. Printing "£0" reads as free
+   and is the more misleading of the two. */
+function band(n){
+  return (!n || n <= 0) ? '<span class="noband">Not yet set</span>' : money(n);
+}
+
+/* A funding band of zero almost always means the register has not published
+   one — a standard in development, or a proposal in progress — rather than
+   the training being free. Showing "£0" states something untrue, so an
+   absent band says so instead. */
+function money(n){
+  const v = Number(n);
+  if(!v && v !== 0) return 'Not set';
+  if(v === 0) return 'Not set';
+  return '£' + v.toLocaleString('en-GB');
+}
+
+/* Where a real zero is meaningful — a cost of nothing, a balance of nothing —
+   use this instead, so those keep showing £0. */
+function money0(n){ return '£' + (Number(n) || 0).toLocaleString('en-GB'); }
 
 /* ---------- Route detection ----------
    Works out which occupational route the person means, by checking their

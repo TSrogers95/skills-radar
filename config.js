@@ -44,3 +44,31 @@ const CONTACT = {
   privacy: "hello@skills-radar.co.uk",     // can be the same address
   address: ""                               // PECR requires a postal address on marketing email
 };
+
+
+/* =========================================================================
+   THE DEMO VIDEO
+
+   Used by demo.html, which is not linked from the site and is excluded from
+   search engines. Share the address with whoever you want to show it to.
+
+   Set ONE of these.
+
+   youtube  the id from a YouTube URL — the part after v=. Upload as
+            Unlisted, not Private: unlisted plays for anyone with the link,
+            private does not. This is the one to use. It streams, adapts
+            quality on a phone, and costs you no bandwidth.
+
+   vimeo    the numeric id, if you would rather use Vimeo.
+
+   file     the filename of an mp4 committed to your repo. Works, but the
+            whole file is sent to every viewer. At 60MB that is roughly
+            1,700 views before you hit Vercel's monthly free allowance.
+   ========================================================================= */
+
+const DEMO = {
+  youtube: "",          // e.g. "dQw4w9WgXcQ"
+  vimeo:   "",
+  file:    "",          // e.g. "skills-radar-demo.mp4"
+  poster:  ""           // optional still image shown before play
+};

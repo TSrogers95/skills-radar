@@ -484,6 +484,8 @@ function show(rows, cols, built, m, file){
         '<div class="mcard"><div class="n">' + built.skippedRetired.toLocaleString('en-GB') + '</div><div class="l">Retired versions skipped</div></div>' +
         '<div class="mcard cool"><div class="n">' + m.out.filter(s => s.options && s.options.length).length.toLocaleString('en-GB') +
           '</div><div class="l">With pathways or options</div></div>' +
+        '<div class="mcard warm"><div class="n">' + m.out.filter(s => !s.funding).length.toLocaleString('en-GB') +
+          '</div><div class="l">No funding band</div></div>' +
       '</div>' +
 
       '<div class="grouphead" style="margin-top:26px"><h2>Columns matched</h2><div class="rule"></div></div>' +
@@ -493,6 +495,16 @@ function show(rows, cols, built, m, file){
     '<section class="lsection costs">' +
       '<div class="lhead"><h2>What this will do</h2>' +
       '<p>Nothing has changed yet. Read this before you copy anything.</p></div>' +
+
+      (m.out.filter(s => !s.funding).length
+        ? '<div class="notice"><b>' + m.out.filter(s => !s.funding).length.toLocaleString('en-GB') +
+          ' standards came in with no funding band.</b> ' +
+          'That is usually correct rather than a fault: a standard still in development, in proposal, or ' +
+          'retired has no band assigned, and some occupational entries are not funded apprenticeships at all. ' +
+          'The site shows these as &ldquo;Not set&rdquo; rather than &pound;0. ' +
+          'If a standard you deliver is in this list, check it on the register — if it has a band there, the ' +
+          'CSV column may not have been picked up, and the column table above will show which heading was matched.</div>'
+        : '') +
 
       '<div class="okbox"><b>Defunding is safe.</b> ' +
         'The sixteen standards losing funding in September are held separately in <code>defunded.js</code> and ' +
