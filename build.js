@@ -205,6 +205,7 @@ function page(a, api){
 <script src="../config.js"></script>
 <script src="../standards.js"></script>
 <script src="../otj-minimums.js"></script>
+<script src="../occupations.js" onerror="void 0"></script>
 <script src="../data.js"></script>
 <script src="../app.js"></script>
 <script src="../ui.js"></script>
