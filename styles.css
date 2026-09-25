@@ -3323,3 +3323,72 @@ main:focus{ outline:none; }
 @media (min-width:861px){
   .ctaring .ring{ display:block; }
 }
+
+/* =========================================================================
+   SIGN-UP — two columns on a desktop, stacked on a phone
+
+   Overrides the single-column version. The form sits left and keeps a
+   comfortable measure; the reasons sit right where they can be read while
+   filling it in, rather than scrolled past first or found afterwards.
+
+   Below 900px they stack, form first — at that width two columns would
+   leave both too narrow to read.
+   ========================================================================= */
+
+.joingrid{
+  display:grid;
+  grid-template-columns:minmax(0, 420px) minmax(0, 1fr);
+  gap:36px; align-items:start;
+  max-width:920px; margin:0 auto 64px;
+}
+
+.joingrid .joinpanel{ padding:28px 30px 26px; margin:0; }
+
+/* ---------- The reasons, as a column ---------- */
+
+.joingrid .whatyouget{ margin-top:0; position:sticky; top:74px; }
+
+.whatyouget > h2{
+  background:var(--ink); color:#fff;
+  font-family:var(--display); font-size:13.5px; font-weight:600;
+  letter-spacing:0.01em; margin:0; padding:13px 18px;
+}
+
+.whatyouget .benefit{
+  border:1px solid var(--line); border-top:none;
+  background:var(--surface);
+}
+.whatyouget .benefit summary{
+  padding:14px 17px; font-size:14.5px; line-height:1.35;
+}
+.whatyouget .benefit[open] summary{
+  border-bottom:1px solid var(--line);
+  background:var(--paper);
+}
+.whatyouget .benefit p{
+  margin:0; padding:15px 17px 17px;
+  font-size:13px; line-height:1.65; color:var(--text-2);
+}
+.getfoot{
+  margin:0; padding:13px 17px;
+  border:1px solid var(--line); border-top:none;
+  background:var(--paper);
+  font-size:11.5px; color:var(--text-3); line-height:1.5;
+}
+
+/* ---------- Stack it ---------- */
+
+@media (max-width:900px){
+  .joingrid{
+    grid-template-columns:1fr; gap:24px;
+    max-width:560px;
+  }
+  .joingrid .whatyouget{ position:static; }
+}
+
+@media (max-width:600px){
+  .joingrid{ max-width:none; }
+  .joingrid .joinpanel{ padding:22px 20px 20px; }
+  .whatyouget .benefit summary{ padding:14px 16px; font-size:14.5px; }
+  .whatyouget .benefit p{ padding:14px 16px 16px; }
+}

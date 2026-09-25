@@ -127,8 +127,8 @@ function joinView(message){
         '<p class="joineyebrow">Membership</p>' +
         '<h1>Stop reading ' + counts.changes + ' changes to find the ' +
           '<em>three</em> that affect you</h1>' +
-        '<p class="joinlede">Tell us which standards you deliver. We will tell you what moved, ' +
-          'what it costs and what you have to do about it.</p>' +
+        '<p class="joinlede">Tell us which standards you deliver. We will tell you what moved, what it costs, ' +
+          'and what your levy will do over the next two years.</p>' +
         '<div class="joinproof">' +
           '<span><b>' + counts.standards + '</b>standards tracked</span>' +
           '<span><b>' + counts.otj + '</b>off-the-job minimums</span>' +
@@ -138,7 +138,7 @@ function joinView(message){
       joinVisual(counts) +
     '</div>' +
 
-    '<div class="joincol">' +
+    '<div class="joingrid">' +
 
       '<div class="signin-panel joinpanel">' +
         msg(message) +
@@ -190,22 +190,23 @@ function joinView(message){
       '</div>' +
 
       '<section class="whatyouget">' +
-        '<h2>What you get</h2>' +
-        benefit('A feed that is only yours',
+        '<h2>What you get for ' + price + ' ' + period + '</h2>' +
+        benefit('Levy forecasting on your own numbers', true,
+          'Enter your pay bill and your current cohort and it forecasts month by month: what goes in, what ' +
+          'comes out, and what your balance does. It names the month co-investment starts and shows how much ' +
+          'expires unused — funds now expire after twelve months, so that is money lost rather than banked. ' +
+          'Then add apprentices you are only considering, and see what they would cost before you commit.') +
+        benefit('A feed that is only yours', false,
           'All ' + counts.standards + ' standards on the register are tracked here, with ' + counts.changes +
           ' live changes between them. Choose the ones you deliver and the feed shows changes to those, ' +
           'alongside the funding rules that apply to everyone — what changed, what it changed from, and what follows.') +
-        benefit('The monthly newsletter',
+        benefit('The monthly newsletter', false,
           'What moved and what it means, once a month. Written rather than generated, and focused on what you ' +
           'have to do about it. Turn it off in one click without losing your account.') +
-        benefit('Levy forecasting',
-          'Month by month on your own pay bill and your own cohorts. It names the month co-investment starts, ' +
-          'shows how much expires unused, and lets you drop in apprentices you are only considering to see what ' +
-          'they would cost before committing.') +
-        benefit('Compliance, in one place',
-          'Off-the-job hours against the published minimum for each of ' + counts.otj + ' standards. A calendar of the deadlines ' +
-          'that touch your provision. And a board report you can print, with your funding position and risks ' +
-          'already written up.') +
+        benefit('Compliance, in one place', false,
+          'Off-the-job hours against the published minimum for each of ' + counts.otj + ' standards. A calendar ' +
+          'of the deadlines that touch your provision. And a board report you can print, with your funding ' +
+          'position and risks already written up.') +
         '<p class="getfoot">Your data is yours. Export or delete all of it at any time, from your own account page.</p>' +
       '</section>' +
     '</div>';
@@ -248,8 +249,11 @@ function siteCounts(){
   };
 }
 
-function benefit(t, d){
-  return '<details class="benefit">' +
+/* The first one opens by default. Someone scanning a column of four closed
+   headings learns nothing; one open shows what the detail looks like and
+   makes the rest obviously clickable. */
+function benefit(t, open, d){
+  return '<details class="benefit"' + (open ? ' open' : '') + '>' +
     '<summary><span>' + t + '</span></summary>' +
     '<p>' + d + '</p>' +
   '</details>';
