@@ -937,6 +937,23 @@ function otjFor(name){ return OTJ[name] || {}; }
    forecast. So it gets its own tab, and the calculators read from it.
    ========================================================================= */
 
+/* The counters were written into the view once and never revisited, so
+   typing a new number changed the table and left the totals above it
+   showing the old figures. They are generated separately now and redrawn
+   on every keystroke — in place, so focus stays in the box being typed in. */
+function cohortStatsHTML(){
+  if(!COHORT.length) return '';
+  const defunded = COHORT.filter(c => { const r = findStandard(c); return r && /Defunded/i.test(r.status); });
+  return '<div class="mgrid">' +
+    '<div class="mcard cool"><div class="n">' + COHORT.length + '</div><div class="l">Standards</div></div>' +
+    '<div class="mcard"><div class="n">' + cohortHeads() + '</div><div class="l">Apprentices</div></div>' +
+    '<div class="mcard ' + (defunded.length ? 'bad' : '') + '"><div class="n">' + defunded.length +
+      '</div><div class="l">Losing funding</div></div>' +
+    '<div class="mcard warm"><div class="n">' + allUpdates().filter(isMyStandardOnly).length +
+      '</div><div class="l">Changes to them</div></div>' +
+  '</div>';
+}
+
 function cohortView(){
   const heads = cohortHeads();
   const defunded = COHORT.filter(c => { const r = findStandard(c); return r && /Defunded/i.test(r.status); });
@@ -962,16 +979,7 @@ function cohortView(){
     '<p>The standards you deliver, and how many apprentices are on each. Everything else on this site follows ' +
     'from this list — your feed, your calendar, your compliance position and your forecast.</p></div>' +
 
-    (COHORT.length
-      ? '<div class="mgrid">' +
-          '<div class="mcard cool"><div class="n">' + COHORT.length + '</div><div class="l">Standards</div></div>' +
-          '<div class="mcard"><div class="n">' + heads + '</div><div class="l">Apprentices</div></div>' +
-          '<div class="mcard ' + (defunded.length ? 'bad' : '') + '"><div class="n">' + defunded.length +
-            '</div><div class="l">Losing funding</div></div>' +
-          '<div class="mcard warm"><div class="n">' + allUpdates().filter(isMyStandardOnly).length +
-            '</div><div class="l">Changes to them</div></div>' +
-        '</div>'
-      : '') +
+    '<div id="cohortstats">' + cohortStatsHTML() + '</div>' +
 
     (defunded.length
       ? '<div class="alert"><b>' + defunded.length + ' of these lose funding on 1 September 2026.</b> ' +
@@ -1004,6 +1012,9 @@ function wireCohort(panel){
     inp.addEventListener('input', () => {
       COHORT[+inp.dataset.i].count = Math.max(0, parseInt(inp.value, 10) || 0);
       saveCohort(); queueSave(); refreshBar();
+
+      const stats = document.getElementById('cohortstats');
+      if(stats) stats.innerHTML = cohortStatsHTML();
     });
   });
   panel.querySelectorAll('#cohortrows .rm').forEach(btn => {
@@ -1440,6 +1451,20 @@ function runForecast(){
   });
 }
 
+/* Same treatment as the cohort counters: generated separately so changing
+   the pay bill or the levy toggle moves these figures too, rather than only
+   the forecast underneath them. */
+function positionStatsHTML(){
+  const f = levyFigures(SETTINGS.payroll, COHORT, youngCount(), SETTINGS.levyPayer);
+  return '<div class="mgrid">' +
+    '<div class="mcard"><div class="n">' + money(Math.round(f.available)) + '</div><div class="l">Levy available this year</div></div>' +
+    '<div class="mcard warm"><div class="n">' + money(Math.round(f.annualDraw)) + '</div><div class="l">Drawn by your cohort</div></div>' +
+    '<div class="mcard ' + (f.youCost > 0 ? 'bad' : 'cool') + '"><div class="n">' +
+      money(Math.round(f.youCost)) + '</div><div class="l">Your co-investment</div></div>' +
+    '<div class="mcard"><div class="n">' + cohortHeads() + '</div><div class="l">Apprentices</div></div>' +
+  '</div>';
+}
+
 function forecastView(){
   const i = forecastInputs();
   const f = runForecast();
@@ -1464,13 +1489,7 @@ function forecastView(){
     (COHORT.length
       ? '<div class="grouphead" style="margin-top:0"><h2>Your position today</h2><div class="rule"></div>' +
           '<button class="linkbtn" data-go="cohort">Change your cohort</button></div>' +
-        '<div class="mgrid">' +
-          '<div class="mcard"><div class="n">' + money(Math.round(now.available)) + '</div><div class="l">Levy available this year</div></div>' +
-          '<div class="mcard warm"><div class="n">' + money(Math.round(now.annualDraw)) + '</div><div class="l">Drawn by your cohort</div></div>' +
-          '<div class="mcard ' + (now.youCost > 0 ? 'bad' : 'cool') + '"><div class="n">' +
-            money(Math.round(now.youCost)) + '</div><div class="l">Your co-investment</div></div>' +
-          '<div class="mcard"><div class="n">' + cohortHeads() + '</div><div class="l">Apprentices</div></div>' +
-        '</div>'
+        '<div id="posstats">' + positionStatsHTML() + '</div>'
       : '<div class="alert"><b>No cohort yet.</b> ' +
         'The forecast runs on the standards you deliver. ' +
         '<button class="linkbtn" data-go="cohort">Add them first</button>, then come back.</div>') +
@@ -1558,6 +1577,9 @@ function monthName(offset){
 }
 
 function renderForecast(){
+  const pos = document.getElementById('posstats');
+  if(pos) pos.innerHTML = positionStatsHTML();
+
   const f = runForecast();
   const i = forecastInputs();
   const el = document.getElementById('fcout');
@@ -1722,13 +1744,14 @@ function wireForecast(panel){
       const v = parseFloat((el.value || '0').replace(/[^\d.]/g,'')) || 0;
       if(id === 'f-in') SETTINGS.monthlyIn = v; else SETTINGS.opening = v;
       saveSettings();
+      queueSave();          // and to the account, not just this session
       renderForecast();
     });
   });
 
   const hz = document.getElementById('f-hz');
   if(hz) hz.addEventListener('change', () => {
-    SETTINGS.horizon = +hz.value; saveSettings(); render();
+    SETTINGS.horizon = +hz.value; saveSettings(); queueSave(); render();
   });
 
   /* Two steps rather than four boxes. Pick a standard, then set the numbers
