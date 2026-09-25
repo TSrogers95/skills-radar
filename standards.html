@@ -177,11 +177,30 @@ function changeCell(s){
     '<span class="chg none">' + fmtLong(s.since) + '</span>' + link;
 }
 
+/* Pathway and typical job titles, where the occupational maps sync has run.
+   Nothing shows until occupations.js exists, so this is also the quickest
+   way to tell at a glance whether the sync has happened. */
+function occupationChips(s){
+  const path = typeof pathwaysFor === 'function' ? pathwaysFor(s) : [];
+  const jobs = typeof jobTitlesFor === 'function' ? jobTitlesFor(s) : [];
+  if(!path.length && !jobs.length) return '';
+
+  return '<div class="pathways">' +
+    path.map(x => '<span class="pw">' + x + '</span>').join('') +
+    jobs.slice(0, 3).map(x => '<span class="jt">' + x + '</span>').join('') +
+    (jobs.length > 3 ? '<span class="jt more">+' + (jobs.length - 3) + ' more</span>' : '') +
+  '</div>';
+}
+
 function rowHTML(s){
   const cls = isDefunded(s) ? 'defunded' : (changedRecently(s) ? 'changed' : '');
   const dur = s.months === 0 ? 'Unit' : s.months + ' mo';
   return '<tr class="' + cls + '">' +
-    '<td class="nm">' + s.name + '<small>' + s.code + ' &middot; v' + s.version + '</small></td>' +
+    '<td class="nm">' +
+      '<a class="stdlink" href="' + standardURL(s) + '" target="_blank" rel="noopener">' + s.name + '</a>' +
+      '<small>' + s.code + ' &middot; v' + s.version + '</small>' +
+      occupationChips(s) +
+    '</td>' +
     '<td class="num">Level ' + s.level + '</td>' +
     '<td class="num hidecol">' + dur + '</td>' +
     '<td class="num">' + money(s.funding) + '</td>' +
