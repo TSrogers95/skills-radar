@@ -50,7 +50,7 @@ function backdropHTML(){
    another, cannot then leave it stranded on a phone. */
 function roomToScribble(){
   if(typeof window === 'undefined' || !window.matchMedia) return false;
-  return window.matchMedia('(min-width: 1000px)').matches;
+  return window.matchMedia('(min-width: 1060px)').matches;
 }
 
 /* Hand-drawn annotation. Two overlapping wobbly strokes rather than a clean
@@ -66,13 +66,19 @@ function scribbleRing(){
 }
 
 function scribbleArrow(){
-  return '<svg class="arrow" viewBox="0 0 150 92" aria-hidden="true">' +
-    '<path d="M6 8 C30 3 62 10 84 28 C102 43 110 58 114 76" ' +
-      'fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>' +
-    '<path d="M101 62 C106 70 111 76 115 80" ' +
-      'fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>' +
-    '<path d="M124 63 C121 72 118 78 115 81" ' +
-      'fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>' +
+  /* The old arrow curved downward and its head pointed at the floor, which
+     read as an underline rather than a pointer. This one travels left to
+     right with a slight sag, and the head opens toward the button so the
+     direction is unmistakable. */
+  return '<svg class="arrow" viewBox="0 0 160 80" aria-hidden="true">' +
+    // the shaft, drawn slightly twice over so it looks drawn rather than plotted
+    '<path d="M10 14 C22 38 40 56 74 61 C101 65 122 63 140 59" ' +
+      'fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>' +
+    '<path d="M13 18 C26 40 44 57 76 62 C100 66 120 64 137 60" ' +
+      'fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>' +
+    // the head, two strokes meeting at the tip
+    '<path d="M124 48 L142 59" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>' +
+    '<path d="M126 70 L142 59" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>' +
   '</svg>';
 }
 

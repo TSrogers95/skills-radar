@@ -3274,3 +3274,40 @@ main:focus{ outline:none; }
   .joinproof{ gap:22px; }
   .joinproof b{ font-size:19px; }
 }
+
+
+/* ---------- Annotation: arrow aimed at the button ----------
+
+   Overrides the earlier placement. The scribble block now sits to the left
+   of the ring and slightly above it, with the arrow's tip reaching almost to
+   the ring's edge so the two read as connected. The note sits above the
+   shaft rather than on top of it.
+*/
+
+.ctascribble{
+  left:-138px; top:-26px;
+  width:146px; height:104px;
+}
+
+.ctascribble .arrow{
+  position:absolute;
+  right:-10px;            /* the tip reaches over toward the ring */
+  bottom:2px;
+  width:132px; height:66px;
+  transform:rotate(-2deg);
+  overflow:visible;
+}
+
+.ctanote{
+  position:absolute; left:2px; top:0;
+  font-family:'Caveat', 'Bricolage Grotesque', cursive;
+  font-size:27px; font-weight:600; line-height:1;
+  color:#F2B858;
+  transform:rotate(-8deg);
+  white-space:nowrap;
+}
+
+/* it needs a little more room beside the button than before */
+@media (max-width:1060px){
+  .ctascribble{ display:none; }
+}
