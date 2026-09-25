@@ -49,7 +49,8 @@
 <div class="controls">
   <div class="wrap controlgrid">
     <div class="tabs" id="tabs">
-      <button data-view="search" class="active">Find a rule</button>
+      <button data-view="browse" class="active">Browse by topic</button>
+      <button data-view="search">Find a rule</button>
       <button data-view="changes">What changed</button>
       <button data-view="doc">Links</button>
     </div>
@@ -217,6 +218,80 @@ function sectionHTML(s, changes){
     locatorHTML(s) +
     chgHTML + relHTML +
   '</div>';
+}
+
+/* =========================================================================
+   BROWSE BY TOPIC
+
+   Thirty sections in a flat list is a list to scroll, not a way in. Grouped
+   into seven questions and collapsed, it becomes something you can scan and
+   open only where you need to. Each section keeps its own address, so a link
+   to one can be sent to a colleague and opens on it.
+   ========================================================================= */
+
+function renderBrowse(){
+  const wrap = document.getElementById('list');
+  const tally = document.getElementById('tally');
+  if(tally) tally.textContent = RULES_SECTIONS.length + ' sections in ' + RULES_GROUPS.length + ' topics';
+
+  wrap.innerHTML =
+    '<p class="browseintro">The 2026/27 rules, grouped by what you are trying to find out. ' +
+    'Open a topic to see its sections, the paragraph numbers, and what each one covers. ' +
+    'Every section links straight into the rules on GOV.UK.</p>' +
+
+    RULES_GROUPS.map(g => {
+      const secs = g.sections
+        .map(id => RULES_SECTIONS.find(s => s.id === id))
+        .filter(Boolean);
+
+      return '<details class="rulegroup" id="g-' + g.id + '">' +
+        '<summary>' +
+          '<span class="rgname">' + g.name + '</span>' +
+          '<span class="rgcount">' + secs.length + ' section' + (secs.length === 1 ? '' : 's') + '</span>' +
+        '</summary>' +
+        '<p class="rgblurb">' + g.blurb + '</p>' +
+        '<div class="rgsections">' +
+          secs.map(s =>
+            '<div class="rgsec" id="sec-' + s.id + '">' +
+              '<div class="rgsechead">' +
+                '<h3>' + s.name + '</h3>' +
+                '<span class="rgparas">' + (s.paras ? 'Paras ' + s.paras : '') + '</span>' +
+              '</div>' +
+              '<p>' + s.gist + '</p>' +
+              '<div class="rgacts">' +
+                '<a href="' + RULES_DOC.landing + '" target="_blank" rel="noopener">Read it on GOV.UK &nearr;</a>' +
+                '<button class="linkbtn" data-copy="' + s.id + '">Copy link to this section</button>' +
+              '</div>' +
+            '</div>').join('') +
+        '</div>' +
+      '</details>';
+    }).join('');
+
+  /* A link to a section opens its topic and scrolls to it. */
+  wrap.querySelectorAll('[data-copy]').forEach(b =>
+    b.addEventListener('click', () => {
+      const url = location.href.split('#')[0] + '#sec-' + b.dataset.copy;
+      navigator.clipboard.writeText(url);
+      const was = b.textContent;
+      b.textContent = 'Link copied';
+      setTimeout(() => { b.textContent = was; }, 1600);
+    }));
+
+  openFromHash();
+}
+
+/* Arriving on a section link: open the topic containing it, then scroll. */
+function openFromHash(){
+  const id = location.hash.replace(/^#sec-/, '');
+  if(!id || id === location.hash) return;
+
+  const sec = document.getElementById('sec-' + id);
+  if(!sec) return;
+  const group = sec.closest('details');
+  if(group) group.open = true;
+  setTimeout(() => sec.scrollIntoView({ behavior:'smooth', block:'center' }), 60);
+  sec.classList.add('flash');
+  setTimeout(() => sec.classList.remove('flash'), 2200);
 }
 
 function renderSearch(query){
@@ -400,14 +475,25 @@ function renderDoc(){
 
 /* ---------- Wiring ---------- */
 
-let currentView = 'search', currentQuery = '';
+let currentView = 'browse', currentQuery = '';
 
 function render(){
+  if(currentView === 'browse')  renderBrowse();
   if(currentView === 'search')  renderSearch(currentQuery);
   if(currentView === 'changes') renderChanges(currentQuery);
   if(currentView === 'doc')     renderDoc();
 }
+if(/^#sec-/.test(location.hash)) currentView = 'browse';
 render();
+
+window.addEventListener('hashchange', () => {
+  if(/^#sec-/.test(location.hash)){
+    currentView = 'browse';
+    document.querySelectorAll('#tabs button').forEach(b =>
+      b.classList.toggle('active', b.dataset.view === 'browse'));
+    render();
+  }
+});
 
 document.querySelectorAll('#tabs button').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -420,6 +506,13 @@ document.querySelectorAll('#tabs button').forEach(btn => {
 
 wireSearch('search', 'clear', 'radar', q => {
   currentQuery = q;
+
+  /* Someone typing in the search box wants results, not the topic list. */
+  if(q && currentView === 'browse'){
+    currentView = 'search';
+    document.querySelectorAll('#tabs button').forEach(b =>
+      b.classList.toggle('active', b.dataset.view === 'search'));
+  }
   if(currentView === 'doc' && q){
     currentView = 'search';
     document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('active', b.dataset.view === 'search'));

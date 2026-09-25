@@ -963,6 +963,39 @@ const RULES_DOC = {
 /* Sections of the 2026/27 rules, with the real paragraph numbers.
    "related" drives the "you should also review" suggestions. */
 
+/* The thirty sections, grouped so the rules page can present them as
+   collapsible blocks rather than one long list. Grouped by the question
+   someone is actually asking, not by the rulebook's own order. */
+const RULES_GROUPS = [
+  { id: "who",      name: "Who can be funded",
+    blurb: "Whether this apprentice, on this programme, can be funded at all. The first thing to check and the most common reason a start is rejected.",
+    sections: ["eligibility", "programme-eligibility", "prior-learning", "initial-assessment", "annex-a"] },
+
+  { id: "employ",   name: "Employment and the agreement",
+    blurb: "The contract, the hours, the wage, and what has to be in place before training starts.",
+    sections: ["employment", "wages", "qualifying-days"] },
+
+  { id: "delivery", name: "Delivering the training",
+    blurb: "Off-the-job hours, the training plan, progress reviews, and support for English, maths and learning needs.",
+    sections: ["off-the-job", "training-plan", "progress-reviews", "english-maths", "learning-support"] },
+
+  { id: "money",    name: "Paying for it",
+    blurb: "What can be funded, how the price is set, co-investment rates, and the account the money comes from.",
+    sections: ["what-funded", "price", "co-investment", "service-account", "reservations", "transfers", "subsidy"] },
+
+  { id: "extra",    name: "Payments you can claim",
+    blurb: "The additional payments, the care leaver bursary, and the hiring payment for smaller employers.",
+    sections: ["additional-payments", "hiring-payment", "foundation"] },
+
+  { id: "changes",  name: "When something changes",
+    blurb: "Breaks in learning, redundancy, a change of employer, and moving an apprentice to a new version of a standard.",
+    sections: ["change-circumstance", "breaks", "new-version"] },
+
+  { id: "other",    name: "Assessment, subcontracting and the rest",
+    blurb: "End-point assessment, subcontracting rules, and the parts that do not sit anywhere else.",
+    sections: ["assessment", "subcontracting", "intro", "glossary"] }
+];
+
 const RULES_SECTIONS = [
   { id:"intro", name:"Introduction and purpose", paras:"2, 5, 13, 15, 26",
     terms:["introduction","purpose","scope","growth and skills levy","dwp","machinery of government","apprenticeship units","growth pilot","end-point assessment terminology"],

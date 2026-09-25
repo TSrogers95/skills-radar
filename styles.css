@@ -3510,3 +3510,82 @@ small.nomatch{ display:block; color:var(--high); font-size:11.5px; margin-top:3p
 }
 .fixbtn:hover{ background:var(--ink); color:#fff; border-color:var(--ink); }
 .noband{ color:var(--text-3); font-style:italic; }
+
+/* ---------- Import comparison ---------- */
+
+table.levytable td.pos{ color:var(--low); font-weight:500; }
+table.levytable td.neg{ color:var(--high); font-weight:600; }
+
+.btn.danger{ background:var(--high); border-color:var(--high); }
+.btn.danger:hover{ background:#8E1E17; }
+
+/* ---------- Funding rules, browsed by topic ---------- */
+
+.browseintro{
+  font-size:14.5px; color:var(--text-2); line-height:1.6;
+  max-width:70ch; margin:0 0 20px;
+}
+
+.rulegroup{
+  background:var(--surface); border:1px solid var(--line);
+  margin-bottom:8px;
+}
+.rulegroup summary{
+  display:flex; align-items:center; justify-content:space-between; gap:14px;
+  cursor:pointer; list-style:none; padding:16px 20px;
+}
+.rulegroup summary::-webkit-details-marker{ display:none; }
+.rulegroup summary:hover{ background:var(--paper); }
+.rulegroup summary:focus-visible{ outline:2px solid var(--ink); outline-offset:-2px; }
+.rgname{
+  font-family:var(--display); font-size:16.5px; font-weight:500;
+  letter-spacing:-0.015em; color:var(--text);
+}
+.rgcount{
+  font-size:12px; color:var(--text-3); white-space:nowrap;
+  display:flex; align-items:center; gap:10px;
+}
+.rgcount::after{
+  content:''; width:9px; height:9px;
+  border-right:1.6px solid var(--text-3); border-bottom:1.6px solid var(--text-3);
+  transform:rotate(45deg) translate(-2px,-2px);
+  transition:transform .18s ease;
+}
+.rulegroup[open] .rgcount::after{ transform:rotate(-135deg) translate(-3px,-3px); }
+.rulegroup[open] summary{ border-bottom:1px solid var(--line); background:var(--paper); }
+
+.rgblurb{
+  margin:0; padding:15px 20px 0;
+  font-size:13.5px; color:var(--text-2); line-height:1.6; max-width:72ch;
+}
+
+.rgsections{ padding:14px 20px 18px; }
+.rgsec{
+  border-left:2px solid var(--line-strong);
+  padding:12px 0 12px 16px; margin-bottom:12px;
+  transition:border-color .3s ease, background .3s ease;
+}
+.rgsec:last-child{ margin-bottom:0; }
+.rgsec.flash{ border-left-color:var(--low); background:var(--low-bg); }
+
+.rgsechead{ display:flex; align-items:baseline; justify-content:space-between; gap:14px; flex-wrap:wrap; }
+.rgsec h3{
+  font-family:var(--display); font-size:15px; font-weight:500;
+  margin:0; letter-spacing:-0.012em;
+}
+.rgparas{ font-size:11.5px; color:var(--text-3); white-space:nowrap; }
+.rgsec p{ margin:5px 0 8px; font-size:13.5px; color:var(--text-2); line-height:1.6; max-width:72ch; }
+
+.rgacts{ display:flex; gap:16px; flex-wrap:wrap; align-items:center; }
+.rgacts a{
+  font-size:12.5px; color:var(--ink-3); text-decoration:none;
+  border-bottom:1px solid var(--line-strong); padding-bottom:1px;
+}
+.rgacts a:hover{ border-bottom-color:var(--ink-3); }
+.rgacts .linkbtn{ font-size:12.5px; }
+
+@media (max-width:600px){
+  .rulegroup summary{ padding:14px 16px; }
+  .rgname{ font-size:15px; }
+  .rgblurb, .rgsections{ padding-left:16px; padding-right:16px; }
+}

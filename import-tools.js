@@ -28,6 +28,12 @@ function importToolHTML(){
     '</div>' +
 
     '<div id="view-standards">' +
+      '<div class="notice" style="margin-bottom:18px"><b>Back up first. It takes ten seconds.</b> ' +
+      'Open <code>standards.js</code> in your repo and note today&rsquo;s commit, or download the current file. ' +
+      'If an import goes wrong, GitHub&rsquo;s History tab on that file lets you paste the previous version back ' +
+      'and the site recovers in under a minute. Nothing here can break the site permanently — but knowing that ' +
+      'in advance is worth more than finding out afterwards.</div>' +
+
       '<section class="lsection">' +
         '<div class="lhead"><h2>1. Download the CSV</h2>' +
         '<p>Open the register, scroll to <b>Download a list of apprenticeships</b>, and take the CSV of all standards.</p></div>' +
@@ -208,6 +214,18 @@ function matchColumns(header){
 /* =========================================================================
    TURNING ROWS INTO STANDARDS
    ========================================================================= */
+
+/* One row of the before-and-after, with the direction called plainly. */
+function compareRow(label, a, b){
+  const diff = b - a;
+  const tone = diff < 0 ? 'neg' : diff > 0 ? 'pos' : '';
+  const note = diff === 0 ? 'no change'
+    : (diff > 0 ? '+' : '') + diff.toLocaleString('en-GB');
+  return '<tr><td class="nm">' + label + '</td>' +
+    '<td class="num">' + a.toLocaleString('en-GB') + '</td>' +
+    '<td class="num"><b>' + b.toLocaleString('en-GB') + '</b></td>' +
+    '<td class="num ' + tone + '">' + note + '</td></tr>';
+}
 
 function fmtWhen(iso){
   const d = new Date(iso);
@@ -510,6 +528,42 @@ function show(rows, cols, built, m, file){
   const noBaseline = (typeof STANDARDS === 'undefined' || !STANDARDS.length);
   const withChange = m.out.filter(s => s.changed && s.changed.trim() !== '').length;
 
+  /* =====================================================================
+     THE REGRESSION GUARD
+
+     An import can quietly destroy the thing the site exists for. It happened:
+     a file that looked fine took the feed from 358 changes to 6, and nothing
+     said so until it was live.
+
+     So before anything is offered for download, compare what you have now
+     against what this file would give you. If it is materially worse, say so
+     loudly and make the download deliberate rather than accidental.
+     ===================================================================== */
+
+  const before = {
+    standards: (typeof STANDARDS !== 'undefined' ? STANDARDS.length : 0),
+    changes:   (typeof STANDARDS !== 'undefined' ? STANDARDS.filter(s => s.changed && s.changed.trim() !== '').length : 0),
+    banded:    (typeof STANDARDS !== 'undefined' ? STANDARDS.filter(s => s.funding > 0).length : 0)
+  };
+  const after = {
+    standards: m.out.length,
+    changes:   withChange,
+    banded:    m.out.filter(s => s.funding > 0).length
+  };
+
+  const losses = [];
+  if(before.changes > 20 && after.changes < before.changes * 0.5)
+    losses.push('Changes in the feed would fall from ' + before.changes.toLocaleString('en-GB') +
+      ' to ' + after.changes.toLocaleString('en-GB') + '. The feed is the point of the site.');
+  if(before.banded > 20 && after.banded < before.banded * 0.5)
+    losses.push('Standards with a funding band would fall from ' + before.banded.toLocaleString('en-GB') +
+      ' to ' + after.banded.toLocaleString('en-GB') + '. The funding column has probably not been matched.');
+  if(before.standards > 50 && after.standards < before.standards * 0.6)
+    losses.push('The register would shrink from ' + before.standards.toLocaleString('en-GB') +
+      ' standards to ' + after.standards.toLocaleString('en-GB') + '.');
+
+  const risky = losses.length > 0;
+
   /* Check the block actually parses before anything is offered for download.
      A single bad character used to produce a file that looked fine, uploaded
      fine, and left the live site with no register at all. Declared here
@@ -609,6 +663,28 @@ function show(rows, cols, built, m, file){
         : '') +
     '</section>' +
 
+    (risky
+      ? '<section class="lsection"><div class="alert" style="border-left-width:4px">' +
+        '<b>Do not upload this file.</b><br>' +
+        'It would make the site worse than it is now:' +
+        '<ul style="margin:10px 0 0;padding-left:18px">' +
+          losses.map(l => '<li>' + l + '</li>').join('') +
+        '</ul>' +
+        '<p style="margin:12px 0 0">Check the column table above first — a heading that has not been matched ' +
+        'is the usual cause. Nothing has changed on your site; you can close this and try a different file.</p>' +
+        '</div></section>'
+      : '') +
+
+    '<section class="lsection">' +
+      '<div class="lhead"><h2>Before and after</h2>' +
+      '<p>What your site holds now, against what this file would give it.</p></div>' +
+      '<table class="std levytable"><thead><tr><th></th><th class="r">Now</th><th class="r">After this import</th><th></th></tr></thead><tbody>' +
+        compareRow('Standards', before.standards, after.standards) +
+        compareRow('With a recorded change', before.changes, after.changes) +
+        compareRow('With a funding band', before.banded, after.banded) +
+      '</tbody></table>' +
+    '</section>' +
+
     (noBaseline
       ? '<section class="lsection"><div class="alert"><b>There is nothing to compare against.</b> ' +
         'The register currently loaded in this browser is empty, so every standard in your file looks new ' +
@@ -642,7 +718,8 @@ function show(rows, cols, built, m, file){
       '<div class="lhead"><h2>4. Put it into the site</h2>' +
       '<p>Download the new register file, or copy just the standards block.</p></div>' +
       '<div class="addrow">' +
-        '<button class="btn" id="dl"' + (parseError ? ' disabled' : '') + '>Download standards.js</button>' +
+        '<button class="btn' + (risky ? ' danger' : '') + '" id="dl"' + (parseError ? ' disabled' : '') + '>' +
+          (risky ? 'Download anyway' : 'Download standards.js') + '</button>' +
         '<button class="btn small" id="copy"' + (parseError ? ' disabled' : '') + '>Copy the standards block</button>' +
       '</div>' +
       '<div class="okbox" style="margin-bottom:14px"><b>The review date updates itself.</b> ' +
@@ -678,6 +755,9 @@ function show(rows, cols, built, m, file){
   const full = header + code + '\n/* STANDARDS:END */\n';
 
   document.getElementById('dl').addEventListener('click', () => {
+    if(risky && !confirm('This import would make the site worse:\n\n' + losses.join('\n\n') +
+      '\n\nDownload it anyway?')) return;
+
     const blob = new Blob([full], { type: 'text/javascript' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
@@ -1150,6 +1230,28 @@ function showStats(rows, cols, list, file){
           : '<span class="chg none">—</span>') + '</td></tr>').join('') +
       '</tbody></table></div>' +
       (out.length > 40 ? '<p class="hint">Showing the top 40 of ' + out.length + ' matched.</p>' : '') +
+    '</section>' +
+
+    (risky
+      ? '<section class="lsection"><div class="alert" style="border-left-width:4px">' +
+        '<b>Do not upload this file.</b><br>' +
+        'It would make the site worse than it is now:' +
+        '<ul style="margin:10px 0 0;padding-left:18px">' +
+          losses.map(l => '<li>' + l + '</li>').join('') +
+        '</ul>' +
+        '<p style="margin:12px 0 0">Check the column table above first — a heading that has not been matched ' +
+        'is the usual cause. Nothing has changed on your site; you can close this and try a different file.</p>' +
+        '</div></section>'
+      : '') +
+
+    '<section class="lsection">' +
+      '<div class="lhead"><h2>Before and after</h2>' +
+      '<p>What your site holds now, against what this file would give it.</p></div>' +
+      '<table class="std levytable"><thead><tr><th></th><th class="r">Now</th><th class="r">After this import</th><th></th></tr></thead><tbody>' +
+        compareRow('Standards', before.standards, after.standards) +
+        compareRow('With a recorded change', before.changes, after.changes) +
+        compareRow('With a funding band', before.banded, after.banded) +
+      '</tbody></table>' +
     '</section>' +
 
     (noBaseline
