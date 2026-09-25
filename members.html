@@ -593,14 +593,14 @@ function dashView(){
   const stops = attention.filter(a => a.level === 'stop').length;
 
   const attentionHTML = attention.length
-    ? attention.map((a, i) =>
+    ? attention.map(a =>
         '<div class="todo ' + a.level + '">' +
           '<div class="todotext"><h3>' + a.title + '</h3><p>' + a.detail + '</p></div>' +
           (a.href
             ? '<a class="todoact" href="' + a.href + '"' + (a.external ? ' target="_blank" rel="noopener"' : '') + '>' + a.action + '</a>'
             : '<button class="todoact" data-go="' + a.view + '">' + a.action + '</button>') +
         '</div>').join('')
-    : '<div class="okbox">Nothing on your standards needs attention right now. The feed still has the wider picture.</div>';
+    : '<div class="okbox">Nothing on your standards needs attention right now.</div>';
 
   const soonHTML = soon.length
     ? soon.map(m => {
@@ -615,17 +615,22 @@ function dashView(){
     : '<div class="okbox">No deadlines in the next 90 days that touch your standards.</div>';
 
   return '<div class="pagehead"><h1>' + MEMBER.org + '</h1>' +
-    '<p>What needs doing, what is coming, and what has changed — all on one page.</p></div>' +
+    '<p>What has changed on the standards you deliver, what needs doing, and what is coming.</p></div>' +
 
-    '<div class="mgrid">' +
+    /* The feed leads. It is the reason someone opens this page, and it is
+       filtered live to whatever is in My cohort — add or remove a standard
+       there and this changes with it. */
+    '<div class="grouphead" style="margin-top:0"><h2>What has changed</h2><div class="rule"></div>' +
+      '<button class="linkbtn" data-go="cohort">Change what you follow</button></div>' +
+    feedBoardHTML() +
+
+    '<div class="mgrid" style="margin-top:34px">' +
       '<div class="mcard ' + (stops ? 'bad' : '') + '"><div class="n">' + attention.length + '</div>' +
         '<div class="l">Needing attention' + (stops ? ' — ' + stops + ' urgent' : '') + '</div></div>' +
       '<div class="mcard warm"><div class="n">' + soon.length + '</div><div class="l">Deadlines in 90 days</div></div>' +
       '<div class="mcard"><div class="n">' + cohortHeads() + '</div><div class="l">Apprentices on programme</div></div>' +
       '<div class="mcard cool"><div class="n">' + openEvents().length + '</div><div class="l">Your events outstanding</div></div>' +
     '</div>' +
-
-    dasPanelHTML(true) +
 
     '<div class="grouphead"><h2>Needs your attention</h2><div class="rule"></div></div>' +
     '<div class="todolist">' + attentionHTML + '</div>' +
@@ -636,7 +641,7 @@ function dashView(){
 
     '<div class="grouphead"><h2>Your standards</h2><div class="rule"></div>' +
       '<button class="linkbtn" data-go="cohort">Edit these</button></div>' +
-    '<table class="std" style="margin-top:12px"><thead><tr>' +
+    '<table class="std" style="margin-top:0"><thead><tr>' +
       '<th>Standard</th><th>Level</th><th>On programme</th><th>Band</th><th>Status</th>' +
     '</tr></thead><tbody>' +
     COHORT.map(s => {
@@ -655,11 +660,7 @@ function dashView(){
           : '<span class="chg yes">Check the name</span>') + '</td></tr>';
     }).join('') + '</tbody></table>' +
 
-    /* The feed lives here rather than on its own page. Someone checking in
-       wants one screen: what to do, what is coming, what has changed. */
-    '<div class="grouphead" style="margin-top:38px"><h2>What has changed</h2><div class="rule"></div>' +
-      '<button class="linkbtn" data-go="cohort">Change what you follow</button></div>' +
-    feedBoardHTML();
+    dasPanelHTML(true);
 }
 
 function feedBoardHTML(){
