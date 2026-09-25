@@ -67,7 +67,7 @@ const CONTACT = {
    ========================================================================= */
 
 const DEMO = {
-  youtube: "",          // e.g. "dQw4w9WgXcQ"
+  youtube: "FNC6twEtAr8",          // e.g. "dQw4w9WgXcQ"
   vimeo:   "",
   file:    "",          // e.g. "skills-radar-demo.mp4"
   poster:  ""           // optional still image shown before play
