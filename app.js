@@ -311,6 +311,47 @@ function articleFor(s, defunded, dev){
 }
 
 /* =========================================================================
+   DEFUNDING, APPLIED OVER THE REGISTER
+
+   Runs once when the page loads, before anything reads STANDARDS. The
+   register CSV does not carry defunding, so an import will have reset these
+   to "Approved" — this puts them back, every time, without anyone having to
+   remember.
+   ========================================================================= */
+
+(function applyDefunding(){
+  if(typeof DEFUNDED_STANDARDS === 'undefined' || typeof STANDARDS === 'undefined') return;
+
+  const norm = s => String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  let applied = 0, missing = [];
+
+  DEFUNDED_STANDARDS.forEach(d => {
+    const want = norm(d.name);
+
+    /* Match on name at the right level. The register sometimes carries a
+       qualifier the announcement does not — "Chartered Manager (degree)" —
+       so a standard whose name starts with the announced one counts. */
+    const hits = STANDARDS.filter(s =>
+      s.level === d.level && (norm(s.name) === want || norm(s.name).indexOf(want) === 0));
+
+    if(!hits.length){ missing.push('L' + d.level + ' ' + d.name); return; }
+
+    hits.forEach(s => {
+      s.status = 'Defunded from Sept 2026';
+      if(!/withdrawn/i.test(s.changed || '')) s.changed = DEFUNDED_NOTE;
+      s.since = DEFUNDED_FROM;
+      if(!s.article) s.article = 'defunding-16';
+      applied++;
+    });
+  });
+
+  if(missing.length){
+    console.warn('Defunded standards not found on the register: ' + missing.join(', ') +
+      '. Check the names in defunded.js against the register — they may have been renamed.');
+  }
+})();
+
+/* =========================================================================
    WHAT CHANGED — a two or three word label
 
    The "changed" text is a sentence. This reduces it to something you can

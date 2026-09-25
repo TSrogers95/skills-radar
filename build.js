@@ -22,7 +22,7 @@ const OUT  = 'a';
 /* ---------- Load the data the same way a browser would ---------- */
 
 function load(){
-  const files = ['standards.js', 'otj-minimums.js', 'occupations.js', 'data.js', 'app.js', 'ui.js'];
+  const files = ['standards.js', 'defunded.js', 'otj-minimums.js', 'occupations.js', 'data.js', 'app.js', 'ui.js'];
   let src = '';
   files.forEach(f => {
     if(fs.existsSync(f)) src += fs.readFileSync(f, 'utf8') + '\n';
@@ -204,6 +204,7 @@ function page(a, api){
 
 <script src="../config.js"></script>
 <script src="../standards.js"></script>
+<script src="../defunded.js"></script>
 <script src="../otj-minimums.js"></script>
 <script src="../occupations.js" onerror="void 0"></script>
 <script src="../data.js"></script>

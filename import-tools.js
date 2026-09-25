@@ -494,6 +494,11 @@ function show(rows, cols, built, m, file){
       '<div class="lhead"><h2>What this will do</h2>' +
       '<p>Nothing has changed yet. Read this before you copy anything.</p></div>' +
 
+      '<div class="okbox"><b>Defunding is safe.</b> ' +
+        'The sixteen standards losing funding in September are held separately in <code>defunded.js</code> and ' +
+        'applied over the register every time the site loads. The register CSV does not carry defunding, so ' +
+        'without that they would be reset to Approved by this import.</div>' +
+
       '<div class="okbox"><b>Your written work is kept.</b> ' +
         m.out.filter(s => s.common).length + ' commonly-delivered flags and ' +
         m.out.filter(s => s.article).length + ' article links carried across. ' +
