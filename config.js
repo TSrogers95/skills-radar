@@ -67,9 +67,8 @@ const CONTACT = {
    ========================================================================= */
 
 const DEMO = {
-  youtube: "https://www.youtube.com/watch?v=FNC6twEtAr8",
+  youtube: "FNC6twEtAr8",
   vimeo: "",
   file: "",
   poster: ""
 };
-
