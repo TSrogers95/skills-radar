@@ -16,791 +16,810 @@
 /* When this register was last refreshed, and by what. The home page shows
    whichever is more recent, this or DATA_UPDATED in data.js, so an import
    moves the date even though it never touches data.js. */
-const STANDARDS_UPDATED = "2026-09-25";
+const STANDARDS_UPDATED = "2026-09-18";
 const STANDARDS_SOURCE  = "import";        // "hand", "import" or "sync"
 
 /* STANDARDS:BEGIN — the sync job rewrites everything between these two
    markers. Do not remove them. Hand-added fields (common, article) are
    preserved by the sync; machine fields are overwritten from the register.
-   Imported from the Skills England CSV on 2026-09-25. */
+   Imported from the Skills England CSV on 2026-09-18. */
 const STANDARDS = [
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  { name:"Animal care and welfare assistant", code:"ST0397", level:2, months:12, funding:0, route:"agriculture", epa:"Assigned", status:"Approved", version:"1.1", since:"2018-08-08", changed:"" },
+  { name:"Arborist", code:"ST0223", level:2, months:18, funding:0, route:"agriculture", epa:"Assigned", status:"Approved", version:"1.2", since:"2017-06-27", changed:"" },
+  { name:"Children, Young People and Families Manager", code:"ST0209", level:2, months:24, funding:7000, route:"agriculture", epa:"Assigned", status:"Approved", version:"1.2", since:"2015-03-26", changed:"Level changed from 5 to 2. Updated to version 1.2" },
+  { name:"Children, Young People and Families Practitioner", code:"ST0210", level:2, months:18, funding:6000, route:"agriculture", epa:"Assigned", status:"Approved", version:"1.2", since:"2016-09-19", changed:"Level changed from 4 to 2. Updated to version 1.2" },
+  { name:"Countryside worker", code:"ST0408", level:2, months:12, funding:0, route:"agriculture", epa:"Assigned", status:"Approved", version:"1", since:"2020-02-03", changed:"" },
+  { name:"Dog Groomer", code:"ST0943", level:2, months:12, funding:5000, route:"agriculture", epa:"Assigned", status:"Approved", version:"1.1", since:"2023-03-17", changed:"Version 1.0 retired" },
+  { name:"Equine groom", code:"ST0166", level:2, months:12, funding:0, route:"agriculture", epa:"Assigned", status:"Approved", version:"1.1", since:"2018-04-13", changed:"" },
+  { name:"Fisher", code:"ST0952", level:2, months:18, funding:10000, route:"agriculture", epa:"Assigned", status:"Approved", version:"1.1", since:"2025-05-12", changed:"Version 1.0 retired" },
+  { name:"Florist", code:"ST0538", level:2, months:24, funding:0, route:"agriculture", epa:"Assigned", status:"Approved", version:"1", since:"2020-06-10", changed:"" },
+  { name:"General Farm Worker", code:"ST0937", level:2, months:18, funding:8000, route:"agriculture", epa:"Assigned", status:"Approved", version:"1.3", since:"2025-07-25", changed:"Funding band raised from £5,000 to £8,000" },
+  { name:"Horticulture or landscape construction operative", code:"ST0225", level:2, months:24, funding:0, route:"agriculture", epa:"Assigned", status:"Approved", version:"1.2", since:"2017-06-27", changed:"" },
+  { name:"Insurance Professional", code:"ST0242", level:2, months:24, funding:9000, route:"agriculture", epa:"Assigned", status:"Approved", version:"1.1", since:"2015-12-23", changed:"Level changed from 4 to 2" },
+  { name:"Poultry worker", code:"ST0389", level:2, months:12, funding:0, route:"agriculture", epa:"Assigned", status:"Approved", version:"1.1", since:"2018-06-07", changed:"" },
+  { name:"Underkeeper", code:"ST0412", level:2, months:18, funding:7000, route:"agriculture", epa:"Assigned", status:"Approved", version:"1.4", since:"2020-07-10", changed:"Updated to version 1.4" },
+  { name:"Veterinary Care Assistant", code:"ST1446", level:2, months:12, funding:0, route:"agriculture", epa:"Pending — standard in development", status:"In development", version:"1.0", since:"2026-09-18", changed:"" },
+  { name:"Advanced Sports Turf Technician", code:"ST1323", level:3, months:24, funding:8000, route:"agriculture", epa:"Assigned", status:"Approved", version:"1.2", since:"2025-12-09", changed:"Version 1.1 retired" },
+  { name:"Animal Care and Welfare Manager", code:"ST1359", level:3, months:18, funding:9000, route:"agriculture", epa:"Assigned", status:"Approved", version:"1", since:"2023-10-16", changed:"Updated to version 1" },
+  { name:"Crop technician", code:"ST0018", level:3, months:24, funding:0, route:"agriculture", epa:"Assigned", status:"Approved", version:"1.1", since:"2018-07-19", changed:"" },
+  { name:"Detection and Protection Working Dog Specialist", code:"ST1298", level:3, months:24, funding:12000, route:"agriculture", epa:"Assigned", status:"Approved", version:"1", since:"2025-06-23", changed:"Updated to version 1" },
+  { name:"Farrier", code:"ST0172", level:3, months:42, funding:0, route:"agriculture", epa:"Assigned", status:"Approved", version:"1.6", since:"2019-07-04", changed:"" },
+  { name:"Forest Craftsperson", code:"ST1321", level:3, months:24, funding:14000, route:"agriculture", epa:"Assigned", status:"Approved", version:"1.1", since:"2024-11-13", changed:"Version 1.0 retired" },
+  { name:"Horticulture or landscaping supervisor", code:"ST0226", level:3, months:30, funding:0, route:"agriculture", epa:"Assigned", status:"Approved", version:"1.2", since:"2018-12-12", changed:"" },
+  { name:"Keeper and aquarist", code:"ST0789", level:3, months:24, funding:0, route:"agriculture", epa:"Assigned", status:"Approved", version:"1", since:"2019-08-05", changed:"" },
+  { name:"Land-based service engineering technician", code:"ST0243", level:3, months:24, funding:0, route:"agriculture", epa:"Assigned", status:"Approved", version:"1.2", since:"2015-12-23", changed:"" },
+  { name:"Livestock Unit Technician", code:"ST0938", level:3, months:18, funding:9000, route:"agriculture", epa:"Assigned", status:"Approved", version:"1.3", since:"2025-07-25", changed:"Funding band raised from £5,000 to £9,000" },
+  { name:"Poultry technician", code:"ST0467", level:3, months:18, funding:0, route:"agriculture", epa:"Assigned", status:"Approved", version:"1.2", since:"2018-08-08", changed:"" },
+  { name:"Senior equine groom", code:"ST0167", level:3, months:18, funding:0, route:"agriculture", epa:"Assigned", status:"Approved", version:"1", since:"2018-08-07", changed:"" },
+  { name:"Senior florist", code:"ST1335", level:3, months:21, funding:0, route:"agriculture", epa:"Assigned", status:"Approved", version:"1.1", since:"2024-06-20", changed:"" },
+  { name:"Train Driver", code:"ST0343", level:3, months:30, funding:9000, route:"agriculture", epa:"Assigned", status:"Approved", version:"1.2", since:"2018-08-08", changed:"Duration changed from 12 to 30 months. Updated to version 1.2" },
+  { name:"Water environment worker", code:"ST0767", level:3, months:18, funding:0, route:"agriculture", epa:"Assigned", status:"Approved", version:"1", since:"2019-09-30", changed:"" },
+  { name:"Animal training instructor", code:"ST0398", level:4, months:24, funding:0, route:"agriculture", epa:"Assigned", status:"Approved", version:"1.1", since:"2018-11-22", changed:"" },
+  { name:"Arboriculturist", code:"ST0921", level:4, months:30, funding:14000, route:"agriculture", epa:"Assigned", status:"Approved", version:"1", since:"2021-09-14", changed:"Updated to version 1" },
+  { name:"Assistant ecologist", code:"ST1474", level:4, months:0, funding:0, route:"agriculture", epa:"Not applicable (unit)", status:"In development", version:"1.0", since:"2026-09-18", changed:"" },
+  { name:"Assistant Farm Manager", code:"ST1320", level:4, months:24, funding:11000, route:"agriculture", epa:"Assigned", status:"Approved", version:"1.1", since:"2024-11-18", changed:"Version 1.0 retired" },
+  { name:"Countryside Ranger", code:"ST0926", level:4, months:26, funding:9000, route:"agriculture", epa:"Assigned", status:"Approved", version:"1.3", since:"2024-11-18", changed:"Version 1.2 retired" },
+  { name:"Forestry Works Manager", code:"ST1427", level:4, months:15, funding:8000, route:"agriculture", epa:"Assigned", status:"Approved", version:"1", since:"2025-02-19", changed:"Updated to version 1" },
+  { name:"Golf course manager", code:"ST0208", level:5, months:36, funding:0, route:"agriculture", epa:"Assigned", status:"Approved", version:"1.2", since:"2020-04-07", changed:"" },
+  { name:"Horticulture and Landscaping Technical Manager", code:"ST0924", level:5, months:36, funding:17000, route:"agriculture", epa:"Assigned", status:"Approved", version:"1", since:"2021-09-28", changed:"Updated to version 1" },
+  { name:"Sports Turf Technical Manager", code:"ST1410", level:5, months:36, funding:0, route:"agriculture", epa:"Pending — standard in development", status:"In development", version:"1.0", since:"2026-09-18", changed:"" },
+  { name:"Vet Technician (livestock)", code:"ST0946", level:5, months:24, funding:13000, route:"agriculture", epa:"Assigned", status:"Approved", version:"1", since:"2021-05-27", changed:"Updated to version 1" },
+  { name:"Agriculture or Horticulture Professional Adviser", code:"ST0761", level:6, months:30, funding:14000, route:"agriculture", epa:"Assigned", status:"Approved", version:"1.0", since:"2025-07-24", changed:"Version retired and replaced" },
+  { name:"Environmental practitioner (Degree)", code:"ST0778", level:6, months:53, funding:0, route:"agriculture", epa:"Assigned", status:"Approved", version:"1.1", since:"2019-06-14", changed:"" },
+  { name:"Professional Arboriculturist (integrated degree)", code:"ST0922", level:6, months:36, funding:22000, route:"agriculture", epa:"Assigned", status:"Approved", version:"1", since:"2021-11-12", changed:"Duration changed from 48 to 36 months. Updated to version 1. Status changed from In development to Approved" },
+  { name:"Professional Forester (integrated degree)", code:"ST0923", level:6, months:36, funding:22000, route:"agriculture", epa:"Assigned", status:"Approved", version:"1.2", since:"2025-03-14", changed:"Version 1.1 retired" },
+  { name:"Ecologist (integrated degree)", code:"ST0577", level:7, months:36, funding:0, route:"agriculture", epa:"Assigned", status:"Approved", version:"1.2", since:"2019-06-28", changed:"" },
+  { name:"Veterinary professional", code:"ST1281", level:7, months:0, funding:0, route:"agriculture", epa:"Not applicable (unit)", status:"Proposal in development", version:"1.0", since:"2026-09-18", changed:"" },
+  { name:"Administration Assistant", code:"ST1472", level:2, months:12, funding:4000, route:"business-administration", epa:"Assigned", status:"Approved", version:"2", since:"2026-08-01", changed:"Updated to version 2", article:"admin-assistant" },
+  { common:true, name:"Customer Service Practitioner", code:"ST0072", level:2, months:12, funding:3500, route:"business-administration", epa:"Assigned", status:"Approved", version:"1.1", since:"2023-04-01", changed:"" },
+  { common:true, name:"Business Administrator", code:"ST0070", level:3, months:18, funding:5000, route:"business-administration", epa:"Assigned", status:"Approved", version:"1", since:"2017-09-18", changed:"Updated to version 1" },
+  { name:"Business Improvement Practitioner", code:"ST0377", level:3, months:12, funding:5000, route:"business-administration", epa:"Assigned", status:"Approved", version:"1.0", since:"2022-06-01", changed:"" },
+  { name:"HR Support", code:"ST0239", level:3, months:18, funding:4500, route:"business-administration", epa:"Assigned", status:"Approved", version:"1.1", since:"2017-08-25", changed:"Updated to version 1.1" },
+  { name:"Improvement technician", code:"ST0193", level:3, months:14, funding:0, route:"business-administration", epa:"Assigned", status:"Approved", version:"1.2", since:"2018-02-27", changed:"" },
+  { name:"Learning and development practitioner", code:"ST0562", level:3, months:18, funding:0, route:"business-administration", epa:"Assigned", status:"Approved", version:"1", since:"2018-08-08", changed:"" },
+  { name:"Leisure duty manager", code:"ST0301", level:3, months:18, funding:0, route:"business-administration", epa:"Assigned", status:"Approved", version:"1.1", since:"2018-01-26", changed:"" },
+  { name:"Library, information and archive services assistant", code:"ST0664", level:3, months:18, funding:0, route:"business-administration", epa:"Assigned", status:"Approved", version:"1.1", since:"2018-12-21", changed:"" },
+  { name:"Public Sector Compliance Investigator and Officer", code:"", level:3, months:18, funding:7000, route:"business-administration", epa:"Assigned", status:"Approved", version:"1", since:"2019-03-01", changed:"Updated to version 1. Status changed from Defunded from Sept 2026 to Approved", article:"defunding-16" },
+  { name:"Public service operational delivery officer", code:"ST0314", level:3, months:12, funding:0, route:"business-administration", epa:"Assigned", status:"Approved", version:"1.1", since:"2015-08-27", changed:"" },
+  { name:"Recruiter", code:"ST1421", level:3, months:18, funding:7000, route:"business-administration", epa:"Assigned", status:"Approved", version:"1", since:"2024-08-20", changed:"Updated to version 1" },
+  { common:true, name:"Team Leader", code:"", level:3, months:15, funding:5000, route:"business-administration", epa:"Assigned", status:"Approved", version:"1.4", since:"2016-06-01", changed:"Duration changed from 12 to 15 months. Updated to version 1.4. Status changed from Defunded from Sept 2026 to Approved", article:"defunding-16" },
+  { name:"Associate Project Manager", code:"ST0310", level:4, months:18, funding:6000, route:"business-administration", epa:"Assigned", status:"Approved", version:"1.5", since:"2016-08-19", changed:"Duration changed from 24 to 18 months. Updated to version 1.5" },
+  { name:"Community energy specialist", code:"ST0092", level:4, months:24, funding:0, route:"business-administration", epa:"Assigned", status:"Approved", version:"1.1", since:"2018-02-27", changed:"" },
+  { name:"Corporate Responsibility and Sustainability Practitioner", code:"ST0934", level:4, months:36, funding:14000, route:"business-administration", epa:"Assigned", status:"Approved", version:"1.1", since:"2021-05-17", changed:"Status changed from In development to Approved" },
+  { name:"Data Protection and Information Governance Practitioner", code:"ST0967", level:4, months:18, funding:10000, route:"business-administration", epa:"Assigned", status:"Approved", version:"2", since:"2022-03-30", changed:"Updated to version 2. Status changed from In development to Approved" },
+  { name:"Employability practitioner", code:"ST0663", level:4, months:24, funding:0, route:"business-administration", epa:"Assigned", status:"Approved", version:"1", since:"2019-02-18", changed:"" },
+  { name:"Governance Officer", code:"ST1302", level:4, months:18, funding:11000, route:"business-administration", epa:"Assigned", status:"Approved", version:"1", since:"2023-05-25", changed:"Updated to version 1. Status changed from In development to Approved" },
+  { common:true, name:"Improvement Practitioner", code:"", level:4, months:14, funding:9000, route:"business-administration", epa:"Assigned", status:"Approved", version:"1.3", since:"2018-02-27", changed:"Duration changed from 18 to 14 months. Updated to version 1.3. Status changed from Defunded from Sept 2026 to Approved", article:"defunding-16" },
+  { name:"Information manager", code:"ST0762", level:4, months:24, funding:0, route:"business-administration", epa:"Assigned", status:"Approved", version:"1", since:"2020-02-03", changed:"" },
+  { name:"Junior management consultant", code:"ST0273", level:4, months:24, funding:0, route:"business-administration", epa:"Assigned", status:"Approved", version:"1.1", since:"2016-04-06", changed:"" },
+  { name:"Policy officer", code:"ST0526", level:4, months:18, funding:0, route:"business-administration", epa:"Assigned", status:"Approved", version:"1.2", since:"2018-02-02", changed:"" },
+  { name:"Quality Practitioner", code:"ST0853", level:4, months:14, funding:6000, route:"business-administration", epa:"Assigned", status:"Approved", version:"1", since:"2020-09-10", changed:"Updated to version 1" },
+  { name:"Regulatory compliance officer", code:"ST0430", level:4, months:24, funding:0, route:"business-administration", epa:"Assigned", status:"Approved", version:"1.2", since:"2018-03-27", changed:"" },
+  { name:"Revenues and welfare benefits practitioner", code:"ST0602", level:4, months:12, funding:0, route:"business-administration", epa:"Assigned", status:"Approved", version:"1.2", since:"2018-08-07", changed:"" },
+  { name:"School business professional", code:"ST0575", level:4, months:18, funding:0, route:"business-administration", epa:"Assigned", status:"Approved", version:"1.1", since:"2018-02-05", changed:"" },
+  { name:"Trade union official", code:"ST0815", level:4, months:18, funding:0, route:"business-administration", epa:"Assigned", status:"Approved", version:"1", since:"2020-06-23", changed:"" },
+  { name:"AI Leadership — adoption, procurement and governance (unit)", code:"AU0010", level:5, months:0, funding:750, route:"business-administration", epa:"Not applicable (unit)", status:"Approved", version:"1", since:"2026-04-21", changed:"Updated to version 1" },
+  { name:"AI Leadership — delivery and organisational transformation (unit)", code:"AU0011", level:5, months:0, funding:750, route:"business-administration", epa:"Not applicable (unit)", status:"Approved", version:"1", since:"2026-04-21", changed:"Updated to version 1" },
+  { name:"AI Leadership — strategy and opportunity (unit)", code:"AU0009", level:5, months:0, funding:750, route:"business-administration", epa:"Not applicable (unit)", status:"Approved", version:"1", since:"2026-04-21", changed:"Updated to version 1" },
+  { common:true, name:"Coaching Professional", code:"", level:5, months:14, funding:5000, route:"business-administration", epa:"Assigned", status:"Approved", version:"1", since:"2020-05-13", changed:"Updated to version 1. Status changed from Defunded from Sept 2026 to Approved", article:"defunding-16" },
+  { name:"Improvement specialist", code:"ST0555", level:5, months:14, funding:0, route:"business-administration", epa:"Assigned", status:"Approved", version:"1.1", since:"2018-11-08", changed:"" },
+  { name:"Learning and development consultant business partner", code:"ST0563", level:5, months:18, funding:0, route:"business-administration", epa:"Assigned", status:"Approved", version:"1.1", since:"2018-08-08", changed:"" },
+  { common:true, name:"Operations Manager", code:"", level:5, months:24, funding:7000, route:"business-administration", epa:"Assigned", status:"Approved", version:"1.4", since:"2016-06-01", changed:"Duration changed from 18 to 24 months. Updated to version 1.4. Status changed from Defunded from Sept 2026 to Approved", article:"defunding-16" },
+  { name:"People professional", code:"ST0238", level:5, months:22, funding:0, route:"business-administration", epa:"Assigned", status:"Approved", version:"1.4", since:"2017-08-18", changed:"" },
+  { name:"Career development professional", code:"ST0694", level:6, months:24, funding:0, route:"business-administration", epa:"Assigned", status:"Approved", version:"1", since:"2019-05-10", changed:"" },
+  { name:"Chartered Manager (degree)", code:"", level:6, months:48, funding:22000, route:"business-administration", epa:"Assigned", status:"Approved", version:"1.1", since:"2015-10-08", changed:"Status changed from Defunded from Sept 2026 to Approved", article:"defunding-16" },
+  { name:"Improvement Leader", code:"", level:6, months:18, funding:15000, route:"business-administration", epa:"Assigned", status:"Approved", version:"1", since:"2019-01-29", changed:"Duration changed from 24 to 18 months. Updated to version 1. Status changed from Defunded from Sept 2026 to Approved", article:"defunding-16" },
+  { name:"Project Manager (integrated degree)", code:"ST0275", level:6, months:48, funding:22000, route:"business-administration", epa:"Assigned", status:"Approved", version:"1", since:"2018-06-22", changed:"Duration changed from 36 to 48 months. Updated to version 1" },
+  { name:"Service Designer", code:"ST0894", level:6, months:24, funding:15000, route:"business-administration", epa:"Assigned", status:"Approved", version:"1", since:"2023-03-23", changed:"Updated to version 1" },
+  { name:"Social Researcher", code:"ST1341", level:6, months:42, funding:24000, route:"business-administration", epa:"Assigned", status:"Approved", version:"1", since:"2023-08-29", changed:"Updated to version 1" },
+  { name:"Library, information and knowledge management professional", code:"ST1337", level:7, months:36, funding:0, route:"business-administration", epa:"Pending — standard in development", status:"In development", version:"1.0", since:"2026-09-18", changed:"" },
+  { name:"Operational Research Specialist", code:"ST0884", level:7, months:24, funding:14000, route:"business-administration", epa:"Assigned", status:"Approved", version:"1.2", since:"2025-12-09", changed:"Version 1.1 retired" },
+  { name:"Senior Leader", code:"ST0480", level:7, months:24, funding:14000, route:"business-administration", epa:"Assigned", status:"Approved", version:"1.2", since:"2026-01-01", changed:"Level 7 age restriction now applies to new starts", article:"level-7" },
+  { name:"Senior People Professional", code:"ST0813", level:7, months:36, funding:19000, route:"business-administration", epa:"Assigned", status:"Approved", version:"1", since:"2021-01-07", changed:"Updated to version 1" },
+  { name:"Sustainability business specialist (integrated degree)", code:"ST0748", level:7, months:24, funding:0, route:"business-administration", epa:"Assigned", status:"Approved", version:"1.1", since:"2020-05-21", changed:"" },
+  { name:"Systems thinking practitioner", code:"ST0787", level:7, months:30, funding:0, route:"business-administration", epa:"Assigned", status:"Approved", version:"1.2", since:"2020-05-13", changed:"" },
+  { common:true, name:"Adult Care Worker", code:"ST0005", level:2, months:12, funding:3000, route:"care-services", epa:"Assigned", status:"Approved", version:"2", since:"2016-07-21", changed:"Updated to version 2" },
+  { name:"Playworker", code:"ST0867", level:2, months:18, funding:5000, route:"care-services", epa:"Assigned", status:"Approved", version:"1", since:"2023-02-02", changed:"Updated to version 1" },
+  { common:true, name:"Lead Adult Care Worker", code:"ST0006", level:3, months:18, funding:4000, route:"care-services", epa:"Assigned", status:"Approved", version:"1.3", since:"2016-07-21", changed:"Updated to version 1.3" },
+  { name:"Safeguarding Support Officer", code:"ST1030", level:3, months:18, funding:7000, route:"care-services", epa:"Assigned", status:"Approved", version:"1", since:"2024-10-14", changed:"Updated to version 1" },
+  { name:"Youth Support Worker", code:"ST0906", level:3, months:18, funding:4500, route:"care-services", epa:"Assigned", status:"Approved", version:"1.2", since:"2025-12-10", changed:"Version 1.1 retired" },
+  { name:"Children, Young People and Families Practitioner", code:"ST0210", level:4, months:24, funding:6000, route:"care-services", epa:"Assigned", status:"Approved", version:"1", since:"2018-06-29", changed:"Duration changed from 18 to 24 months. Updated to version 1" },
+  { name:"Domestic and Sexual Abuse Support Worker", code:"ST0862", level:4, months:18, funding:8000, route:"care-services", epa:"Assigned", status:"Approved", version:"1", since:"2024-04-19", changed:"Updated to version 1" },
+  { name:"Early Intervention Practitioner", code:"ST0868", level:4, months:18, funding:5000, route:"care-services", epa:"Assigned", status:"Approved", version:"1.1", since:"2021-05-27", changed:"Status changed from In development to Approved" },
+  { name:"Lead Practitioner in Adult Care", code:"", level:4, months:18, funding:7000, route:"care-services", epa:"Assigned", status:"Approved", version:"1.2", since:"2020-03-31", changed:"Updated to version 1.2. Status changed from Defunded from Sept 2026 to Approved", article:"defunding-16" },
+  { name:"Children, Young People and Families Manager", code:"ST0209", level:5, months:24, funding:7000, route:"care-services", epa:"Assigned", status:"Approved", version:"1", since:"2018-06-29", changed:"Updated to version 1" },
+  { name:"Leader in Adult Care", code:"ST0008", level:5, months:18, funding:7000, route:"care-services", epa:"Assigned", status:"Approved", version:"1.2", since:"2020-02-03", changed:"Updated to version 1.2" },
+  { name:"Youth Justice Practitioner", code:"ST0878", level:5, months:25, funding:17000, route:"care-services", epa:"Assigned", status:"Approved", version:"1.1", since:"2025-12-10", changed:"Version 1.0 retired" },
+  { name:"Church minister (integrated degree)", code:"ST0527", level:6, months:36, funding:0, route:"care-services", epa:"Assigned", status:"Approved", version:"1.1", since:"2019-09-27", changed:"" },
+  { name:"Social Worker (integrated degree)", code:"ST0510", level:6, months:36, funding:25000, route:"care-services", epa:"Assigned", status:"Approved", version:"2", since:"2018-11-30", changed:"Updated to version 2" },
+  { name:"Youth Worker", code:"ST0522", level:6, months:36, funding:20000, route:"care-services", epa:"Assigned", status:"Approved", version:"1.1", since:"2025-07-16", changed:"Version 1.0 retired" },
+  { name:"Play Therapist", code:"ST0905", level:7, months:36, funding:20000, route:"care-services", epa:"Assigned", status:"Approved", version:"1", since:"2021-06-23", changed:"Updated to version 1" },
+  { name:"Baker", code:"ST0186", level:2, months:18, funding:6000, route:"catering-hospitality", epa:"Assigned", status:"Approved", version:"1.1", since:"2017-06-09", changed:"Duration changed from 15 to 18 months" },
+  { name:"Catering and Hospitality foundation apprenticeship", code:"FA0008", level:2, months:8, funding:3500, route:"catering-hospitality", epa:"Assigned", status:"Approved", version:"1", since:"2026-04-01", changed:"Updated to version 1" },
+  { common:true, name:"Commis Chef", code:"ST0231", level:2, months:12, funding:5000, route:"catering-hospitality", epa:"Assigned", status:"Approved", version:"1.4", since:"2016-04-27", changed:"Updated to version 1.4" },
+  { name:"Food and Beverage Team Member", code:"ST1488", level:2, months:12, funding:6000, route:"catering-hospitality", epa:"Assigned", status:"Approved", version:"1", since:"2024-12-18", changed:"Updated to version 1" },
+  { name:"Hospitality Accommodation Team Member", code:"ST1420", level:2, months:12, funding:6000, route:"catering-hospitality", epa:"Assigned", status:"Approved", version:"1", since:"2025-05-16", changed:"Updated to version 1" },
+  { common:true, name:"Hospitality Team Member", code:"ST0233", level:2, months:12, funding:5000, route:"catering-hospitality", epa:"Assigned", status:"Approved", version:"1.1", since:"2023-05-01", changed:"" },
+  { name:"Production chef", code:"ST0589", level:2, months:12, funding:0, route:"catering-hospitality", epa:"Assigned", status:"Approved", version:"1.2", since:"2018-10-11", changed:"" },
+  { common:true, name:"Chef de Partie", code:"ST0229", level:3, months:18, funding:6000, route:"catering-hospitality", epa:"Assigned", status:"Approved", version:"1.2", since:"2017-04-07", changed:"Duration changed from 12 to 18 months. Updated to version 1.2" },
+  { name:"Hospitality Supervisor", code:"ST0235", level:3, months:12, funding:5000, route:"catering-hospitality", epa:"Assigned", status:"Approved", version:"1.1", since:"2023-05-01", changed:"" },
+  { name:"Lead Baker", code:"ST1349", level:3, months:24, funding:9000, route:"catering-hospitality", epa:"Assigned", status:"Approved", version:"1", since:"2023-11-07", changed:"Updated to version 1" },
+  { name:"Pastry Chef", code:"ST0929", level:3, months:18, funding:11000, route:"catering-hospitality", epa:"Assigned", status:"Approved", version:"1", since:"2024-04-30", changed:"Updated to version 1" },
+  { name:"Senior Chef Production Cooking", code:"ST0232", level:3, months:12, funding:6000, route:"catering-hospitality", epa:"Assigned", status:"Approved", version:"1.4", since:"2016-09-07", changed:"Updated to version 1.4" },
+  { common:true, name:"Chef de Partie", code:"ST0229", level:4, months:18, funding:6000, route:"catering-hospitality", epa:"Assigned", status:"Approved", version:"1", since:"2018-01-10", changed:"Duration changed from 12 to 18 months. Level changed from 3 to 4. Updated to version 1" },
+  { name:"Senior culinary chef", code:"ST0864", level:4, months:24, funding:0, route:"catering-hospitality", epa:"Assigned", status:"Approved", version:"1", since:"2020-02-25", changed:"" },
+  { name:"Bricklayer", code:"ST0091", level:2, months:24, funding:14000, route:"construction", epa:"Assigned", status:"Approved", version:"1.2", since:"2018-06-22", changed:"Updated to version 1.2" },
+  { name:"Building Services Engineering foundation apprenticeship", code:"FA0001", level:2, months:8, funding:4000, route:"construction", epa:"Assigned", status:"Approved", version:"1", since:"2025-04-29", changed:"Updated to version 1" },
+  { name:"Building Services Engineering Installer", code:"ST0164", level:2, months:24, funding:15000, route:"construction", epa:"Assigned", status:"Approved", version:"1.1", since:"2023-11-01", changed:"" },
+  { common:true, name:"Carpentry and Joinery", code:"ST0175", level:2, months:24, funding:15000, route:"construction", epa:"Assigned", status:"Approved", version:"1.4", since:"2018-02-27", changed:"Updated to version 1.4" },
+  { name:"Commercial thermal insulation operative", code:"ST0333", level:2, months:18, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1.1", since:"2018-02-21", changed:"" },
+  { name:"Construction assembly and installation operative", code:"ST0265", level:2, months:18, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1", since:"2019-07-03", changed:"" },
+  { name:"Construction plant operative", code:"ST0736", level:2, months:15, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1.2", since:"2020-07-10", changed:"" },
+  { name:"Demolition operative", code:"ST0615", level:2, months:24, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1.3", since:"2018-09-12", changed:"" },
+  { name:"Dual fuel smart meter installer", code:"ST0158", level:2, months:8, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1.4", since:"2015-08-27", changed:"" },
+  { name:"Facilities services operative", code:"ST0617", level:2, months:12, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1", since:"2019-04-11", changed:"" },
+  { name:"Fencing installer", code:"ST0366", level:2, months:18, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1.2", since:"2018-09-24", changed:"" },
+  { name:"Fenestration installer", code:"ST0743", level:2, months:18, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1.1", since:"2019-09-27", changed:"" },
+  { name:"Finishing Trades foundation apprenticeship", code:"FA0002", level:2, months:8, funding:4000, route:"construction", epa:"Assigned", status:"Approved", version:"1", since:"2025-04-29", changed:"Updated to version 1" },
+  { name:"Fitted Interiors Installer", code:"ST0980", level:2, months:18, funding:11000, route:"construction", epa:"Assigned", status:"Approved", version:"1", since:"2023-10-18", changed:"Updated to version 1" },
+  { name:"Floorlayer - textile and resilient", code:"ST0504", level:2, months:30, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1.4", since:"2018-11-08", changed:"" },
+  { name:"Floorlayer Wood Based", code:"ST1498", level:2, months:30, funding:20000, route:"construction", epa:"Assigned", status:"Approved", version:"1.1", since:"2025-09-09", changed:"Version 1.0 retired" },
+  { name:"Formworker", code:"ST0461", level:2, months:18, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1", since:"2018-08-08", changed:"" },
+  { name:"General builder", code:"ST0984", level:2, months:0, funding:0, route:"construction", epa:"Not applicable (unit)", status:"Proposal in development", version:"1.0", since:"2026-09-18", changed:"" },
+  { name:"Groundworker", code:"ST0513", level:2, months:18, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1.2", since:"2018-12-07", changed:"" },
+  { name:"Highway electrical maintenance and installation operative", code:"ST0051", level:2, months:24, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1", since:"2016-08-19", changed:"" },
+  { name:"Highways maintenance skilled operative", code:"ST0053", level:2, months:18, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1", since:"2018-08-10", changed:"" },
+  { name:"Hire controller (plant, tools and equipment)", code:"ST0269", level:2, months:12, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1.2", since:"2018-12-04", changed:"" },
+  { name:"Insulation Installation Operative", code:"ST1480", level:2, months:24, funding:15000, route:"construction", epa:"Assigned", status:"Approved", version:"1", since:"2025-07-25", changed:"Updated to version 1" },
+  { name:"Interior systems installer", code:"ST0388", level:2, months:24, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1.1", since:"2019-07-03", changed:"" },
+  { name:"Lifting technician", code:"ST0267", level:2, months:24, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"2", since:"2017-12-01", changed:"" },
+  { name:"Lightning Protection Operative", code:"ST0651", level:2, months:18, funding:14000, route:"construction", epa:"Assigned", status:"Approved", version:"1.1", since:"2025-12-09", changed:"Version 1.0 retired" },
+  { name:"Mastic Asphalter", code:"ST0750", level:2, months:34, funding:12000, route:"construction", epa:"Assigned", status:"Approved", version:"1", since:"2021-05-17", changed:"Updated to version 1" },
+  { name:"Onsite Trades foundation apprenticeship", code:"FA0003", level:2, months:8, funding:4000, route:"construction", epa:"Assigned", status:"Approved", version:"1", since:"2025-04-29", changed:"Updated to version 1" },
+  { name:"Painter and Decorator", code:"ST0352", level:2, months:24, funding:12000, route:"construction", epa:"Assigned", status:"Approved", version:"1.3", since:"2018-06-22", changed:"Updated to version 1.3" },
+  { name:"Permanent Modular Building Assembly (unit)", code:"AU0001", level:2, months:0, funding:3200, route:"construction", epa:"Not applicable (unit)", status:"Approved", version:"1", since:"2026-03-17", changed:"Updated to version 1" },
+  { name:"Plasterer", code:"ST0353", level:2, months:24, funding:14000, route:"construction", epa:"Assigned", status:"Approved", version:"2.2", since:"2019-12-18", changed:"Updated to version 2.2" },
+  { name:"Powered pedestrian door installer and service engineer", code:"ST0373", level:2, months:24, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1.1", since:"2018-09-24", changed:"" },
+  { name:"Property maintenance operative", code:"ST0171", level:2, months:24, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1.1", since:"2015-03-26", changed:"" },
+  { name:"Road surfacing operative", code:"ST0693", level:2, months:15, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1.1", since:"2019-07-03", changed:"" },
+  { name:"Roofer", code:"ST0570", level:2, months:24, funding:14000, route:"construction", epa:"Assigned", status:"Approved", version:"1.1", since:"2023-06-01", changed:"" },
+  { name:"Scaffolder", code:"ST0567", level:2, months:18, funding:16000, route:"construction", epa:"Assigned", status:"Approved", version:"1.2", since:"2018-05-08", changed:"Duration changed from 24 to 18 months. Updated to version 1.2" },
+  { name:"Steel fixer", code:"ST0271", level:2, months:18, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1.3", since:"2017-05-16", changed:"" },
+  { name:"Steeplejack", code:"ST1342", level:2, months:24, funding:13000, route:"construction", epa:"Assigned", status:"Approved", version:"1", since:"2024-08-16", changed:"Updated to version 1" },
+  { name:"Stonemason", code:"ST0442", level:2, months:24, funding:11000, route:"construction", epa:"Assigned", status:"Approved", version:"1.2", since:"2023-08-10", changed:"Version 1.1 retired; dispensation in place" },
+  { name:"Supply Chain Practitioner", code:"ST0270", level:2, months:24, funding:5000, route:"construction", epa:"Assigned", status:"Approved", version:"1.1", since:"2019-09-30", changed:"Level changed from 3 to 2" },
+  { common:true, name:"Supply Chain Warehouse Operative", code:"ST0268", level:2, months:18, funding:4000, route:"construction", epa:"Assigned", status:"Approved", version:"1", since:"2018-06-22", changed:"Duration changed from 12 to 18 months. Updated to version 1" },
+  { name:"Telecoms field operative", code:"ST0832", level:2, months:15, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1.1", since:"2020-05-13", changed:"" },
+  { name:"Thatcher", code:"ST0821", level:2, months:24, funding:21000, route:"construction", epa:"Assigned", status:"Approved", version:"1", since:"2024-02-27", changed:"Updated to version 1" },
+  { name:"Tramway construction operative", code:"ST0669", level:2, months:18, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1", since:"2019-03-28", changed:"" },
+  { name:"Tunnelling operative", code:"ST0375", level:2, months:12, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1", since:"2018-01-26", changed:"" },
+  { name:"Wall and floor tiler", code:"ST0368", level:2, months:30, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1.4", since:"2018-11-23", changed:"" },
+  { name:"Wireless communications rigger", code:"ST0616", level:2, months:18, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1.2", since:"2019-03-22", changed:"" },
+  { name:"Ambulance Support Worker", code:"ST0433", level:3, months:36, funding:6000, route:"construction", epa:"Assigned", status:"Approved", version:"1.3", since:"2018-11-08", changed:"Duration changed from 12 to 36 months. Updated to version 1.3" },
+  { name:"Bricklayer", code:"ST0091", level:3, months:36, funding:14000, route:"construction", epa:"Assigned", status:"Approved", version:"1.1", since:"2017-10-04", changed:"Duration changed from 24 to 36 months. Level changed from 2 to 3" },
+  { name:"Building services engineering craftsperson", code:"ST0062", level:3, months:36, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1.2", since:"2017-06-06", changed:"" },
+  { name:"Building services engineering service and maintenance engineer", code:"ST0061", level:3, months:48, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1.1", since:"2017-09-12", changed:"" },
+  { name:"Building Services Engineering Technician", code:"ST0165", level:3, months:48, funding:21000, route:"construction", epa:"Assigned", status:"Approved", version:"1.1", since:"2023-11-01", changed:"" },
+  { name:"Building services engineering technician 2022", code:"ST0063", level:3, months:32, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1.2", since:"2017-06-09", changed:"" },
+  { name:"Construction Equipment Maintenance Technician", code:"ST0671", level:3, months:36, funding:19000, route:"construction", epa:"Assigned", status:"Approved", version:"1.1", since:"2025-06-17", changed:"Version 1.0 retired" },
+  { name:"Construction Support Technician", code:"ST0960", level:3, months:24, funding:11000, route:"construction", epa:"Assigned", status:"Approved", version:"1", since:"2022-02-11", changed:"Updated to version 1" },
+  { name:"Craft Bricklayer", code:"ST1334", level:3, months:18, funding:10000, route:"construction", epa:"Assigned", status:"Approved", version:"1.2", since:"2025-08-05", changed:"Version 1.1 retired" },
+  { name:"Craft carpentry and joinery", code:"ST0263", level:3, months:15, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1.3", since:"2018-02-27", changed:"" },
+  { name:"Craft Painter and Decorator", code:"ST1358", level:3, months:18, funding:12000, route:"construction", epa:"Assigned", status:"Approved", version:"1.2", since:"2025-07-29", changed:"Version 1.1 retired" },
+  { name:"Craft Plasterer", code:"ST1385", level:3, months:18, funding:13000, route:"construction", epa:"Assigned", status:"Approved", version:"1", since:"2024-07-17", changed:"Updated to version 1" },
+  { name:"Curtain wall installer", code:"ST0802", level:3, months:30, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1.2", since:"2020-02-03", changed:"" },
+  { name:"Digital engineering technician", code:"ST0266", level:3, months:36, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1.1", since:"2017-09-18", changed:"" },
+  { name:"Domestic Electrician", code:"ST1017", level:3, months:36, funding:19000, route:"construction", epa:"Assigned", status:"Approved", version:"1.1", since:"2025-08-21", changed:"Funding band raised from £15,000 to £19,000" },
+  { name:"Energy manager", code:"ST0161", level:3, months:24, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1.2", since:"2015-12-01", changed:"" },
+  { name:"Engineering construction pipefitter", code:"ST0162", level:3, months:36, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1.4", since:"2017-10-16", changed:"" },
+  { name:"EV Charging Point Installation and Maintenance (unit)", code:"AU0006", level:3, months:0, funding:950, route:"construction", epa:"Not applicable (unit)", status:"Approved", version:"1", since:"2026-03-17", changed:"Updated to version 1" },
+  { name:"Facilities Management Supervisor", code:"", level:3, months:18, funding:6000, route:"construction", epa:"Assigned", status:"Approved", version:"1.2", since:"2017-02-17", changed:"Updated to version 1.2. Status changed from Defunded from Sept 2026 to Approved", article:"defunding-16" },
+  { name:"Fall Protection Technician", code:"ST0614", level:3, months:12, funding:8000, route:"construction", epa:"Assigned", status:"Approved", version:"1", since:"2021-06-28", changed:"Updated to version 1" },
+  { name:"Fire emergency and security systems technician", code:"ST0189", level:3, months:36, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1.2", since:"2016-08-19", changed:"" },
+  { name:"Gas engineering operative", code:"ST0155", level:3, months:18, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1.3", since:"2016-02-05", changed:"" },
+  { name:"Geospatial survey technician", code:"ST0491", level:3, months:24, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1.1", since:"2018-02-27", changed:"" },
+  { name:"Highways electrician or service operative", code:"ST0052", level:3, months:24, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1.2", since:"2016-08-19", changed:"" },
+  { name:"Industrial thermal insulation technician", code:"ST0521", level:3, months:24, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1.1", since:"2018-02-09", changed:"" },
+  { name:"Installation and Maintenance Electrician", code:"ST0152", level:3, months:54, funding:21000, route:"construction", epa:"Assigned", status:"Approved", version:"1.2", since:"2015-09-10", changed:"Duration changed from 42 to 54 months" },
+  { name:"Insulation technician", code:"ST1396", level:3, months:0, funding:0, route:"construction", epa:"Not applicable (unit)", status:"In development", version:"1.0", since:"2026-09-18", changed:"" },
+  { name:"Landscape technician", code:"ST0741", level:3, months:24, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1.1", since:"2020-06-04", changed:"" },
+  { name:"Low Carbon Heating Technician", code:"ST1020", level:3, months:36, funding:22000, route:"construction", epa:"Assigned", status:"Approved", version:"1.2", since:"2026-05-05", changed:"Version 1.1 retired; 1.2 current", article:"low-carbon-heating" },
+  { name:"Military engineering construction technician", code:"ST0414", level:3, months:18, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1.8", since:"2018-07-31", changed:"" },
+  { name:"Pharmacy Services Assistant", code:"ST0322", level:3, months:36, funding:3000, route:"construction", epa:"Assigned", status:"Approved", version:"1.3", since:"2015-09-10", changed:"Duration changed from 12 to 36 months. Level changed from 2 to 3. Updated to version 1.3" },
+  { name:"Plumbing and Domestic Heating Technician", code:"ST0303", level:3, months:48, funding:21000, route:"construction", epa:"Assigned", status:"Approved", version:"1.2", since:"2024-04-01", changed:"" },
+  { name:"Smart home technician", code:"ST0464", level:3, months:18, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1.2", since:"2019-09-30", changed:"" },
+  { name:"Solar PV Installation and Maintenance (unit)", code:"AU0007", level:3, months:0, funding:950, route:"construction", epa:"Not applicable (unit)", status:"Approved", version:"1", since:"2026-03-17", changed:"Updated to version 1" },
+  { name:"Surveying Technician", code:"ST0058", level:3, months:24, funding:15000, route:"construction", epa:"Assigned", status:"Approved", version:"1", since:"2015-09-10", changed:"Updated to version 1" },
+  { name:"Transport planning technician", code:"ST0336", level:3, months:30, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1.2", since:"2016-05-11", changed:"" },
+  { name:"BEMS (building energy management systems) controls engineer", code:"ST0629", level:4, months:36, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1.2", since:"2020-02-03", changed:"" },
+  { name:"Building services engineering senior technician", code:"ST0041", level:4, months:36, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1.4", since:"2018-05-08", changed:"" },
+  { name:"Civil engineering senior technician", code:"ST0046", level:4, months:36, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1.3", since:"2018-03-27", changed:"" },
+  { name:"Civil Engineering Technician", code:"ST0043", level:4, months:36, funding:21000, route:"construction", epa:"Assigned", status:"Approved", version:"1.1", since:"2019-09-13", changed:"Level changed from 3 to 4" },
+  { name:"Construction quantity surveying technician", code:"ST0049", level:4, months:36, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1.1", since:"2019-07-03", changed:"" },
+  { name:"Construction Site Supervisor", code:"ST0044", level:4, months:36, funding:21000, route:"construction", epa:"Assigned", status:"Approved", version:"1", since:"2019-09-06", changed:"Updated to version 1" },
+  { name:"Facilities manager", code:"ST0484", level:4, months:24, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1.4", since:"2018-05-03", changed:"" },
+  { name:"Land Referencer", code:"ST0877", level:4, months:30, funding:14000, route:"construction", epa:"Assigned", status:"Approved", version:"1.1", since:"2020-12-16", changed:"Status changed from Retirement consultation to Approved" },
+  { name:"Town Planning Assistant", code:"ST0936", level:4, months:24, funding:12000, route:"construction", epa:"Assigned", status:"Approved", version:"1", since:"2021-06-15", changed:"Updated to version 1" },
+  { name:"Heritage Construction Specialist", code:"ST1105", level:5, months:24, funding:8000, route:"construction", epa:"Assigned", status:"Approved", version:"1", since:"2023-10-26", changed:"Updated to version 1" },
+  { name:"Retrofit coordinator", code:"ST1375", level:5, months:0, funding:0, route:"construction", epa:"Not applicable (unit)", status:"In development", version:"1.0", since:"2026-09-18", changed:"" },
+  { name:"Architectural assistant (integrated degree)", code:"ST0534", level:6, months:48, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1.1", since:"2018-06-27", changed:"" },
+  { name:"Building control surveyor (integrated degree)", code:"ST0652", level:6, months:48, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1", since:"2019-05-02", changed:"" },
+  { name:"Building services engineer", code:"ST0372", level:6, months:60, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1.1", since:"2017-10-04", changed:"" },
+  { name:"Chartered Surveyor (degree)", code:"ST0057", level:6, months:60, funding:27000, route:"construction", epa:"Assigned", status:"Approved", version:"1.2", since:"2024-03-01", changed:"" },
+  { name:"Civil engineer", code:"ST0417", level:6, months:60, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1.1", since:"2017-10-04", changed:"" },
+  { name:"Civil Engineer (degree)", code:"ST0042", level:6, months:60, funding:27000, route:"construction", epa:"Assigned", status:"Approved", version:"1.1", since:"2023-07-01", changed:"" },
+  { name:"Construction Site Management (degree)", code:"ST0045", level:6, months:36, funding:27000, route:"construction", epa:"Assigned", status:"Approved", version:"1", since:"2019-09-06", changed:"Duration changed from 60 to 36 months. Updated to version 1" },
+  { name:"Construction Site Management (degree)", code:"ST0045", level:6, months:36, funding:27000, route:"construction", epa:"Assigned", status:"Approved", version:"1", since:"2019-07-11", changed:"Duration changed from 60 to 36 months. Updated to version 1" },
+  { name:"Construction Site Supervisor", code:"ST0044", level:6, months:48, funding:21000, route:"construction", epa:"Assigned", status:"Approved", version:"1", since:"2019-09-27", changed:"Duration changed from 36 to 48 months. Level changed from 4 to 6. Updated to version 1" },
+  { name:"Fire Safety Engineer", code:"ST0859", level:6, months:60, funding:27000, route:"construction", epa:"Assigned", status:"Approved", version:"1.2", since:"2025-12-09", changed:"Version 1.1 retired" },
+  { name:"Geospatial mapping and science specialist (degree)", code:"ST0492", level:6, months:60, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1", since:"2018-03-27", changed:"" },
+  { name:"Senior and head of facilities management (integrated degree)", code:"ST0410", level:6, months:42, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1", since:"2018-03-27", changed:"" },
+  { name:"Transport planner (integrated degree)", code:"ST0698", level:6, months:60, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1.1", since:"2019-06-11", changed:"" },
+  { name:"Architect (integrated degree)", code:"ST0533", level:7, months:48, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1.1", since:"2018-06-27", changed:"" },
+  { name:"Chartered Landscape Professional", code:"ST0742", level:7, months:60, funding:25000, route:"construction", epa:"Assigned", status:"Approved", version:"1.1", since:"2021-07-01", changed:"Status changed from Retirement consultation to Approved" },
+  { name:"Chartered town planner (degree)", code:"ST0536", level:7, months:60, funding:0, route:"construction", epa:"Assigned", status:"Approved", version:"1", since:"2019-03-22", changed:"" },
+  { name:"Bookbinder", code:"ST0469", level:2, months:24, funding:10000, route:"creative-design", epa:"Assigned", status:"Approved", version:"1", since:"2020-08-24", changed:"Updated to version 1" },
+  { name:"Junior Grip", code:"ST1318", level:2, months:24, funding:15000, route:"creative-design", epa:"Assigned", status:"Approved", version:"1", since:"2023-08-29", changed:"Updated to version 1" },
+  { name:"Leather craftsperson", code:"ST0460", level:2, months:15, funding:0, route:"creative-design", epa:"Assigned", status:"Approved", version:"1", since:"2018-12-14", changed:"" },
+  { name:"Print Operative", code:"ST0962", level:2, months:24, funding:8000, route:"creative-design", epa:"Assigned", status:"Approved", version:"1.2", since:"2025-12-10", changed:"Version 1.1 retired" },
+  { name:"Archaeological technician", code:"ST0221", level:3, months:12, funding:0, route:"creative-design", epa:"Assigned", status:"Approved", version:"1.1", since:"2019-03-29", changed:"" },
+  { name:"Art market coordinator", code:"ST1450", level:3, months:18, funding:0, route:"creative-design", epa:"Pending — standard in development", status:"In development", version:"1.0", since:"2026-09-18", changed:"" },
+  { name:"Assistant production accountant", code:"ST1436", level:3, months:0, funding:0, route:"creative-design", epa:"Not applicable (unit)", status:"Proposal in development", version:"1.0", since:"2026-09-18", changed:"" },
+  { name:"Assistant puppet maker", code:"ST0476", level:3, months:18, funding:0, route:"creative-design", epa:"Assigned", status:"Approved", version:"1", since:"2019-12-18", changed:"" },
+  { name:"Bespoke furniture maker", code:"ST0639", level:3, months:24, funding:0, route:"creative-design", epa:"Assigned", status:"Approved", version:"1.1", since:"2019-09-30", changed:"" },
+  { name:"Bespoke saddler", code:"ST0328", level:3, months:24, funding:0, route:"creative-design", epa:"Assigned", status:"Approved", version:"1.1", since:"2017-06-27", changed:"" },
+  { name:"Blacksmith", code:"ST0378", level:3, months:48, funding:0, route:"creative-design", epa:"Assigned", status:"Approved", version:"1.1", since:"2020-02-03", changed:"" },
+  { name:"Broadcast and media systems technical operator", code:"ST0424", level:3, months:22, funding:0, route:"creative-design", epa:"Assigned", status:"Approved", version:"1.2", since:"2019-06-07", changed:"" },
+  { name:"Camera prep technician", code:"ST0900", level:3, months:24, funding:0, route:"creative-design", epa:"Assigned", status:"Approved", version:"1.1", since:"2020-07-10", changed:"" },
+  { name:"Clock maker", code:"ST0447", level:3, months:24, funding:0, route:"creative-design", epa:"Assigned", status:"Approved", version:"1", since:"2020-02-03", changed:"" },
+  { name:"Collections Technician", code:"ST1469", level:3, months:18, funding:13000, route:"creative-design", epa:"Assigned", status:"Approved", version:"1", since:"2025-06-23", changed:"Updated to version 1" },
+  { name:"Content creator", code:"ST0105", level:3, months:15, funding:0, route:"creative-design", epa:"Assigned", status:"Approved", version:"1.1", since:"2017-06-06", changed:"" },
+  { name:"Costume Technician — stage and screen", code:"ST0783", level:3, months:15, funding:9000, route:"creative-design", epa:"Assigned", status:"Approved", version:"1.1", since:"2020-11-09", changed:"Status changed from In development to Approved" },
+  { name:"Craft Technician", code:"ST0919", level:3, months:18, funding:14000, route:"creative-design", epa:"Assigned", status:"Approved", version:"1.1", since:"2024-08-27", changed:"" },
+  { name:"Creative Industries Production Technician", code:"ST1297", level:3, months:24, funding:14000, route:"creative-design", epa:"Assigned", status:"Approved", version:"1.1", since:"2023-08-29", changed:"Status changed from In development to Approved" },
+  { name:"Cultural learning and participation officer", code:"ST0396", level:3, months:15, funding:0, route:"creative-design", epa:"Assigned", status:"Approved", version:"1", since:"2019-02-14", changed:"" },
+  { name:"Furniture Restorer", code:"ST0978", level:3, months:36, funding:13000, route:"creative-design", epa:"Assigned", status:"Approved", version:"1.1", since:"2025-12-09", changed:"Version 1.0 retired" },
+  { name:"Garment maker", code:"ST0846", level:3, months:24, funding:0, route:"creative-design", epa:"Assigned", status:"Approved", version:"1.1", since:"2019-09-27", changed:"" },
+  { name:"Hair, Wigs, Make-up and Prosthetics Technician", code:"ST0918", level:3, months:24, funding:14000, route:"creative-design", epa:"Assigned", status:"Approved", version:"1", since:"2023-02-28", changed:"Updated to version 1. Status changed from In development to Approved" },
+  { name:"Jewellery, Silversmithing and Allied Trades Professional", code:"ST0439", level:3, months:36, funding:16000, route:"creative-design", epa:"Assigned", status:"Approved", version:"1.1", since:"2025-12-08", changed:"Version 1.0 retired" },
+  { name:"Junior advertising creative", code:"ST0925", level:3, months:18, funding:0, route:"creative-design", epa:"Assigned", status:"Approved", version:"1.1", since:"2020-07-10", changed:"" },
+  { name:"Music business co-ordinator", code:"ST1449", level:3, months:18, funding:0, route:"creative-design", epa:"Pending — standard in development", status:"In development", version:"1.0", since:"2026-09-18", changed:"" },
+  { name:"Musical instrument maintenance and repair technician", code:"ST1440", level:3, months:21, funding:0, route:"creative-design", epa:"Pending — standard in development", status:"In development", version:"1.0", since:"2026-09-18", changed:"" },
+  { name:"Organ builder", code:"ST0382", level:3, months:36, funding:0, route:"creative-design", epa:"Assigned", status:"Approved", version:"1.1", since:"2017-09-26", changed:"" },
+  { name:"Props technician", code:"ST0174", level:3, months:18, funding:0, route:"creative-design", epa:"Assigned", status:"Approved", version:"1", since:"2019-09-20", changed:"" },
+  { name:"Rail Engineering Operative", code:"ST0341", level:3, months:9, funding:12000, route:"creative-design", epa:"Assigned", status:"Approved", version:"1.3", since:"2016-06-24", changed:"Duration changed from 18 to 9 months. Level changed from 2 to 3. Updated to version 1.3" },
+  { name:"Scenic Artist", code:"ST0916", level:3, months:21, funding:19000, route:"creative-design", epa:"Assigned", status:"Approved", version:"1", since:"2023-02-28", changed:"Updated to version 1. Status changed from In development to Approved" },
+  { name:"Scenic Automation Technician", code:"ST0915", level:3, months:24, funding:17000, route:"creative-design", epa:"Assigned", status:"Approved", version:"1", since:"2024-05-14", changed:"Updated to version 1. Status changed from In development to Approved" },
+  { name:"Scenic Construction Technician", code:"ST0917", level:3, months:30, funding:23000, route:"creative-design", epa:"Assigned", status:"Approved", version:"1", since:"2024-02-27", changed:"Updated to version 1. Status changed from In development to Approved" },
+  { name:"Watchmaker", code:"ST0395", level:3, months:24, funding:0, route:"creative-design", epa:"Assigned", status:"Approved", version:"1.2", since:"2018-02-19", changed:"" },
+  { name:"Assistant Recording Technician", code:"ST0944", level:4, months:24, funding:10000, route:"creative-design", epa:"Assigned", status:"Approved", version:"1", since:"2021-05-27", changed:"Updated to version 1. Status changed from In development to Approved" },
+  { name:"Historic environment advice assistant", code:"ST0749", level:4, months:24, funding:0, route:"creative-design", epa:"Assigned", status:"Approved", version:"1", since:"2019-04-11", changed:"" },
+  { name:"Junior animator", code:"ST0488", level:4, months:18, funding:0, route:"creative-design", epa:"Assigned", status:"Approved", version:"1.4", since:"2020-05-13", changed:"" },
+  { name:"Junior Production Coordinator", code:"ST0792", level:4, months:18, funding:11000, route:"creative-design", epa:"Assigned", status:"Approved", version:"1.2", since:"2020-08-24", changed:"Status changed from In development to Approved" },
+  { name:"Junior VFX Artist or Assistant Technical Director", code:"ST1325", level:4, months:18, funding:10000, route:"creative-design", epa:"Assigned", status:"Approved", version:"1.2", since:"2025-12-09", changed:"Version 1.1 retired" },
+  { name:"Photographer", code:"ST1388", level:4, months:18, funding:8000, route:"creative-design", epa:"Assigned", status:"Approved", version:"1.1", since:"2024-03-06", changed:"Version 1.0 retired" },
+  { name:"Post production technical operator", code:"ST0696", level:4, months:12, funding:0, route:"creative-design", epa:"Assigned", status:"Approved", version:"1.1", since:"2019-04-11", changed:"" },
+  { name:"Publishing Professional", code:"ST1442", level:4, months:24, funding:10000, route:"creative-design", epa:"Assigned", status:"Approved", version:"1.1", since:"2024-01-23", changed:"Status changed from In development to Approved" },
+  { name:"Stained Glass Craftsperson", code:"ST0912", level:4, months:36, funding:27000, route:"creative-design", epa:"Assigned", status:"Approved", version:"1", since:"2021-09-13", changed:"Updated to version 1" },
+  { name:"Audiovisual Technician", code:"ST0940", level:5, months:24, funding:18000, route:"creative-design", epa:"Assigned", status:"Approved", version:"1", since:"2022-09-13", changed:"Updated to version 1" },
+  { name:"Bespoke cutter and tailor", code:"ST0055", level:5, months:24, funding:0, route:"creative-design", epa:"Assigned", status:"Approved", version:"1.2", since:"2016-02-03", changed:"" },
+  { name:"Broadcast and media systems technician", code:"ST0425", level:5, months:24, funding:0, route:"creative-design", epa:"Assigned", status:"Approved", version:"1", since:"2020-03-06", changed:"" },
+  { name:"Junior Journalist", code:"ST1516", level:5, months:14, funding:13000, route:"creative-design", epa:"Assigned", status:"Approved", version:"1", since:"2026-04-14", changed:"Updated to version 1" },
+  { name:"Post Production Engineer", code:"ST0933", level:5, months:24, funding:14000, route:"creative-design", epa:"Assigned", status:"Approved", version:"1", since:"2021-08-03", changed:"Updated to version 1" },
+  { name:"Advertising Creative", code:"ST1340", level:6, months:24, funding:17000, route:"creative-design", epa:"Assigned", status:"Approved", version:"1", since:"2023-11-24", changed:"Updated to version 1" },
+  { name:"Broadcast and media systems engineer (integrated degree)", code:"ST0426", level:6, months:36, funding:0, route:"creative-design", epa:"Assigned", status:"Approved", version:"1.1", since:"2018-09-24", changed:"" },
+  { name:"Interior Designer", code:"ST1361", level:6, months:36, funding:26000, route:"creative-design", epa:"Assigned", status:"Approved", version:"2", since:"2026-05-21", changed:"Updated to version 2" },
+  { name:"Journalist", code:"ST1490", level:6, months:18, funding:14000, route:"creative-design", epa:"Assigned", status:"Approved", version:"2", since:"2026-04-14", changed:"Updated to version 2" },
+  { name:"Living and commercial spaces designer", code:"ST0965", level:6, months:0, funding:0, route:"creative-design", epa:"Not applicable (unit)", status:"In development", version:"1.0", since:"2026-09-18", changed:"" },
+  { name:"Model Maker", code:"ST1371", level:6, months:36, funding:26000, route:"creative-design", epa:"Assigned", status:"Approved", version:"1", since:"2024-07-23", changed:"Updated to version 1" },
+  { name:"Production Manager", code:"ST1483", level:6, months:18, funding:14000, route:"creative-design", epa:"Assigned", status:"Approved", version:"2", since:"2026-04-28", changed:"Updated to version 2" },
+  { name:"Registrar (creative and cultural)", code:"ST0590", level:6, months:36, funding:0, route:"creative-design", epa:"Assigned", status:"Approved", version:"1", since:"2020-02-03", changed:"" },
+  { name:"VFX Artist or Technical Director", code:"ST0902", level:6, months:18, funding:11000, route:"creative-design", epa:"Assigned", status:"Approved", version:"1", since:"2021-08-03", changed:"Updated to version 1" },
+  { name:"Archaeological specialist (degree)", code:"ST0769", level:7, months:36, funding:0, route:"creative-design", epa:"Assigned", status:"Approved", version:"1", since:"2019-07-11", changed:"" },
+  { name:"Archivist and Records Manager", code:"ST0904", level:7, months:36, funding:12000, route:"creative-design", epa:"Assigned", status:"Approved", version:"1", since:"2021-11-12", changed:"Updated to version 1" },
+  { name:"Cultural heritage conservator (degree)", code:"ST0628", level:7, months:54, funding:0, route:"creative-design", epa:"Assigned", status:"Approved", version:"1.1", since:"2019-04-18", changed:"" },
+  { name:"Curator", code:"ST0782", level:7, months:36, funding:0, route:"creative-design", epa:"Assigned", status:"Approved", version:"1.2", since:"2020-04-27", changed:"" },
+  { name:"Historic environment advisor", code:"ST0831", level:7, months:36, funding:0, route:"creative-design", epa:"Assigned", status:"Approved", version:"1", since:"2020-06-09", changed:"" },
+  { name:"Teacher (Postgraduate)", code:"ST0489", level:7, months:18, funding:9000, route:"creative-design", epa:"Assigned", status:"Approved", version:"1.1", since:"2020-02-03", changed:"Duration changed from 12 to 18 months. Level changed from 6 to 7. Updated to version 1.1" },
+  { name:"VFX Supervisor", code:"ST0901", level:7, months:18, funding:21000, route:"creative-design", epa:"Assigned", status:"Approved", version:"1", since:"2021-05-27", changed:"Updated to version 1" },
+  { name:"Hardware, Network and Infrastructure foundation apprenticeship", code:"FA0004", level:2, months:8, funding:4000, route:"digital", epa:"Assigned", status:"Approved", version:"1", since:"2025-04-29", changed:"Updated to version 1" },
+  { name:"Software and Data foundation apprenticeship", code:"FA0005", level:2, months:8, funding:4000, route:"digital", epa:"Assigned", status:"Approved", version:"1", since:"2025-04-29", changed:"Updated to version 1" },
+  { name:"Cyber Security Technician", code:"ST1071", level:3, months:18, funding:15000, route:"digital", epa:"Assigned", status:"Approved", version:"1.1", since:"2020-05-13", changed:"Duration changed from 24 to 18 months. Updated to version 1.1" },
+  { name:"Data Technician", code:"ST0951", level:3, months:24, funding:12000, route:"digital", epa:"Assigned", status:"Approved", version:"1.1", since:"2020-07-10", changed:"Duration changed from 15 to 24 months. Updated to version 1.1" },
+  { name:"Digital Device Repair Technician", code:"ST0682", level:3, months:21, funding:11000, route:"digital", epa:"Assigned", status:"Approved", version:"1.1", since:"2025-12-09", changed:"Version 1.0 retired" },
+  { name:"Digital Support Technician", code:"ST0120", level:3, months:15, funding:15000, route:"digital", epa:"Assigned", status:"Approved", version:"1.1", since:"2024-05-01", changed:"" },
+  { name:"Information Communications Technician", code:"ST0973", level:3, months:18, funding:15000, route:"digital", epa:"Assigned", status:"Approved", version:"1.2", since:"2021-05-04", changed:"Status changed from In development to Approved" },
+  { name:"IT Solutions Technician", code:"ST0505", level:3, months:18, funding:15000, route:"digital", epa:"Assigned", status:"Approved", version:"1.1", since:"2019-02-18", changed:"Duration changed from 24 to 18 months" },
+  { name:"Network cable installer", code:"ST0485", level:3, months:15, funding:0, route:"digital", epa:"Assigned", status:"Approved", version:"1.2", since:"2019-04-23", changed:"" },
+  { name:"Radio Network Technician", code:"ST0757", level:3, months:24, funding:19000, route:"digital", epa:"Assigned", status:"Approved", version:"1.2", since:"2020-12-11", changed:"Status changed from In development to Approved" },
+  { name:"Software Development Technician", code:"ST0128", level:3, months:18, funding:15000, route:"digital", epa:"Assigned", status:"Approved", version:"1.1", since:"2023-10-01", changed:"" },
+  { name:"Applications Support Lead", code:"ST0949", level:4, months:24, funding:17000, route:"digital", epa:"Assigned", status:"Approved", version:"2", since:"2021-11-12", changed:"Updated to version 2. Status changed from In development to Approved" },
+  { name:"Artificial Intelligence and Automation Practitioner", code:"ST1512", level:4, months:18, funding:18000, route:"digital", epa:"Assigned", status:"Approved", version:"2.1", since:"2025-12-10", changed:"Version 2.0 retired; 2.1 current" },
+  { name:"Business analyst", code:"ST0117", level:4, months:18, funding:0, route:"digital", epa:"Assigned", status:"Approved", version:"1.2", since:"2017-03-31", changed:"" },
+  { name:"Cellular Network Field Engineer", code:"ST1299", level:4, months:36, funding:27000, route:"digital", epa:"Assigned", status:"Approved", version:"1.1", since:"2025-12-09", changed:"Version 1.0 retired" },
+  { name:"Cyber Security Technologist (2021)", code:"ST1021", level:4, months:24, funding:18000, route:"digital", epa:"Assigned", status:"Approved", version:"1.1", since:"2025-09-29", changed:"Version 1.0 retired" },
+  { common:true, name:"Data Analyst", code:"ST0118", level:4, months:24, funding:15000, route:"digital", epa:"Assigned", status:"Approved", version:"1.1", since:"2024-04-01", changed:"" },
+  { name:"DevOps engineer", code:"ST0825", level:4, months:24, funding:0, route:"digital", epa:"Assigned", status:"Approved", version:"1.1", since:"2020-03-12", changed:"" },
+  { name:"Digital Accessibility Specialist", code:"ST0863", level:4, months:24, funding:16000, route:"digital", epa:"Assigned", status:"Approved", version:"1", since:"2021-07-01", changed:"Updated to version 1. Status changed from In development to Approved" },
+  { name:"Digital community manager", code:"ST0345", level:4, months:24, funding:0, route:"digital", epa:"Assigned", status:"Approved", version:"1", since:"2019-08-14", changed:"" },
+  { name:"Digital Forensic Technician", code:"ST1343", level:4, months:24, funding:18000, route:"digital", epa:"Assigned", status:"Approved", version:"1.1", since:"2024-03-19", changed:"Version 1.0 retired" },
+  { name:"Digital Product Manager", code:"ST0964", level:4, months:24, funding:18000, route:"digital", epa:"Assigned", status:"Approved", version:"2", since:"2023-05-11", changed:"Updated to version 2. Status changed from In development to Approved" },
+  { name:"Network Engineer", code:"ST0127", level:4, months:24, funding:18000, route:"digital", epa:"Assigned", status:"Approved", version:"1.4", since:"2014-11-12", changed:"Updated to version 1.4" },
+  { common:true, name:"Software Developer", code:"ST0116", level:4, months:24, funding:18000, route:"digital", epa:"Assigned", status:"Approved", version:"1.2", since:"2014-11-12", changed:"Updated to version 1.2" },
+  { name:"Software tester", code:"ST0129", level:4, months:24, funding:0, route:"digital", epa:"Assigned", status:"Approved", version:"1.1", since:"2016-04-21", changed:"" },
+  { name:"Data Engineer", code:"ST1386", level:5, months:24, funding:19000, route:"digital", epa:"Assigned", status:"Approved", version:"1", since:"2023-12-11", changed:"Updated to version 1. Status changed from In development to Approved" },
+  { name:"Digital Learning Designer", code:"ST0974", level:5, months:24, funding:16000, route:"digital", epa:"Assigned", status:"Approved", version:"1", since:"2023-05-25", changed:"Updated to version 1" },
+  { name:"Creative digital design professional (integrated degree)", code:"ST0625", level:6, months:36, funding:0, route:"digital", epa:"Assigned", status:"Approved", version:"1", since:"2020-02-03", changed:"" },
+  { name:"Cyber Security Technical Professional (integrated degree)", code:"ST0409", level:6, months:48, funding:25000, route:"digital", epa:"Assigned", status:"Approved", version:"1.1", since:"2023-05-01", changed:"" },
+  { name:"Data Scientist (integrated degree)", code:"ST0585", level:6, months:36, funding:24000, route:"digital", epa:"Assigned", status:"Approved", version:"1.1", since:"2023-07-01", changed:"" },
+  { name:"Digital and Technology Solutions Professional (degree)", code:"ST0119", level:6, months:48, funding:25000, route:"digital", epa:"Assigned", status:"Approved", version:"1.2", since:"2024-05-01", changed:"" },
+  { name:"Digital user experience (UX) professional (integrated degree)", code:"ST0470", level:6, months:48, funding:0, route:"digital", epa:"Assigned", status:"Approved", version:"1", since:"2020-02-03", changed:"" },
+  { name:"Machine Learning Engineer", code:"ST1398", level:6, months:24, funding:22000, route:"digital", epa:"Assigned", status:"Approved", version:"1", since:"2024-12-18", changed:"Updated to version 1. Status changed from In development to Approved" },
+  { name:"Advanced Digital Forensic Professional", code:"ST1409", level:7, months:36, funding:27000, route:"digital", epa:"Assigned", status:"Approved", version:"1.1", since:"2024-10-02", changed:"" },
+  { name:"Artificial intelligence (AI) data specialist", code:"ST0763", level:7, months:24, funding:0, route:"digital", epa:"Assigned", status:"Approved", version:"1", since:"2020-05-13", changed:"" },
+  { name:"Digital and Technology Solutions Specialist (degree)", code:"ST0482", level:7, months:18, funding:21000, route:"digital", epa:"Assigned", status:"Approved", version:"1", since:"2018-08-07", changed:"Duration changed from 24 to 18 months. Updated to version 1", article:"level-7" },
+  { name:"Game Programmer", code:"ST0953", level:7, months:24, funding:19000, route:"digital", epa:"Assigned", status:"Approved", version:"1.2", since:"2023-02-13", changed:"Version 1.1 retired" },
+  { name:"Spatial Data Specialist", code:"ST0957", level:7, months:24, funding:18000, route:"digital", epa:"Assigned", status:"Approved", version:"1.1", since:"2024-09-30", changed:"Version 1.0 retired" },
+  { common:true, name:"Early Years Practitioner", code:"ST0888", level:2, months:12, funding:4000, route:"education-early-years", epa:"Assigned", status:"Approved", version:"1.1", since:"2023-06-01", changed:"" },
+  { common:true, name:"Early Years Educator", code:"ST0135", level:3, months:18, funding:6000, route:"education-early-years", epa:"Assigned", status:"Approved", version:"1.5", since:"2019-04-03", changed:"Updated to version 1.5" },
+  { name:"Education Technician", code:"ST0666", level:3, months:24, funding:10000, route:"education-early-years", epa:"Assigned", status:"Approved", version:"1", since:"2021-07-01", changed:"Updated to version 1" },
+  { common:true, name:"Learning and Skills Assessor", code:"ST1380", level:3, months:12, funding:5000, route:"education-early-years", epa:"Assigned", status:"Approved", version:"1.1", since:"2023-03-31", changed:"Status changed from Defunded from Sept 2026 to Approved", article:"defunding-16" },
+  { common:true, name:"Teaching Assistant", code:"ST0454", level:3, months:18, funding:5000, route:"education-early-years", epa:"Assigned", status:"Approved", version:"1.1", since:"2018-06-26", changed:"Updated to version 1.1" },
+  { common:true, name:"Learning and Skills Mentor", code:"ST1379", level:4, months:12, funding:5000, route:"education-early-years", epa:"Assigned", status:"Approved", version:"1.3", since:"2023-03-01", changed:"Status changed from Defunded from Sept 2026 to Approved", article:"defunding-16" },
+  { name:"Early Years Lead Practitioner", code:"ST0551", level:5, months:24, funding:9000, route:"education-early-years", epa:"Assigned", status:"Approved", version:"1.1", since:"2025-08-01", changed:"Funding band raised from £8,000 to £9,000" },
+  { name:"Learning and skills teacher", code:"ST0149", level:5, months:18, funding:0, route:"education-early-years", epa:"Assigned", status:"Approved", version:"1.4", since:"2019-01-29", changed:"" },
+  { name:"Specialist Teaching Assistant", code:"ST1414", level:5, months:24, funding:12000, route:"education-early-years", epa:"Assigned", status:"Approved", version:"1.1", since:"2024-10-14", changed:"Status changed from In development to Approved", article:"epa-reform" },
+  { name:"Early Years Teacher (with EYTS)", code:"ST1077", level:6, months:33, funding:27000, route:"education-early-years", epa:"Assigned", status:"Approved", version:"1.1", since:"2025-04-14", changed:"Version 1.0 retired" },
+  { name:"Teacher — Undergraduate", code:"ST1502", level:6, months:45, funding:27000, route:"education-early-years", epa:"Assigned", status:"Approved", version:"2", since:"2025-08-01", changed:"Updated to version 2" },
+  { name:"Teacher (Postgraduate)", code:"ST0489", level:6, months:9, funding:9000, route:"education-early-years", epa:"Assigned", status:"Approved", version:"2", since:"2017-10-19", changed:"Duration changed from 12 to 9 months. Updated to version 2" },
+  { name:"Academic Professional", code:"ST0477", level:7, months:18, funding:9000, route:"education-early-years", epa:"Assigned", status:"Approved", version:"1", since:"2018-05-08", changed:"Duration changed from 24 to 18 months. Updated to version 1", article:"level-7" },
+  { name:"Teacher for the Sensory Impaired", code:"ST0966", level:7, months:24, funding:14000, route:"education-early-years", epa:"Assigned", status:"Approved", version:"1", since:"2023-11-14", changed:"Updated to version 1" },
+  { name:"Abattoir worker", code:"ST0418", level:2, months:16, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.2", since:"2018-05-08", changed:"" },
+  { name:"Autocare Technician", code:"ST0499", level:2, months:30, funding:9000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.3", since:"2018-05-24", changed:"Duration changed from 15 to 30 months. Updated to version 1.3" },
+  { name:"Aviation maintenance mechanic", code:"ST0014", level:2, months:18, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.2", since:"2016-09-15", changed:"" },
+  { name:"Battery Manufacturing (unit)", code:"AU0008", level:2, months:0, funding:1650, route:"engineering-manufacturing", epa:"Not applicable (unit)", status:"Approved", version:"1", since:"2026-03-24", changed:"Updated to version 1" },
+  { name:"Bicycle mechanic", code:"ST0622", level:2, months:18, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.2", since:"2018-08-22", changed:"" },
+  { name:"Bus, Coach and HGV Service and Maintenance Technician", code:"ST1422", level:2, months:24, funding:14000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"2", since:"2026-08-05", changed:"Updated to version 2" },
+  { name:"Commercial laundry operative", code:"ST0604", level:2, months:12, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2018-06-22", changed:"" },
+  { name:"Construction Equipment Maintenance Mechanic", code:"ST0805", level:2, months:24, funding:10000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2020-08-07", changed:"Updated to version 1" },
+  { name:"Drainage Network Operative", code:"ST1348", level:2, months:18, funding:9000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2024-04-19", changed:"Updated to version 1" },
+  { name:"Electrical Fitting and Assembly (unit)", code:"AU0005", level:2, months:0, funding:1650, route:"engineering-manufacturing", epa:"Not applicable (unit)", status:"Approved", version:"1", since:"2026-03-17", changed:"Updated to version 1" },
+  { name:"Engineering and Manufacturing foundation apprenticeship", code:"FA0006", level:2, months:8, funding:4500, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2025-04-29", changed:"Updated to version 1" },
+  { common:true, name:"Engineering Operative", code:"ST0537", level:2, months:12, funding:9000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.5", since:"2018-09-24", changed:"Updated to version 1.5" },
+  { name:"Fenestration fabricator", code:"ST0744", level:2, months:18, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2019-09-27", changed:"" },
+  { name:"Food and Drink Process Operator", code:"ST0198", level:2, months:12, funding:6000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.2", since:"2016-08-25", changed:"Updated to version 1.2" },
+  { name:"Footwear manufacturer", code:"ST0202", level:2, months:15, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.2", since:"2018-06-21", changed:"" },
+  { name:"Furniture Finisher", code:"ST0977", level:2, months:15, funding:9000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2024-08-22", changed:"Updated to version 1" },
+  { name:"Furniture Making Operative", code:"ST0982", level:2, months:18, funding:11000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2024-08-22", changed:"Updated to version 1" },
+  { name:"Furniture manufacturer", code:"ST0203", level:2, months:24, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2016-09-07", changed:"" },
+  { name:"Gas network operative", code:"ST0204", level:2, months:24, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.3", since:"2015-10-22", changed:"" },
+  { name:"Lean manufacturing operative", code:"ST0420", level:2, months:12, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.2", since:"2019-07-25", changed:"" },
+  { name:"Leisure industry technician", code:"ST1471", level:2, months:0, funding:0, route:"engineering-manufacturing", epa:"Not applicable (unit)", status:"Proposal in development", version:"1.0", since:"2026-09-18", changed:"" },
+  { name:"Maritime mechanical and electrical mechanic", code:"ST0276", level:2, months:18, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2018-10-05", changed:"" },
+  { name:"Material Cutter", code:"ST0899", level:2, months:12, funding:5000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2020-08-24", changed:"Updated to version 1" },
+  { name:"Material processing plant operator", code:"ST0144", level:2, months:18, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2017-06-06", changed:"" },
+  { name:"Mattress Manufacturing Operative", code:"ST0981", level:2, months:15, funding:9000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2024-10-15", changed:"Updated to version 1" },
+  { name:"Mechanical Fitting and Assembly (unit)", code:"AU0003", level:2, months:0, funding:1650, route:"engineering-manufacturing", epa:"Not applicable (unit)", status:"Approved", version:"1", since:"2026-03-17", changed:"Updated to version 1" },
+  { name:"Metal recycling general operative", code:"ST0507", level:2, months:12, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2018-08-07", changed:"" },
+  { name:"Mineral and construction product sampling and testing operations", code:"ST0511", level:2, months:14, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2018-10-17", changed:"" },
+  { name:"Non-destructive testing (NDT) operator", code:"ST0358", level:2, months:18, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2016-08-22", changed:"" },
+  { name:"Nuclear health physics monitor", code:"ST0290", level:2, months:24, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.2", since:"2015-09-03", changed:"" },
+  { name:"Nuclear operative", code:"ST0291", level:2, months:24, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2018-01-22", changed:"" },
+  { name:"Rail Engineering Operative", code:"ST0341", level:2, months:15, funding:12000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"2", since:"2016-04-19", changed:"Duration changed from 18 to 15 months. Updated to version 2" },
+  { name:"Science manufacturing process operative", code:"ST0422", level:2, months:18, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2018-02-27", changed:"" },
+  { name:"Sewing machinist", code:"ST0549", level:2, months:15, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.2", since:"2018-08-08", changed:"" },
+  { name:"Stairlift, platform lift, service lift electromechanic", code:"ST0251", level:2, months:24, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2020-03-19", changed:"" },
+  { name:"Textile manufacturing operative", code:"ST0458", level:2, months:18, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.2", since:"2018-05-03", changed:"" },
+  { name:"Upholstery operative", code:"ST1034", level:2, months:0, funding:0, route:"engineering-manufacturing", epa:"Not applicable (unit)", status:"In development", version:"1.0", since:"2026-09-18", changed:"" },
+  { name:"Water network operative", code:"ST0898", level:2, months:18, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.2", since:"2020-06-17", changed:"" },
+  { name:"Water Process Operative", code:"ST0876", level:2, months:18, funding:9000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2020-08-24", changed:"Updated to version 1" },
+  { name:"Welder", code:"ST0349", level:2, months:18, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.4", since:"2016-04-27", changed:"" },
+  { name:"Welding, mechanised (unit)", code:"AU0004", level:2, months:0, funding:2100, route:"engineering-manufacturing", epa:"Not applicable (unit)", status:"Approved", version:"1", since:"2026-03-17", changed:"Updated to version 1" },
+  { name:"Wood Machinist", code:"ST0976", level:2, months:24, funding:14000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2025-04-17", changed:"Version 1.0 retired" },
+  { name:"Wood product manufacturing operative", code:"ST0531", level:2, months:24, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2019-07-03", changed:"" },
+  { name:"Advanced furniture CNC technician", code:"ST0655", level:3, months:24, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2019-09-27", changed:"" },
+  { name:"Advanced upholsterer", code:"ST0656", level:3, months:24, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2019-09-30", changed:"" },
+  { name:"Aerospace Engineering Technician", code:"ST1313", level:3, months:48, funding:27000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2025-12-09", changed:"Version 1.0 retired" },
+  { name:"Aircraft Maintenance Technician", code:"ST1315", level:3, months:36, funding:27000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2024-12-03", changed:"Version 1.0 retired" },
+  { name:"Automotive glazing technician", code:"ST0031", level:3, months:18, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.2", since:"2018-06-28", changed:"" },
+  { name:"Battery Manufacturing Technician", code:"ST1338", level:3, months:36, funding:24000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2023-11-30", changed:"Updated to version 1" },
+  { name:"Boatbuilder", code:"ST0059", level:3, months:42, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.3", since:"2016-02-25", changed:"" },
+  { name:"Building Services Engineering Installer", code:"ST0164", level:3, months:42, funding:15000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.2", since:"2016-04-27", changed:"Duration changed from 24 to 42 months. Level changed from 2 to 3. Updated to version 1.2" },
+  { name:"Bulk Storage Terminal Technician", code:"ST1339", level:3, months:30, funding:22000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2024-10-17", changed:"Updated to version 1" },
+  { name:"Bus and coach engineering technician", code:"ST0067", level:3, months:36, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.2", since:"2016-09-07", changed:"" },
+  { name:"Butcher", code:"ST0195", level:3, months:42, funding:7000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2014-12-09", changed:"Duration changed from 18 to 42 months. Level changed from 2 to 3" },
+  { name:"Cold Forming Setter Technician", code:"ST1355", level:3, months:36, funding:24000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2025-05-29", changed:"Updated to version 1" },
+  { name:"Composites technician", code:"ST0094", level:3, months:36, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2017-02-16", changed:"" },
+  { name:"Compressed air and vacuum technician", code:"ST0817", level:3, months:36, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2020-05-13", changed:"" },
+  { name:"Drinks dispense technician", code:"ST0752", level:3, months:18, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.3", since:"2019-05-13", changed:"" },
+  { name:"Electrical, electronic product service and installation engineer", code:"ST0150", level:3, months:36, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2017-12-06", changed:"" },
+  { name:"Engineering and Manufacturing Support Technician", code:"ST1395", level:3, months:42, funding:27000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2024-08-21", changed:"Updated to version 1" },
+  { name:"Engineering fitter", code:"ST0432", level:3, months:42, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.4", since:"2018-11-20", changed:"" },
+  { name:"Engineering Maintenance Technician — dual discipline", code:"ST1443", level:3, months:48, funding:27000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2025-06-23", changed:"Updated to version 1" },
+  { name:"Engineering Maintenance Technician — single discipline", code:"ST1426", level:3, months:42, funding:27000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2025-06-23", changed:"Updated to version 1" },
+  { name:"Engineering Technician", code:"ST0457", level:3, months:42, funding:21000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.6", since:"2017-03-31", changed:"Duration changed from 36 to 42 months. Updated to version 1.6" },
+  { name:"Fashion and textiles pattern cutter", code:"ST0541", level:3, months:22, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2018-10-05", changed:"" },
+  { name:"Fitted furniture design technician", code:"ST0654", level:3, months:18, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2019-08-23", changed:"" },
+  { name:"Food and drink technical operator", code:"ST0196", level:3, months:30, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.3", since:"2016-08-25", changed:"" },
+  { name:"Gas network craftsperson", code:"ST0205", level:3, months:48, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.3", since:"2015-10-22", changed:"" },
+  { name:"Healthcare Engineering Specialist Technician", code:"ST0950", level:3, months:48, funding:24000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2021-05-27", changed:"Updated to version 1" },
+  { name:"Heat Network Maintenance Technician", code:"ST1308", level:3, months:36, funding:26000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2024-10-17", changed:"Updated to version 1" },
+  { name:"Heavy vehicle service and maintenance technician", code:"ST0068", level:3, months:36, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.5", since:"2016-09-07", changed:"" },
+  { name:"Heritage engineering technician", code:"ST0571", level:3, months:42, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2018-08-23", changed:"" },
+  { name:"Knitted Product Manufacturing Technician", code:"ST0910", level:3, months:24, funding:11000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2020-08-24", changed:"Updated to version 1" },
+  { name:"Lift and escalator engineering", code:"ST0252", level:3, months:36, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.2", since:"2019-01-29", changed:"" },
+  { name:"Lift truck and powered access engineering technician", code:"ST0387", level:3, months:36, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.2", since:"2020-07-10", changed:"" },
+  { name:"Lifting Equipment Technician", code:"ST0872", level:3, months:24, funding:12000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.2", since:"2024-06-10", changed:"Version 1.1 retired" },
+  { name:"Machining Technician", code:"ST1305", level:3, months:42, funding:27000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.5", since:"2024-06-25", changed:"" },
+  { name:"Maintenance and operations engineering technician", code:"ST0154", level:3, months:36, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.6", since:"2016-09-26", changed:"" },
+  { name:"Marine Electrician", code:"ST0808", level:3, months:42, funding:23000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.2", since:"2023-11-15", changed:"Version 1.1 retired" },
+  { name:"Marine engineer", code:"ST0364", level:3, months:42, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2018-01-19", changed:"" },
+  { name:"Maritime Electrical Fitter", code:"ST1403", level:3, months:42, funding:26000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2025-05-29", changed:"Version 1.0 retired" },
+  { name:"Maritime Mechanical Fitter", code:"ST1402", level:3, months:42, funding:27000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.2", since:"2026-05-19", changed:"Version 1.1 retired" },
+  { name:"Maritime Pipeworker", code:"ST1391", level:3, months:42, funding:24000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2024-11-19", changed:"Updated to version 1" },
+  { name:"Marketing Manager", code:"ST0791", level:3, months:30, funding:16000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2019-07-03", changed:"Duration changed from 24 to 30 months. Level changed from 6 to 3. Updated to version 1" },
+  { name:"Mechatronics Maintenance Technician", code:"ST1326", level:3, months:42, funding:27000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2024-08-19", changed:"Updated to version 1" },
+  { name:"Metal casting, foundry and patternmaking technician", code:"ST0566", level:3, months:27, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.3", since:"2018-10-11", changed:"" },
+  { name:"Metal Fabricator", code:"ST0288", level:3, months:42, funding:24000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.3", since:"2019-01-18", changed:"Updated to version 1.3" },
+  { name:"Metal Fabricator", code:"ST0288", level:3, months:24, funding:24000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2015-12-01", changed:"Duration changed from 42 to 24 months" },
+  { name:"Mobile Transport Refrigeration Technician", code:"ST1327", level:3, months:36, funding:16000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2024-07-01", changed:"Version 1.0 retired" },
+  { name:"Motor Vehicle Service and Maintenance Technician", code:"ST0033", level:3, months:36, funding:21000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.5", since:"2015-10-22", changed:"Updated to version 1.5" },
+  { name:"Motorcycle technician (repair and maintenance)", code:"ST0376", level:3, months:36, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2018-09-24", changed:"" },
+  { name:"Painter and Decorator", code:"ST0352", level:3, months:33, funding:12000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2017-06-06", changed:"Duration changed from 24 to 33 months. Level changed from 2 to 3" },
+  { name:"Pipe welder", code:"ST0851", level:3, months:48, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.2", since:"2019-07-19", changed:"" },
+  { name:"Plate Welder", code:"ST0463", level:3, months:36, funding:22000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2023-07-01", changed:"" },
+  { name:"Polymer Processing Technician", code:"ST1328", level:3, months:36, funding:25000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2023-08-09", changed:"Updated to version 1" },
+  { name:"Power Industry Distribution Cable Jointer", code:"ST1332", level:3, months:30, funding:27000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2023-11-30", changed:"" },
+  { name:"Power Industry Overhead Linesperson", code:"ST1330", level:3, months:30, funding:27000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.2", since:"2025-02-25", changed:"Version 1.1 retired" },
+  { name:"Power Industry Substation Fitter", code:"ST1331", level:3, months:30, funding:27000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.2", since:"2024-10-28", changed:"Version 1.1 retired" },
+  { name:"Print technician", code:"ST0309", level:3, months:36, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.2", since:"2019-05-24", changed:"" },
+  { name:"Process Industry Manufacturing Technician", code:"ST1407", level:3, months:36, funding:24000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2023-11-30", changed:"Updated to version 1" },
+  { name:"Project controls technician", code:"ST0163", level:3, months:36, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2017-08-17", changed:"" },
+  { name:"Rail Engineering Technician", code:"ST0342", level:3, months:36, funding:21000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.2", since:"2016-04-19", changed:"Updated to version 1.2" },
+  { name:"Railway engineering design technician", code:"ST0315", level:3, months:30, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2015-03-26", changed:"" },
+  { name:"Science Manufacturing Technician 2023", code:"ST1406", level:3, months:36, funding:22000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2024-03-04", changed:"Updated to version 1" },
+  { name:"Signage Technician", code:"ST0824", level:3, months:24, funding:10000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2020-11-09", changed:"Updated to version 1" },
+  { name:"Spectacle technician", code:"ST0383", level:3, months:18, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.2", since:"2016-12-21", changed:"" },
+  { name:"Surface Finisher", code:"ST0963", level:3, months:42, funding:24000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2023-03-23", changed:"Updated to version 1" },
+  { name:"Survival equipment fitter", code:"ST0015", level:3, months:36, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2016-06-07", changed:"" },
+  { name:"Toolmaker and tool and die maintenance technician", code:"ST1370", level:3, months:0, funding:0, route:"engineering-manufacturing", epa:"Not applicable (unit)", status:"In development", version:"1.0", since:"2026-09-18", changed:"" },
+  { name:"Vehicle damage mechanical, electrical and trim (MET) technician", code:"ST0405", level:3, months:36, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.3", since:"2019-03-22", changed:"" },
+  { name:"Vehicle damage paint technician", code:"ST0448", level:3, months:36, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.2", since:"2019-03-22", changed:"" },
+  { name:"Vehicle damage panel technician", code:"ST0403", level:3, months:36, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.3", since:"2019-03-22", changed:"" },
+  { name:"Water Industry Asset Maintenance Technician", code:"ST1404", level:3, months:48, funding:27000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2025-06-26", changed:"Updated to version 1" },
+  { name:"Water Industry Network Technician", code:"ST1292", level:3, months:30, funding:15000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2022-09-13", changed:"Updated to version 1" },
+  { name:"Water treatment technician", code:"ST0453", level:3, months:24, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2019-02-18", changed:"" },
+  { name:"Wind turbine maintenance technician", code:"ST1455", level:3, months:0, funding:0, route:"engineering-manufacturing", epa:"Not applicable (unit)", status:"In development", version:"1.0", since:"2026-09-18", changed:"" },
+  { name:"Aircraft certifying technician", code:"ST0019", level:4, months:45, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2016-07-01", changed:"" },
+  { name:"Asset Manager", code:"ST0861", level:4, months:18, funding:9000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2021-05-17", changed:"Updated to version 1" },
+  { name:"Automation and controls engineering technician", code:"ST0662", level:4, months:48, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2019-07-03", changed:"" },
+  { name:"Brewer", code:"ST0580", level:4, months:18, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.2", since:"2018-06-22", changed:"" },
+  { name:"Electrical power networks engineer", code:"ST0475", level:4, months:30, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2017-12-20", changed:"" },
+  { name:"Electrical power protection and plant commissioning engineer", code:"ST0157", level:4, months:36, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2016-09-19", changed:"" },
+  { name:"Engineer Surveyor", code:"ST0847", level:4, months:24, funding:12000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.2", since:"2025-06-19", changed:"Version 1.1 retired" },
+  { name:"Engineering manufacturing technician", code:"ST0841", level:4, months:42, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.4", since:"2019-11-05", changed:"" },
+  { name:"Fashion and textiles product technologist", code:"ST0540", level:4, months:22, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2018-10-04", changed:"" },
+  { name:"High speed rail and infrastructure technician", code:"ST0528", level:4, months:36, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2017-12-27", changed:"" },
+  { name:"Intelligence Analyst", code:"ST0292", level:4, months:48, funding:9000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2015-08-27", changed:"Duration changed from 18 to 48 months" },
+  { name:"Lead Engineering Maintenance Technician", code:"ST0999", level:4, months:36, funding:19000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.2", since:"2024-06-07", changed:"" },
+  { name:"Ordnance munitions explosives technician", code:"ST0833", level:4, months:30, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2020-05-13", changed:"" },
+  { name:"Process leader", code:"ST0695", level:4, months:24, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2019-03-04", changed:"" },
+  { name:"Propulsion technician", code:"ST0588", level:4, months:42, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2018-09-05", changed:"" },
+  { name:"Quarrying and mining blasting operations technician", code:"ST1451", level:4, months:0, funding:0, route:"engineering-manufacturing", epa:"Not applicable (unit)", status:"In development", version:"1.0", since:"2026-09-18", changed:"" },
+  { name:"Rail engineering advanced technician", code:"ST0316", level:4, months:48, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2016-04-19", changed:"" },
+  { name:"Small Vessel Chief Engineer", code:"ST0875", level:4, months:48, funding:16000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2022-06-01", changed:"Updated to version 1" },
+  { name:"Space Engineering Technician", code:"ST0855", level:4, months:48, funding:19000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2020-08-24", changed:"Status changed from Paused for starts to Approved" },
+  { name:"Textile technical specialist", code:"ST0581", level:4, months:24, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2019-11-07", changed:"" },
+  { name:"Vehicle damage assessor", code:"ST0406", level:4, months:36, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2019-04-18", changed:"" },
+  { name:"Water operations manager", code:"ST1453", level:4, months:0, funding:0, route:"engineering-manufacturing", epa:"Not applicable (unit)", status:"In development", version:"1.0", since:"2026-09-18", changed:"" },
+  { name:"Food and drink engineer", code:"ST0624", level:5, months:36, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2019-05-10", changed:"" },
+  { name:"Mineral products technician", code:"ST0605", level:5, months:36, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2019-08-28", changed:"" },
+  { name:"Nuclear technician", code:"ST0380", level:5, months:36, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2017-03-24", changed:"" },
+  { name:"Aerospace engineer", code:"ST0010", level:6, months:48, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2015-09-03", changed:"" },
+  { name:"Control systems engineer (degree)", code:"ST0023", level:6, months:42, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.2", since:"2014-11-12", changed:"" },
+  { name:"Electrical and electronic engineer (degree)", code:"ST0024", level:6, months:42, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.3", since:"2014-11-12", changed:"" },
+  { name:"Electro-mechanical Engineer", code:"ST0672", level:6, months:60, funding:27000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2020-12-16", changed:"Updated to version 1" },
+  { name:"Embedded electronic systems design and development engineer (degree)", code:"ST0151", level:6, months:36, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.3", since:"2016-06-10", changed:"" },
+  { name:"Firefighter", code:"ST0289", level:6, months:36, funding:12000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2015-09-03", changed:"Duration changed from 24 to 36 months. Level changed from 3 to 6. Updated to version 1" },
+  { name:"Food and drink advanced engineer (integrated degree)", code:"ST0529", level:6, months:60, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2018-02-27", changed:"" },
+  { name:"High integrity software engineer", code:"ST0013", level:6, months:48, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.2", since:"2015-09-03", changed:"" },
+  { name:"Manufacturing Engineer (degree)", code:"ST0025", level:6, months:42, funding:27000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.2", since:"2014-11-12", changed:"Duration changed from 48 to 42 months. Updated to version 1.2" },
+  { name:"Manufacturing manager (integrated degree)", code:"ST0515", level:6, months:42, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2019-02-22", changed:"" },
+  { name:"Materials science technologist (degree)", code:"ST0675", level:6, months:48, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2019-07-03", changed:"" },
+  { name:"Mine Management", code:"ST1309", level:6, months:48, funding:24000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2022-09-29", changed:"Updated to version 1" },
+  { name:"Naval architect", code:"ST0897", level:6, months:0, funding:0, route:"engineering-manufacturing", epa:"Not applicable (unit)", status:"In development", version:"1.0", since:"2026-09-18", changed:"" },
+  { name:"Non-destructive testing engineer (degree)", code:"ST0369", level:6, months:48, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2017-11-20", changed:"" },
+  { name:"Nuclear Reactor Desk Engineer", code:"ST0784", level:6, months:30, funding:27000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2021-05-06", changed:"Updated to version 1" },
+  { name:"Ordnance munitions and explosives (OME) professional (integrated degree)", code:"ST0574", level:6, months:60, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2018-08-08", changed:"" },
+  { name:"Packaging professional (integrated degree)", code:"ST0637", level:6, months:48, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2018-06-27", changed:"" },
+  { name:"Product design and development engineer (degree)", code:"ST0027", level:6, months:42, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2014-11-12", changed:"" },
+  { name:"Project controls professional", code:"ST0845", level:6, months:48, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2021-08-03", changed:"" },
+  { name:"Rail and rail systems senior engineer (integrated degree)", code:"ST0496", level:6, months:36, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2018-07-13", changed:"" },
+  { name:"Robotics Engineer (degree)", code:"ST1317", level:6, months:48, funding:27000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.2", since:"2024-11-18", changed:"Version 1.1 retired" },
+  { name:"Science industry process and plant engineer (degree)", code:"ST0473", level:6, months:60, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2018-02-27", changed:"" },
+  { name:"Space Systems Engineer", code:"ST0856", level:6, months:48, funding:27000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2025-11-14", changed:"Version 1.0 retired" },
+  { name:"Systems engineer (integrated degree)", code:"ST1478", level:6, months:0, funding:0, route:"engineering-manufacturing", epa:"Not applicable (unit)", status:"In development", version:"1.0", since:"2026-09-18", changed:"" },
+  { name:"Tool process design engineer", code:"ST0641", level:6, months:48, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2020-07-10", changed:"" },
+  { name:"Advanced Robotics Engineer", code:"ST1381", level:7, months:36, funding:27000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2024-04-26", changed:"Updated to version 1" },
+  { name:"Digital manufacturing engineering leader", code:"ST1376", level:7, months:36, funding:0, route:"engineering-manufacturing", epa:"Pending — standard in development", status:"In development", version:"1.0", since:"2026-09-18", changed:"" },
+  { name:"Geotechnical Engineer (integrated degree)", code:"ST0881", level:7, months:30, funding:21000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2021-08-03", changed:"Updated to version 1" },
+  { name:"Human Factors Specialist", code:"ST0785", level:7, months:36, funding:19000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2023-05-11", changed:"Updated to version 1" },
+  { name:"Infrastructure Asset Management Professional", code:"ST0860", level:7, months:24, funding:20000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2023-08-29", changed:"Updated to version 1" },
+  { name:"Materials process engineer (degree)", code:"ST0659", level:7, months:24, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2019-03-22", changed:"" },
+  { name:"Ordnance munitions and explosives specialist (integrated degree)", code:"ST0834", level:7, months:36, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2020-07-10", changed:"" },
+  { name:"Post graduate engineer", code:"ST0456", level:7, months:30, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2017-03-31", changed:"" },
+  { name:"Power and Propulsion Gas Turbine Engineer", code:"ST0790", level:7, months:36, funding:16000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.0", since:"2024-12-17", changed:"" },
+  { name:"Rail and rail systems principal engineer (integrated degree)", code:"ST0497", level:7, months:48, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2018-06-27", changed:"" },
+  { name:"Risk and safety management professional (degree)", code:"ST0465", level:7, months:36, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.2", since:"2018-09-24", changed:"" },
+  { name:"Systems engineer (degree)", code:"ST0107", level:7, months:48, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.2", since:"2015-09-11", changed:"" },
+  { name:"Through life engineering services specialist (integrated degree)", code:"ST0740", level:7, months:24, funding:0, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1", since:"2019-08-21", changed:"" },
+  { name:"Tunnel engineer (degree)", code:"ST1344", level:7, months:30, funding:0, route:"engineering-manufacturing", epa:"Pending — standard in development", status:"In development", version:"1.0", since:"2026-09-18", changed:"" },
+  { name:"Barbering Professional", code:"ST1273", level:2, months:18, funding:9000, route:"hair-beauty", epa:"Assigned", status:"Approved", version:"1", since:"2023-05-22", changed:"Updated to version 1" },
+  { name:"Beauty Professional", code:"ST0219", level:2, months:18, funding:9000, route:"hair-beauty", epa:"Assigned", status:"Approved", version:"1.1", since:"2023-05-22", changed:"" },
+  { name:"Beauty therapist", code:"ST0630", level:2, months:15, funding:0, route:"hair-beauty", epa:"Assigned", status:"Approved", version:"1", since:"2018-10-11", changed:"" },
+  { name:"Hairdressing Professional", code:"ST0217H", level:2, months:24, funding:9000, route:"hair-beauty", epa:"Assigned", status:"Approved", version:"1.2", since:"2016-12-21", changed:"Duration changed from 18 to 24 months. Updated to version 1.2" },
+  { name:"Nail services technician", code:"ST0635", level:2, months:12, funding:0, route:"hair-beauty", epa:"Assigned", status:"Approved", version:"1", since:"2018-12-07", changed:"" },
+  { name:"Advanced and Creative Hair Professional", code:"ST0218", level:3, months:12, funding:9000, route:"hair-beauty", epa:"Assigned", status:"Approved", version:"1", since:"2020-02-03", changed:"Duration changed from 18 to 12 months. Updated to version 1" },
+  { name:"Advanced Beauty Therapist", code:"ST0220", level:3, months:18, funding:9000, route:"hair-beauty", epa:"Assigned", status:"Approved", version:"1", since:"2020-05-13", changed:"Updated to version 1" },
+  { name:"Wellbeing and Holistic Therapist", code:"ST0685", level:3, months:20, funding:9000, route:"hair-beauty", epa:"Assigned", status:"Approved", version:"1.1", since:"2025-12-09", changed:"Version 1.0 retired" },
+  { name:"Aesthetic practitioner - skin rejuvenation", code:"ST1238", level:5, months:14, funding:0, route:"hair-beauty", epa:"Pending — standard in development", status:"In development", version:"1.0", since:"2026-09-18", changed:"" },
+  { name:"Advanced and Creative Hair Professional", code:"ST0218", level:2, months:14, funding:9000, route:"health-science", epa:"Assigned", status:"Approved", version:"1.1", since:"2016-05-10", changed:"Duration changed from 18 to 14 months. Level changed from 3 to 2. Updated to version 1.1" },
+  { name:"Cleaning Hygiene Operative", code:"", level:2, months:12, funding:4000, route:"health-science", epa:"Assigned", status:"Approved", version:"1.1", since:"2020-02-03", changed:"Updated to version 1.1. Status changed from Defunded from Sept 2026 to Approved", article:"defunding-16" },
+  { name:"Community activator coach", code:"ST0478", level:2, months:18, funding:0, route:"health-science", epa:"Assigned", status:"Approved", version:"1.3", since:"2017-12-15", changed:"" },
+  { name:"Health and Social Care foundation apprenticeship", code:"FA0007", level:2, months:8, funding:3000, route:"health-science", epa:"Assigned", status:"Approved", version:"1.1", since:"2025-04-29", changed:"" },
+  { name:"Leisure team member", code:"ST0390", level:2, months:18, funding:0, route:"health-science", epa:"Assigned", status:"Approved", version:"1.2", since:"2019-02-18", changed:"" },
+  { name:"Pharmacy Services Assistant", code:"ST0322", level:2, months:12, funding:3000, route:"health-science", epa:"Assigned", status:"Approved", version:"1.1", since:"2023-04-01", changed:"" },
+  { common:true, name:"Senior Healthcare Support Worker", code:"ST0216", level:2, months:8, funding:5000, route:"health-science", epa:"Assigned", status:"Approved", version:"1.3", since:"2016-05-19", changed:"Duration changed from 18 to 8 months. Level changed from 3 to 2. Updated to version 1.3" },
+  { name:"Ambulance support worker (emergency, urgent and non-urgent)", code:"ST0627", level:3, months:13, funding:0, route:"health-science", epa:"Assigned", status:"Approved", version:"1", since:"2018-06-26", changed:"" },
+  { name:"Clinical coder", code:"ST0535", level:3, months:18, funding:0, route:"health-science", epa:"Assigned", status:"Approved", version:"1", since:"2019-04-12", changed:"" },
+  { name:"Community Health and Wellbeing Worker", code:"ST0958", level:3, months:12, funding:7000, route:"health-science", epa:"Assigned", status:"Approved", version:"1.1", since:"2021-09-14", changed:"Status changed from In development to Approved" },
+  { name:"Community sport and health officer", code:"ST0093", level:3, months:16, funding:0, route:"health-science", epa:"Assigned", status:"Approved", version:"1.2", since:"2018-03-09", changed:"" },
+  { name:"Dental Nurse", code:"ST1431", level:3, months:18, funding:8000, route:"health-science", epa:"Assigned", status:"Approved", version:"2", since:"2024-08-27", changed:"Updated to version 2" },
+  { name:"Food and Drink Process Operator", code:"ST0198", level:3, months:24, funding:6000, route:"health-science", epa:"Assigned", status:"Approved", version:"1.2", since:"2016-08-25", changed:"Duration changed from 12 to 24 months. Level changed from 2 to 3. Updated to version 1.2" },
+  { common:true, name:"Healthcare Support Worker", code:"ST0217", level:3, months:24, funding:3000, route:"health-science", epa:"Assigned", status:"Approved", version:"1.6", since:"2016-10-31", changed:"Duration changed from 12 to 24 months. Level changed from 2 to 3. Updated to version 1.6" },
+  { name:"Laboratory Technician", code:"ST0246", level:3, months:24, funding:15000, route:"health-science", epa:"Assigned", status:"Approved", version:"1.3", since:"2014-12-09", changed:"Updated to version 1.3" },
+  { name:"Metrology technician", code:"ST0282", level:3, months:36, funding:0, route:"health-science", epa:"Assigned", status:"Approved", version:"1.2", since:"2017-08-17", changed:"" },
+  { name:"Mortuary Technician", code:"ST0889", level:3, months:18, funding:13000, route:"health-science", epa:"Assigned", status:"Approved", version:"1.1", since:"2025-12-10", changed:"Version 1.0 retired" },
+  { name:"Optical Assistant 2022", code:"ST1377", level:3, months:18, funding:8000, route:"health-science", epa:"Assigned", status:"Approved", version:"1.2", since:"2025-12-10", changed:"Version 1.1 retired" },
+  { name:"Outdoor activity instructor", code:"ST0479", level:3, months:12, funding:0, route:"health-science", epa:"Assigned", status:"Approved", version:"1.1", since:"2018-09-24", changed:"" },
+  { name:"Peer Worker", code:"ST0896", level:3, months:15, funding:5000, route:"health-science", epa:"Assigned", status:"Approved", version:"1", since:"2022-07-20", changed:"Updated to version 1" },
+  { name:"Personal trainer", code:"ST0302", level:3, months:15, funding:0, route:"health-science", epa:"Assigned", status:"Approved", version:"1.1", since:"2018-08-08", changed:"" },
+  { name:"Pharmacy Technician (integrated)", code:"ST0311", level:3, months:24, funding:12000, route:"health-science", epa:"Assigned", status:"Approved", version:"2", since:"2019-07-03", changed:"Updated to version 2" },
+  { name:"Prosthetic and orthotic technician", code:"ST0632", level:3, months:18, funding:0, route:"health-science", epa:"Assigned", status:"Approved", version:"1.1", since:"2018-11-07", changed:"" },
+  { name:"Sporting excellence professional", code:"ST0524", level:3, months:18, funding:0, route:"health-science", epa:"Assigned", status:"Approved", version:"1.1", since:"2019-05-07", changed:"" },
+  { name:"Surveying Technician", code:"ST0058", level:3, months:24, funding:15000, route:"health-science", epa:"Assigned", status:"Approved", version:"1.2", since:"2017-06-09", changed:"Updated to version 1.2" },
+  { name:"Water Industry Treatment Process Technician", code:"ST1291", level:3, months:36, funding:16000, route:"health-science", epa:"Assigned", status:"Approved", version:"1.1", since:"2023-06-30", changed:"Version 1.0 retired" },
+  { name:"Advanced Beauty Therapist", code:"ST0220", level:4, months:24, funding:9000, route:"health-science", epa:"Assigned", status:"Approved", version:"1.1", since:"2016-10-31", changed:"Duration changed from 18 to 24 months. Level changed from 3 to 4. Updated to version 1.1" },
+  { name:"Associate Ambulance Practitioner", code:"ST0245", level:4, months:18, funding:9000, route:"health-science", epa:"Assigned", status:"Approved", version:"1.3", since:"2017-01-12", changed:"Updated to version 1.3" },
+  { name:"Hygiene specialist", code:"ST0873", level:4, months:24, funding:0, route:"health-science", epa:"Assigned", status:"Approved", version:"1.1", since:"2020-07-10", changed:"" },
+  { name:"Mammography associate", code:"ST0583", level:4, months:12, funding:0, route:"health-science", epa:"Assigned", status:"Approved", version:"1.3", since:"2018-08-22", changed:"" },
+  { name:"Oral health practitioner", code:"ST0542", level:4, months:14, funding:0, route:"health-science", epa:"Assigned", status:"Approved", version:"1.1", since:"2019-03-07", changed:"" },
+  { name:"Orthodontic Therapist", code:"ST1434", level:4, months:13, funding:18000, route:"health-science", epa:"Assigned", status:"Approved", version:"2", since:"2024-12-12", changed:"Updated to version 2" },
+  { name:"Sports coach", code:"ST0770", level:4, months:18, funding:0, route:"health-science", epa:"Assigned", status:"Approved", version:"1.3", since:"2021-02-15", changed:"" },
+  { name:"Sports massage therapist", code:"ST1435", level:4, months:0, funding:0, route:"health-science", epa:"Not applicable (unit)", status:"Proposal in development", version:"1.0", since:"2026-09-18", changed:"" },
+  { name:"Assistant practitioner (health)", code:"ST0215", level:5, months:24, funding:0, route:"health-science", epa:"Assigned", status:"Approved", version:"1.2", since:"2016-05-19", changed:"" },
+  { name:"Associate continuing healthcare practitioner", code:"ST0786", level:5, months:24, funding:0, route:"health-science", epa:"Assigned", status:"Approved", version:"1.1", since:"2019-07-11", changed:"" },
+  { name:"Clinical Dental Technician", code:"ST1433", level:5, months:24, funding:18000, route:"health-science", epa:"Assigned", status:"Approved", version:"2", since:"2024-12-12", changed:"Updated to version 2" },
+  { name:"Dairy technologist", code:"ST0393", level:5, months:36, funding:0, route:"health-science", epa:"Assigned", status:"Approved", version:"1.2", since:"2016-10-31", changed:"" },
+  { name:"Dental Technician", code:"ST1432", level:5, months:36, funding:22000, route:"health-science", epa:"Assigned", status:"Approved", version:"2", since:"2024-12-11", changed:"Updated to version 2" },
+  { name:"Embalmer", code:"ST0890", level:5, months:36, funding:20000, route:"health-science", epa:"Assigned", status:"Approved", version:"1.1", since:"2025-12-09", changed:"Version 1.0 retired" },
+  { name:"Health play specialist", code:"ST0829", level:5, months:24, funding:0, route:"health-science", epa:"Assigned", status:"Approved", version:"1.1", since:"2019-09-30", changed:"" },
+  { name:"Hearing aid dispenser", code:"ST0600", level:5, months:24, funding:0, route:"health-science", epa:"Assigned", status:"Approved", version:"2", since:"2019-03-15", changed:"" },
+  { common:true, name:"Nursing Associate (NMC 2018)", code:"ST0827", level:5, months:24, funding:15000, route:"health-science", epa:"Assigned", status:"Approved", version:"2", since:"2019-04-08", changed:"Updated to version 2" },
+  { name:"Outdoor Learning Specialist", code:"ST0945", level:5, months:24, funding:13000, route:"health-science", epa:"Assigned", status:"Approved", version:"1", since:"2022-02-02", changed:"Updated to version 1. Status changed from Defunded from Sept 2026 to Approved", article:"defunding-16" },
+  { name:"Senior metrology technician", code:"ST0283", level:5, months:36, funding:0, route:"health-science", epa:"Assigned", status:"Approved", version:"1.1", since:"2018-08-07", changed:"" },
+  { name:"Technician scientist", code:"ST0597", level:5, months:36, funding:0, route:"health-science", epa:"Assigned", status:"Approved", version:"1.1", since:"2018-08-07", changed:"" },
+  { name:"Vision rehabilitation specialist", code:"ST0431", level:5, months:24, funding:0, route:"health-science", epa:"Assigned", status:"Approved", version:"1.2", since:"2018-02-27", changed:"" },
+  { name:"Biomedical Scientist", code:"ST1314", level:6, months:36, funding:27000, route:"health-science", epa:"Assigned", status:"Approved", version:"2", since:"2023-08-16", changed:"Updated to version 2" },
+  { name:"Clinical trials specialist (degree)", code:"ST0609", level:6, months:60, funding:0, route:"health-science", epa:"Assigned", status:"Approved", version:"1.1", since:"2018-06-28", changed:"" },
+  { name:"Dental Hygienist", code:"ST1383", level:6, months:36, funding:27000, route:"health-science", epa:"Assigned", status:"Approved", version:"2", since:"2024-07-24", changed:"Updated to version 2" },
+  { name:"Diagnostic radiographer", code:"ST0619", level:6, months:36, funding:0, route:"health-science", epa:"Assigned", status:"Approved", version:"2", since:"2019-04-05", changed:"" },
+  { name:"Dietitian", code:"ST0599", level:6, months:48, funding:0, route:"health-science", epa:"Assigned", status:"Approved", version:"2", since:"2019-07-03", changed:"" },
+  { name:"Dispensing Optician", code:"ST0774", level:6, months:36, funding:23000, route:"health-science", epa:"Assigned", status:"Approved", version:"2", since:"2023-12-13", changed:"Updated to version 2" },
+  { name:"Enhanced Clinical Practitioner", code:"ST0895", level:6, months:18, funding:7000, route:"health-science", epa:"Assigned", status:"Approved", version:"1.2", since:"2025-11-20", changed:"Version 1.1 retired" },
+  { name:"Environmental health practitioner (integrated degree)", code:"ST0714", level:6, months:48, funding:0, route:"health-science", epa:"Assigned", status:"Approved", version:"1", since:"2019-06-14", changed:"" },
+  { name:"Food industry technical professional (integrated degree)", code:"ST0197", level:6, months:48, funding:0, route:"health-science", epa:"Assigned", status:"Approved", version:"1.1", since:"2017-06-27", changed:"" },
+  { name:"General Welder", code:"ST0517", level:6, months:48, funding:9000, route:"health-science", epa:"Assigned", status:"Approved", version:"2", since:"2018-12-07", changed:"Duration changed from 18 to 48 months. Level changed from 2 to 6. Updated to version 2" },
+  { name:"Geoscientist (integrated degree)", code:"ST1356", level:6, months:60, funding:0, route:"health-science", epa:"Assigned", status:"Approved", version:"1.1", since:"2023-10-16", changed:"" },
+  { name:"Healthcare science practitioner (integrated degree)", code:"ST0413", level:6, months:36, funding:0, route:"health-science", epa:"Assigned", status:"Approved", version:"1.1", since:"2017-03-31", changed:"" },
+  { name:"Laboratory Scientist (degree)", code:"ST0247", level:6, months:60, funding:27000, route:"health-science", epa:"Assigned", status:"Approved", version:"1.1", since:"2023-08-01", changed:"" },
+  { name:"Midwife (2019 NMC standards)", code:"ST0948", level:6, months:48, funding:26000, route:"health-science", epa:"Assigned", status:"Approved", version:"2", since:"2020-10-02", changed:"Updated to version 2" },
+  { name:"Operating department practitioner", code:"ST0582", level:6, months:48, funding:0, route:"health-science", epa:"Assigned", status:"Approved", version:"2", since:"2018-06-28", changed:"" },
+  { name:"Orthoptist", code:"ST1272", level:6, months:36, funding:25000, route:"health-science", epa:"Assigned", status:"Approved", version:"2", since:"2024-08-22", changed:"Updated to version 2" },
+  { name:"Osteopath", code:"ST1462", level:6, months:48, funding:27000, route:"health-science", epa:"Assigned", status:"Approved", version:"2", since:"2026-02-18", changed:"Updated to version 2" },
+  { name:"Physiotherapist", code:"ST0519", level:6, months:48, funding:0, route:"health-science", epa:"Assigned", status:"Approved", version:"2", since:"2018-12-18", changed:"" },
+  { name:"Podiatrist", code:"ST0493", level:6, months:48, funding:0, route:"health-science", epa:"Assigned", status:"Approved", version:"2", since:"2018-05-14", changed:"" },
+  { name:"Prosthetist and orthotist", code:"ST0601", level:6, months:48, funding:0, route:"health-science", epa:"Assigned", status:"Approved", version:"2", since:"2018-10-31", changed:"" },
+  { name:"Psychological wellbeing practitioner", code:"ST0568", level:6, months:12, funding:0, route:"health-science", epa:"Assigned", status:"Approved", version:"2", since:"2019-03-22", changed:"" },
+  { name:"Public health practitioner - integrated degree", code:"ST0631", level:6, months:36, funding:0, route:"health-science", epa:"Assigned", status:"Approved", version:"1.2", since:"2019-09-30", changed:"" },
+  { name:"Registered Nurse (degree)", code:"ST0781", level:6, months:48, funding:26000, route:"health-science", epa:"Assigned", status:"Approved", version:"2", since:"2019-02-13", changed:"Updated to version 2" },
+  { name:"Scaffolder", code:"ST0567", level:6, months:36, funding:16000, route:"health-science", epa:"Assigned", status:"Approved", version:"2", since:"2018-08-08", changed:"Duration changed from 24 to 36 months. Level changed from 2 to 6. Updated to version 2" },
+  { name:"Scientist", code:"ST0626", level:6, months:60, funding:0, route:"health-science", epa:"Assigned", status:"Approved", version:"1.2", since:"2018-01-03", changed:"" },
+  { name:"Sonographer (integrated degree)", code:"ST0554", level:6, months:36, funding:0, route:"health-science", epa:"Assigned", status:"Approved", version:"1.1", since:"2019-08-16", changed:"" },
+  { name:"Speech and language therapist", code:"ST0618", level:6, months:48, funding:0, route:"health-science", epa:"Assigned", status:"Approved", version:"2", since:"2019-07-03", changed:"" },
+  { name:"Therapeutic radiographer", code:"ST0620", level:6, months:36, funding:0, route:"health-science", epa:"Assigned", status:"Approved", version:"2", since:"2019-04-15", changed:"" },
+  { name:"Advanced clinical practitioner (integrated degree)", code:"ST0564", level:7, months:36, funding:0, route:"health-science", epa:"Assigned", status:"Approved", version:"1", since:"2018-03-27", changed:"" },
+  { name:"Arts therapist", code:"ST0633", level:7, months:24, funding:0, route:"health-science", epa:"Assigned", status:"Approved", version:"2", since:"2019-04-05", changed:"" },
+  { name:"Bioinformatics scientist (degree)", code:"ST0649", level:7, months:30, funding:0, route:"health-science", epa:"Assigned", status:"Approved", version:"1", since:"2019-01-29", changed:"" },
+  { name:"Clinical Associate in Psychology (integrated degree)", code:"ST0820", level:7, months:18, funding:16000, route:"health-science", epa:"Assigned", status:"Approved", version:"1.1", since:"2025-02-11", changed:"Version 1.0 retired" },
+  { name:"Clinical Pharmacology Scientist (integrated degree)", code:"ST0798", level:7, months:30, funding:18000, route:"health-science", epa:"Assigned", status:"Approved", version:"1", since:"2020-10-23", changed:"Updated to version 1" },
+  { name:"Clinical Scientist", code:"ST0893", level:7, months:36, funding:20000, route:"health-science", epa:"Assigned", status:"Approved", version:"1.1", since:"2023-07-24", changed:"Version 1.0 retired" },
+  { name:"Cognitive behavioural psychotherapist", code:"ST1382", level:7, months:0, funding:0, route:"health-science", epa:"Not applicable (unit)", status:"Proposal in development", version:"1.0", since:"2026-09-18", changed:"" },
+  { name:"Community Nurse Specialist Practitioner (NMC 2022)", code:"ST1419", level:7, months:24, funding:14000, route:"health-science", epa:"Assigned", status:"Approved", version:"2", since:"2023-09-20", changed:"Updated to version 2" },
+  { name:"Doctor (degree)", code:"ST0995", level:7, months:60, funding:27000, route:"health-science", epa:"Assigned", status:"Approved", version:"2", since:"2022-07-19", changed:"Updated to version 2" },
+  { name:"Family and Systemic Psychotherapist", code:"ST1310", level:7, months:24, funding:16000, route:"health-science", epa:"none", status:"Approved", version:"1.1", since:"2024-10-25", changed:"Version 1.0 retired; no assessment organisation yet" },
+  { name:"Health and care intelligence specialist", code:"ST0830", level:7, months:36, funding:0, route:"health-science", epa:"Assigned", status:"Approved", version:"1", since:"2020-07-10", changed:"" },
+  { name:"Hydrogeologist (integrated degree)", code:"ST1399", level:7, months:0, funding:0, route:"health-science", epa:"Not applicable (unit)", status:"In development", version:"1.0", since:"2026-09-18", changed:"" },
+  { name:"Medical Statistician", code:"ST0892", level:7, months:30, funding:17000, route:"health-science", epa:"Assigned", status:"Approved", version:"1", since:"2021-11-12", changed:"Updated to version 1" },
+  { name:"Optometrist", code:"ST0773", level:7, months:0, funding:0, route:"health-science", epa:"Not applicable (unit)", status:"In development", version:"1.0", since:"2026-09-18", changed:"" },
+  { name:"Pharmacist (degree)", code:"ST0702", level:7, months:0, funding:0, route:"health-science", epa:"Not applicable (unit)", status:"Proposal in development", version:"1.0", since:"2026-09-18", changed:"" },
+  { name:"Physician associate - integrated degree", code:"ST0518", level:7, months:30, funding:0, route:"health-science", epa:"Assigned", status:"Approved", version:"1.2", since:"2019-09-30", changed:"" },
+  { name:"Regulatory affairs specialist", code:"ST0586", level:7, months:30, funding:0, route:"health-science", epa:"Assigned", status:"Approved", version:"1.1", since:"2018-11-08", changed:"" },
+  { name:"Research scientist", code:"ST0759", level:7, months:30, funding:0, route:"health-science", epa:"Assigned", status:"Approved", version:"1.1", since:"2019-05-13", changed:"" },
+  { name:"Soil Scientist", code:"ST1362", level:7, months:24, funding:21000, route:"health-science", epa:"Assigned", status:"Approved", version:"1", since:"2023-10-26", changed:"Updated to version 1" },
+  { name:"Specialist Community Public Health Nurse (NMC 2022)", code:"ST1418", level:7, months:18, funding:14000, route:"health-science", epa:"Assigned", status:"Approved", version:"2", since:"2023-09-20", changed:"Updated to version 2" },
+  { name:"Surgical care practitioner", code:"ST1475", level:7, months:36, funding:0, route:"health-science", epa:"Pending — standard in development", status:"In development", version:"1.0", since:"2026-09-18", changed:"" },
+  { common:true, name:"Accounts or Finance Assistant", code:"ST0002", level:2, months:12, funding:5000, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"2", since:"2019-07-19", changed:"Updated to version 2" },
+  { name:"Advanced Carpentry and Joinery", code:"ST0176", level:2, months:12, funding:15000, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"1", since:"2016-03-10", changed:"Duration changed from 18 to 12 months. Level changed from 3 to 2. Updated to version 1" },
+  { common:true, name:"Accounts or Finance Assistant", code:"ST0002", level:3, months:15, funding:5000, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"2", since:"2016-09-07", changed:"Duration changed from 12 to 15 months. Level changed from 2 to 3. Updated to version 2" },
+  { name:"Asset finance practitioner", code:"ST0880", level:3, months:24, funding:0, route:"legal-finance-accounting", epa:"Pending — standard in development", status:"In development", version:"1.0", since:"2026-09-18", changed:"" },
+  { name:"Assistant Accountant", code:"ST0002B", level:3, months:15, funding:8000, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"1.1", since:"2023-04-01", changed:"" },
+  { name:"Associate Ambulance Practitioner", code:"ST0245", level:3, months:24, funding:9000, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"1.3", since:"2015-09-03", changed:"Duration changed from 18 to 24 months. Level changed from 4 to 3. Updated to version 1.3" },
+  { common:true, name:"Carpentry and Joinery", code:"ST0175", level:3, months:18, funding:15000, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"1.1", since:"2016-10-31", changed:"Duration changed from 24 to 18 months. Level changed from 2 to 3. Updated to version 1.1" },
+  { name:"Compliance and Risk Officer", code:"ST0123", level:3, months:15, funding:9000, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"2", since:"2016-09-19", changed:"Duration changed from 24 to 15 months. Updated to version 2" },
+  { name:"Financial services administrator", code:"ST0177", level:3, months:12, funding:0, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"1.3", since:"2014-11-12", changed:"" },
+  { name:"Financial services customer adviser", code:"ST0185", level:3, months:18, funding:0, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"2", since:"2015-08-27", changed:"" },
+  { name:"HR Consultant Partner", code:"ST0240", level:3, months:12, funding:7000, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"1.4", since:"2015-10-30", changed:"Duration changed from 24 to 12 months. Level changed from 5 to 3. Updated to version 1.4" },
+  { name:"Mortgage adviser", code:"ST0182", level:3, months:12, funding:0, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"2", since:"2015-11-19", changed:"" },
+  { name:"Motor finance specialist", code:"ST0474", level:3, months:24, funding:0, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"1.1", since:"2017-12-04", changed:"" },
+  { name:"Paralegal", code:"ST0137", level:3, months:24, funding:9000, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"1.1", since:"2023-06-01", changed:"" },
+  { name:"Payroll administrator", code:"ST0073", level:3, months:18, funding:0, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"2", since:"2018-06-13", changed:"" },
+  { name:"Pensions administrator", code:"ST0187", level:3, months:18, funding:0, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"2", since:"2015-08-27", changed:"" },
+  { name:"Actuarial technician", code:"ST0004", level:4, months:24, funding:0, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"2", since:"2015-03-26", changed:"" },
+  { name:"Insurance Practitioner", code:"ST0241", level:4, months:24, funding:6000, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"2", since:"2015-11-19", changed:"Duration changed from 18 to 24 months. Level changed from 3 to 4. Updated to version 2" },
+  { name:"Internal Audit Technician", code:"ST1484", level:4, months:18, funding:10000, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"2", since:"2026-03-13", changed:"Updated to version 2" },
+  { name:"Investment operations specialist", code:"ST0180", level:4, months:18, funding:0, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"2", since:"2015-08-27", changed:"" },
+  { name:"Legal Technician — conveyancing or probate", code:"ST1312", level:4, months:24, funding:10000, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"2", since:"2024-01-03", changed:"Updated to version 2" },
+  { name:"Manufacturing Support Technician", code:"ST0587", level:4, months:18, funding:19000, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"1", since:"2018-06-22", changed:"Duration changed from 36 to 18 months. Level changed from 3 to 4. Updated to version 1" },
+  { name:"Paraplanner and Financial Planner", code:"ST1301", level:4, months:24, funding:13000, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"1", since:"2025-05-02", changed:"Updated to version 1" },
+  { name:"Professional Accounting or Taxation Technician", code:"ST0003", level:4, months:18, funding:8000, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"2", since:"2016-07-21", changed:"Updated to version 2" },
+  { name:"Professional Taxation Technician", code:"ST1458", level:4, months:24, funding:15000, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"2", since:"2025-05-08", changed:"Updated to version 2" },
+  { name:"Senior pensions administrator", code:"ST1461", level:4, months:20, funding:0, route:"legal-finance-accounting", epa:"Pending — standard in development", status:"Proposal in development", version:"1.0", since:"2026-09-18", changed:"" },
+  { name:"Treasury assistant", code:"ST1485", level:4, months:18, funding:0, route:"legal-finance-accounting", epa:"Pending — standard in development", status:"In development", version:"1.0", since:"2026-09-18", changed:"" },
+  { name:"Advanced Paralegal", code:"ST1476", level:5, months:24, funding:18000, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"2", since:"2025-07-25", changed:"Updated to version 2" },
+  { name:"Payroll Assistant Manager", code:"ST0869", level:5, months:24, funding:11000, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"2", since:"2020-12-16", changed:"Updated to version 2" },
+  { name:"Accounting Finance Manager", code:"ST1303", level:6, months:36, funding:27000, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"1", since:"2023-02-21", changed:"Updated to version 1" },
+  { name:"Actuarial analyst", code:"ST1473", level:6, months:0, funding:0, route:"legal-finance-accounting", epa:"Not applicable (unit)", status:"In development", version:"1.0", since:"2026-09-18", changed:"" },
+  { name:"Certified internal auditor", code:"ST1487", level:6, months:0, funding:0, route:"legal-finance-accounting", epa:"Not applicable (unit)", status:"In development", version:"1.0", since:"2026-09-18", changed:"" },
+  { name:"Chartered legal executive", code:"ST0244", level:6, months:60, funding:0, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"2.1", since:"2015-09-03", changed:"" },
+  { name:"Consumer financial services professional", code:"ST1464", level:6, months:36, funding:0, route:"legal-finance-accounting", epa:"Pending — standard in development", status:"In development", version:"1.0", since:"2026-09-18", changed:"" },
+  { name:"Corporate treasurer", code:"ST1468", level:6, months:36, funding:0, route:"legal-finance-accounting", epa:"Pending — standard in development", status:"In development", version:"1.0", since:"2026-09-18", changed:"" },
+  { name:"Costs Lawyer", code:"ST1400", level:6, months:48, funding:21000, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"2", since:"2024-09-16", changed:"Updated to version 2" },
+  { name:"Financial investment professional", code:"ST1465", level:6, months:36, funding:0, route:"legal-finance-accounting", epa:"Pending — standard in development", status:"In development", version:"1.0", since:"2026-09-18", changed:"" },
+  { name:"Financial Services Professional", code:"ST0472", level:6, months:42, funding:21000, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"1", since:"2017-12-06", changed:"Duration changed from 36 to 42 months. Updated to version 1" },
+  { name:"Fintech Product Manager", code:"ST1460", level:6, months:0, funding:0, route:"legal-finance-accounting", epa:"Not applicable (unit)", status:"Proposal in development", version:"1.0", since:"2026-09-18", changed:"" },
+  { name:"Licensed Conveyancer or Licensed Probate Practitioner", code:"ST1311", level:6, months:56, funding:18000, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"2", since:"2023-12-06", changed:"Updated to version 2" },
+  { name:"Patent scientist or patent engineer", code:"ST1454", level:6, months:0, funding:0, route:"legal-finance-accounting", epa:"Not applicable (unit)", status:"In development", version:"1.0", since:"2026-09-18", changed:"" },
+  { name:"Professional economist (integrated degree)", code:"ST0603", level:6, months:42, funding:0, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"1", since:"2018-08-08", changed:"" },
+  { name:"Senior compliance and risk specialist", code:"ST0363", level:6, months:36, funding:0, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"1.1", since:"2016-09-19", changed:"" },
+  { name:"Senior insurance professional", code:"ST0520", level:6, months:36, funding:0, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"2", since:"2017-11-07", changed:"" },
+  { name:"Trading Standards Professional", code:"ST0998", level:6, months:36, funding:22000, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"1.1", since:"2024-11-14", changed:"Version 1.0 retired" },
+  { name:"Accountancy or Taxation Professional", code:"ST0001", level:7, months:36, funding:21000, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"1", since:"2017-11-07", changed:"Updated to version 1", article:"level-7" },
+  { name:"Actuary", code:"ST0502", level:7, months:39, funding:0, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"2", since:"2018-03-27", changed:"" },
+  { name:"Barrister", code:"ST1389", level:7, months:72, funding:27000, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"2", since:"2024-02-19", changed:"Updated to version 2" },
+  { name:"Chartered Legal Executive Litigator and Advocate", code:"ST1368", level:7, months:66, funding:27000, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"2.1", since:"2026-05-01", changed:"Version 2.0 retired; 2.1 current" },
+  { name:"Chartered tax advisor", code:"ST1459", level:7, months:36, funding:0, route:"legal-finance-accounting", epa:"Pending — standard in development", status:"In development", version:"1.0", since:"2026-09-18", changed:"" },
+  { name:"Internal audit professional", code:"ST0610", level:7, months:36, funding:0, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"1", since:"2018-08-08", changed:"" },
+  { name:"Laboratory Technician", code:"ST0246", level:7, months:72, funding:15000, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"2", since:"2015-09-03", changed:"Duration changed from 24 to 72 months. Level changed from 3 to 7. Updated to version 2" },
+  { name:"Senior investment and commercial banking professional", code:"ST0561", level:7, months:18, funding:0, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"1", since:"2018-05-08", changed:"" },
+  { name:"Senior professional economist", code:"ST0796", level:7, months:24, funding:0, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"2", since:"2019-12-20", changed:"" },
+  { name:"Solicitor", code:"ST0246S", level:7, months:60, funding:27000, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"1.2", since:"2026-01-01", changed:"Level 7 age restriction now applies to new starts", article:"level-7" },
+  { name:"HM forces serviceperson (protective services)", code:"ST0222", level:2, months:12, funding:0, route:"protective-services", epa:"Assigned", status:"Approved", version:"1.1", since:"2016-06-10", changed:"" },
+  { name:"Professional Security Operative", code:"ST1016", level:2, months:12, funding:6000, route:"protective-services", epa:"Assigned", status:"Approved", version:"1", since:"2023-07-27", changed:"Updated to version 1. Status changed from Defunded from Sept 2026 to Approved", article:"defunding-16" },
+  { name:"Community fire safety advisor", code:"ST0593", level:3, months:12, funding:0, route:"protective-services", epa:"Assigned", status:"Approved", version:"1.2", since:"2019-03-22", changed:"" },
+  { name:"Custody and Detention Professional", code:"", level:3, months:12, funding:5000, route:"protective-services", epa:"Assigned", status:"Approved", version:"1.1", since:"2018-05-08", changed:"Updated to version 1.1. Status changed from Defunded from Sept 2026 to Approved", article:"defunding-16" },
+  { name:"Emergency contact handler", code:"ST0483", level:3, months:12, funding:0, route:"protective-services", epa:"Assigned", status:"Approved", version:"1.2", since:"2018-04-12", changed:"" },
+  { name:"Fire safety advisor", code:"ST0188", level:3, months:18, funding:0, route:"protective-services", epa:"Assigned", status:"Approved", version:"1.2", since:"2018-02-27", changed:"" },
+  { name:"Operational firefighter", code:"ST0486", level:3, months:24, funding:0, route:"protective-services", epa:"Assigned", status:"Approved", version:"1.3", since:"2018-02-27", changed:"" },
+  { name:"Prison Officer", code:"ST0646", level:3, months:12, funding:6000, route:"protective-services", epa:"Assigned", status:"Approved", version:"1.1", since:"2023-06-01", changed:"" },
+  { name:"Probation service practitioner", code:"ST0494", level:3, months:18, funding:0, route:"protective-services", epa:"Assigned", status:"Approved", version:"1.1", since:"2019-08-20", changed:"" },
+  { name:"Safety, health and environment technician", code:"ST0550", level:3, months:24, funding:0, route:"protective-services", epa:"Assigned", status:"Approved", version:"1.4", since:"2018-03-29", changed:"" },
+  { name:"Security First Line Manager", code:"", level:3, months:18, funding:6000, route:"protective-services", epa:"Assigned", status:"Approved", version:"1", since:"2018-10-22", changed:"Updated to version 1. Status changed from Defunded from Sept 2026 to Approved", article:"defunding-16" },
+  { name:"Anti-Social Behaviour and Community Safety Officer", code:"ST0930", level:4, months:24, funding:8000, route:"protective-services", epa:"Assigned", status:"Approved", version:"1.2", since:"2024-04-29", changed:"" },
+  { name:"Counter fraud investigator", code:"ST0747", level:4, months:24, funding:0, route:"protective-services", epa:"Assigned", status:"Approved", version:"1.1", since:"2019-09-30", changed:"" },
+  { name:"Fire safety inspector", code:"ST0746", level:4, months:24, funding:0, route:"protective-services", epa:"Assigned", status:"Approved", version:"1.1", since:"2019-11-20", changed:"" },
+  { name:"Fraud control specialist", code:"ST1445", level:4, months:24, funding:0, route:"protective-services", epa:"Pending — standard in development", status:"In development", version:"1.0", since:"2026-09-18", changed:"" },
+  { name:"Intelligence Analyst", code:"ST0292", level:4, months:18, funding:9000, route:"protective-services", epa:"Assigned", status:"Approved", version:"1.3", since:"2018-11-30", changed:"Updated to version 1.3" },
+  { name:"Non Home Office Police Officer", code:"ST0764", level:4, months:24, funding:13000, route:"protective-services", epa:"Assigned", status:"Approved", version:"1", since:"2021-05-17", changed:"Updated to version 1. Status changed from In development to Approved" },
+  { name:"Police community support officer", code:"ST0509", level:4, months:12, funding:0, route:"protective-services", epa:"Assigned", status:"Approved", version:"1.1", since:"2018-05-17", changed:"" },
+  { name:"Protective Security Adviser", code:"ST1401", level:4, months:21, funding:9000, route:"protective-services", epa:"Assigned", status:"Approved", version:"1", since:"2025-05-14", changed:"Updated to version 1" },
+  { name:"Specialist rescue operative", code:"ST0487", level:4, months:18, funding:0, route:"protective-services", epa:"Assigned", status:"Approved", version:"1", since:"2019-04-18", changed:"" },
+  { name:"Police Constable (degree)", code:"ST0642", level:6, months:36, funding:24000, route:"protective-services", epa:"Assigned", status:"Approved", version:"1.2", since:"2024-04-01", changed:"" },
+  { name:"Police constable (integrated degree)", code:"ST0304", level:6, months:36, funding:0, route:"protective-services", epa:"Assigned", status:"Approved", version:"1.2", since:"2018-03-27", changed:"" },
+  { name:"Resilience and Emergencies Professional", code:"ST1322", level:6, months:40, funding:23000, route:"protective-services", epa:"Assigned", status:"Approved", version:"1.1", since:"2024-10-15", changed:"" },
+  { name:"Serious and complex crime investigator (integrated degree)", code:"ST0512", level:6, months:30, funding:0, route:"protective-services", epa:"Assigned", status:"Approved", version:"1.1", since:"2020-07-03", changed:"" },
+  { name:"Butcher", code:"ST0195", level:2, months:18, funding:7000, route:"sales-marketing-procurement", epa:"Assigned", status:"Approved", version:"1.4", since:"2015-09-24", changed:"Updated to version 1.4" },
+  { name:"Fishmonger", code:"ST0194", level:2, months:18, funding:0, route:"sales-marketing-procurement", epa:"Assigned", status:"Approved", version:"1.1", since:"2017-05-16", changed:"" },
+  { name:"Funeral team member", code:"ST0594", level:2, months:12, funding:0, route:"sales-marketing-procurement", epa:"Assigned", status:"Approved", version:"1.2", since:"2019-02-18", changed:"" },
+  { name:"Hospitality Supervisor", code:"ST0235", level:2, months:12, funding:5000, route:"sales-marketing-procurement", epa:"Assigned", status:"Approved", version:"1.4", since:"2015-11-26", changed:"Level changed from 3 to 2. Updated to version 1.4" },
+  { name:"Junior estate agent", code:"ST0329", level:2, months:12, funding:0, route:"sales-marketing-procurement", epa:"Assigned", status:"Approved", version:"1.1", since:"2018-07-11", changed:"" },
+  { name:"Retail Service, Supply and Administration foundation apprenticeship", code:"FA0009", level:2, months:8, funding:3500, route:"sales-marketing-procurement", epa:"Assigned", status:"Approved", version:"1", since:"2026-04-14", changed:"Updated to version 1" },
+  { common:true, name:"Retailer", code:"ST0324", level:2, months:14, funding:4000, route:"sales-marketing-procurement", epa:"Assigned", status:"Approved", version:"1.2", since:"2016-05-11", changed:"Duration changed from 12 to 14 months. Updated to version 1.2" },
+  { name:"Trade supplier", code:"ST0334", level:2, months:12, funding:0, route:"sales-marketing-procurement", epa:"Assigned", status:"Approved", version:"1", since:"2018-04-10", changed:"" },
+  { name:"Advanced butcher", code:"ST0077", level:3, months:18, funding:0, route:"sales-marketing-procurement", epa:"Assigned", status:"Approved", version:"1.2", since:"2016-11-07", changed:"" },
+  { name:"Bid and proposal co-ordinator", code:"ST0056", level:3, months:24, funding:0, route:"sales-marketing-procurement", epa:"Assigned", status:"Approved", version:"1.1", since:"2019-01-29", changed:"" },
+  { common:true, name:"Customer Service Specialist", code:"ST0071", level:3, months:15, funding:4000, route:"sales-marketing-procurement", epa:"Assigned", status:"Approved", version:"1.3", since:"2018-05-10", changed:"Updated to version 1.3" },
+  { common:true, name:"Digital Marketer", code:"ST0122", level:3, months:18, funding:11000, route:"sales-marketing-procurement", epa:"Assigned", status:"Approved", version:"1.1", since:"2024-05-01", changed:"" },
+  { name:"Event assistant", code:"ST0168", level:3, months:18, funding:0, route:"sales-marketing-procurement", epa:"Assigned", status:"Approved", version:"1.1", since:"2017-01-12", changed:"" },
+  { name:"Fundraiser", code:"ST0416", level:3, months:18, funding:8000, route:"sales-marketing-procurement", epa:"Assigned", status:"Approved", version:"1", since:"2020-07-10", changed:"Updated to version 1" },
+  { name:"Funeral director", code:"ST0584", level:3, months:12, funding:0, route:"sales-marketing-procurement", epa:"Assigned", status:"Approved", version:"1.1", since:"2019-02-18", changed:"" },
+  { name:"Housing and Property Management", code:"ST0234", level:3, months:18, funding:6000, route:"sales-marketing-procurement", epa:"Assigned", status:"Approved", version:"1.5", since:"2015-11-26", changed:"Updated to version 1.5" },
+  { name:"IT technical salesperson", code:"ST0115", level:3, months:12, funding:0, route:"sales-marketing-procurement", epa:"Assigned", status:"Approved", version:"1.1", since:"2016-09-19", changed:"" },
+  { name:"Multi-channel Marketer", code:"ST1031", level:3, months:18, funding:11000, route:"sales-marketing-procurement", epa:"Assigned", status:"Approved", version:"1.1", since:"2023-12-11", changed:"Status changed from In development to Approved" },
+  { name:"Probation Officer", code:"ST0644", level:3, months:18, funding:19000, route:"sales-marketing-procurement", epa:"Assigned", status:"Approved", version:"1.1", since:"2018-11-08", changed:"Duration changed from 24 to 18 months. Level changed from 6 to 3" },
+  { name:"Procurement and Supply Assistant", code:"ST0810", level:3, months:18, funding:6000, route:"sales-marketing-procurement", epa:"Assigned", status:"Approved", version:"1.1", since:"2025-12-10", changed:"Version 1.0 retired" },
+  { name:"Retail Team Leader", code:"ST0326", level:3, months:15, funding:5000, route:"sales-marketing-procurement", epa:"Assigned", status:"Approved", version:"1.1", since:"2023-05-01", changed:"" },
+  { name:"Sales representative", code:"ST1495", level:3, months:0, funding:0, route:"sales-marketing-procurement", epa:"Not applicable (unit)", status:"Proposal in development", version:"1.0", since:"2026-09-18", changed:"" },
+  { name:"Travel consultant", code:"ST0340", level:3, months:12, funding:0, route:"sales-marketing-procurement", epa:"Assigned", status:"Approved", version:"1.1", since:"2016-07-21", changed:"" },
+  { name:"Buying and merchandising assistant", code:"ST0683", level:4, months:18, funding:0, route:"sales-marketing-procurement", epa:"Assigned", status:"Approved", version:"1", since:"2019-05-16", changed:"" },
+  { name:"Hospitality Manager", code:"ST0236", level:4, months:18, funding:6000, route:"sales-marketing-procurement", epa:"Assigned", status:"Approved", version:"1.4", since:"2015-11-26", changed:"Updated to version 1.4" },
+  { name:"Market Research Executive", code:"ST0883", level:4, months:18, funding:8000, route:"sales-marketing-procurement", epa:"Assigned", status:"Approved", version:"1", since:"2021-05-27", changed:"Updated to version 1" },
+  { name:"Marketing Executive", code:"ST0790M", level:4, months:15, funding:8000, route:"sales-marketing-procurement", epa:"Assigned", status:"Approved", version:"1", since:"2018-09-24", changed:"Duration changed from 18 to 15 months. Updated to version 1" },
+  { name:"Pharmacy Technician (integrated)", code:"ST0311", level:4, months:14, funding:12000, route:"sales-marketing-procurement", epa:"Assigned", status:"Approved", version:"1.3", since:"2018-03-27", changed:"Duration changed from 24 to 14 months. Level changed from 3 to 4. Updated to version 1.3" },
+  { name:"Procurement and Supply Chain Practitioner", code:"ST0812", level:4, months:18, funding:9000, route:"sales-marketing-procurement", epa:"Assigned", status:"Approved", version:"2.3", since:"2017-12-17", changed:"Duration changed from 24 to 18 months. Updated to version 2.3" },
+  { name:"Retail Manager", code:"ST0325", level:4, months:12, funding:6000, route:"sales-marketing-procurement", epa:"Assigned", status:"Approved", version:"1.2", since:"2016-10-07", changed:"Duration changed from 19 to 12 months. Updated to version 1.2" },
+  { name:"Sales Executive", code:"ST0442S", level:4, months:18, funding:6000, route:"sales-marketing-procurement", epa:"Assigned", status:"Approved", version:"1.1", since:"2023-07-01", changed:"" },
+  { name:"Assistant buyer and merchandiser", code:"ST0668", level:6, months:24, funding:0, route:"sales-marketing-procurement", epa:"Assigned", status:"Approved", version:"1.1", since:"2019-07-16", changed:"" },
+  { name:"Business to Business Sales Professional", code:"ST0806", level:6, months:24, funding:15000, route:"sales-marketing-procurement", epa:"Assigned", status:"Approved", version:"1.1", since:"2023-09-01", changed:"" },
+  { name:"Business to business sales professional (integrated degree)", code:"ST0423", level:6, months:36, funding:0, route:"sales-marketing-procurement", epa:"Assigned", status:"Approved", version:"1", since:"2018-06-26", changed:"" },
+  { name:"Digital marketer (integrated degree)", code:"ST0481", level:6, months:36, funding:0, route:"sales-marketing-procurement", epa:"Assigned", status:"Approved", version:"1", since:"2018-06-22", changed:"" },
+  { name:"Marketing Manager", code:"ST0791", level:6, months:24, funding:16000, route:"sales-marketing-procurement", epa:"Assigned", status:"Approved", version:"1", since:"2018-09-24", changed:"Updated to version 1" },
+  { name:"Retail leadership (integrated degree)", code:"ST0547", level:6, months:48, funding:0, route:"sales-marketing-procurement", epa:"Assigned", status:"Approved", version:"1", since:"2018-11-30", changed:"" },
+  { name:"Senior Procurement and Supply Chain Professional", code:"ST0811", level:6, months:30, funding:18000, route:"sales-marketing-procurement", epa:"Assigned", status:"Approved", version:"1", since:"2023-10-18", changed:"Updated to version 1" },
+  { name:"Aviation Customer Service Operative", code:"ST0907", level:2, months:12, funding:3500, route:"transport-logistics", epa:"Assigned", status:"Approved", version:"1.1", since:"2021-09-13", changed:"Status changed from Retirement consultation to Approved" },
+  { name:"Aviation Ground Handler", code:"ST0908", level:2, months:12, funding:3500, route:"transport-logistics", epa:"Assigned", status:"Approved", version:"1", since:"2021-09-13", changed:"Updated to version 1" },
+  { name:"Aviation ground operative", code:"ST0037", level:2, months:12, funding:0, route:"transport-logistics", epa:"Assigned", status:"Approved", version:"1", since:"2016-04-14", changed:"" },
+  { name:"Express delivery operative", code:"ST0103", level:2, months:12, funding:0, route:"transport-logistics", epa:"Assigned", status:"Approved", version:"1", since:"2018-08-17", changed:"" },
+  { name:"Express Delivery Sortation Hub Operative", code:"ST0753", level:2, months:12, funding:4000, route:"transport-logistics", epa:"Assigned", status:"Approved", version:"1", since:"2022-02-11", changed:"Updated to version 1" },
+  { name:"Investment Operations Technician", code:"ST0257", level:2, months:13, funding:6000, route:"transport-logistics", epa:"Assigned", status:"Approved", version:"1.4", since:"2016-06-24", changed:"Duration changed from 18 to 13 months. Level changed from 3 to 2. Updated to version 1.4" },
+  { name:"Large Goods Vehicle Driver", code:"ST0257L", level:2, months:13, funding:7000, route:"transport-logistics", epa:"Assigned", status:"Approved", version:"1.1", since:"2023-06-01", changed:"" },
+  { name:"Lead Traffic Management Operative", code:"ST0985", level:2, months:18, funding:8000, route:"transport-logistics", epa:"Assigned", status:"Approved", version:"1.2", since:"2025-12-09", changed:"Version 1.1 retired" },
+  { name:"Marina and boatyard operative", code:"ST0592", level:2, months:18, funding:0, route:"transport-logistics", epa:"Assigned", status:"Approved", version:"1", since:"2018-12-17", changed:"" },
+  { name:"Passenger transport driver - bus and coach or tram", code:"ST0338", level:2, months:12, funding:0, route:"transport-logistics", epa:"Assigned", status:"Approved", version:"1.2", since:"2017-08-17", changed:"" },
+  { name:"Passenger transport operative", code:"ST0339", level:2, months:12, funding:0, route:"transport-logistics", epa:"Assigned", status:"Approved", version:"1.2", since:"2017-11-23", changed:"" },
+  { name:"Port operative", code:"ST0307", level:2, months:12, funding:0, route:"transport-logistics", epa:"Assigned", status:"Approved", version:"1.1", since:"2018-09-24", changed:"" },
+  { name:"Removals Operative", code:"ST1393", level:2, months:12, funding:5000, route:"transport-logistics", epa:"Assigned", status:"Approved", version:"1", since:"2024-07-19", changed:"Updated to version 1. Status changed from In development to Approved" },
+  { name:"Seafarer (deck rating)", code:"ST0274", level:2, months:18, funding:0, route:"transport-logistics", epa:"Assigned", status:"Approved", version:"1.1", since:"2015-08-27", changed:"" },
+  { common:true, name:"Supply Chain Warehouse Operative", code:"ST0268", level:2, months:12, funding:4000, route:"transport-logistics", epa:"Assigned", status:"Approved", version:"1.1", since:"2023-06-01", changed:"" },
+  { name:"Traffic Operator", code:"ST1394", level:2, months:12, funding:6000, route:"transport-logistics", epa:"Assigned", status:"Approved", version:"1.1", since:"2025-02-12", changed:"Version 1.0 retired" },
+  { name:"Urban Driver", code:"ST1025", level:2, months:12, funding:8000, route:"transport-logistics", epa:"Assigned", status:"Approved", version:"1.1", since:"2024-10-24", changed:"Funding band raised from £5,000 to £8,000" },
+  { name:"Aviation Flight Operations Coordinator", code:"ST1007", level:3, months:18, funding:8000, route:"transport-logistics", epa:"Assigned", status:"Approved", version:"1", since:"2023-09-04", changed:"Updated to version 1" },
+  { name:"Aviation ground specialist", code:"ST0038", level:3, months:18, funding:0, route:"transport-logistics", epa:"Assigned", status:"Approved", version:"1.2", since:"2016-04-14", changed:"" },
+  { name:"Aviation Movement Specialist", code:"ST0954", level:3, months:18, funding:7000, route:"transport-logistics", epa:"Assigned", status:"Approved", version:"1.1", since:"2021-08-03", changed:"" },
+  { name:"Boatmaster", code:"ST0621", level:3, months:24, funding:0, route:"transport-logistics", epa:"Assigned", status:"Approved", version:"1.2", since:"2019-11-04", changed:"" },
+  { name:"Cabin crew", code:"ST0558", level:3, months:12, funding:0, route:"transport-logistics", epa:"Assigned", status:"Approved", version:"1.1", since:"2018-06-28", changed:"" },
+  { name:"International freight forwarding specialist", code:"ST0539", level:3, months:18, funding:0, route:"transport-logistics", epa:"Assigned", status:"Approved", version:"1.1", since:"2018-04-20", changed:"" },
+  { name:"Officer of the Watch (near coastal)", code:"ST0842", level:3, months:36, funding:15000, route:"transport-logistics", epa:"Assigned", status:"Approved", version:"1.2", since:"2021-11-12", changed:"Status changed from Retirement consultation to Approved" },
+  { name:"Port Agent", code:"ST0544", level:3, months:18, funding:13000, route:"transport-logistics", epa:"Assigned", status:"Approved", version:"1.0", since:"2025-02-18", changed:"Version retired and replaced" },
+  { name:"Rail Infrastructure Operator", code:"ST1378", level:3, months:18, funding:15000, route:"transport-logistics", epa:"Assigned", status:"Approved", version:"1.1", since:"2022-09-21", changed:"Status changed from In development to Approved" },
+  { name:"Small commercial vessel crewmember", code:"ST0400", level:3, months:24, funding:0, route:"transport-logistics", epa:"Assigned", status:"Approved", version:"1.2", since:"2018-08-07", changed:"" },
+  { name:"Supply chain practitioner (fast-moving consumer goods (FMCG))", code:"ST0201", level:3, months:30, funding:0, route:"transport-logistics", epa:"Assigned", status:"Approved", version:"1.1", since:"2017-11-24", changed:"" },
+  { name:"Train Driver", code:"ST0343", level:3, months:12, funding:9000, route:"transport-logistics", epa:"Assigned", status:"Approved", version:"1", since:"2018-06-13", changed:"Updated to version 1" },
+  { name:"Transport and Warehouse Operations Supervisor", code:"ST0647", level:3, months:12, funding:5000, route:"transport-logistics", epa:"Assigned", status:"Approved", version:"1.1", since:"2022-11-18", changed:"" },
+  { name:"Transport Scheduler", code:"ST1438", level:3, months:18, funding:8000, route:"transport-logistics", epa:"Assigned", status:"Approved", version:"1", since:"2023-12-21", changed:"Updated to version 1. Status changed from In development to Approved" },
+  { name:"Aviation operations manager", code:"ST0039", level:4, months:18, funding:0, route:"transport-logistics", epa:"Assigned", status:"Approved", version:"1.1", since:"2016-08-19", changed:"" },
+  { name:"Jack-up barge master - non-propelled unit", code:"ST1336", level:4, months:0, funding:0, route:"transport-logistics", epa:"Not applicable (unit)", status:"In development", version:"1.0", since:"2026-09-18", changed:"" },
+  { name:"Passenger transport operations manager", code:"ST0337", level:4, months:18, funding:0, route:"transport-logistics", epa:"Assigned", status:"Approved", version:"1", since:"2017-12-20", changed:"" },
+  { name:"Port marine operations officer", code:"ST0428", level:4, months:24, funding:0, route:"transport-logistics", epa:"Assigned", status:"Approved", version:"1", since:"2018-05-01", changed:"" },
+  { name:"Ship's Master — under 500gt near coastal", code:"ST1333", level:4, months:48, funding:27000, route:"transport-logistics", epa:"Assigned", status:"Approved", version:"1", since:"2025-02-19", changed:"Updated to version 1" },
+  { name:"Air traffic controller", code:"ST0595", level:5, months:15, funding:0, route:"transport-logistics", epa:"Assigned", status:"Approved", version:"1.2", since:"2019-08-16", changed:"" },
+  { name:"Marine pilot", code:"ST0427", level:5, months:30, funding:0, route:"transport-logistics", epa:"Assigned", status:"Approved", version:"1", since:"2018-06-22", changed:"" },
+  { name:"Uncrewed marine vehicle specialist", code:"ST0975", level:5, months:0, funding:0, route:"transport-logistics", epa:"Not applicable (unit)", status:"In development", version:"1.0", since:"2026-09-18", changed:"" },
+  { name:"Express delivery manager (degree)", code:"ST0471", level:6, months:36, funding:0, route:"transport-logistics", epa:"Assigned", status:"Approved", version:"1.3", since:"2019-09-30", changed:"" },
+  { name:"First officer pilot", code:"ST0523", level:6, months:24, funding:0, route:"transport-logistics", epa:"Assigned", status:"Approved", version:"1.1", since:"2019-02-18", changed:"" },
+  { name:"Railway operations manager", code:"ST1441", level:6, months:36, funding:0, route:"transport-logistics", epa:"Assigned", status:"Approved", version:"2", since:"2026-05-21", changed:"" },
+  { name:"Supply chain leadership professional (integrated degree)", code:"ST0548", level:6, months:48, funding:0, route:"transport-logistics", epa:"Assigned", status:"Approved", version:"1", since:"2018-12-24", changed:"" },
+  { name:"Clinical research practitioner", code:"ST1444", level:6, months:36, funding:0, route:"", epa:"Pending — standard in development", status:"Proposal in development", version:"1.0", since:"2026-09-18", changed:"" },
 ];
 
 /* STANDARDS:END */
