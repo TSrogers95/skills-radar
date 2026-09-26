@@ -177,7 +177,11 @@ function deriveUpdates(){
       const dev = /development|paused|retirement|notice/i.test(s.status);
 
       let status = 'updated';
-      if(defunded || isFuture(s.since)) status = 'upcoming';
+      /* Defunding used to force "upcoming" whatever the date, so the
+         September withdrawals were still listed as coming up weeks after
+         they had taken effect. Upcoming means the date is ahead of today,
+         for every kind of change. */
+      if(isFuture(s.since)) status = 'upcoming';
       else if(dev) status = 'in-review';
 
       let urgency = 'low';
@@ -299,10 +303,22 @@ function allUpdatesUnfiltered(){
   return curated.concat(derived);
 }
 
+/* A stored status can go stale — an item written as "upcoming" months ago
+   is not upcoming once its date has passed. The date is the truth, so it is
+   recomputed on read rather than trusted. */
+function placeByDate(u){
+  if(!u.date) return u;
+  const ahead = isFuture(u.date);
+  if(ahead && u.status !== 'in-review') return Object.assign({}, u, { status: 'upcoming' });
+  if(!ahead && u.status === 'upcoming')  return Object.assign({}, u, { status: 'updated' });
+  return u;
+}
+
 /* What the feed shows: changes still current, and anything still ahead. */
 function allUpdates(){
-  return allUpdatesUnfiltered().filter(u =>
-    u.pinned || feedPlacement(u.date) !== 'background');
+  return allUpdatesUnfiltered()
+    .filter(u => u.pinned || feedPlacement(u.date) !== 'background')
+    .map(placeByDate);
 }
 
 /* Everything older than the window — still real, still searchable, just not

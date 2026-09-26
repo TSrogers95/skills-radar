@@ -13,7 +13,7 @@
    automatically when it commits a change.
    ----------------------------------------------------------------------- */
 
-const DATA_UPDATED = "2026-09-02";
+const DATA_UPDATED = "2026-09-26";
 const DATA_SOURCE  = "hand";   // "hand" or "sync"
 
 /* ---------- 1. OCCUPATIONAL ROUTES -------------------------------------
