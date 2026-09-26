@@ -301,11 +301,14 @@ function allUpdatesUnfiltered(){
 
 /* What the feed shows: changes still current, and anything still ahead. */
 function allUpdates(){
-  return allUpdatesUnfiltered().filter(u => {
-    if(u.pinned) return true;             // hand-pinned stays regardless
-    if(isFuture(u.date)) return true;     // upcoming, until the date passes
-    return stillRecent(u.date, u.urgency, hasChangeDate(u));
-  });
+  return allUpdatesUnfiltered().filter(u =>
+    u.pinned || feedPlacement(u.date) !== 'background');
+}
+
+/* Everything older than the window — still real, still searchable, just not
+   competing for attention in the feed. */
+function backgroundUpdates(){
+  return allUpdatesUnfiltered().filter(u => !u.pinned && feedPlacement(u.date) === 'background');
 }
 
 /* =========================================================================
@@ -385,38 +388,29 @@ function articleFor(s, defunded, dev){
 })();
 
 /* =========================================================================
-   HOW LONG A CHANGE STAYS IN THE FEED
+   WHERE A CHANGE SITS
 
-   A change was previously "recent" forever, so the feed only ever grew.
+   One rule, applied to the date of the change itself:
 
-   Now: six months for an ordinary change, twelve for a high-urgency one —
-   a defunding is still worth seeing eleven months later, a version bump is
-   not. Anything dated in the future is "upcoming" and stays there until the
-   date passes, at which point it becomes recent on its own.
+     dated ahead of today   -> upcoming, and stays there until the date passes
+     within the last 9 months -> recent, shown in the feed
+     older than that        -> background: still on the standard, still
+                               searchable, still shown when someone looks the
+                               standard up. Just not in the feed.
+
+   Nothing is ever deleted. The feed is a view of what is current; the
+   register keeps everything.
    ========================================================================= */
 
-const RECENT_DAYS = 183;          // six months
-const RECENT_DAYS_IMPORTANT = 365; // twelve, for high urgency
+const FEED_MONTHS = 9;
+const FEED_DAYS = FEED_MONTHS * 31;
 
-function stillRecent(date, urgency, trusted){
-  /* Before the importer was fixed, a standard's date was its approval date
-     rather than the date a change was found — often years old. Ageing those
-     out empties the feed of changes that were spotted this week. So an
-     untrusted date is kept: better a slightly long feed than a wrong one.
-     Once a fresh import has run, every changed standard carries a real
-     detection date and the window applies properly. */
-  if(trusted === false) return true;
-
+function feedPlacement(date){
+  if(!date) return 'background';
   const age = daysAgo(date);
-  if(age < 0) return true;         // not yet happened; handled as upcoming
-  return age <= (urgency === 'high' ? RECENT_DAYS_IMPORTANT : RECENT_DAYS);
-}
-
-/* A date is trustworthy as a change date when the record distinguishes the
-   two — the importer now writes "approved" alongside "since". Where it does
-   not, the date is an approval date and cannot be used to age anything out. */
-function hasChangeDate(item){
-  return !!(item && item.dated);
+  if(isNaN(age)) return 'background';
+  if(age < 0) return 'upcoming';
+  return age <= FEED_DAYS ? 'recent' : 'background';
 }
 
 /* =========================================================================

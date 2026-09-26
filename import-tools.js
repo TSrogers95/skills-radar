@@ -275,9 +275,32 @@ function slugRoute(name){
 /* The CSV carries one row per version, including retired ones. We keep only
    the newest live version of each standard, which is what the site shows. */
 
-/* How long a standard counts as recently changed when we are going on the
-   register's own date rather than a comparison. */
-const RECENT_MONTHS = 12;
+/* =========================================================================
+   DATING A CHANGE
+
+   Every change needs a date, and the site decides where it goes from that:
+   ahead of today is upcoming, within nine months is recent, older than that
+   drops to the background — still searchable, just not in the feed.
+
+   Three ways a date is arrived at, in order of how much we trust it:
+
+     1. The file says so. If the export carries a last-updated column, that
+        is the date of the change and nothing beats it.
+     2. We spotted it. Where a standard differs from what the site already
+        holds, the change is dated today, because today is when it was
+        found.
+     3. It is new to us. A standard the site has never seen is dated by its
+        approval date if the file gives one — a standard approved last month
+        is news, one approved in 2019 is not.
+   ========================================================================= */
+
+function changeDate(r, detected){
+  if(r.updated) return r.updated;                    // 1
+  if(detected) return new Date().toISOString().slice(0,10);  // 2
+  return r.since || new Date().toISOString().slice(0,10);    // 3
+}
+
+const RECENT_MONTHS = 9;
 
 function recentlyUpdated(iso){
   if(!iso) return false;
@@ -375,7 +398,7 @@ function merge(imported){
         common: false, name: r.name, code: r.code, level: r.level,
         months: r.months, funding: r.funding, route: r.route,
         epa: epa, status: r.status, version: r.version,
-        since: r.updated || new Date().toISOString().slice(0,10),
+        since: changeDate(r, false),
         approved: r.since || '',
         /* Three ways a standard new to this site can still be news:
            the register says it changed recently, it is losing funding, or
@@ -412,7 +435,7 @@ function merge(imported){
            approved. "since" drives how long an item stays in the feed, and
            the approval date is often years old — using it made a six-month
            window throw away changes found this morning. */
-        since: new Date().toISOString().slice(0,10),
+        since: changeDate(r, true),
         approved: r.since || old.approved || '',
         changed: diffs.join('. '),
         options: (r.options && r.options.length) ? r.options : (old.options || [])
@@ -552,6 +575,9 @@ function show(rows, cols, built, m, file){
   };
 
   const losses = [];
+  if(feedCount !== null && before.changes > 20 && feedCount < 20)
+    losses.push('The feed would show only ' + feedCount + ' items. It shows ' +
+      before.changes.toLocaleString('en-GB') + ' now.');
   if(before.changes > 20 && after.changes < before.changes * 0.5)
     losses.push('Changes in the feed would fall from ' + before.changes.toLocaleString('en-GB') +
       ' to ' + after.changes.toLocaleString('en-GB') + '. The feed is the point of the site.');
@@ -564,13 +590,42 @@ function show(rows, cols, built, m, file){
 
   const risky = losses.length > 0;
 
-  /* Check the block actually parses before anything is offered for download.
-     A single bad character used to produce a file that looked fine, uploaded
-     fine, and left the live site with no register at all. Declared here
-     because the summary below reports on it. */
-  let parseError = null, parsedCount = 0;
+  /* =====================================================================
+     WHAT THE FEED WILL ACTUALLY SHOW
+
+     Reporting "45 changes found" and then delivering six items in the feed
+     is worse than reporting nothing, because it looks like the import
+     worked. The two numbers differ because the feed applies its own rules
+     on top — deduplication against hand-written updates, and a recency
+     window.
+
+     So rather than counting changed rows and hoping, run the generated
+     register through the site's own feed code and report what comes out.
+     Same functions, same result, no guessing.
+     ===================================================================== */
+  let parseError = null, parsedCount = 0, feedCount = null, feedRecent = 0, feedUpcoming = 0;
+
   try {
-    parsedCount = new Function(code + '\n; return STANDARDS.length;')();
+    const probe = new Function(code + `
+      ;(function(){
+        if(typeof DEFUNDED_STANDARDS !== 'undefined'){
+          const norm = s => String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');
+          DEFUNDED_STANDARDS.forEach(function(d){
+            STANDARDS.filter(function(s){
+              return s.level === d.level && norm(s.name).indexOf(norm(d.name)) === 0;
+            }).forEach(function(s){
+              s.status = 'Defunded from Sept 2026';
+              if(!/withdrawn/i.test(s.changed||'')) s.changed = DEFUNDED_NOTE;
+            });
+          });
+        }
+      })();
+      return { count: STANDARDS.length, feed: allUpdates(), all: allUpdatesUnfiltered() };`);
+    const out = probe();
+    parsedCount = out.count;
+    feedCount = out.feed.length;
+    feedRecent = out.feed.filter(function(u){ return !isFuture(u.date); }).length;
+    feedUpcoming = feedCount - feedRecent;
   } catch(err){
     parseError = err.message;
   }
@@ -673,6 +728,27 @@ function show(rows, cols, built, m, file){
         '<p style="margin:12px 0 0">Check the column table above first — a heading that has not been matched ' +
         'is the usual cause. Nothing has changed on your site; you can close this and try a different file.</p>' +
         '</div></section>'
+      : '') +
+
+    (feedCount !== null
+      ? '<section class="lsection ' + (feedCount < 20 ? 'costs' : '') + '">' +
+        '<div class="lhead"><h2>What the feed will show</h2>' +
+        '<p>Not how many rows changed &mdash; what the site will actually display, ' +
+        'worked out by running this file through the same code the feed uses.</p></div>' +
+        '<div class="mgrid">' +
+          '<div class="mcard ' + (feedCount < 20 ? 'bad' : 'cool') + '"><div class="n">' + feedCount +
+            '</div><div class="l">Items in the feed</div></div>' +
+          '<div class="mcard"><div class="n">' + feedRecent + '</div><div class="l">Recent changes</div></div>' +
+          '<div class="mcard warm"><div class="n">' + feedUpcoming + '</div><div class="l">Upcoming</div></div>' +
+          '<div class="mcard"><div class="n">' + parsedCount.toLocaleString('en-GB') + '</div><div class="l">Standards in the file</div></div>' +
+        '</div>' +
+        (feedCount < 20
+          ? '<div class="alert" style="margin-top:14px"><b>That is almost nothing.</b> ' +
+            'Whatever the change count above says, this file would leave the feed nearly empty. ' +
+            'Do not upload it. The usual cause is that the file has no date column and nothing to compare ' +
+            'against, so no change can be dated &mdash; see the column table above.</div>'
+          : '') +
+      '</section>'
       : '') +
 
     '<section class="lsection">' +
@@ -1242,6 +1318,27 @@ function showStats(rows, cols, list, file){
         '<p style="margin:12px 0 0">Check the column table above first — a heading that has not been matched ' +
         'is the usual cause. Nothing has changed on your site; you can close this and try a different file.</p>' +
         '</div></section>'
+      : '') +
+
+    (feedCount !== null
+      ? '<section class="lsection ' + (feedCount < 20 ? 'costs' : '') + '">' +
+        '<div class="lhead"><h2>What the feed will show</h2>' +
+        '<p>Not how many rows changed &mdash; what the site will actually display, ' +
+        'worked out by running this file through the same code the feed uses.</p></div>' +
+        '<div class="mgrid">' +
+          '<div class="mcard ' + (feedCount < 20 ? 'bad' : 'cool') + '"><div class="n">' + feedCount +
+            '</div><div class="l">Items in the feed</div></div>' +
+          '<div class="mcard"><div class="n">' + feedRecent + '</div><div class="l">Recent changes</div></div>' +
+          '<div class="mcard warm"><div class="n">' + feedUpcoming + '</div><div class="l">Upcoming</div></div>' +
+          '<div class="mcard"><div class="n">' + parsedCount.toLocaleString('en-GB') + '</div><div class="l">Standards in the file</div></div>' +
+        '</div>' +
+        (feedCount < 20
+          ? '<div class="alert" style="margin-top:14px"><b>That is almost nothing.</b> ' +
+            'Whatever the change count above says, this file would leave the feed nearly empty. ' +
+            'Do not upload it. The usual cause is that the file has no date column and nothing to compare ' +
+            'against, so no change can be dated &mdash; see the column table above.</div>'
+          : '') +
+      '</section>'
       : '') +
 
     '<section class="lsection">' +

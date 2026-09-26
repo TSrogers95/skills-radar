@@ -169,6 +169,8 @@ function renderReadings(){
   document.getElementById('s-noepa').textContent    = STANDARDS.filter(s => changeLevel(s) === 'defunded').length;
 }
 
+/* The standards page shows a standard's change whatever its age. The feed
+   window governs the feed, not the register. */
 function changeCell(s){
   if(!s.changed) return '<span class="chg none">No change since ' + fmtLong(s.since) + '</span>';
 

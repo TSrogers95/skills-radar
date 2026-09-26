@@ -177,12 +177,14 @@ function renderRouteContext(routeKey, query, results){
 let FEEDINDEX = [];
 
 function cardHTML(item, i){
+  const older = typeof feedPlacement === 'function' && feedPlacement(item.date) === 'background';
   const flag = item.pinned ? '<span class="dotflag" title="Priority"></span>' : '';
   const line = item.short || firstClause(item.summary);
   const tag  = itemTagHTML(item);
   return '<button class="card ' + item.urgency + '" data-i="' + i + '">' +
     flag + '<h3>' + item.title + '</h3>' +
-    '<div class="whatchanged"><span class="wclabel">What changed</span>' + tag + '</div>' +
+    '<div class="whatchanged"><span class="wclabel">What changed</span>' + tag +
+      (older ? '<span class="ctag info">earlier change</span>' : '') + '</div>' +
     '<p>' + line + '</p>' +
     '<span class="cdate">' + fmtShort(item.date) + ' ' + fmtYear(item.date) + '</span>' +
   '</button>';
@@ -279,7 +281,8 @@ function renderBoard(filter, query){
   const routeKey = detectRoute(query);
   FEEDINDEX = [];
 
-  let list = FEED.slice();
+  /* A search reaches into the background; browsing does not. */
+  let list = (query ? FEED_ALL : FEED).slice();
   if(filter !== 'all') list = list.filter(i => i.category === filter);
   list = list.filter(i => matches(i, query, routeKey));
 
@@ -347,7 +350,12 @@ function renderBoard(filter, query){
 }
 
 let currentFilter = 'all', currentQuery = '';
+/* Two lists. The feed shows what is current. A search looks through
+   everything, including changes older than the nine-month window — someone
+   searching for a standard by name wants its last change whenever it
+   happened, not silence. */
 const FEED = allUpdates();
+const FEED_ALL = allUpdatesUnfiltered();
 renderBoard(currentFilter, currentQuery);
 wireCollapse();
 
