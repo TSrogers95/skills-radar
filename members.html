@@ -904,13 +904,18 @@ function wirePicker(id, onAdd){
       })
       .filter(x => x.score > 0)
       .sort((a,b) => b.score - a.score)
-      .slice(0, 8);
+      .slice(0, 25);
 
     if(!hits.length){
-      res.innerHTML = '<div class="pickernone">Nothing on the register matches that.</div>';
+      res.innerHTML = '<div class="pickernone">Nothing on the register matches that. ' +
+        'Try a shorter word, or the reference number.</div>';
       res.classList.add('on');
       return;
     }
+
+    /* Say how many matched, so a long list does not look like the whole
+       answer when it is the top of one. */
+    const matched = STANDARDS.filter(s => !COHORT.some(c => c.name === s.name)).length;
 
     res.innerHTML = hits.map(x => {
       const s = x.s;
@@ -925,6 +930,10 @@ function wirePicker(id, onAdd){
         (gone ? '<em class="warn">Losing funding September 2026</em>' : '') +
       '</button>';
     }).join('');
+    if(hits.length >= 25){
+      res.insertAdjacentHTML('beforeend',
+        '<div class="pickernone">Showing the closest 25. Add a word to narrow it down.</div>');
+    }
     res.classList.add('on');
 
     res.querySelectorAll('.pickeritem').forEach(b => {
@@ -1586,7 +1595,8 @@ function forecastView(){
         '<input type="text" id="f-open" inputmode="numeric" value="' + i.opening.toLocaleString('en-GB') + '"></div>' +
         '<div class="field"><label for="f-hz">Forecast period</label>' +
         '<select id="f-hz">' +
-          [12,18,24,36].map(n => '<option value="' + n + '"' + (i.horizon === n ? ' selected' : '') + '>' + n + ' months</option>').join('') +
+          [12,18,24,36,48,60].map(n => '<option value="' + n + '"' + (i.horizon === n ? ' selected' : '') + '>' +
+            n + ' months' + (n >= 48 ? ' (' + (n/12) + ' years)' : '') + '</option>').join('') +
         '</select></div>' +
       '</div>' +
       '<p class="hint" style="max-width:66ch">Both come from your Apprenticeship Service account. The forecast is only as good as these two numbers.</p>' +
@@ -1620,8 +1630,14 @@ function forecastView(){
                 '<span>apprentices</span>' +
               '</div>' +
               '<div class="whenpick" id="p-when">' +
-                [0,1,3,6,12].map((n, i) => '<button type="button" data-m="' + n + '"' +
+                [0,3,6,12].map((n, i) => '<button type="button" data-m="' + n + '"' +
                   (i === 0 ? ' class="on"' : '') + '>' + (n === 0 ? 'Now' : monthName(n)) + '</button>').join('') +
+                '<button type="button" data-m="custom">Pick a date</button>' +
+              '</div>' +
+              '<div class="custommonth" id="p-custom" hidden>' +
+                '<label for="p-month">Starting</label>' +
+                '<select id="p-month">' + monthOptions() + '</select>' +
+                '<select id="p-year">' + yearOptions() + '</select>' +
               '</div>' +
               '<div class="agepick" id="p-agepick">' +
                 '<button type="button" data-age="1" class="on">16 to 24</button>' +
@@ -1639,6 +1655,29 @@ function forecastView(){
       '<div class="lhead"><h2>What happens</h2><p>Over ' + i.horizon + ' months, on these figures.</p></div>' +
       '<div id="fcout"></div>' +
     '</section>';
+}
+
+/* Any month, any year within a sensible window. Cohorts get planned two or
+   three years out, and a fixed list of offsets cannot express "September
+   2028" — which is exactly the sort of intake people are modelling. */
+function monthOptions(){
+  const now = new Date();
+  return Array.from({ length: 12 }, (_, i) =>
+    '<option value="' + i + '"' + (i === now.getMonth() ? ' selected' : '') + '>' +
+    new Date(2000, i, 1).toLocaleDateString('en-GB', { month: 'long' }) + '</option>').join('');
+}
+
+function yearOptions(){
+  const y = new Date().getFullYear();
+  return Array.from({ length: 6 }, (_, i) =>
+    '<option value="' + (y + i) + '"' + (i === 0 ? ' selected' : '') + '>' + (y + i) + '</option>').join('');
+}
+
+/* Months from now to a given month and year, which is what the forecast
+   works in. Negative means it has already started. */
+function offsetFor(month, year){
+  const now = new Date();
+  return (year - now.getFullYear()) * 12 + (month - now.getMonth());
 }
 
 function monthName(offset){
@@ -1916,11 +1955,32 @@ function wireForecast(panel){
   };
   bump('p-up', 1); bump('p-down', -1);
 
+  const custom = document.getElementById('p-custom');
+
   panel.querySelectorAll('#p-when button').forEach(b =>
     b.addEventListener('click', () => {
       panel.querySelectorAll('#p-when button').forEach(x => x.classList.remove('on'));
-      b.classList.add('on'); months = +b.dataset.m; refreshImpact();
+      b.classList.add('on');
+
+      if(b.dataset.m === 'custom'){
+        if(custom) custom.hidden = false;
+        months = offsetFor(+document.getElementById('p-month').value,
+                           +document.getElementById('p-year').value);
+      } else {
+        if(custom) custom.hidden = true;
+        months = +b.dataset.m;
+      }
+      refreshImpact();
     }));
+
+  ['p-month','p-year'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.addEventListener('change', () => {
+      months = offsetFor(+document.getElementById('p-month').value,
+                         +document.getElementById('p-year').value);
+      refreshImpact();
+    });
+  });
 
   panel.querySelectorAll('#p-agepick button').forEach(b =>
     b.addEventListener('click', () => {

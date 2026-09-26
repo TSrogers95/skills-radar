@@ -293,7 +293,9 @@ function render(filter, query){
   if(searchRanked){
     blocks.innerHTML = '<section class="routeblock">' +
       '<h2>Best matches</h2>' +
-      '<p class="sub">Closest first. ' + list.length + ' standard' + (list.length === 1 ? '' : 's') + ' matching &ldquo;' + query + '&rdquo;</p>' +
+      '<p class="sub">Closest first. ' + list.length + ' of ' + STANDARDS.length.toLocaleString('en-GB') +
+        ' standards match &ldquo;' + query + '&rdquo;. Every standard on the register is searchable, ' +
+        'whether or not it has changed recently.</p>' +
       '<table class="std"><thead><tr>' +
         '<th>Standard</th><th>Level</th><th class="hidecol">Duration</th>' +
         '<th>Max funding</th><th class="hidecol">EPA</th><th class="hidecol">Status</th><th>Change</th>' +
