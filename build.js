@@ -22,7 +22,7 @@ const OUT  = 'a';
 /* ---------- Load the data the same way a browser would ---------- */
 
 function load(){
-  const files = ['standards.js', 'defunded.js', 'otj-minimums.js', 'occupations.js', 'data.js', 'app.js', 'ui.js'];
+  const files = ['standards.js', 'defunded.js', 'otj-minimums.js', 'occupations.js', 'data.js', 'guides.js', 'app.js', 'ui.js'];
   let src = '';
   files.forEach(f => {
     if(fs.existsSync(f)) src += fs.readFileSync(f, 'utf8') + '\n';
@@ -33,7 +33,7 @@ function load(){
     'var window={addEventListener:function(){},location:{}};var location={hash:"",search:""};' +
     'var navigator={};var sessionStorage={getItem:function(){return null},setItem:function(){},removeItem:function(){}};';
   return new Function(stub + src + '; return {allArticles:allArticles, ROUTES:ROUTES, STANDARDS:STANDARDS, ' +
-    'READING:(typeof READING!=="undefined"?READING:[]), fmtLong:fmtLong, money:money, band:band, ' +
+    'READING:(typeof READING!=="undefined"?READING:[]), GUIDES:(typeof GUIDES!=="undefined"?GUIDES:[]), fmtLong:fmtLong, money:money, band:band, ' +
     'tagClass:tagClass, urgencyTag:urgencyTag, iconHTML:iconHTML, standardURL:standardURL, ' +
     'otjMinimum:(typeof otjMinimum==="function"?otjMinimum:null), ' +
     'pathwaysFor:(typeof pathwaysFor==="function"?pathwaysFor:null), ' +
@@ -291,12 +291,13 @@ function truncate(s, n){
 
 /* ---------- Sitemap and robots ---------- */
 
-function sitemap(articles){
+function sitemap(articles, guides){
   const pages = [
     { loc: '/', pri: '1.0', freq: 'daily' },
     { loc: '/articles.html', pri: '0.9', freq: 'daily' },
     { loc: '/standards.html', pri: '0.9', freq: 'weekly' },
     { loc: '/rules.html', pri: '0.8', freq: 'weekly' },
+    { loc: '/guides/', pri: '0.9', freq: 'monthly' },
     { loc: '/members.html', pri: '0.5', freq: 'monthly' },
     { loc: '/privacy.html', pri: '0.3', freq: 'yearly' },
     { loc: '/terms.html', pri: '0.3', freq: 'yearly' }
@@ -310,6 +311,11 @@ function sitemap(articles){
   ).concat(articles.map(a =>
     `  <url><loc>${SITE}/${OUT}/${a.id}.html</loc><lastmod>${a.date}</lastmod>` +
     `<changefreq>monthly</changefreq><priority>${a.compiled ? '0.6' : '0.8'}</priority></url>`
+  )).concat((guides || []).map(g =>
+    /* The pillar outranks everything but the home page: it is the page the
+       whole cluster points at. */
+    `  <url><loc>${SITE}/guides/${g.slug}.html</loc><lastmod>${g.updated}</lastmod>` +
+    `<changefreq>monthly</changefreq><priority>${g.pillar ? '1.0' : '0.9'}</priority></url>`
   ));
 
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join('\n')}\n</urlset>\n`;
@@ -407,6 +413,294 @@ function siteSchema(){
   return '<script type="application/ld+json">' + JSON.stringify(ld) + '</script>\n';
 }
 
+/* =========================================================================
+   GUIDES
+
+   Generates /guides/<slug>.html from guides.js, plus an index at
+   /guides/index.html. These are the pages built to be found in search, so
+   they carry more structured data than the article pages do: Article,
+   FAQPage and BreadcrumbList, plus a table of contents and a properly
+   linked cluster.
+   ========================================================================= */
+
+function guidePage(g, all, fmtLong){
+  const url = SITE + '/guides/' + g.slug + '.html';
+  const pillar = all.find(x => x.pillar);
+  const related = (g.related || []).map(s => all.find(x => x.slug === s)).filter(Boolean);
+
+  const toc = g.body.map((s, i) =>
+    `<li><a href="#s${i + 1}">${esc(s.h)}</a></li>`).join('');
+
+  const sections = g.body.map((s, i) => `
+      <section class="gsec" id="s${i + 1}">
+        <h2>${esc(s.h)}</h2>
+        ${s.p.map(p => `<p>${esc(p)}</p>`).join('\n        ')}
+      </section>`).join('');
+
+  const faq = g.faq && g.faq.length ? `
+      <section class="gfaq" id="faq">
+        <h2>Common questions</h2>
+        ${g.faq.map(f => `
+        <details class="gq">
+          <summary>${esc(f.q)}</summary>
+          <p>${esc(f.a)}</p>
+        </details>`).join('')}
+      </section>` : '';
+
+  /* Article, FAQ and breadcrumbs. The FAQ block is what produces the
+     expanded result in Google, and it only works if the questions on the
+     page match the questions in the markup exactly. */
+  const ld = [
+    {
+      '@context': 'https://schema.org', '@type': 'Article',
+      headline: g.h1, description: g.description,
+      datePublished: g.updated, dateModified: g.updated,
+      inLanguage: 'en-GB',
+      mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+      author: { '@type': 'Organization', name: 'Skills Radar', url: SITE + '/' },
+      publisher: { '@type': 'Organization', name: 'Skills Radar', url: SITE + '/' }
+    },
+    {
+      '@context': 'https://schema.org', '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Skills Radar', item: SITE + '/' },
+        { '@type': 'ListItem', position: 2, name: 'Guides', item: SITE + '/guides/' },
+        { '@type': 'ListItem', position: 3, name: g.h1, item: url }
+      ]
+    }
+  ];
+  if(g.faq && g.faq.length){
+    ld.push({
+      '@context': 'https://schema.org', '@type': 'FAQPage',
+      mainEntity: g.faq.map(f => ({
+        '@type': 'Question', name: f.q,
+        acceptedAnswer: { '@type': 'Answer', text: f.a }
+      }))
+    });
+  }
+
+  return `<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${esc(g.title)}</title>
+<meta name="description" content="${esc(g.description)}">
+<link rel="canonical" href="${url}">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Skills Radar">
+<meta property="og:locale" content="en_GB">
+<meta property="og:title" content="${esc(g.title)}">
+<meta property="og:description" content="${esc(g.description)}">
+<meta property="og:url" content="${url}">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="${esc(g.title)}">
+<meta name="twitter:description" content="${esc(g.description)}">
+${ld.map(x => '<script type="application/ld+json">' + JSON.stringify(x) + '</script>').join('\n')}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+<a class="skiplink" href="#main">Skip to content</a>
+
+<div class="masthead">
+  <div class="wrap"><div id="heroblock"></div></div>
+</div>
+
+<div class="navbar"><div class="wrap"><div id="navmain"></div></div></div>
+
+<div class="stickybar">
+  <div class="wrap inner">
+    <a class="mini" href="../index.html">Skills <em>Radar</em></a>
+    <div id="navslot"></div>
+  </div>
+</div>
+
+<main id="main" tabindex="-1">
+<div class="wrap">
+
+  <nav class="crumbs" aria-label="Breadcrumb">
+    <a href="../index.html">Home</a> <span>›</span>
+    <a href="index.html">Guides</a> <span>›</span>
+    <span>${esc(g.h1)}</span>
+  </nav>
+
+  <article class="guide${g.pillar ? ' pillar' : ''}">
+    <header class="ghead">
+      ${g.pillar ? '<span class="ctag new">Complete guide</span>' : ''}
+      <h1>${esc(g.h1)}</h1>
+      <p class="gstand">${esc(g.description)}</p>
+      <p class="gmeta">Updated ${fmtLong(g.updated)} · about ${g.reading} minutes to read</p>
+    </header>
+
+    <nav class="gtoc" aria-label="On this page">
+      <h2>On this page</h2>
+      <ol>${toc}${g.faq && g.faq.length ? '<li><a href="#faq">Common questions</a></li>' : ''}</ol>
+    </nav>
+
+    ${sections}
+    ${faq}
+
+    <div class="gcta">
+      <h2>Track this yourself</h2>
+      <p>Skills Radar follows every change to the funding rules, the standards register and T-Levels,
+      with what changed, what it changed from, and what follows. Free to read.</p>
+      <div class="gctabtns">
+        <a class="btn" href="../index.html">See what has changed</a>
+        <a class="btn ghost" href="../rules.html">Browse the 2026/27 rules</a>
+      </div>
+    </div>
+  </article>
+
+  ${related.length ? `
+  <div class="grouphead"><h2>Related guides</h2></div>
+  <div class="grelated">
+    ${related.map(r => `<a class="gcard" href="${r.slug}.html">
+      <h3>${esc(r.h1)}</h3>
+      <p>${esc(r.description)}</p>
+    </a>`).join('')}
+  </div>` : ''}
+
+  ${!g.pillar && pillar ? `
+  <p class="gback">Part of <a href="${pillar.slug}.html">${esc(pillar.h1)}</a>,
+  our complete guide to the 2026/27 rules.</p>` : ''}
+
+</div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Skills Radar is maintained by hand from the Skills England apprenticeship register,
+    the Skills England occupational maps, and GOV.UK apprenticeship funding and T-Level guidance.
+    Always check the source before acting on a compliance deadline.</p>
+    <p class="legal"><a href="../privacy.html">Privacy notice</a> ·
+      <a href="../terms.html">Terms</a> · <a href="../account.html">Members</a></p>
+    <div class="attribution">
+      <a href="https://www.gov.uk/government/organisations/skills-england" target="_blank" rel="noopener" class="selogo"><img src="https://occupational-maps.skillsengland.education.gov.uk/media/cyropis5/skills-england_lesser_arms_landscape-se-logo-white.svg" alt="Skills England" width="150" height="40" loading="lazy"></a>
+      <p>Contains data from Skills England. © Skills England 2026. This information is licensed under the
+      <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3" target="_blank" rel="noopener">Open Government Licence v3.0</a>.
+      Funding rules content is Crown copyright, also under the Open Government Licence.</p>
+    </div>
+  </div>
+</footer>
+
+<script src="../config.js"></script>
+<script src="../standards.js"></script>
+<script src="../defunded.js"></script>
+<script src="../otj-minimums.js"></script>
+<script src="../occupations.js" onerror="void 0"></script>
+<script src="../data.js"></script>
+<script src="../app.js"></script>
+<script src="../ui.js"></script>
+<script src="../auth.js"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script>
+  document.getElementById('heroblock').innerHTML = titleBlockHTML('').replace(/href="index\.html"/g, 'href="../index.html"');
+  document.getElementById('navmain').innerHTML = navHTML('').replace(/href="/g, 'href="../');
+  document.getElementById('navslot').innerHTML = navHTML('').replace(/href="/g, 'href="../');
+  if(typeof recordView === 'function') recordView();
+  if(typeof recordEvent === 'function') recordEvent('guide', ${JSON.stringify(g.slug)});
+</script>
+</body>
+</html>`;
+}
+
+function guidesIndex(all, fmtLong){
+  const url = SITE + '/guides/';
+  const pillar = all.find(x => x.pillar);
+  const rest = all.filter(x => !x.pillar);
+
+  const ld = {
+    '@context': 'https://schema.org', '@type': 'CollectionPage',
+    name: 'Apprenticeship funding guides',
+    description: 'Guides to the 2026/27 apprenticeship funding rules, compliance, audit and eligibility.',
+    url: url, inLanguage: 'en-GB'
+  };
+
+  return `<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apprenticeship Funding Guides: Rules, Compliance and Audit</title>
+<meta name="description" content="Plain guides to apprenticeship funding: the 2026/27 rules, compliance requirements, audit preparation, eligibility, evidence and the levy.">
+<link rel="canonical" href="${url}">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Skills Radar">
+<meta property="og:title" content="Apprenticeship Funding Guides">
+<meta property="og:description" content="Guides to the 2026/27 apprenticeship funding rules, compliance, audit and eligibility.">
+<meta property="og:url" content="${url}">
+<script type="application/ld+json">${JSON.stringify(ld)}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+<a class="skiplink" href="#main">Skip to content</a>
+
+<div class="masthead"><div class="wrap"><div id="heroblock"></div></div></div>
+<div class="navbar"><div class="wrap"><div id="navmain"></div></div></div>
+<div class="stickybar"><div class="wrap inner">
+  <a class="mini" href="../index.html">Skills <em>Radar</em></a><div id="navslot"></div>
+</div></div>
+
+<main id="main" tabindex="-1">
+<div class="wrap">
+
+  <div class="pagehead">
+    <h1>Apprenticeship funding guides</h1>
+    <p>Standing answers to the questions that come up most: what the rules require,
+    what compliance actually means, what an audit looks at, and who can be funded.</p>
+  </div>
+
+  ${pillar ? `
+  <a class="gpillar" href="${pillar.slug}.html">
+    <span class="ctag new">Start here</span>
+    <h2>${esc(pillar.h1)}</h2>
+    <p>${esc(pillar.description)}</p>
+    <span class="gmore">Read the complete guide →</span>
+  </a>` : ''}
+
+  <div class="grouphead"><h2>Every guide</h2></div>
+  <div class="grelated wide">
+    ${rest.map(g => `<a class="gcard" href="${g.slug}.html">
+      <h3>${esc(g.h1)}</h3>
+      <p>${esc(g.description)}</p>
+      <span class="gwhen">Updated ${fmtLong(g.updated)}</span>
+    </a>`).join('')}
+  </div>
+
+</div>
+</main>
+
+<footer><div class="wrap">
+  <p class="legal"><a href="../privacy.html">Privacy notice</a> · <a href="../terms.html">Terms</a> · <a href="../account.html">Members</a></p>
+</div></footer>
+
+<script src="../config.js"></script>
+<script src="../standards.js"></script>
+<script src="../defunded.js"></script>
+<script src="../otj-minimums.js"></script>
+<script src="../data.js"></script>
+<script src="../app.js"></script>
+<script src="../ui.js"></script>
+<script src="../auth.js"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script>
+  document.getElementById('heroblock').innerHTML = titleBlockHTML('').replace(/href="index\.html"/g, 'href="../index.html"');
+  document.getElementById('navmain').innerHTML = navHTML('').replace(/href="/g, 'href="../');
+  document.getElementById('navslot').innerHTML = navHTML('').replace(/href="/g, 'href="../');
+  if(typeof recordView === 'function') recordView();
+</script>
+</body>
+</html>`;
+}
+
 /* ---------- Run ---------- */
 
 function run(){
@@ -427,7 +721,15 @@ function run(){
 
   injectMeta();
 
-  fs.writeFileSync('sitemap.xml', sitemap(articles));
+  /* The guides cluster */
+  if(typeof api.GUIDES !== 'undefined' && api.GUIDES.length){
+    if(!fs.existsSync('guides')) fs.mkdirSync('guides');
+    api.GUIDES.forEach(g => fs.writeFileSync('guides/' + g.slug + '.html', guidePage(g, api.GUIDES, api.fmtLong)));
+    fs.writeFileSync('guides/index.html', guidesIndex(api.GUIDES, api.fmtLong));
+    console.log('Built ' + api.GUIDES.length + ' guides');
+  }
+
+  fs.writeFileSync('sitemap.xml', sitemap(articles, api.GUIDES || []));
   fs.writeFileSync('robots.txt', robots());
 
   console.log('Built ' + written + ' article pages');

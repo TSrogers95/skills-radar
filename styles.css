@@ -4019,3 +4019,99 @@ blockquote, .standfirst{ font-family:var(--serif); font-style:italic; }
     pointer-events:none;
   }
 }
+
+/* ---------- Guides ---------- */
+
+.guide{ max-width:760px; margin:0 auto 50px; }
+.guide.pillar{ max-width:800px; }
+
+.ghead{ border-bottom:2px solid var(--ink); padding-bottom:22px; margin-bottom:26px; }
+.ghead h1{
+  font-family:var(--serif); font-size:clamp(30px,4.2vw,46px); font-weight:600;
+  line-height:1.06; letter-spacing:-0.022em; margin:10px 0 14px;
+}
+.gstand{
+  font-family:var(--serif); font-size:clamp(17px,1.6vw,20px);
+  line-height:1.5; color:var(--text-2); margin:0 0 14px; max-width:62ch;
+}
+.gmeta{
+  font-family:var(--sans); font-size:12px; letter-spacing:0.03em;
+  text-transform:uppercase; color:var(--text-3); margin:0;
+}
+
+.gtoc{
+  background:var(--paper); border:1px solid var(--line);
+  border-left:3px solid var(--ink); padding:18px 22px; margin-bottom:34px;
+}
+.gtoc h2{
+  font-family:var(--sans); font-size:11px; font-weight:700;
+  letter-spacing:0.1em; text-transform:uppercase; color:var(--text-3);
+  margin:0 0 10px;
+}
+.gtoc ol{ margin:0; padding-left:20px; }
+.gtoc li{ margin-bottom:5px; font-size:14.5px; }
+.gtoc a{ color:var(--ink-3); text-decoration:none; }
+.gtoc a:hover{ text-decoration:underline; }
+
+.gsec{ margin-bottom:30px; scroll-margin-top:80px; }
+.gsec h2{
+  font-family:var(--serif); font-size:24px; font-weight:600;
+  letter-spacing:-0.016em; margin:0 0 12px; line-height:1.18;
+}
+.gsec p{
+  font-family:var(--serif); font-size:18px; line-height:1.62;
+  color:var(--text); margin:0 0 15px; max-width:64ch;
+}
+
+.gfaq{ margin-top:44px; scroll-margin-top:80px; }
+.gfaq h2{ font-family:var(--serif); font-size:24px; font-weight:600; margin:0 0 14px; }
+.gq{ border-bottom:1px solid var(--line); }
+.gq summary{
+  cursor:pointer; list-style:none; padding:14px 0;
+  font-family:var(--serif); font-size:17px; font-weight:500; line-height:1.3;
+  display:flex; justify-content:space-between; gap:14px; align-items:center;
+}
+.gq summary::-webkit-details-marker{ display:none; }
+.gq summary::after{
+  content:''; flex:none; width:9px; height:9px;
+  border-right:1.6px solid var(--text-3); border-bottom:1.6px solid var(--text-3);
+  transform:rotate(45deg) translate(-2px,-2px); transition:transform .18s ease;
+}
+.gq[open] summary::after{ transform:rotate(-135deg) translate(-3px,-3px); }
+.gq p{ margin:0 0 16px; font-size:15px; line-height:1.62; color:var(--text-2); max-width:64ch; }
+
+.gcta{
+  background:var(--ink); color:#fff; padding:30px 32px; margin-top:44px;
+}
+.gcta h2{ font-family:var(--serif); font-size:22px; color:#fff; margin:0 0 10px; }
+.gcta p{ color:#A9C2BC; font-size:14.5px; line-height:1.6; margin:0 0 18px; max-width:58ch; }
+.gctabtns{ display:flex; gap:10px; flex-wrap:wrap; }
+.gcta .btn{ background:#6ED0B6; color:#06211C; border:none; text-decoration:none; }
+.gcta .btn.ghost{ background:transparent; color:#D7E3E0; border:1px solid #2A5049; }
+
+.grelated{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:1px; background:var(--line); border:1px solid var(--line); }
+.grelated.wide{ grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); }
+.gcard{ background:var(--surface); padding:20px 22px; text-decoration:none; color:inherit; display:block; }
+.gcard:hover{ background:var(--paper); }
+.gcard h3{ font-family:var(--serif); font-size:17px; font-weight:600; margin:0 0 6px; line-height:1.22; }
+.gcard p{ font-size:13px; line-height:1.55; color:var(--text-2); margin:0; }
+.gwhen{ display:block; margin-top:9px; font-size:11px; letter-spacing:0.04em; text-transform:uppercase; color:var(--text-3); }
+
+.gpillar{
+  display:block; text-decoration:none; color:inherit;
+  background:var(--surface); border:1px solid var(--line);
+  border-top:3px solid var(--low); padding:28px 30px; margin-bottom:34px;
+}
+.gpillar:hover{ background:var(--paper); }
+.gpillar h2{ font-family:var(--serif); font-size:27px; font-weight:600; margin:10px 0 10px; letter-spacing:-0.018em; line-height:1.12; }
+.gpillar p{ font-size:15px; line-height:1.6; color:var(--text-2); margin:0; max-width:64ch; }
+.gmore{ display:inline-block; margin-top:14px; font-size:13.5px; font-weight:600; color:var(--ink-3); }
+
+.gback{ font-size:14px; color:var(--text-2); margin-top:26px; }
+.gback a{ color:var(--ink-3); }
+
+@media (max-width:640px){
+  .gsec p{ font-size:16.5px; }
+  .gcta{ padding:24px 20px; }
+  .gctabtns .btn{ width:100%; text-align:center; }
+}
