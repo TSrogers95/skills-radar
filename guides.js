@@ -38,6 +38,7 @@ const GUIDES = [
 /* ---------- THE PILLAR ---------- */
 {
   slug: "apprenticeship-funding-rules",
+  watch: ["defunding-16", "growth-skills-levy", "level-7-withdrawal"],
   pillar: true,
   title: "Apprenticeship Funding Rules 2026/27: A Complete Guide",
   h1: "Apprenticeship funding rules 2026 to 2027",
@@ -86,6 +87,7 @@ const GUIDES = [
 /* ---------- COMPLIANCE ---------- */
 {
   slug: "apprenticeship-funding-compliance",
+  watch: ["otj-hours-change", "defunding-16"],
   title: "Apprenticeship Funding Compliance: 2026/27 Requirements",
   h1: "Apprenticeship funding compliance",
   description: "What funding compliance actually requires in 2026/27, where providers and employers most often fall short, and how to check your position before an auditor does.",
@@ -123,6 +125,7 @@ const GUIDES = [
 
 {
   slug: "apprenticeship-funding-compliance-checklist",
+  watch: ["otj-hours-change", "rpl-requirement"],
   title: "Apprenticeship Funding Compliance Checklist 2026/27",
   h1: "Apprenticeship funding compliance checklist",
   description: "A practical checklist covering eligibility, evidence, off-the-job training, prior learning and the funding claim, with what an auditor looks for at each point.",
@@ -163,6 +166,7 @@ const GUIDES = [
 /* ---------- AUDIT ---------- */
 {
   slug: "apprenticeship-funding-audit",
+  watch: ["otj-hours-change"],
   title: "Apprenticeship Funding Audit: What to Expect in 2026/27",
   h1: "Apprenticeship funding audit",
   description: "How a funding audit works, what auditors sample and ask for, what triggers a review, and what happens when evidence cannot be produced.",
@@ -282,6 +286,7 @@ const GUIDES = [
 /* ---------- ELIGIBILITY ---------- */
 {
   slug: "apprenticeship-funding-eligibility",
+  watch: ["level-7-withdrawal", "defunding-16"],
   title: "Apprenticeship Funding Eligibility Rules 2026/27",
   h1: "Apprenticeship funding eligibility",
   description: "Who can be funded for an apprenticeship in 2026/27: residency, age, employment, prior qualifications, and the changes that closed routes this year.",
@@ -325,6 +330,7 @@ const GUIDES = [
 /* ---------- AUDIENCE PAGES ---------- */
 {
   slug: "apprenticeship-funding-rules-for-employers",
+  watch: ["growth-skills-levy", "hiring-payment", "non-levy-full-funding"],
   title: "Apprenticeship Funding Rules for Employers 2026/27",
   h1: "Apprenticeship funding rules for employers",
   description: "What the 2026/27 rules require of employers: the agreement, time to train, wages, evidence you must hold, and what changed with the Growth and Skills Levy.",
@@ -399,6 +405,7 @@ const GUIDES = [
 /* ---------- SPECIFIC REQUIREMENTS ---------- */
 {
   slug: "apprenticeship-funding-off-the-job-training",
+  watch: ["otj-hours-change"],
   title: "Off-the-Job Training Rules and Minimum Hours 2026/27",
   h1: "Off-the-job training: the funding rules",
   description: "How off-the-job training works since the 2025 change to published minimum hours per standard, what counts, what does not, and the 187-hour floor.",
@@ -480,6 +487,7 @@ const GUIDES = [
 /* ---------- LEVY ---------- */
 {
   slug: "apprenticeship-levy-funding-rules",
+  watch: ["growth-skills-levy", "non-levy-full-funding"],
   title: "Apprenticeship Levy Rules 2026/27: Growth and Skills Levy",
   h1: "Apprenticeship levy funding rules",
   description: "How the Growth and Skills Levy works in 2026/27: the twelve-month expiry, the removal of the top-up, co-investment, transfers, and what it means for planning.",
@@ -518,6 +526,7 @@ const GUIDES = [
 /* ---------- PROBLEMS ---------- */
 {
   slug: "apprenticeship-funding-clawback",
+  watch: ["otj-hours-change"],
   title: "Apprenticeship Funding Clawback and Common Errors",
   h1: "Funding clawback and the errors that cause it",
   description: "Why apprenticeship funding gets recovered, the errors that cause it most often, how extrapolation multiplies the cost, and what reduces the risk.",

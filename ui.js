@@ -11,7 +11,6 @@ const PAGES = [
   { file: "articles.html",   label: "Articles" },
   { file: "standards.html",  label: "Standards" },
   { file: "rules.html",      label: "26/27 rules" },
-  { file: "guides/",         label: "Guides" },
   { file: "members.html",    label: "Members" }
 ];
 

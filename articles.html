@@ -43,8 +43,8 @@
 
 <div class="wrap">
   <div class="pagehead">
-    <h1>Articles</h1>
-    <p>Written analysis of the policy changes, plus a page for every standard with a significant change of its own, a defunding, a withdrawal, a funding band move, a pause or a new age restriction. Each has its own address, so you can send someone straight to the one that matters.</p>
+    <h1>Articles and guides</h1>
+    <p>Two kinds of writing. <b>Guides</b> are standing answers to the questions that keep coming up, kept in step with the rules as they change. <b>Articles</b> are written analysis of individual changes, plus a page for every standard with a significant change of its own. Each has its own address, so you can send someone straight to the one that matters.</p>
   </div>
 </div>
 
@@ -76,6 +76,8 @@
 </div>
 
 <div class="wrap">
+  <div id="guidesblock"></div>
+  <div class="grouphead"><h2>Articles</h2></div>
   <div class="tally" id="tally"></div>
   <div class="alist" id="list"></div>
 
@@ -102,6 +104,7 @@
 <script src="standards.js"></script>
 <script src="defunded.js"></script>
 <script src="occupations.js" onerror="console.info('occupations.js not present yet, run /api/sync-occupations')"></script>
+<script src="guides.js"></script>
 <script src="data.js"></script>
 <script src="app.js"></script>
 <script src="ui.js"></script>
@@ -110,6 +113,31 @@
 
 document.getElementById('heroblock').innerHTML = titleBlockHTML('');
 document.getElementById('navslot').innerHTML = navHTML('articles.html');
+
+/* Guides sit above the articles rather than in their own section of the
+   site. They answer the standing questions; the articles below cover what
+   changed and when. Same page, different jobs, no extra navigation. */
+(function renderGuides(){
+  const box = document.getElementById('guidesblock');
+  if(!box || typeof GUIDES === 'undefined' || !GUIDES.length) return;
+
+  const pillar = GUIDES.find(g => g.pillar);
+  const rest = GUIDES.filter(g => !g.pillar);
+
+  box.innerHTML =
+    '<div class="grouphead"><h2>Guides</h2>' +
+      '<span class="hint" style="margin:0">Standing answers, checked against current guidance</span></div>' +
+
+    (pillar ? '<a class="gpillar" href="guides/' + pillar.slug + '.html">' +
+      '<span class="ctag new">Start here</span>' +
+      '<h2>' + pillar.h1 + '</h2><p>' + pillar.description + '</p>' +
+      '<span class="gmore">Read the complete guide &rarr;</span></a>' : '') +
+
+    '<div class="grelated wide">' +
+      rest.map(g => '<a class="gcard" href="guides/' + g.slug + '.html">' +
+        '<h3>' + g.h1 + '</h3><p>' + g.description + '</p></a>').join('') +
+    '</div>';
+})();
 document.getElementById('navmain').innerHTML = navHTML('articles.html');
 
 function rowHTML(a){

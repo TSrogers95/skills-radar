@@ -32,7 +32,7 @@ function load(){
     'querySelectorAll:function(){return []},addEventListener:function(){}};' +
     'var window={addEventListener:function(){},location:{}};var location={hash:"",search:""};' +
     'var navigator={};var sessionStorage={getItem:function(){return null},setItem:function(){},removeItem:function(){}};';
-  return new Function(stub + src + '; return {allArticles:allArticles, ROUTES:ROUTES, STANDARDS:STANDARDS, ' +
+  return new Function(stub + src + '; return {allArticles:allArticles, allUpdates:allUpdates, ROUTES:ROUTES, STANDARDS:STANDARDS, ' +
     'READING:(typeof READING!=="undefined"?READING:[]), GUIDES:(typeof GUIDES!=="undefined"?GUIDES:[]), fmtLong:fmtLong, money:money, band:band, ' +
     'tagClass:tagClass, urgencyTag:urgencyTag, iconHTML:iconHTML, standardURL:standardURL, ' +
     'otjMinimum:(typeof otjMinimum==="function"?otjMinimum:null), ' +
@@ -423,10 +423,26 @@ function siteSchema(){
    linked cluster.
    ========================================================================= */
 
-function guidePage(g, all, fmtLong){
+/* A month and year rather than a date. A guide is a standing answer, and a
+   precise day on it invites the reader to treat it as news and to discount it
+   the moment it is a few weeks old. The exact date still goes in the schema,
+   where search engines want it. */
+function monthOf(iso){
+  const d = new Date(iso);
+  return isNaN(d) ? '' : d.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+}
+
+function guidePage(g, all, fmtLong, api){
   const url = SITE + '/guides/' + g.slug + '.html';
   const pillar = all.find(x => x.pillar);
   const related = (g.related || []).map(s => all.find(x => x.slug === s)).filter(Boolean);
+
+  /* The changes this guide covers, pulled live rather than written in, so a
+     guide cannot quietly fall out of step with the feed. */
+  const changes = (g.watch || [])
+    .map(id => (api.allUpdates() || []).find(u => u.article === id || u.id === id))
+    .filter(Boolean)
+    .slice(0, 4);
 
   const toc = g.body.map((s, i) =>
     `<li><a href="#s${i + 1}">${esc(s.h)}</a></li>`).join('');
@@ -533,7 +549,7 @@ ${ld.map(x => '<script type="application/ld+json">' + JSON.stringify(x) + '</scr
       ${g.pillar ? '<span class="ctag new">Complete guide</span>' : ''}
       <h1>${esc(g.h1)}</h1>
       <p class="gstand">${esc(g.description)}</p>
-      <p class="gmeta">Updated ${fmtLong(g.updated)} · about ${g.reading} minutes to read</p>
+      <p class="gmeta">Checked against current guidance ${monthOf(g.updated)} · about ${g.reading} minutes to read</p>
     </header>
 
     <nav class="gtoc" aria-label="On this page">
@@ -543,6 +559,17 @@ ${ld.map(x => '<script type="application/ld+json">' + JSON.stringify(x) + '</scr
 
     ${sections}
     ${faq}
+
+    ${changes.length ? `
+    <section class="gchanges">
+      <h2>What has changed recently</h2>
+      <p class="gchintro">Live from the feed. This guide is kept in step with these.</p>
+      ${changes.map(c => `<a class="gch" href="../${c.article ? OUT + '/' + c.article + '.html' : 'index.html'}">
+        <span class="ctag ${c.urgency === 'high' ? 'stop' : c.urgency === 'medium' ? 'warn' : 'new'}">${esc(c.tagText || 'Changed')}</span>
+        <span class="gchtitle">${esc(c.title)}</span>
+        <span class="gchdate">${fmtLong(c.date)}</span>
+      </a>`).join('')}
+    </section>` : ''}
 
     <div class="gcta">
       <h2>Track this yourself</h2>
@@ -671,7 +698,7 @@ function guidesIndex(all, fmtLong){
     ${rest.map(g => `<a class="gcard" href="${g.slug}.html">
       <h3>${esc(g.h1)}</h3>
       <p>${esc(g.description)}</p>
-      <span class="gwhen">Updated ${fmtLong(g.updated)}</span>
+      <span class="gwhen">Checked ${monthOf(g.updated)}</span>
     </a>`).join('')}
   </div>
 
@@ -724,7 +751,7 @@ function run(){
   /* The guides cluster */
   if(typeof api.GUIDES !== 'undefined' && api.GUIDES.length){
     if(!fs.existsSync('guides')) fs.mkdirSync('guides');
-    api.GUIDES.forEach(g => fs.writeFileSync('guides/' + g.slug + '.html', guidePage(g, api.GUIDES, api.fmtLong)));
+    api.GUIDES.forEach(g => fs.writeFileSync('guides/' + g.slug + '.html', guidePage(g, api.GUIDES, api.fmtLong, api)));
     fs.writeFileSync('guides/index.html', guidesIndex(api.GUIDES, api.fmtLong));
     console.log('Built ' + api.GUIDES.length + ' guides');
   }
