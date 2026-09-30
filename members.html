@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Members — Skills Radar</title>
+<title>Members, Skills Radar</title>
 <meta name="description" content="A personal compliance calendar, a feed filtered to the standards you deliver, levy modelling and a tailored newsletter.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,11 +15,11 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Skills Radar">
 <meta property="og:locale" content="en_GB">
-<meta property="og:title" content="Members — Skills Radar">
+<meta property="og:title" content="Members, Skills Radar">
 <meta property="og:description" content="A personal compliance calendar, a feed filtered to the standards you deliver, levy modelling and a tailored newsletter.">
 <meta property="og:url" content="https://skills-radar.co.uk/members.html">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Members — Skills Radar">
+<meta name="twitter:title" content="Members, Skills Radar">
 <meta name="twitter:description" content="A personal compliance calendar, a feed filtered to the standards you deliver, levy modelling and a tailored newsletter.">
 <!-- /generated:meta -->
 </head>
@@ -30,6 +30,8 @@
 <div class="masthead">
 <div class="wrap"><div id="heroblock"></div></div>
 </div>
+
+<div class="navbar"><div class="wrap"><div id="navmain"></div></div></div>
 
 <div class="stickybar">
   <div class="wrap inner">
@@ -79,7 +81,7 @@
 
 <footer>
   <div class="wrap">
-    <p>Levy figures are estimates built from the rates in the current funding rules and the numbers you enter. They are a planning aid, not a statement of your account. Check your Apprenticeship Service account and the funding rules before making a financial decision. Incentives and grants change frequently — every one links to its source.</p>
+    <p>Levy figures are estimates built from the rates in the current funding rules and the numbers you enter. They are a planning aid, not a statement of your account. Check your Apprenticeship Service account and the funding rules before making a financial decision. Incentives and grants change frequently, every one links to its source.</p>
   </div>
     <div class="wrap"><p class="legal"><a href="privacy.html">Privacy notice</a> &middot; <a href="terms.html">Terms</a> &middot; <a href="account.html">Members</a></p>
       <div class="attribution"><a href="https://www.gov.uk/government/organisations/skills-england" target="_blank" rel="noopener" class="selogo"><img src="https://occupational-maps.skillsengland.education.gov.uk/media/cyropis5/skills-england_lesser_arms_landscape-se-logo-white.svg" alt="Skills England" width="150" height="40" loading="lazy"></a><p>Contains data from Skills England. &copy; Skills England 2026. This information is licensed under the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3" target="_blank" rel="noopener">Open Government Licence v3.0</a>. Funding rules content is Crown copyright, also under the Open Government Licence.</p></div></div>
@@ -90,7 +92,7 @@
 <script src="standards.js"></script>
 <script src="defunded.js"></script>
 <script src="otj-minimums.js"></script>
-<script src="occupations.js" onerror="console.info('occupations.js not present yet — run /api/sync-occupations')"></script>
+<script src="occupations.js" onerror="console.info('occupations.js not present yet, run /api/sync-occupations')"></script>
 <script src="data.js"></script>
 <script src="app.js"></script>
 <script src="ui.js"></script>
@@ -99,6 +101,7 @@
 
 document.getElementById('heroblock').innerHTML = titleBlockHTML('');
 document.getElementById('navslot').innerHTML = navHTML('members.html');
+document.getElementById('navmain').innerHTML = navHTML('members.html');
 
 /* ---------- Sign in ---------- */
 
@@ -152,7 +155,7 @@ async function checkAccess(){
   /* Coming back from Stripe. The payment has succeeded, but access is
      granted by the webhook, which arrives separately and can take a few
      seconds. Bouncing straight back to the payment page in that window tells
-     someone who has just paid that they have not — so wait, and say what is
+     someone who has just paid that they have not, so wait, and say what is
      happening while we do. */
   if(new URLSearchParams(location.search).get('welcome') === '1' && !hasAccess(sub, profile)){
     showConfirming();
@@ -191,7 +194,7 @@ function showStuck(){
   document.body.innerHTML =
     '<div class="wrap"><div class="waitbox">' +
       '<h1>Your payment went through, but access has not switched on</h1>' +
-      '<p>This one is on us. Stripe has your payment, and it confirms to us separately — occasionally that ' +
+      '<p>This one is on us. Stripe has your payment, and it confirms to us separately, occasionally that ' +
       'confirmation is delayed or does not arrive.</p>' +
       '<p><b>Try again in a minute.</b> If it still has not worked, email ' +
       (email ? '<a href="mailto:' + email + '">' + email + '</a>' : 'us') +
@@ -242,7 +245,7 @@ async function loadAccount(){
   } catch(e){ console.warn('could not load account data:', e.message); }
 }
 
-/* Write back what changed. Quiet on failure — someone typing into the
+/* Write back what changed. Quiet on failure, someone typing into the
    calculator should not be interrupted by a save error. */
 async function persist(){
   if(!ACCOUNT) return;
@@ -290,7 +293,7 @@ function isMine(item){
 
    The old test asked whether the item's title contained a cohort name
    anywhere, so someone following "Engineering Technician" was shown
-   "Space Engineering Technician" and "Aerospace Engineering Technician" —
+   "Space Engineering Technician" and "Aerospace Engineering Technician"  to 
    different standards that happen to end with the same words. */
 function isMyStandardOnly(item){
   if(!item.standard) return false;
@@ -320,7 +323,7 @@ function isMyStandardOnly(item){
 /* =========================================================================
    YOUR OWN EVENTS
 
-   Inductions, reviews, open evenings, EPA windows — the dates that matter to
+   Inductions, reviews, open evenings, EPA windows, the dates that matter to
    you but exist nowhere in policy. Added here, they sit alongside the policy
    milestones in the calendar, on the dashboard and in the board report.
 
@@ -396,7 +399,7 @@ function policyMilestones(){
 }
 
 function milestoneReason(m){
-  if(m.mine) return m.done ? 'Your event — done' : 'Your event';
+  if(m.mine) return m.done ? 'Your event, done' : 'Your event';
   const mine = COHORT.map(s => s.name.toLowerCase());
   if(m.scope === 'standards'){
     const hit = (m.standards || []).filter(n => mine.indexOf(n.toLowerCase()) > -1);
@@ -489,7 +492,7 @@ function levyFigures(payroll, standards, under25, levyPayer){
    DASHBOARD
 
    Deliberately not a second feed. The feed tab lists what has happened; this
-   answers a different question — what do I have to do, and what is coming.
+   answers a different question, what do I have to do, and what is coming.
    Every item here is something with an action attached or a date to plan
    against, drawn from the member's own cohort.
    ========================================================================= */
@@ -519,7 +522,7 @@ function attentionItems(){
     if(/waiting|pending/i.test(reg.epa || '')){
       out.push({ level:'warn', title:'L' + c.level + ' ' + c.name + ' has no assessment organisation',
         detail:'You can enrol and deliver, but nobody is currently appointed to assess. On a ' + (reg.months || c.months) +
-          '-month programme that is a real timing risk — ask how long appointment is expected to take against your planned end dates.',
+          '-month programme that is a real timing risk, ask how long appointment is expected to take against your planned end dates.',
         action:'View on the register', href: standardURL(reg), external:true });
     }
 
@@ -566,7 +569,7 @@ function comingUp(days){
 
 /* A completion forecast lived here. It has been removed rather than
    corrected, because without each apprentice's actual start date any figure
-   is an assumption about a steady intake dressed up as a projection — not
+   is an assumption about a steady intake dressed up as a projection, not
    something to put in front of a board.
 
    Doing it properly needs start dates per apprentice. Those live in the
@@ -582,7 +585,7 @@ function setupSteps(){
       action: 'Add standards', view: 'cohort' },
     { done: cohortHeads() > 0,
       title: 'Say how many apprentices are on each',
-      why: 'Needed for the levy figures and for the completion picture. An estimate is fine — you can change it whenever.',
+      why: 'Needed for the levy figures and for the completion picture. An estimate is fine, you can change it whenever.',
       action: 'Add numbers', view: 'cohort' },
     { done: SETTINGS.payroll > 0,
       title: 'Enter your annual pay bill',
@@ -656,7 +659,7 @@ function dashView(){
     '<p>What has changed on the standards you deliver, what needs doing, and what is coming.</p></div>' +
 
     /* The feed leads. It is the reason someone opens this page, and it is
-       filtered live to whatever is in My cohort — add or remove a standard
+       filtered live to whatever is in My cohort, add or remove a standard
        there and this changes with it. */
     '<div class="grouphead" style="margin-top:0"><h2>What has changed</h2><div class="rule"></div>' +
       '<button class="linkbtn" data-go="cohort">Change what you follow</button></div>' +
@@ -664,7 +667,7 @@ function dashView(){
 
     '<div class="mgrid" style="margin-top:34px">' +
       '<div class="mcard ' + (stops ? 'bad' : '') + '"><div class="n">' + attention.length + '</div>' +
-        '<div class="l">Needing attention' + (stops ? ' — ' + stops + ' urgent' : '') + '</div></div>' +
+        '<div class="l">Needing attention' + (stops ? ', ' + stops + ' urgent' : '') + '</div></div>' +
       '<div class="mcard warm"><div class="n">' + soon.length + '</div><div class="l">Deadlines in 90 days</div></div>' +
       '<div class="mcard"><div class="n">' + cohortHeads() + '</div><div class="l">Apprentices on programme</div></div>' +
       '<div class="mcard cool"><div class="n">' + openEvents().length + '</div><div class="l">Your events outstanding</div></div>' +
@@ -747,7 +750,7 @@ function calView(){
   const mine = myMilestones().length, all = MILESTONES.length;
   return '<div class="pagehead"><h1>My calendar</h1>' +
     '<p>Twelve months ahead, filtered to the ' + COHORT.length + ' standards you deliver and the ' +
-    'rules that apply to everyone. Coloured days carry a deadline — hover or tap for the detail.</p></div>' +
+    'rules that apply to everyone. Coloured days carry a deadline, hover or tap for the detail.</p></div>' +
     '<div class="scopeswitch">' +
       '<button data-scope="mine"' + (calScope === 'mine' ? ' class="on"' : '') + '>Relevant to me <em>' + mine + '</em></button>' +
       '<button data-scope="all"' + (calScope === 'all' ? ' class="on"' : '') + '>Everything <em>' + all + '</em></button>' +
@@ -760,7 +763,7 @@ function calView(){
     '<div class="calgrid" id="calgrid"></div>' +
 
     '<div class="grouphead" style="margin-top:38px"><h2>Your own events</h2><div class="rule"></div></div>' +
-    '<p class="hint" style="max-width:66ch;margin:12px 0 16px">Inductions, progress review windows, open evenings, EPA bookings — ' +
+    '<p class="hint" style="max-width:66ch;margin:12px 0 16px">Inductions, progress review windows, open evenings, EPA bookings, ' +
     'anything with a date that matters to you. They appear in the calendar above, on your dashboard, and in the board report.</p>' +
 
     '<div class="eventadd">' +
@@ -784,7 +787,7 @@ function calView(){
 /* =========================================================================
    MY STANDARDS
 
-   One editable list drives the whole members area — the dashboard, the feed,
+   One editable list drives the whole members area, the dashboard, the feed,
    the calendar and the levy calculator all read from it. Edits survive tab
    switches within a session. Once accounts are live this saves to the
    database instead of sessionStorage.
@@ -798,7 +801,7 @@ let COHORT = loadCohort();
    Payroll and the age split used to live in the levy calculator's input
    boxes, read fresh each time and stored nowhere. That meant the dashboard
    and the board report were still using the account's original figures while
-   the calculator showed the ones you had typed — so a report printed after
+   the calculator showed the ones you had typed, so a report printed after
    changing your pay bill was wrong.
 
    One object now holds them, saved as you type and read by every view.
@@ -869,7 +872,7 @@ function pickerHTML(id){
     '<label for="' + id + '-q">Add a standard</label>' +
     '<div class="pickerbox">' +
       '<input type="search" id="' + id + '-q" autocomplete="off" ' +
-        'placeholder="Search the register — try &ldquo;business admin&rdquo;, &ldquo;ST0070&rdquo;, &ldquo;nursing&rdquo;">' +
+        'placeholder="Search the register, try &ldquo;business admin&rdquo;, &ldquo;ST0070&rdquo;, &ldquo;nursing&rdquo;">' +
       '<svg class="radar" id="' + id + '-r" viewBox="0 0 20 20" aria-hidden="true">' +
         '<circle cx="10" cy="10" r="8.6" fill="none" stroke="#CBC5B6" stroke-width="1"/>' +
         '<circle cx="10" cy="10" r="4.6" fill="none" stroke="#CBC5B6" stroke-width="1"/>' +
@@ -988,8 +991,8 @@ function otjFor(name){ return OTJ[name] || {}; }
 /* The counters were written into the view once and never revisited, so
    typing a new number changed the table and left the totals above it
    showing the old figures. They are generated separately now and redrawn
-   on every keystroke — in place, so focus stays in the box being typed in. */
-/* A cohort entry that no longer matches the register — usually because an
+   on every keystroke, in place, so focus stays in the box being typed in. */
+/* A cohort entry that no longer matches the register, usually because an
    import renamed the standard. Rather than a dead end, offer the closest
    entries and repair it in one click. */
 function fixHTML(entry, i){
@@ -998,7 +1001,7 @@ function fixHTML(entry, i){
     return '<small class="nomatch">Not on the register under this name. ' +
       'Remove it and search for it again.</small>';
   }
-  return '<small class="nomatch">Not matching the register &mdash; the name may have changed.</small>' +
+  return '<small class="nomatch">Not matching the register, the name may have changed.</small>' +
     '<div class="fixrow">' +
       near.map(s => '<button class="fixbtn" data-fix="' + i + '" data-to="' + s.name.replace(/"/g,'&quot;') + '">' +
         'L' + s.level + ' ' + s.name + '</button>').join('') +
@@ -1047,7 +1050,7 @@ function cohortView(){
       health.why + ' Until that is fixed every standard below will show as unmatched, and the feed will be ' +
       'nearly empty. Check <code>standards.js</code> is in your repo and that the last deployment was green.</div>') +
     '<p>The standards you deliver, and how many apprentices are on each. Everything else on this site follows ' +
-    'from this list — your feed, your calendar, your compliance position and your forecast.</p></div>' +
+    'from this list, your feed, your calendar, your compliance position and your forecast.</p></div>' +
 
     '<div id="cohortstats">' + cohortStatsHTML() + '</div>' +
 
@@ -1066,13 +1069,13 @@ function cohortView(){
 
     '<div class="addpanel">' +
       pickerHTML('cohortpick') +
-      '<p class="hint" style="margin:12px 0 0">Search by name, by reference number, or by what people call the job — ' +
+      '<p class="hint" style="margin:12px 0 0">Search by name, by reference number, or by what people call the job, ' +
       'try &ldquo;business admin&rdquo;, &ldquo;ST0070&rdquo; or &ldquo;welder&rdquo;. Added as soon as you pick one.</p>' +
     '</div>' +
 
     '<div class="notice" style="margin-top:22px"><b>An estimate is fine.</b> ' +
     'The numbers drive your forecast and your completion picture, not anything official. Change them whenever ' +
-    'the cohort changes — nothing is locked.</div>' +
+    'the cohort changes, nothing is locked.</div>' +
 
     dasPanelHTML(true);
 }
@@ -1132,10 +1135,10 @@ function otjView(){
       '<td class="num"><input class="otjin" type="number" min="0" data-f="rpl" data-n="' + esc(c.name) + '" ' +
         'value="' + (o.rpl || '') + '" placeholder="0" data-i="' + i + '"></td>' +
       '<td class="num" id="otj-req-' + i + '">' +
-        (p.unknown ? '<span class="otjnone">&mdash;</span>'
+        (p.unknown ? '<span class="otjnone">,</span>'
                    : '<b>' + p.required + 'h</b>' + (p.rplCapped ? '<small class="cap">capped at floor</small>' : '')) + '</td>' +
       '<td class="num"><input class="otjin" type="number" min="0" data-f="planned" data-n="' + esc(c.name) + '" ' +
-        'value="' + (o.planned || '') + '" placeholder="—" data-i="' + i + '"></td>' +
+        'value="' + (o.planned || '') + '" placeholder=" to " data-i="' + i + '"></td>' +
       '<td id="otj-state-' + i + '">' + stateCell +
         (p.weekly ? '<small class="cap">' + p.weekly.toFixed(1) + 'h a week average</small>' : '') + '</td>' +
     '</tr>';
@@ -1189,7 +1192,7 @@ function otjView(){
     (overridden
       ? '<div class="notice" style="margin-top:16px"><b>' + overridden + ' figure' + (overridden === 1 ? ' has' : 's have') +
         ' been overridden.</b> Your entered value is being used instead of the one on file. That is right if you have read a newer ' +
-        'figure from the register — the annex was a 2025/26 snapshot and each standard can now move independently.</div>'
+        'figure from the register, the annex was a 2025/26 snapshot and each standard can now move independently.</div>'
       : '') +
 
     '<div class="grouphead" style="margin-top:34px"><h2>What counts, and what does not</h2><div class="rule"></div></div>' +
@@ -1203,7 +1206,7 @@ function otjView(){
     '</div>' +
 
     '<div class="notice" style="margin-top:20px"><b>Three things worth knowing.</b> ' +
-    'Prior learning reduces the requirement but never below 187 hours — a programme under that is non-compliant whatever the RPL evidence says. ' +
+    'Prior learning reduces the requirement but never below 187 hours, a programme under that is non-compliant whatever the RPL evidence says. ' +
     'The provider is responsible for evidencing all of it, even where a subcontractor or the employer delivers it. ' +
     'And standalone English and maths qualifications do not count as active learning.</div>';
 }
@@ -1213,8 +1216,8 @@ function esc(s){ return String(s).replace(/"/g, '&quot;'); }
 /* =========================================================================
    APPRENTICESHIP SERVICE CONNECTION
 
-   Everything on this page that is currently typed in by hand — cohort sizes,
-   standards, start dates, off-the-job hours actually delivered — already
+   Everything on this page that is currently typed in by hand, cohort sizes,
+   standards, start dates, off-the-job hours actually delivered, already
    exists in the employer's Apprenticeship Service account. Connecting to it
    would replace the estimates with facts.
 
@@ -1259,7 +1262,7 @@ function dasPanelHTML(compact){
 
     '<div class="dasaction">' +
       (registered
-        ? '<div class="okbox" style="margin:0"><b>Noted — you are on the list.</b> ' +
+        ? '<div class="okbox" style="margin:0"><b>Noted, you are on the list.</b> ' +
           'We will get in touch when the connection is available. Nothing has been shared with anyone.</div>'
         : '<button class="btn" id="dasbtn">Register your interest</button>' +
           '<p class="hint" style="margin:10px 0 0">One click. It records that you want this, nothing more.</p>') +
@@ -1267,7 +1270,7 @@ function dasPanelHTML(compact){
 
     '<div class="notice" style="margin-top:20px"><b>Being straight about where this is.</b> ' +
     'This is not connected, and the button above does not connect it. Reading an employer\'s DAS account needs an approved ' +
-    'application to the Apprenticeship Service and the employer\'s own authorisation each time — it is a proper integration, ' +
+    'application to the Apprenticeship Service and the employer\'s own authorisation each time, it is a proper integration, ' +
     'not a switch. Registering interest tells us it is worth building, and gets you in the first group when it is. ' +
     'Until then, the figures on this page are the ones you enter.</div>' +
   '</section>';
@@ -1304,7 +1307,7 @@ function reportView(){
 
   return '<div class="pagehead noprint"><h1>Governance report</h1>' +
     '<p>A one-page position for a board or governance meeting, built from your cohort, your levy figures and your compliance position. ' +
-    'Print it or save it as a PDF — the buttons and navigation are left out of the printed version.</p>' +
+    'Print it or save it as a PDF, the buttons and navigation are left out of the printed version.</p>' +
     '<div class="addrow" style="margin-top:16px">' +
       '<button class="btn" id="printit">Print or save as PDF</button>' +
       '<span class="hint" style="align-self:center;margin:0">Choose &ldquo;Save as PDF&rdquo; as the destination to keep a copy</span>' +
@@ -1356,7 +1359,7 @@ function reportView(){
             positions.map(p => '<tr><td>Level ' + p.level + ' ' + p.name +
               (p.estimateUsed ? ' <span class="est">estimated minimum</span>' : '') + '</td>' +
               '<td class="r">' + p.required + 'h</td>' +
-              '<td class="r">' + (p.planned != null ? p.planned + 'h' : '—') + '</td>' +
+              '<td class="r">' + (p.planned != null ? p.planned + 'h' : ' to ') + '</td>' +
               '<td class="r ' + (p.state === 'illegal' || p.state === 'short' ? 'neg' : '') + '">' +
                 (p.planned == null ? 'Not recorded'
                   : p.state === 'illegal' ? 'Below the 187h floor'
@@ -1410,7 +1413,7 @@ function reportView(){
           return '<tr><td>Level ' + c.level + ' ' + c.name + '</td>' +
             '<td class="r">' + c.count + '</td>' +
             '<td class="r">' + money((reg && reg.funding) || c.funding) + '</td>' +
-            '<td class="r">' + ((reg && reg.months) || c.months || '—') + ' months</td></tr>';
+            '<td class="r">' + ((reg && reg.months) || c.months || ' to ') + ' months</td></tr>';
         }).join('') +
         '<tr class="rtotal"><td><b>Total</b></td><td class="r"><b>' + cohortHeads() + '</b></td><td></td><td></td></tr>' +
         '</tbody></table>' +
@@ -1437,7 +1440,7 @@ function wireOtj(panel){
 
       const req = document.getElementById('otj-req-' + i);
       if(req) req.innerHTML = p.unknown
-        ? '<span class="otjnone">—</span>'
+        ? '<span class="otjnone"> to </span>'
         : '<b>' + p.required + 'h</b>' + (p.rplCapped ? '<small class="cap">capped at floor</small>' : '');
 
       const st = document.getElementById('otj-state-' + i);
@@ -1659,7 +1662,7 @@ function forecastView(){
 
 /* Any month, any year within a sensible window. Cohorts get planned two or
    three years out, and a fixed list of offsets cannot express "September
-   2028" — which is exactly the sort of intake people are modelling. */
+   2028", which is exactly the sort of intake people are modelling. */
 function monthOptions(){
   const now = new Date();
   return Array.from({ length: 12 }, (_, i) =>
@@ -1737,8 +1740,8 @@ function renderForecast(){
       '<td class="num">' + money0(Math.round(r.in)) + '</td>' +
       '<td class="num">' + money0(Math.round(r.draw)) + '</td>' +
       '<td class="num">' + money0(Math.round(r.fromLevy)) + '</td>' +
-      '<td class="num' + (r.youPay > 0 ? ' neg' : '') + '">' + (r.youPay > 0 ? money0(Math.round(r.youPay)) : '—') + '</td>' +
-      '<td class="num' + (r.expired > 0 ? ' neg' : '') + '">' + (r.expired > 0 ? money0(Math.round(r.expired)) : '—') + '</td>' +
+      '<td class="num' + (r.youPay > 0 ? ' neg' : '') + '">' + (r.youPay > 0 ? money0(Math.round(r.youPay)) : ' to ') + '</td>' +
+      '<td class="num' + (r.expired > 0 ? ' neg' : '') + '">' + (r.expired > 0 ? money0(Math.round(r.expired)) : ' to ') + '</td>' +
       '<td class="num"><b>' + money0(Math.round(r.balance)) + '</b></td></tr>').join('') +
     '</tbody></table></div>' +
 
@@ -1749,7 +1752,7 @@ function renderForecast(){
     '<div class="notice" style="margin-top:18px"><b>How this is worked out.</b> ' +
     'Money is spent oldest first, which is how the account behaves, so funds are used before they expire where possible. ' +
     'Each cohort draws its funding band spread evenly across its duration. Existing cohorts are assumed to be roughly ' +
-    'half way through, since the site does not hold start dates — connecting your Apprenticeship Service account would fix that. ' +
+    'half way through, since the site does not hold start dates, connecting your Apprenticeship Service account would fix that. ' +
     'Co-investment is applied at the rate for the apprentice\'s age under the 2026/27 rules. ' +
     'Treat it as a planning estimate against your own figures, not a statement of account.</div>';
 
@@ -1895,7 +1898,7 @@ function wireForecast(panel){
       '<div class="impactrow"><b>' + money0(commitment) + '</b><span>total commitment</span></div>' +
       '<div class="impactrow"><b class="' + (extraCost > 0 ? 'neg' : '') + '">' +
         (extraCost > 0 ? '+' + money0(Math.round(extraCost)) : 'nothing') + '</b>' +
-        '<span>' + (extraCost > 0 ? 'added to what you pay' : 'costs you nothing — levy covers it') + '</span></div>' +
+        '<span>' + (extraCost > 0 ? 'added to what you pay' : 'costs you nothing, levy covers it') + '</span></div>' +
       (savedExpiry > 100
         ? '<div class="impactrow"><b class="pos">' + money0(Math.round(savedExpiry)) + '</b><span>less expiring unused</span></div>'
         : '') +
@@ -2033,7 +2036,7 @@ function accountView(){
     '<div class="addrow" style="margin-top:18px">' +
       '<button class="btn" id="acc-billing">Manage billing and cancel</button>' +
       '<a class="btn ghost" href="mailto:' + contactAddress() +
-        '?subject=' + encodeURIComponent('Skills Radar — ' + ((p && p.org_name) || 'member enquiry')) +
+        '?subject=' + encodeURIComponent('Skills Radar, ' + ((p && p.org_name) || 'member enquiry')) +
         '">Contact us</a>' +
     '</div>' +
     '<p class="hint" style="margin-top:10px">Card, invoices and cancellation are handled by Stripe. ' +
@@ -2048,7 +2051,7 @@ function accountView(){
 
       '<div class="todo stop"><div class="todotext"><h3>Delete your account</h3>' +
       '<p>Removes your profile, your standards, your calendar entries and your history. It cannot be undone. ' +
-      'Cancel your membership first, or you will keep being charged for an account that no longer exists — ' +
+      'Cancel your membership first, or you will keep being charged for an account that no longer exists, ' +
       'the billing button above does that.</p></div>' +
       '<button class="todoact" id="acc-delete">Delete</button></div>' +
     '</div>' +
@@ -2057,7 +2060,7 @@ function accountView(){
 
     '<div class="notice" style="margin-top:22px"><b>What happens to a deleted account.</b> ' +
     'Everything listed above is removed immediately. Stripe keeps a record of payments taken, because tax law ' +
-    'requires it to be kept for six years — that is a legal obligation nobody can override, and it holds your email ' +
+    'requires it to be kept for six years, that is a legal obligation nobody can override, and it holds your email ' +
     'and payment history, nothing else from this site. The <a href="privacy.html">privacy notice</a> sets out the detail.</div>';
 }
 
@@ -2068,7 +2071,7 @@ function contactAddress(){
 function subLabel(s){
   if(!s) return 'None';
   const map = { active:'Active', trialing:'Trial', past_due:'Payment failing', canceled:'Cancelled', none:'Not subscribed' };
-  return (map[s.status] || s.status) + (s.cancel_at_period_end ? ' — ending at period end' : '');
+  return (map[s.status] || s.status) + (s.cancel_at_period_end ? ', ending at period end' : '');
 }
 
 function wireAccount(panel){
@@ -2134,7 +2137,7 @@ function prefsView(){
           (COHORT.length
             ? COHORT.map((s, i) => '<span class="stdchip">L' + s.level + ' ' + s.name +
                 '<button class="chipx" data-i="' + i + '" aria-label="Remove ' + s.name.replace(/"/g,'&quot;') + '">&times;</button></span>').join('')
-            : '<span class="chipnone">None yet — search below to add the standards you deliver.</span>') +
+            : '<span class="chipnone">None yet, search below to add the standards you deliver.</span>') +
         '</div>' +
         pickerHTML('prefspick') +
       '</div>' +
@@ -2145,14 +2148,14 @@ function prefsView(){
         '</div></div>' +
       '<button class="btn" id="savep">Save preferences</button>' +
       '<div class="notice" style="margin-top:20px"><b>Nothing sends yet.</b> A static site cannot deliver email. ' +
-      'Connect a mailing service — Buttondown, MailerLite, Kit or Mailchimp — and store these preferences server-side ' +
+      'Connect a mailing service, Buttondown, MailerLite, Kit or Mailchimp, and store these preferences server-side ' +
       'alongside real accounts. Right now they live only in this browser session.</div>' +
     '</div>';
 }
 
 function eventListHTML(){
   if(!MYEVENTS.length){
-    return '<div class="okbox" style="margin-top:16px">Nothing added yet. Whatever you put here is yours — it never appears on the public site.</div>';
+    return '<div class="okbox" style="margin-top:16px">Nothing added yet. Whatever you put here is yours, it never appears on the public site.</div>';
   }
 
   const sorted = MYEVENTS.slice().sort((a,b) => {

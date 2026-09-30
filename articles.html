@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Articles — Skills Radar</title>
+<title>Articles, Skills Radar</title>
 <meta name="description" content="What each policy change actually changed, what it changed from, and what follows from it.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,11 +15,11 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Skills Radar">
 <meta property="og:locale" content="en_GB">
-<meta property="og:title" content="Articles — Skills Radar">
+<meta property="og:title" content="Articles, Skills Radar">
 <meta property="og:description" content="What each policy change actually changed, what it changed from, and what follows from it.">
 <meta property="og:url" content="https://skills-radar.co.uk/articles.html">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Articles — Skills Radar">
+<meta name="twitter:title" content="Articles, Skills Radar">
 <meta name="twitter:description" content="What each policy change actually changed, what it changed from, and what follows from it.">
 <!-- /generated:meta -->
 </head>
@@ -30,6 +30,8 @@
 <div class="masthead">
 <div class="wrap"><div id="heroblock"></div></div>
 </div>
+
+<div class="navbar"><div class="wrap"><div id="navmain"></div></div></div>
 
 <div class="stickybar">
   <div class="wrap inner">
@@ -42,7 +44,7 @@
 <div class="wrap">
   <div class="pagehead">
     <h1>Articles</h1>
-    <p>Written analysis of the policy changes, plus a page for every standard with a significant change of its own — a defunding, a withdrawal, a funding band move, a pause or a new age restriction. Each has its own address, so you can send someone straight to the one that matters.</p>
+    <p>Written analysis of the policy changes, plus a page for every standard with a significant change of its own, a defunding, a withdrawal, a funding band move, a pause or a new age restriction. Each has its own address, so you can send someone straight to the one that matters.</p>
   </div>
 </div>
 
@@ -80,7 +82,7 @@
   <section class="reading">
     <div class="grouphead"><h2>Where else to follow this</h2><div class="rule"></div></div>
     <p style="font-size:14.5px;color:var(--text-2);max-width:66ch;margin:14px 0 0">
-      Skills Radar summarises. These are the places that report, consult and set the rules — worth following directly if this is your day job.
+      Skills Radar summarises. These are the places that report, consult and set the rules, worth following directly if this is your day job.
     </p>
     <div class="readgrid" id="readgrid"></div>
   </section>
@@ -99,7 +101,7 @@
 <script src="config.js"></script>
 <script src="standards.js"></script>
 <script src="defunded.js"></script>
-<script src="occupations.js" onerror="console.info('occupations.js not present yet — run /api/sync-occupations')"></script>
+<script src="occupations.js" onerror="console.info('occupations.js not present yet, run /api/sync-occupations')"></script>
 <script src="data.js"></script>
 <script src="app.js"></script>
 <script src="ui.js"></script>
@@ -108,6 +110,7 @@
 
 document.getElementById('heroblock').innerHTML = titleBlockHTML('');
 document.getElementById('navslot').innerHTML = navHTML('articles.html');
+document.getElementById('navmain').innerHTML = navHTML('articles.html');
 
 function rowHTML(a){
   return '<a class="arow" href="a/' + a.id + '.html">' +
@@ -182,7 +185,7 @@ document.getElementById('readgrid').innerHTML = READING.map(r =>
 
 let currentFilter = 'all', currentQuery = '';
 
-/* An old-style link — articles.html#defunding-16 — still works: it now
+/* An old-style link, articles.html#defunding-16, still works: it now
    forwards to the article's own page rather than expanding a row. */
 if(location.hash){
   const target = location.hash.slice(1);

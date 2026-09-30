@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Standards — Skills Radar</title>
+<title>Standards, Skills Radar</title>
 <meta name="description" content="Every tracked apprenticeship standard grouped by occupational route, with funding, duration, level and change status.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,11 +15,11 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Skills Radar">
 <meta property="og:locale" content="en_GB">
-<meta property="og:title" content="Standards — Skills Radar">
+<meta property="og:title" content="Standards, Skills Radar">
 <meta property="og:description" content="Every tracked apprenticeship standard grouped by occupational route, with funding, duration, level and change status.">
 <meta property="og:url" content="https://skills-radar.co.uk/standards.html">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Standards — Skills Radar">
+<meta name="twitter:title" content="Standards, Skills Radar">
 <meta name="twitter:description" content="Every tracked apprenticeship standard grouped by occupational route, with funding, duration, level and change status.">
 <!-- /generated:meta -->
 </head>
@@ -30,6 +30,8 @@
 <div class="masthead">
 <div class="wrap"><div id="heroblock"></div></div>
 </div>
+
+<div class="navbar"><div class="wrap"><div id="navmain"></div></div></div>
 
 <div class="stickybar">
   <div class="wrap inner">
@@ -71,7 +73,7 @@
       <button data-filter="major">Major changes</button>
     </div>
     <div class="searchbox">
-      <input type="search" id="search" placeholder="Search a standard, code or route — try &ldquo;ST1472&rdquo;, &ldquo;dental&rdquo;, &ldquo;digital&rdquo;" aria-label="Search standards">
+      <input type="search" id="search" placeholder="Search a standard, code or route, try &ldquo;ST1472&rdquo;, &ldquo;dental&rdquo;, &ldquo;digital&rdquo;" aria-label="Search standards">
       <svg class="radar" id="radar" viewBox="0 0 20 20" aria-hidden="true">
         <circle cx="10" cy="10" r="8.6" fill="none" stroke="#CBC5B6" stroke-width="1"/>
         <circle cx="10" cy="10" r="4.6" fill="none" stroke="#CBC5B6" stroke-width="1"/>
@@ -111,7 +113,7 @@
 <script src="standards.js"></script>
 <script src="defunded.js"></script>
 <script src="otj-minimums.js"></script>
-<script src="occupations.js" onerror="console.info('occupations.js not present yet — run /api/sync-occupations')"></script>
+<script src="occupations.js" onerror="console.info('occupations.js not present yet, run /api/sync-occupations')"></script>
 <script src="data.js"></script>
 <script src="app.js"></script>
 <script src="ui.js"></script>
@@ -120,11 +122,12 @@
 
 document.getElementById('heroblock').innerHTML = titleBlockHTML('');
 document.getElementById('navslot').innerHTML = navHTML('standards.html');
+document.getElementById('navmain').innerHTML = navHTML('standards.html');
 
 /* How material is the recorded change?
-   major  — affects funding, eligibility, or whether you can deliver at all
-   minor  — housekeeping: point version increments, revisions in progress
-   none   — nothing recorded */
+   major , affects funding, eligibility, or whether you can deliver at all
+   minor , housekeeping: point version increments, revisions in progress
+   none  , nothing recorded */
 function changeLevel(s){
   if(isDefunded(s)) return 'defunded';
   if(!s.changed || s.changed.trim() === '') return 'none';

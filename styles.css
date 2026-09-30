@@ -3953,3 +3953,69 @@ footer p{ font-family:var(--sans); font-size:12.5px; }
 .notice{ border-left:3px solid var(--ink-3); }
 
 blockquote, .standfirst{ font-family:var(--serif); font-style:italic; }
+
+
+/* ---------- Italics, used sparingly ----------
+
+   Italics had crept into the wordmark, every standfirst, every lede and the
+   hero line. Used that heavily they stop meaning anything and start looking
+   like a default. They now appear only where they do a job: a publication
+   title, a genuine emphasis inside a sentence, and the standfirst on an
+   article, where the convention is long established and earns its place.
+*/
+
+.wordmark em{ font-style:normal; }
+.hero{ font-style:normal; }
+.joinlede{ font-style:normal; }
+.ctahook em{ font-style:normal; }
+.joinhero h1 em{ font-style:normal; }
+.repbrand em{ font-style:normal; }
+.noband{ font-style:normal; }
+
+/* the standfirst keeps its italic: it is the one place the convention is
+   genuinely editorial rather than decorative */
+.pstand{ font-style:italic; }
+
+/* Without the italic the accent word needs its own weight to stay distinct. */
+.wordmark em{ font-weight:400; color:#6ED0B6; }
+
+/* ---------- Navigation that is always there ----------
+
+   The nav used to live only in the sticky bar, which is hidden until you
+   scroll past the masthead. So on arriving at any page there was no visible
+   way to get anywhere else, and on a phone it appeared only after scrolling.
+   It now sits permanently under the masthead, and the sticky copy takes over
+   once that has scrolled away.
+*/
+
+.navbar{
+  background:var(--surface);
+  border-bottom:1px solid var(--line-strong);
+  position:relative; z-index:20;
+}
+.navbar .nav{
+  display:flex; flex-wrap:nowrap; overflow-x:auto;
+  -webkit-overflow-scrolling:touch; scrollbar-width:none;
+}
+.navbar .nav::-webkit-scrollbar{ display:none; }
+.navbar .nav a{
+  color:var(--text-2); white-space:nowrap; flex:none;
+  border-bottom:3px solid transparent;
+  padding:14px 16px;
+}
+.navbar .nav a:first-child{ padding-left:0; }
+.navbar .nav a:hover{ color:var(--text); background:var(--paper); }
+.navbar .nav a.on{
+  color:var(--text); border-bottom-color:var(--ink); background:none;
+}
+
+@media (max-width:640px){
+  .navbar .nav a{ padding:13px 13px; font-size:12.5px; }
+  /* a hint that there is more to the right */
+  .navbar{ position:relative; }
+  .navbar::after{
+    content:''; position:absolute; right:0; top:0; bottom:0; width:26px;
+    background:linear-gradient(to right, transparent, var(--surface));
+    pointer-events:none;
+  }
+}

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Skills Radar — a walk through</title>
+<title>Skills Radar, a walk through</title>
 <meta name="description" content="A short walk through Skills Radar.">
 <meta name="robots" content="noindex, nofollow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -17,6 +17,8 @@
 <div class="masthead">
   <div class="wrap"><div id="heroblock"></div></div>
 </div>
+
+<div class="navbar"><div class="wrap"><div id="navmain"></div></div></div>
 
 <div class="stickybar">
   <div class="wrap inner">
@@ -95,6 +97,7 @@
 
 document.getElementById('heroblock').innerHTML = titleBlockHTML('');
 document.getElementById('navslot').innerHTML = navHTML('');
+document.getElementById('navmain').innerHTML = navHTML('');
 
 /* =========================================================================
    THE VIDEO
@@ -107,7 +110,7 @@ document.getElementById('navslot').innerHTML = navHTML('');
 
    Local file: drop the mp4 in your repo and set DEMO.file to its name. It
    works, but a 60MB file is served in full to every viewer, and Vercel's
-   free tier allows 100GB a month — about 1,700 views. Fine for a handful of
+   free tier allows 100GB a month, about 1,700 views. Fine for a handful of
    demos, not for a link you share widely.
    ========================================================================= */
 
@@ -135,7 +138,7 @@ else if(D.file){
 }
 else {
   box.innerHTML = '<div class="notice" style="margin:0"><b>No video set yet.</b> ' +
-    'Open <code>config.js</code> and fill in the <code>DEMO</code> block — either a YouTube id ' +
+    'Open <code>config.js</code> and fill in the <code>DEMO</code> block, either a YouTube id ' +
     '(upload as Unlisted), a Vimeo id, or the filename of an mp4 in your repo. ' +
     'The rest of this page works either way.</div>';
 }

@@ -1,5 +1,5 @@
 /* =========================================================================
-   SKILLS RADAR — SHARED PAGE FURNITURE
+   SKILLS RADAR, SHARED PAGE FURNITURE
    Builds the masthead and navigation so every page stays consistent.
    ========================================================================= */
 
@@ -20,7 +20,7 @@ function navHTML(current){
   ).join('') + '</nav>';
 }
 
-/* Concentric arcs sweeping out of the corner — the radar idea without a
+/* Concentric arcs sweeping out of the corner, the radar idea without a
    logo, sitting behind the wordmark rather than competing with it. */
 function backdropHTML(){
   let arcs = '';
@@ -190,7 +190,7 @@ function urgencyTag(u){
    finger mid-scroll, which can re-trigger the very threshold that caused it.
 
    It now does nothing to the layout at all. The bar is fixed rather than
-   sticky, so it takes up no space until it is needed — that is what removed
+   sticky, so it takes up no space until it is needed, that is what removed
    the pale band that used to sit under the masthead. The masthead scrolls
    away like any other content and the bar slides down over the top. Only
    transform and opacity change, both of which the browser handles on the

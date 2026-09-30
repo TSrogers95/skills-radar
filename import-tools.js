@@ -31,7 +31,7 @@ function importToolHTML(){
       '<div class="notice" style="margin-bottom:18px"><b>Back up first. It takes ten seconds.</b> ' +
       'Open <code>standards.js</code> in your repo and note today&rsquo;s commit, or download the current file. ' +
       'If an import goes wrong, GitHub&rsquo;s History tab on that file lets you paste the previous version back ' +
-      'and the site recovers in under a minute. Nothing here can break the site permanently — but knowing that ' +
+      'and the site recovers in under a minute. Nothing here can break the site permanently, but knowing that ' +
       'in advance is worth more than finding out afterwards.</div>' +
 
       '<section class="lsection">' +
@@ -40,7 +40,7 @@ function importToolHTML(){
         '<p><a class="btn" href="https://skillsengland.education.gov.uk/apprenticeships/" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none">Open the register &nearr;</a></p>' +
         '<div class="notice" style="margin-top:14px"><b>Where the button is.</b> ' +
         'Scroll past the search results to <b>Download a list of apprenticeships</b> near the foot of the page. ' +
-        'Do not filter the list first — the importer needs the lot to work out what has changed.</div>' +
+        'Do not filter the list first, the importer needs the lot to work out what has changed.</div>' +
       '</section>' +
 
       '<section class="lsection">' +
@@ -178,12 +178,12 @@ const COLUMNS = {
   approved:['approved for delivery', 'approved date', 'approval date'],
   /* The date the register itself last changed this standard. If the export
      has one, it can date changes without needing a previous import to
-     compare against — which matters, because a first import has nothing to
+     compare against, which matters, because a first import has nothing to
      compare with. */
   updated: ['last updated', 'last changed', 'date updated', 'updated',
             'last modified', 'version date', 'revision date'],
   epao:    ['epao', 'assessment organisation', 'aao'],
-  // Several standards carry options, pathways or occupational specialisms —
+  // Several standards carry options, pathways or occupational specialisms  to 
   // Mechatronics inside Engineering Technician, for instance. If the export
   // includes them under any of these headings they are picked up and become
   // searchable; if not, nothing breaks and the field stays empty.
@@ -280,7 +280,7 @@ function slugRoute(name){
 
    Every change needs a date, and the site decides where it goes from that:
    ahead of today is upcoming, within nine months is recent, older than that
-   drops to the background — still searchable, just not in the feed.
+   drops to the background, still searchable, just not in the feed.
 
    Three ways a date is arrived at, in order of how much we trust it:
 
@@ -290,7 +290,7 @@ function slugRoute(name){
         holds, the change is dated today, because today is when it was
         found.
      3. It is new to us. A standard the site has never seen is dated by its
-        approval date if the file gives one — a standard approved last month
+        approval date if the file gives one, a standard approved last month
         is news, one approved in 2019 is not.
    ========================================================================= */
 
@@ -364,7 +364,7 @@ function tidyStatus(s){
 
 function epaFrom(rec){
   if(rec.months === 0 || /^AU/.test(rec.code)) return 'Not applicable (unit)';
-  if(/development|proposal/i.test(rec.status)) return 'Pending — standard in development';
+  if(/development|proposal/i.test(rec.status)) return 'Pending, standard in development';
   if(/waiting/i.test(rec.raw || '') || /waiting/i.test(rec.epao || '')) return 'Waiting for an assessment organisation';
   return 'Assigned';
 }
@@ -433,7 +433,7 @@ function merge(imported){
         epa: epa, status: r.status, version: r.version,
         /* The date a change was SPOTTED, not the date the standard was
            approved. "since" drives how long an item stays in the feed, and
-           the approval date is often years old — using it made a six-month
+           the approval date is often years old, using it made a six-month
            window throw away changes found this morning. */
         since: changeDate(r, true),
         approved: r.since || old.approved || '',
@@ -465,13 +465,20 @@ function merge(imported){
    OUTPUT
    ========================================================================= */
 
+/* The register uses em dashes in names and status text. They are not part
+   of the house style, so they are normalised on the way in rather than
+   left for every page to deal with. */
+function stripDashes(v){
+  return String(v == null ? '' : v).replace(/\s+—\s+/g, ', ').replace(/—/g, '-');
+}
+
 function render(s){
   /* JSON.stringify rather than a hand-rolled escape. The previous version
      handled quotes and backslashes but not newlines, and CSV fields often
-     contain them — one such name produced an unterminated string, which
+     contain them, one such name produced an unterminated string, which
      stopped the whole file parsing and left the site with no register at
      all. This cannot have that failure. */
-  const q = v => JSON.stringify(String(v == null ? '' : v));
+  const q = v => JSON.stringify(stripDashes(v));
   return '  { ' + (s.common ? 'common:true, ' : '') +
     'name:' + q(s.name) + ', code:' + q(s.code || '') +
     ', level:' + (s.level||0) + ', months:' + (s.months||0) + ', funding:' + (s.funding||0) +
@@ -485,7 +492,7 @@ function render(s){
 }
 
 function block(list){
-  return '/* STANDARDS:BEGIN — the sync job rewrites everything between these two\n' +
+  return '/* STANDARDS:BEGIN, the sync job rewrites everything between these two\n' +
     '   markers. Do not remove them. Hand-added fields (common, article) are\n' +
     '   preserved by the sync; machine fields are overwritten from the register.\n' +
     '   Imported from the Skills England CSV on ' + new Date().toISOString().slice(0,10) + '. */\n' +
@@ -596,7 +603,7 @@ function show(rows, cols, built, m, file){
      Reporting "45 changes found" and then delivering six items in the feed
      is worse than reporting nothing, because it looks like the import
      worked. The two numbers differ because the feed applies its own rules
-     on top — deduplication against hand-written updates, and a recency
+     on top, deduplication against hand-written updates, and a recency
      window.
 
      So rather than counting changed rows and hoping, run the generated
@@ -634,7 +641,7 @@ function show(rows, cols, built, m, file){
     '<tr><td class="nm">' + f + '</td><td>' +
     (cols[f] !== undefined
       ? '<b>' + (rows[0][cols[f]] || '') + '</b>'
-      : '<span style="color:var(--text-3)">not found — left as it was</span>') +
+      : '<span style="color:var(--text-3)">not found, left as it was</span>') +
     '</td></tr>').join('');
 
   document.getElementById('results').innerHTML =
@@ -644,7 +651,7 @@ function show(rows, cols, built, m, file){
       '<div class="mgrid">' +
         '<div class="mcard"><div class="n">' + m.out.length.toLocaleString('en-GB') + '</div><div class="l">Standards after import</div></div>' +
         '<div class="mcard cool"><div class="n">' + m.added.length.toLocaleString('en-GB') + '</div><div class="l">New to the site' +
-          (ANNOUNCE_NEW ? ' — going in the feed' : ' — not in the feed') + '</div></div>' +
+          (ANNOUNCE_NEW ? ', going in the feed' : ', not in the feed') + '</div></div>' +
         '<div class="mcard warm"><div class="n">' + m.updated.length + '</div><div class="l">Updated</div></div>' +
         '<div class="mcard"><div class="n">' + built.skippedRetired.toLocaleString('en-GB') + '</div><div class="l">Retired versions skipped</div></div>' +
         '<div class="mcard cool"><div class="n">' + m.out.filter(s => s.options && s.options.length).length.toLocaleString('en-GB') +
@@ -667,7 +674,7 @@ function show(rows, cols, built, m, file){
           'That is usually correct rather than a fault: a standard still in development, in proposal, or ' +
           'retired has no band assigned, and some occupational entries are not funded apprenticeships at all. ' +
           'The site shows these as &ldquo;Not set&rdquo; rather than &pound;0. ' +
-          'If a standard you deliver is in this list, check it on the register — if it has a band there, the ' +
+          'If a standard you deliver is in this list, check it on the register, if it has a band there, the ' +
           'CSV column may not have been picked up, and the column table above will show which heading was matched.</div>'
         : '') +
 
@@ -701,7 +708,7 @@ function show(rows, cols, built, m, file){
         '&ldquo;what changed&rdquo; label worked out from the difference. ' +
         (ANNOUNCE_NEW
           ? 'The ' + m.added.length + ' new standards will appear too, labelled Newly approved.'
-          : 'The ' + m.added.length + ' new standards will be searchable and selectable but will not appear in the feed — tick the box above if you want them announced.') +
+          : 'The ' + m.added.length + ' new standards will be searchable and selectable but will not appear in the feed, tick the box above if you want them announced.') +
       '</div>' +
 
       (m.updated.length
@@ -725,7 +732,7 @@ function show(rows, cols, built, m, file){
         '<ul style="margin:10px 0 0;padding-left:18px">' +
           losses.map(l => '<li>' + l + '</li>').join('') +
         '</ul>' +
-        '<p style="margin:12px 0 0">Check the column table above first — a heading that has not been matched ' +
+        '<p style="margin:12px 0 0">Check the column table above first, a heading that has not been matched ' +
         'is the usual cause. Nothing has changed on your site; you can close this and try a different file.</p>' +
         '</div></section>'
       : '') +
@@ -733,7 +740,7 @@ function show(rows, cols, built, m, file){
     (feedCount !== null
       ? '<section class="lsection ' + (feedCount < 20 ? 'costs' : '') + '">' +
         '<div class="lhead"><h2>What the feed will show</h2>' +
-        '<p>Not how many rows changed &mdash; what the site will actually display, ' +
+        '<p>Not how many rows changed, what the site will actually display, ' +
         'worked out by running this file through the same code the feed uses.</p></div>' +
         '<div class="mgrid">' +
           '<div class="mcard ' + (feedCount < 20 ? 'bad' : 'cool') + '"><div class="n">' + feedCount +
@@ -746,7 +753,7 @@ function show(rows, cols, built, m, file){
           ? '<div class="alert" style="margin-top:14px"><b>That is almost nothing.</b> ' +
             'Whatever the change count above says, this file would leave the feed nearly empty. ' +
             'Do not upload it. The usual cause is that the file has no date column and nothing to compare ' +
-            'against, so no change can be dated &mdash; see the column table above.</div>'
+            'against, so no change can be dated, see the column table above.</div>'
           : '') +
       '</section>'
       : '') +
@@ -765,7 +772,7 @@ function show(rows, cols, built, m, file){
       ? '<section class="lsection"><div class="alert"><b>There is nothing to compare against.</b> ' +
         'The register currently loaded in this browser is empty, so every standard in your file looks new ' +
         'and no changes can be detected by comparison. ' +
-        'If your live <code>standards.js</code> is broken, fix that first — otherwise this import will ' +
+        'If your live <code>standards.js</code> is broken, fix that first, otherwise this import will ' +
         'produce a register with no change history at all.<br><br>' +
         (withChange
           ? '<b>The good news:</b> ' + withChange.toLocaleString('en-GB') + ' standards carry a recent date in ' +
@@ -777,7 +784,7 @@ function show(rows, cols, built, m, file){
 
     (noBand === m.out.length && m.out.length
       ? '<section class="lsection"><div class="alert"><b>No standard has a funding band.</b> ' +
-        'The funding column was not matched. Look at the column table above — if it says &ldquo;not found&rdquo; ' +
+        'The funding column was not matched. Look at the column table above, if it says &ldquo;not found&rdquo; ' +
         'next to <code>funding</code>, tell me the exact heading your file uses and it can be added. ' +
         'The site will show every band as &ldquo;Not yet set&rdquo; until this is sorted.</div></section>'
       : '') +
@@ -785,7 +792,7 @@ function show(rows, cols, built, m, file){
     (parseError
       ? '<section class="lsection"><div class="alert"><b>This file will not load, so it is not safe to upload.</b><br>' +
         parseError.replace(/</g,'&lt;') + '<br><br>' +
-        'Something in the CSV has produced invalid JavaScript. Tell me what the error says and it can be fixed — ' +
+        'Something in the CSV has produced invalid JavaScript. Tell me what the error says and it can be fixed, ' +
         'do not upload this file, or the site will lose its register entirely.</div></section>'
       : '<div class="okbox" style="margin-top:22px"><b>Checked.</b> ' +
         'The generated file parses and holds ' + parsedCount.toLocaleString('en-GB') + ' standards.</div>') +
@@ -805,8 +812,8 @@ function show(rows, cols, built, m, file){
 
       '<div class="notice" style="margin-top:18px"><b>This only ever writes standards.js.</b> ' +
       'Upload it to GitHub in place of the current <code>standards.js</code>, commit, and Vercel redeploys in about thirty seconds. ' +
-      '<code>data.js</code> is never touched, so nothing you or anyone else has written — articles, milestones, ' +
-      'rules, routes — can be overwritten by an import. If a result looks wrong, revert the commit and you are back where you started.</div>' +
+      '<code>data.js</code> is never touched, so nothing you or anyone else has written, articles, milestones, ' +
+      'rules, routes, can be overwritten by an import. If a result looks wrong, revert the commit and you are back where you started.</div>' +
     '</section>';
 
   // Rebuild standards.js, keeping its header comment and replacing only the
@@ -881,12 +888,12 @@ function renderDocsTool(){
       '<div class="lhead"><h2>Other files worth having</h2>' +
       '<p>Direct downloads. None of these need a key or a sign-in.</p></div>' +
       '<div class="dllist">' +
-        '<div class="dlrow"><div class="dlmain"><b>APAR — provider and assessment register</b>' +
+        '<div class="dlrow"><div class="dlmain"><b>APAR, provider and assessment register</b>' +
           '<span>Every organisation eligible to deliver funded apprenticeship training: UKPRN, legal name, route, and whether they are currently permitted to recruit.</span></div>' +
           '<a class="btn small" href="https://download.apprenticeships.education.gov.uk/apar" target="_blank" rel="noopener">Open download page</a></div>' +
 
         '<div class="dlrow"><div class="dlmain"><b>Off-the-job minimum requirements (Annex C)</b>' +
-          '<span>The published minimum hours per standard. Already loaded into the site as otj-minimums.js — replace that file when a new version is issued.</span></div>' +
+          '<span>The published minimum hours per standard. Already loaded into the site as otj-minimums.js, replace that file when a new version is issued.</span></div>' +
           '<a class="btn small" href="https://www.gov.uk/government/publications/apprenticeship-funding-rules-2025-to-2026" target="_blank" rel="noopener">Open publication</a></div>' +
 
         '<div class="dlrow"><div class="dlmain"><b>2026/27 funding rules and summary of changes</b>' +
@@ -916,7 +923,7 @@ const DOC_FORMS = {
     fields: [
       { id:'name', label:'Document title', ph:'Apprenticeship technical funding guide' },
       { id:'url',  label:'Link', ph:'https://www.gov.uk/...' },
-      { id:'note', label:'Why someone would open it', ph:'How payments are calculated — instalments, the completion payment, and breaks.', area:true }
+      { id:'note', label:'Why someone would open it', ph:'How payments are calculated, instalments, the completion payment, and breaks.', area:true }
     ],
     build: v => 'Add this inside the OTHER_DOCS = [ ... ] list:\n\n' +
       '  { name:' + q(v.name) + ', url:' + q(v.url) + ',\n' +
@@ -979,7 +986,7 @@ const DOC_FORMS = {
     where: 'Goes in the RULES_CHANGES list in data.js. Appears on the What changed tab, and in the contents.',
     fields: [
       { id:'title',   label:'What changed, in a sentence', ph:'Subcontracting de-minimis opened up to every provider' },
-      { id:'section', label:'Section id it belongs to', ph:'subcontracting', hint:'Must match an id in RULES_SECTIONS — e.g. eligibility, co-investment, off-the-job' },
+      { id:'section', label:'Section id it belongs to', ph:'subcontracting', hint:'Must match an id in RULES_SECTIONS, e.g. eligibility, co-investment, off-the-job' },
       { id:'paras',   label:'Paragraph numbers', ph:'262.3' },
       { id:'from',    label:'What the rule was before', ph:'The de-minimis could only be used by providers who had achieved the subcontracting standard.', area:true },
       { id:'to',      label:'What it is now', ph:'From 1 August 2026 any provider can use the exemption.', area:true },
@@ -1091,7 +1098,7 @@ const EES_CATALOGUE = 'https://explore-education-statistics.service.gov.uk/data-
 
 const EES_SETS = [
   { name: 'Starts and achievements by standard',
-    look: 'Subjects — Starts, Achievements, Enrolments … Standard-framework name',
+    look: 'Subjects, Starts, Achievements, Enrolments … Standard-framework name',
     note: 'Start volumes per standard. This is what should drive the commonly delivered list, instead of judgement.' },
   { name: 'Achievement rates by standard',
     look: 'Achievement Rates Subjects … Standard-framework name',
@@ -1115,11 +1122,11 @@ function renderStatsTool(){
         '<a class="btn" href="' + EES_EXPLORE + '" target="_blank" rel="noopener">Open the apprenticeships release &nearr;</a>' +
         '<ol>' +
           '<li>Press <b>Explore and download data</b>.</li>' +
-          '<li>Find the dataset you want in the list — the names to look for are below.</li>' +
+          '<li>Find the dataset you want in the list, the names to look for are below.</li>' +
           '<li>Press <b>Download data set (ZIP)</b>, then unzip it. The .csv is inside, alongside a guidance file you can ignore.</li>' +
         '</ol>' +
         '<p class="hint" style="margin:0">That page always shows the current release, so this route keeps working. ' +
-        'Direct file links do not — the identifiers change every time the data is reissued.</p>' +
+        'Direct file links do not, the identifiers change every time the data is reissued.</p>' +
       '</div>' +
 
       '<div class="dllist" style="margin-top:18px">' +
@@ -1135,7 +1142,7 @@ function renderStatsTool(){
       '<div class="notice" style="margin-top:16px"><b>Cannot find one?</b> ' +
       'Search the <a href="' + EES_CATALOGUE + '" target="_blank" rel="noopener">data catalogue</a> for the name above. ' +
       'It covers every release rather than just the latest, so an older year is still there if you want a trend rather than a snapshot. ' +
-      'Whichever you take, note the academic year — these releases run well behind, and a rate describes apprentices who finished a while ago.</div>' +
+      'Whichever you take, note the academic year, these releases run well behind, and a rate describes apprentices who finished a while ago.</div>' +
     '</section>' +
 
     '<section class="lsection">' +
@@ -1212,8 +1219,8 @@ function processStats(text, file){
     throw new Error('No starts, achievements or achievement rate column was found. The header reads: ' + rows[0].slice(0,14).join(' | '));
   }
 
-  // The statistics files have one row per breakdown — age, level, region and
-  // so on — so the same standard appears many times. Sum the volumes and take
+  // The statistics files have one row per breakdown, age, level, region and
+  // so on, so the same standard appears many times. Sum the volumes and take
   // the widest achievement rate rather than treating each row as a standard.
   const agg = {};
   const norm = s => String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -1303,7 +1310,7 @@ function showStats(rows, cols, list, file){
         '<td class="num">' + o.stat.starts.toLocaleString('en-GB') + '</td>' +
         '<td class="num">' + (o.stat.rate != null
           ? '<b class="' + (o.stat.rate < 50 ? 'ratelow' : o.stat.rate < 65 ? 'ratemid' : 'ratehigh') + '">' + o.stat.rate + '%</b>'
-          : '<span class="chg none">—</span>') + '</td></tr>').join('') +
+          : '<span class="chg none"> to </span>') + '</td></tr>').join('') +
       '</tbody></table></div>' +
       (out.length > 40 ? '<p class="hint">Showing the top 40 of ' + out.length + ' matched.</p>' : '') +
     '</section>' +
@@ -1315,7 +1322,7 @@ function showStats(rows, cols, list, file){
         '<ul style="margin:10px 0 0;padding-left:18px">' +
           losses.map(l => '<li>' + l + '</li>').join('') +
         '</ul>' +
-        '<p style="margin:12px 0 0">Check the column table above first — a heading that has not been matched ' +
+        '<p style="margin:12px 0 0">Check the column table above first, a heading that has not been matched ' +
         'is the usual cause. Nothing has changed on your site; you can close this and try a different file.</p>' +
         '</div></section>'
       : '') +
@@ -1323,7 +1330,7 @@ function showStats(rows, cols, list, file){
     (feedCount !== null
       ? '<section class="lsection ' + (feedCount < 20 ? 'costs' : '') + '">' +
         '<div class="lhead"><h2>What the feed will show</h2>' +
-        '<p>Not how many rows changed &mdash; what the site will actually display, ' +
+        '<p>Not how many rows changed, what the site will actually display, ' +
         'worked out by running this file through the same code the feed uses.</p></div>' +
         '<div class="mgrid">' +
           '<div class="mcard ' + (feedCount < 20 ? 'bad' : 'cool') + '"><div class="n">' + feedCount +
@@ -1336,7 +1343,7 @@ function showStats(rows, cols, list, file){
           ? '<div class="alert" style="margin-top:14px"><b>That is almost nothing.</b> ' +
             'Whatever the change count above says, this file would leave the feed nearly empty. ' +
             'Do not upload it. The usual cause is that the file has no date column and nothing to compare ' +
-            'against, so no change can be dated &mdash; see the column table above.</div>'
+            'against, so no change can be dated, see the column table above.</div>'
           : '') +
       '</section>'
       : '') +
@@ -1355,7 +1362,7 @@ function showStats(rows, cols, list, file){
       ? '<section class="lsection"><div class="alert"><b>There is nothing to compare against.</b> ' +
         'The register currently loaded in this browser is empty, so every standard in your file looks new ' +
         'and no changes can be detected by comparison. ' +
-        'If your live <code>standards.js</code> is broken, fix that first — otherwise this import will ' +
+        'If your live <code>standards.js</code> is broken, fix that first, otherwise this import will ' +
         'produce a register with no change history at all.<br><br>' +
         (withChange
           ? '<b>The good news:</b> ' + withChange.toLocaleString('en-GB') + ' standards carry a recent date in ' +
@@ -1367,7 +1374,7 @@ function showStats(rows, cols, list, file){
 
     (noBand === m.out.length && m.out.length
       ? '<section class="lsection"><div class="alert"><b>No standard has a funding band.</b> ' +
-        'The funding column was not matched. Look at the column table above — if it says &ldquo;not found&rdquo; ' +
+        'The funding column was not matched. Look at the column table above, if it says &ldquo;not found&rdquo; ' +
         'next to <code>funding</code>, tell me the exact heading your file uses and it can be added. ' +
         'The site will show every band as &ldquo;Not yet set&rdquo; until this is sorted.</div></section>'
       : '') +
@@ -1375,7 +1382,7 @@ function showStats(rows, cols, list, file){
     (parseError
       ? '<section class="lsection"><div class="alert"><b>This file will not load, so it is not safe to upload.</b><br>' +
         parseError.replace(/</g,'&lt;') + '<br><br>' +
-        'Something in the CSV has produced invalid JavaScript. Tell me what the error says and it can be fixed — ' +
+        'Something in the CSV has produced invalid JavaScript. Tell me what the error says and it can be fixed, ' +
         'do not upload this file, or the site will lose its register entirely.</div></section>'
       : '<div class="okbox" style="margin-top:22px"><b>Checked.</b> ' +
         'The generated file parses and holds ' + parsedCount.toLocaleString('en-GB') + ' standards.</div>') +
@@ -1390,7 +1397,7 @@ function showStats(rows, cols, list, file){
       '<div class="notice" style="margin-top:18px"><b>Add it to the site with a script tag.</b> ' +
       'Upload <code>standard-stats.js</code> to GitHub, then add ' +
       '<code>&lt;script src="standard-stats.js"&gt;&lt;/script&gt;</code> next to the other data files on each page. ' +
-      'Nothing breaks if you forget — the site simply carries on without the figures.</div>' +
+      'Nothing breaks if you forget, the site simply carries on without the figures.</div>' +
       (list.length - matched > 0
         ? '<div class="notice" style="margin-top:14px"><b>' + (list.length - matched).toLocaleString('en-GB') + ' did not match your register.</b> ' +
           'Usually these are retired standards or old frameworks that still appear in historical statistics. ' +

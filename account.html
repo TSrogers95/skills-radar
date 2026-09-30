@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sign in or join — Skills Radar</title>
+<title>Sign in or join, Skills Radar</title>
 <meta name="description" content="Create a Skills Radar account for a personal compliance calendar, a feed filtered to your standards, and levy forecasting.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,11 +15,11 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Skills Radar">
 <meta property="og:locale" content="en_GB">
-<meta property="og:title" content="Sign in or join — Skills Radar">
+<meta property="og:title" content="Sign in or join, Skills Radar">
 <meta property="og:description" content="Create a Skills Radar account for a personal compliance calendar, a feed filtered to your standards, and levy forecasting.">
 <meta property="og:url" content="https://skills-radar.co.uk/account.html">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Sign in or join — Skills Radar">
+<meta name="twitter:title" content="Sign in or join, Skills Radar">
 <meta name="twitter:description" content="Create a Skills Radar account for a personal compliance calendar, a feed filtered to your standards, and levy forecasting.">
 <!-- /generated:meta -->
 </head>
@@ -30,6 +30,8 @@
 <div class="masthead">
 <div class="wrap"><div id="heroblock"></div></div>
 </div>
+
+<div class="navbar"><div class="wrap"><div id="navmain"></div></div></div>
 
 <div class="stickybar">
   <div class="wrap inner">
@@ -46,7 +48,7 @@
 <footer>
   <div class="wrap">
     <p>We store your email, organisation and the standards you follow, so the site can tell you what affects you.
-    You can export or delete everything at any time. Payment is handled by Stripe — card details never reach this site.</p>
+    You can export or delete everything at any time. Payment is handled by Stripe, card details never reach this site.</p>
   </div>
 </footer>
 
@@ -55,7 +57,7 @@
 <script src="standards.js"></script>
 <script src="defunded.js"></script>
 <script src="otj-minimums.js"></script>
-<script src="occupations.js" onerror="console.info('occupations.js not present yet — run /api/sync-occupations')"></script>
+<script src="occupations.js" onerror="console.info('occupations.js not present yet, run /api/sync-occupations')"></script>
 <script src="data.js"></script>
 <script src="app.js"></script>
 <script src="ui.js"></script>
@@ -64,6 +66,7 @@
 
 document.getElementById('heroblock').innerHTML = titleBlockHTML('');
 document.getElementById('navslot').innerHTML = navHTML('members.html');
+document.getElementById('navmain').innerHTML = navHTML('members.html');
 
 const panel = document.getElementById('panel');
 const q = new URLSearchParams(location.search);
@@ -196,12 +199,12 @@ function joinView(message){
         benefit('Levy forecasting on your own numbers', true,
           'Enter your pay bill and your current cohort and it forecasts month by month: what goes in, what ' +
           'comes out, and what your balance does. It names the month co-investment starts and shows how much ' +
-          'expires unused — funds now expire after twelve months, so that is money lost rather than banked. ' +
+          'expires unused, funds now expire after twelve months, so that is money lost rather than banked. ' +
           'Then add apprentices you are only considering, and see what they would cost before you commit.') +
         benefit('A feed that is only yours', false,
           'All ' + counts.standards + ' standards on the register are tracked here, with ' + counts.changes +
           ' live changes between them. Choose the ones you deliver and the feed shows changes to those, ' +
-          'alongside the funding rules that apply to everyone — what changed, what it changed from, and what follows.') +
+          'alongside the funding rules that apply to everyone, what changed, what it changed from, and what follows.') +
         benefit('The monthly newsletter', false,
           'What moved and what it means, once a month. Written rather than generated, and focused on what you ' +
           'have to do about it. Turn it off in one click without losing your account.') +
@@ -377,7 +380,7 @@ async function payView(message){
     b.disabled = true; b.textContent = 'Opening Stripe…';
     try { await startCheckout(); }
     catch(e){
-      fail(e.message + (e.fix ? ' — ' + e.fix : '') + (e.detail ? ' (' + e.detail + ')' : ''));
+      fail(e.message + (e.fix ? ', ' + e.fix : '') + (e.detail ? ' (' + e.detail + ')' : ''));
       b.disabled = false; b.textContent = 'Continue to payment';
     }
   });
@@ -486,7 +489,7 @@ function friendly(m){
   const s = String(m || '');
   if(/Invalid login/i.test(s)) return 'That email and password do not match an account.';
   if(/already registered/i.test(s)) return 'There is already an account with that email. Try signing in.';
-  if(/Email not confirmed/i.test(s)) return 'Confirm your email first — check for the link we sent.';
+  if(/Email not confirmed/i.test(s)) return 'Confirm your email first, check for the link we sent.';
   if(/rate limit|too many/i.test(s)) return 'Too many attempts. Wait a minute and try again.';
   return s;
 }
@@ -513,7 +516,7 @@ boot().catch(err => {
     '<div class="alert centred" style="max-width:620px"><b>' + String(err && err.message || err) + '</b></div>' +
     '<div class="notice centred" style="max-width:620px">' +
     'Most often this is the Supabase URL or key in <code>config.js</code>, or a redirect URL that has not been ' +
-    'added under Authentication → URL Configuration. Reload once first — a slow network can cause it too.</div>';
+    'added under Authentication → URL Configuration. Reload once first, a slow network can cause it too.</div>';
 });
 
 recordView();

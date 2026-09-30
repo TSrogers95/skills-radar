@@ -7,7 +7,7 @@
 
    Why this exists: article.html?id=… works for people but not for search
    engines, which see one page. A crawler needs a distinct URL with its own
-   title, description and content in the source — not assembled by script
+   title, description and content in the source, not assembled by script
    after the page loads.
 
    Output: /a/<id>.html, sitemap.xml, robots.txt
@@ -102,7 +102,7 @@ function page(a, api){
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${esc(truncate(strip(a.title), 65))} — Skills Radar</title>
+<title>${esc(truncate(strip(a.title), 65))}, Skills Radar</title>
 <meta name="description" content="${esc(desc)}">
 <link rel="canonical" href="${url}">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
@@ -170,7 +170,7 @@ function page(a, api){
 
     ${a.compiled ? `<div class="notice"><b>This page is compiled, not written.</b>
       Every figure in it comes from this standard&rsquo;s own record on the Skills England register.
-      The guidance is general to this type of change rather than specific to your provision —
+      The guidance is general to this type of change rather than specific to your provision  to 
       check the source before acting on it.</div>` : ''}
 
     ${a.onRoute && a.onRoute.length ? routeList(a) : ''}
@@ -214,7 +214,10 @@ function page(a, api){
 <script src="../auth.js"></script>
 <script defer src="/_vercel/insights/script.js"></script>
 <script>
-  document.getElementById('heroblock').innerHTML = titleBlockHTML('');
+  /* Generated pages live in /a/, so every link out of them needs one level
+   up. The nav was already rewritten; the wordmark was not, which is why
+   clicking the logo landed on /a/ and 404'd. */
+document.getElementById('heroblock').innerHTML = titleBlockHTML('').replace(/href="index\.html"/g, 'href="../index.html"');
   document.getElementById('navslot').innerHTML = navHTML('articles.html').replace(/href="/g, 'href="../');
   if(typeof recordView === 'function') recordView();
   if(typeof recordEvent === 'function') recordEvent('article', ${JSON.stringify(a.id)});
@@ -250,7 +253,7 @@ function factBox(s, api){
 
 function routeList(a){
   return `<section class="onroute">
-      <h2>Every changed standard on this route — ${a.onRoute.length}</h2>
+      <h2>Every changed standard on this route, ${a.onRoute.length}</h2>
       <p>Kept current from the register, so it reflects today rather than when this was written.</p>
       <div class="onroutelist">
         ${a.onRoute.map(s => `<div class="orrow"><div><b>L${s.level} ${esc(s.name)}</b><span>${esc(s.changed)}</span></div>` +
@@ -327,7 +330,7 @@ Sitemap: ${SITE}/sitemap.xml
    METADATA FOR THE MAIN PAGES
 
    The article pages get their tags written when they are generated. The
-   hand-written pages had none — no canonical, nothing for a link preview.
+   hand-written pages had none, no canonical, nothing for a link preview.
    Rather than hard-code a domain into ten files, this injects them at build
    time from SITE_URL, so the address lives in one place and cannot drift.
    ========================================================================= */

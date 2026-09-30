@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin — Skills Radar</title>
+<title>Admin, Skills Radar</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,6 +17,8 @@
 <div class="masthead">
 <div class="wrap"><div id="heroblock"></div></div>
 </div>
+
+<div class="navbar"><div class="wrap"><div id="navmain"></div></div></div>
 
 <div class="stickybar">
   <div class="wrap inner">
@@ -93,7 +95,7 @@
 <script src="standards.js"></script>
 <script src="defunded.js"></script>
 <script src="otj-minimums.js"></script>
-<script src="occupations.js" onerror="console.info('occupations.js not present yet — run /api/sync-occupations')"></script>
+<script src="occupations.js" onerror="console.info('occupations.js not present yet, run /api/sync-occupations')"></script>
 <script src="data.js"></script>
 <script src="app.js"></script>
 <script src="ui.js"></script>
@@ -103,6 +105,7 @@
 
 document.getElementById('heroblock').innerHTML = titleBlockHTML('');
 document.getElementById('navslot').innerHTML = navHTML('');
+document.getElementById('navmain').innerHTML = navHTML('');
 
 /* =========================================================================
    THE GATE
@@ -170,7 +173,7 @@ document.getElementById('gateform').addEventListener('submit', async e => {
    reason and showing "could not load" turns a one-line fix into an hour of
    guessing. */
 async function adminFetch(what){
-  if(!accountsLive()) return { failed: 'Accounts are not connected — config.js still has placeholders.' };
+  if(!accountsLive()) return { failed: 'Accounts are not connected, config.js still has placeholders.' };
 
   const c = sbClient();
   const { data } = await c.auth.getSession();
@@ -287,7 +290,7 @@ function overviewView(){
     '<div class="grouphead"><h2>Data freshness</h2><div class="rule"></div></div>' +
     '<table class="std levytable"><tbody>' +
       row('Written content', typeof DATA_UPDATED !== 'undefined' ? fmtLong(DATA_UPDATED) : 'unknown',
-          'DATA_UPDATED in data.js — set it by hand when you edit content') +
+          'DATA_UPDATED in data.js, set it by hand when you edit content') +
       row('Standards register', typeof STANDARDS_UPDATED !== 'undefined' ? fmtLong(STANDARDS_UPDATED) : 'not stamped',
           'Set by the importer and the weekly sync') +
       row('Occupational maps', typeof OCCUPATIONS_UPDATED !== 'undefined' ? fmtLong(OCCUPATIONS_UPDATED) : 'not yet synced',
@@ -299,7 +302,7 @@ function overviewView(){
     '<div class="grouphead"><h2>Traffic</h2><div class="rule"></div></div>' +
 
     '<div class="notice" style="margin-top:0"><b>Two sources, and they count different things.</b> ' +
-    'The figures below come from this site\'s own <code>page_views</code> table — every page load, no cookies, ' +
+    'The figures below come from this site\'s own <code>page_views</code> table, every page load, no cookies, ' +
     'no identifiers. <b>Vercel Web Analytics</b> runs alongside it and gives visitors rather than views, plus ' +
     'devices, countries and referrers. Its data cannot be read from here, because Vercel does not expose it to ' +
     'a page, so it lives in your Vercel dashboard.</div>' +
@@ -338,7 +341,7 @@ async function loadTraffic(panel){
   const el = document.getElementById('traffic');
   if(!el) return;
   if(!accountsLive()){
-    el.innerHTML = '<p class="hint">Page views are recorded once Supabase is connected. No cookies, no identifiers — path and day only.</p>';
+    el.innerHTML = '<p class="hint">Page views are recorded once Supabase is connected. No cookies, no identifiers, path and day only.</p>';
     return;
   }
   const out = await adminFetch('traffic');
@@ -378,9 +381,9 @@ function failureHTML(out, what){
         'ticked for Production. ' +
         (missing === 'SUPABASE_SERVICE_KEY'
           ? 'Its value is in Supabase under <b>Settings &rarr; API</b>, labelled <b>service_role</b>. ' +
-            'That key bypasses every security rule, so it belongs in Vercel only — never in config.js.'
+            'That key bypasses every security rule, so it belongs in Vercel only, never in config.js.'
           : 'Its value is in Supabase under <b>Settings &rarr; API</b>.') +
-        ' Then <b>redeploy</b> — variables only take effect on a new deployment.</div>'
+        ' Then <b>redeploy</b>, variables only take effect on a new deployment.</div>'
       : '<div class="notice" style="margin-top:14px"><b>Most likely causes.</b> ' +
         'The three Supabase variables are not set in Vercel yet ' +
         '(<code>SUPABASE_URL</code>, <code>SUPABASE_ANON_KEY</code>, <code>SUPABASE_SERVICE_KEY</code>), ' +
@@ -428,7 +431,7 @@ async function loadMembers(panel){
     '<div class="grouphead"><h2>All members</h2><div class="rule"></div></div>' +
     '<table class="std"><thead><tr><th>Member</th><th>Joined</th><th>Status</th><th>Email</th><th></th></tr></thead><tbody>' +
     m.map(x => '<tr>' +
-      '<td class="nm">' + (x.org_name || '&mdash;') + '<small>' + x.email + (x.is_admin ? ' · admin' : '') + '</small></td>' +
+      '<td class="nm">' + (x.org_name || ',') + '<small>' + x.email + (x.is_admin ? ' · admin' : '') + '</small></td>' +
       '<td class="num">' + fmtLong(x.created_at.slice(0,10)) + '</td>' +
       '<td>' + statusTag(x.subscription) + '</td>' +
       '<td>' + (x.email_opt_out ? '<span class="chg none">opted out</span>' : '<span class="chg yes">yes</span>') + '</td>' +
@@ -480,12 +483,12 @@ function wireMemberActions(el){
     a.href = URL.createObjectURL(blob);
     a.download = 'member-' + b.dataset.export + '.json';
     a.click();
-    say('Exported. That file is everything held about them — send it as-is for a subject access request.');
+    say('Exported. That file is everything held about them, send it as-is for a subject access request.');
   }));
 
   el.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', async () => {
     if(!confirm('Delete the account for ' + b.dataset.em + '?\n\nThis removes their profile, standards, events and history. ' +
-      'It cannot be undone, and it does NOT cancel their Stripe subscription — do that first.')) return;
+      'It cannot be undone, and it does NOT cancel their Stripe subscription, do that first.')) return;
     const out = await adminAction({ action:'delete', userId: b.dataset.del });
     say(out.message || out.error, out.ok ? 'okbox' : 'alert');
     if(out.ok) render();
@@ -498,7 +501,7 @@ function whatGoesHere(){
     '<div class="grouphead"><h2>What goes here once accounts are live</h2><div class="rule"></div></div>' +
     '<div class="readgrid" style="margin-top:0">' +
       card('Member list', 'Email, organisation, standards followed, signed up, last seen, subscription status. Read from Supabase.') +
-      card('Password resets', 'You will not build this. Supabase Auth sends the reset email itself — this page just links to the user.') +
+      card('Password resets', 'You will not build this. Supabase Auth sends the reset email itself, this page just links to the user.') +
       card('Suspend or cancel', 'Set subscription status, or ban the account in Supabase Auth. Cancellations and refunds happen in Stripe.') +
       card('Export a member&rsquo;s data', 'A saved query returning everything held about one person. This is a legal requirement, not a convenience.') +
       card('Delete a member', 'One statement, cascading across every table. Test it before you need it.') +
@@ -586,7 +589,7 @@ function writeView(){
 
 function sourceRow(i){
   return '<div class="srcrow">' +
-    '<input type="text" class="w-slabel" placeholder="GOV.UK — Apprenticeship funding rules" data-i="' + i + '">' +
+    '<input type="text" class="w-slabel" placeholder="GOV.UK, Apprenticeship funding rules" data-i="' + i + '">' +
     '<input type="text" class="w-surl" placeholder="https://www.gov.uk/..." data-i="' + i + '">' +
   '</div>';
 }
@@ -618,14 +621,14 @@ function wireWrite(panel){
   document.getElementById('w-summary').addEventListener('input', () => {
     const n = document.getElementById('w-summary').value.length;
     const el = document.getElementById('c-summary');
-    el.textContent = n + ' characters' + (n > 155 ? ' — will be cut off in search results' : n < 60 && n > 0 ? ' — could say more' : '');
+    el.textContent = n + ' characters' + (n > 155 ? ', will be cut off in search results' : n < 60 && n > 0 ? ', could say more' : '');
     el.className = 'counter' + (n > 155 ? ' over' : '');
   });
 
   document.getElementById('w-body').addEventListener('input', () => {
     const w = document.getElementById('w-body').value.trim().split(/\s+/).filter(Boolean).length;
     const el = document.getElementById('c-body');
-    el.textContent = w + ' words' + (w > 340 ? ' — long for this site' : w < 200 && w > 0 ? ' — thin, most articles run 200 to 300' : '');
+    el.textContent = w + ' words' + (w > 340 ? ', long for this site' : w < 200 && w > 0 ? ', thin, most articles run 200 to 300' : '');
     el.className = 'counter' + (w > 340 || (w < 200 && w > 0) ? ' over' : '');
   });
 
@@ -776,13 +779,13 @@ function contentView(){
 
     '<div class="notice" style="margin-top:14px"><b>Editing a written article.</b> ' +
     'Open <code>data.js</code> on GitHub, find the block with that id, change it and commit. The build regenerates its page. ' +
-    'Changing the id changes the address and breaks any link already shared — rename only if you mean to.</div>';
+    'Changing the id changes the address and breaks any link already shared, rename only if you mean to.</div>';
 }
 
 /* ---------- Removing an article ----------
 
    The site's content lives in data.js in the repo, so nothing here can
-   delete a file directly — and that is the right shape, because every change
+   delete a file directly, and that is the right shape, because every change
    should be a commit you can revert. This works out exactly what to remove
    and what else points at it, so a deletion does not leave dead links behind.
 */
@@ -813,11 +816,11 @@ function removeArticle(id){
           ' link to this article.</b> Remove the <code>article:</code> line from each, or they will point at a page ' +
           'that no longer exists.' +
           '<ul style="margin:10px 0 0;padding-left:18px;font-size:13px">' +
-            stdRefs.map(s => '<li>Standard: <b>' + s.name + '</b> — remove <code>article:"' + id + '"</code></li>').join('') +
+            stdRefs.map(s => '<li>Standard: <b>' + s.name + '</b>, remove <code>article:"' + id + '"</code></li>').join('') +
             msRefs.map(m => '<li>Milestone: <b>' + m.title + '</b></li>').join('') +
             incRefs.map(i => '<li>Incentive: <b>' + i.name + '</b></li>').join('') +
             (!total && feedRefs.length ? '<li>' + feedRefs.length + ' feed item' + (feedRefs.length === 1 ? '' : 's') +
-              ' resolve to it automatically — those will fall back to their route round-up, so nothing breaks.</li>' : '') +
+              ' resolve to it automatically, those will fall back to their route round-up, so nothing breaks.</li>' : '') +
           '</ul></div>'
         : '<div class="okbox"><b>Nothing links to it.</b> Safe to remove.</div>') +
 
@@ -828,7 +831,7 @@ function removeArticle(id){
         (total ? '<li><b>Remove the links listed above</b><span>Delete the <code>article:</code> property from each one.</span></li>' : '') +
         '<li><b>Update the stamp</b><span>Set <code>DATA_UPDATED</code> to today.</span></li>' +
         '<li><b>Commit</b><span>The build regenerates the site without it, and drops it from the sitemap. ' +
-        'The old page stops existing, so any link already shared will 404 — that is the cost of deleting rather than rewriting.</span></li>' +
+        'The old page stops existing, so any link already shared will 404, that is the cost of deleting rather than rewriting.</span></li>' +
       '</ol>' +
 
       '<div class="notice" style="margin-top:18px"><b>Consider rewriting instead.</b> ' +
@@ -852,7 +855,7 @@ function removeArticle(id){
 
    Two lists, and the distinction is legal rather than cosmetic. The
    newsletter list excludes anyone who ticked the box at sign-up. The full
-   list is everyone, and may only be used for things about their account —
+   list is everyone, and may only be used for things about their account  to 
    a payment failing, a change to the terms. Sending marketing to the full
    list would breach PECR.
 */
@@ -903,7 +906,7 @@ async function loadEmails(){
         '<button class="todoact" data-dl="news-copy">Copy addresses</button>' +
       '</div></div>' +
 
-      '<div class="todo stop"><div class="todotext"><h3>All accounts — ' + all.length + ' addresses</h3>' +
+      '<div class="todo stop"><div class="todotext"><h3>All accounts, ' + all.length + ' addresses</h3>' +
       '<p>Everyone, including the ' + optedOut.length + ' who opted out. Use this only for messages about ' +
       'someone&rsquo;s account: a payment failing, a change to the terms, the site closing. ' +
       'Sending marketing to this list would breach PECR.</p></div>' +
@@ -918,7 +921,7 @@ async function loadEmails(){
     '<div style="max-height:360px;overflow-y:auto;border:1px solid var(--line)">' +
     '<table class="std"><thead><tr><th>Email</th><th>Organisation</th><th>Newsletter</th><th>Status</th></tr></thead><tbody>' +
     all.map(m => '<tr><td class="nm">' + m.email + '</td>' +
-      '<td>' + (m.org_name || '&mdash;') + '</td>' +
+      '<td>' + (m.org_name || ',') + '</td>' +
       '<td>' + (m.email_opt_out
         ? '<span class="ctag stop">opted out</span>'
         : '<span class="ctag new">' + (m.frequency || 'monthly') + '</span>') + '</td>' +
@@ -939,7 +942,7 @@ async function loadEmails(){
 
     '<div class="notice" style="margin-top:20px"><b>What every newsletter has to carry.</b> ' +
     'A working unsubscribe link, your organisation&rsquo;s name, and a postal address. That is PECR, not etiquette. ' +
-    'When somebody unsubscribes at the mailing service, tick their opt-out here too — otherwise the next export ' +
+    'When somebody unsubscribes at the mailing service, tick their opt-out here too, otherwise the next export ' +
     'puts them straight back on the list.</div>';
 
   wireEmail(el, optedIn, all);
@@ -985,7 +988,7 @@ function wireEmail(el, optedIn, all){
       navigator.clipboard.writeText(list);
       b.textContent = 'Copied';
       setTimeout(() => { b.textContent = 'Copy addresses'; }, 1600);
-      note(optedIn.length + ' addresses copied, comma separated. Paste into the BCC field — never To or Cc, ' +
+      note(optedIn.length + ' addresses copied, comma separated. Paste into the BCC field, never To or Cc, ' +
         'or every member sees every other member&rsquo;s address.');
     }
   }));

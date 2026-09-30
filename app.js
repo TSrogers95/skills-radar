@@ -1,5 +1,5 @@
 /* =========================================================================
-   SKILLS RADAR — SHARED FUNCTIONS
+   SKILLS RADAR, SHARED FUNCTIONS
    Used by every page. You shouldn't normally need to edit this file.
    ========================================================================= */
 
@@ -22,7 +22,7 @@ function fmtShort(d){ return new Date(d).toLocaleDateString('en-GB', { day:'nume
 function fmtLong(d){ return new Date(d).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' }); }
 function fmtYear(d){ return new Date(d).getFullYear(); }
 function fmtMonthYear(d){ return new Date(d).toLocaleDateString('en-GB', { month:'long', year:'numeric' }); }
-/* A standard with no funding band is not free — it has not had one set.
+/* A standard with no funding band is not free, it has not had one set.
    That happens while a standard is in development, and for units and
    foundation apprenticeships before approval. Printing "£0" reads as free
    and is the more misleading of the two. */
@@ -31,7 +31,7 @@ function band(n){
 }
 
 /* A funding band of zero almost always means the register has not published
-   one — a standard in development, or a proposal in progress — rather than
+   one, a standard in development, or a proposal in progress, rather than
    the training being free. Showing "£0" states something untrue, so an
    absent band says so instead. */
 function money(n){
@@ -41,7 +41,7 @@ function money(n){
   return '£' + v.toLocaleString('en-GB');
 }
 
-/* Where a real zero is meaningful — a cost of nothing, a balance of nothing —
+/* Where a real zero is meaningful, a cost of nothing, a balance of nothing  to 
    use this instead, so those keep showing £0. */
 function money0(n){ return '£' + (Number(n) || 0).toLocaleString('en-GB'); }
 
@@ -219,14 +219,14 @@ function deriveUpdates(){
     });
 }
 
-/* A very short status line for the board — one glanceable phrase, no more. */
+/* A very short status line for the board, one glanceable phrase, no more. */
 /* One line saying what actually moved, with the number in it. "Duration
    changed" tells you nothing; "Cut from 18 to 12 months" tells you whether
    to care. Pulls the specifics out of the recorded change text. */
 function shortLine(s, defunded, dev){
   const c = String(s.changed || '');
 
-  if(defunded) return 'Funding withdrawn — no new starts after 1 September 2026';
+  if(defunded) return 'Funding withdrawn, no new starts after 1 September 2026';
 
   // Funding band, with the direction and the numbers
   const band = c.match(/funding band changed from £([\d,]+) to £([\d,]+)/i);
@@ -256,10 +256,10 @@ function shortLine(s, defunded, dev){
   if(/ksb|knowledge, skills/i.test(c)) return 'KSBs revised';
 
   if(dev){
-    if(/retirement/i.test(s.status))   return 'Retirement consultation open — respond while you can';
-    if(/paused/i.test(s.status))       return 'Paused — no new starts until it lifts';
+    if(/retirement/i.test(s.status))   return 'Retirement consultation open, respond while you can';
+    if(/paused/i.test(s.status))       return 'Paused, no new starts until it lifts';
     if(/funding/i.test(c))             return 'Funding band under review';
-    if(/notice period/i.test(s.status + c)) return 'Notice period — current version closing to new starts';
+    if(/notice period/i.test(s.status + c)) return 'Notice period, current version closing to new starts';
     return 'Version ' + s.version + ' in development, current one still open';
   }
 
@@ -268,7 +268,7 @@ function shortLine(s, defunded, dev){
   if(/new foundation/i.test(c))        return 'New foundation apprenticeship, ' + (s.months || 8) + ' months at ' + money(s.funding);
   if(/new standard|newly approved|new on the register/i.test(c)) return 'Newly approved at ' + money(s.funding);
 
-  if(/waiting|pending/i.test(s.epa || '')) return 'Version ' + s.version + ' — but no assessment organisation yet';
+  if(/waiting|pending/i.test(s.epa || '')) return 'Version ' + s.version + ', but no assessment organisation yet';
 
   // Version, with what came before it where we know
   const ver = c.match(/version ([\d.]+) retired/i);
@@ -303,7 +303,7 @@ function allUpdatesUnfiltered(){
   return curated.concat(derived);
 }
 
-/* A stored status can go stale — an item written as "upcoming" months ago
+/* A stored status can go stale, an item written as "upcoming" months ago
    is not upcoming once its date has passed. The date is the truth, so it is
    recomputed on read rather than trusted. */
 function placeByDate(u){
@@ -321,7 +321,7 @@ function allUpdates(){
     .map(placeByDate);
 }
 
-/* Everything older than the window — still real, still searchable, just not
+/* Everything older than the window, still real, still searchable, just not
    competing for attention in the feed. */
 function backgroundUpdates(){
   return allUpdatesUnfiltered().filter(u => !u.pinned && feedPlacement(u.date) === 'background');
@@ -367,7 +367,7 @@ function articleFor(s, defunded, dev){
 
    Runs once when the page loads, before anything reads STANDARDS. The
    register CSV does not carry defunding, so an import will have reset these
-   to "Approved" — this puts them back, every time, without anyone having to
+   to "Approved", this puts them back, every time, without anyone having to
    remember.
    ========================================================================= */
 
@@ -381,7 +381,7 @@ function articleFor(s, defunded, dev){
     const want = norm(d.name);
 
     /* Match on name at the right level. The register sometimes carries a
-       qualifier the announcement does not — "Chartered Manager (degree)" —
+       qualifier the announcement does not, "Chartered Manager (degree)"  to 
        so a standard whose name starts with the announced one counts. */
     const hits = STANDARDS.filter(s =>
       s.level === d.level && (norm(s.name) === want || norm(s.name).indexOf(want) === 0));
@@ -399,7 +399,7 @@ function articleFor(s, defunded, dev){
 
   if(missing.length){
     console.warn('Defunded standards not found on the register: ' + missing.join(', ') +
-      '. Check the names in defunded.js against the register — they may have been renamed.');
+      '. Check the names in defunded.js against the register, they may have been renamed.');
   }
 })();
 
@@ -430,7 +430,7 @@ function feedPlacement(date){
 }
 
 /* =========================================================================
-   WHAT CHANGED — a two or three word label
+   WHAT CHANGED, a two or three word label
 
    The "changed" text is a sentence. This reduces it to something you can
    read at a glance in a list, so you can scan a column of forty items and
@@ -484,7 +484,7 @@ function changeTagHTML(text, status){
 }
 
 /* Hand-written updates carry their own label, because guessing from prose
-   misfires — a summary mentioning assessment plans is not necessarily a
+   misfires, a summary mentioning assessment plans is not necessarily a
    change to one. Derived items fall back to reading the change text. */
 function itemTagHTML(item){
   if(item.tag) return '<span class="ctag ' + item.tag.tone + '">' + item.tag.label + '</span>';
@@ -496,7 +496,7 @@ function itemTagHTML(item){
    SEARCH RANKING
 
    A boolean "does this contain the word" test returns the right set but in
-   the wrong order — typing "project manager" put Level 6 Project Manager
+   the wrong order, typing "project manager" put Level 6 Project Manager
    somewhere past forty near-misses. This scores every hit so the closest
    match is first.
    ========================================================================= */
@@ -509,7 +509,7 @@ function scoreMatch(query, fields){
   const code  = String(fields.code  || '').toLowerCase();
   const extra = String(fields.extra || '').toLowerCase();
 
-  // Options and pathways sit inside a standard — searching "mechatronics"
+  // Options and pathways sit inside a standard, searching "mechatronics"
   // should find the standard that contains it, ranked below a standard of
   // that name but well above a loose word match in a description.
   const opts = (fields.options || []).map(o => String(o).toLowerCase());
@@ -594,7 +594,7 @@ function rankBySearch(list, query, getFields){
 /* =========================================================================
    COMPILED ARTICLES
 
-   The written articles cover policy. They cannot cover every standard — but
+   The written articles cover policy. They cannot cover every standard, but
    a defunding, a withdrawal, a funding band move or a pause is significant
    enough that it deserves its own page rather than being folded into a route
    round-up.
@@ -652,17 +652,17 @@ function compiledArticle(s){
       'The reason given is budget pressure combined with a policy shift towards younger apprentices. Skills England has noted the offer grew beyond 700 standards while starts among 16 to 24 year olds fell around 40% over a decade, with growth concentrated in older, higher-level and more expensive provision.',
       'What to do about it: if you deliver this standard, decide now whether learners can move to an adjacent standard on ' + rname + ', whether apprenticeship units can cover the same capability, or whether development here moves outside the levy entirely. If you are an employer using it as a pipeline, you need that answer before the cut-off rather than after it.'
     );
-    sources.push({ label: 'Skills England — Streamlining apprenticeships', url: 'https://help.apprenticeships.education.gov.uk/hc/en-gb/articles/34005717182226-Streamlining-apprenticeships' });
+    sources.push({ label: 'Skills England, Streamlining apprenticeships', url: 'https://help.apprenticeships.education.gov.uk/hc/en-gb/articles/34005717182226-Streamlining-apprenticeships' });
   }
 
   else if(kind === 'retiring'){
     urgency = 'high'; icon = 'stop';
     title = s.name + ': retirement consultation open';
     summary = 'Skills England is consulting on withdrawing this standard. Consultation is the only point at which the outcome can be influenced.';
-    standfirst = 'Not yet a decision — which is exactly why it is worth responding to.';
+    standfirst = 'Not yet a decision, which is exactly why it is worth responding to.';
     body.push(
       'A retirement consultation is open on ' + s.name + ' at ' + level + '. ' + spec,
-      'A retirement consultation means Skills England is asking whether the standard should continue. It is not a decision, and outcomes do vary — some standards emerge revised rather than withdrawn.',
+      'A retirement consultation means Skills England is asking whether the standard should continue. It is not a decision, and outcomes do vary, some standards emerge revised rather than withdrawn.',
       'What changes today: nothing. The standard remains approved for delivery and you can continue to start apprentices on it while the consultation runs.',
       'What could change: if the outcome is retirement, the standard closes to new starts from a date to be announced, with existing apprentices funded to completion as usual.',
       'What to do about it: respond. Consultation is the only stage at which employer and provider demand is formally counted, and standards on ' + rname + ' with quiet consultations are the ones most likely to go. In the meantime, avoid building a new commercial offer on this standard until the outcome is known, and have an alternative identified.'
@@ -693,7 +693,7 @@ function compiledArticle(s){
       s.name + ' at ' + level + ' is currently paused for starts. ' + spec,
       'A pause is different from a revision. A standard in revision can still take new apprentices on the current version. A paused standard cannot take anyone at all until the pause lifts.',
       'Apprentices already on programme are unaffected and continue to completion.',
-      'Pauses are usually applied while something material is being resolved — an assessment plan problem, a regulatory change, or a funding review. No end date is normally published.',
+      'Pauses are usually applied while something material is being resolved, an assessment plan problem, a regulatory change, or a funding review. No end date is normally published.',
       'What to do about it: if you had a cohort planned, you need an alternative on ' + rname + ' now rather than a wait-and-see. Check the register weekly, since a pause can lift as suddenly as it appeared, and tell any employer expecting to recruit onto this standard before they advertise a vacancy they cannot fill.'
     );
     sources.push({ label: 'Skills England apprenticeship register', url: 'https://skillsengland.education.gov.uk/apprenticeships/' });
@@ -729,7 +729,7 @@ function compiledArticle(s){
     urgency = 'medium'; icon = 'cap';
     title = s.name + ': new age restriction applies';
     summary = 'Eligibility now depends on the apprentice\'s age at the start of training.';
-    standfirst = 'An eligibility rule rather than a funding rate — get it wrong and the whole start is unfunded.';
+    standfirst = 'An eligibility rule rather than a funding rate, get it wrong and the whole start is unfunded.';
     body.push(
       'An age restriction now applies to ' + s.name + ' at ' + level + '. ' + spec,
       'This is an eligibility condition, not a co-investment rate. An apprentice outside the age range cannot be funded on this standard at all, rather than being funded at a different percentage.',
@@ -737,7 +737,7 @@ function compiledArticle(s){
       'Age restrictions of this kind fit the wider pattern across the 2026/27 rules of directing funding towards younger apprentices, alongside the Level 7 restriction and the changes to co-investment.',
       'What to do about it: check the eligibility gate in your enrolment process actually tests this, rather than relying on someone remembering. An ineligible start discovered at audit is a clawback, not a correction. And be aware there is now no funded route at this level on ' + rname + ' for adults outside the range.'
     );
-    sources.push({ label: 'GOV.UK — Apprenticeship funding rules', url: 'https://www.gov.uk/guidance/apprenticeship-funding-rules' });
+    sources.push({ label: 'GOV.UK, Apprenticeship funding rules', url: 'https://www.gov.uk/guidance/apprenticeship-funding-rules' });
   }
 
   else if(kind === 'version'){
@@ -752,9 +752,9 @@ function compiledArticle(s){
       s.name + ' at ' + level + ' is now at version ' + s.version + '. ' + spec,
       'Recorded change: ' + s.changed + '.',
       inDev
-        ? 'In development means a new version is being prepared while the current one remains available for starts. You are not blocked, but anything you build on the current version — curriculum, marketing, employer agreements — may need revisiting when the revision lands.'
+        ? 'In development means a new version is being prepared while the current one remains available for starts. You are not blocked, but anything you build on the current version, curriculum, marketing, employer agreements, may need revisiting when the revision lands.'
         : 'A new version typically revises the knowledge, skills and behaviours, the assessment plan, or both. Apprentices already on programme continue under the version they started on, and the funding rules that apply are those in force on their individual start date.',
-      'What to do about it: confirm which version each cohort is recorded against in your MIS, because you may be delivering two versions of the same standard side by side. Check whether the assessment plan moved with the version — where it did, your assessment organisation will need to be working to the revised plan. And read the change against ' + rname + ' as a whole, since versions often move in batches when a regulator or sector body updates its own requirements.'
+      'What to do about it: confirm which version each cohort is recorded against in your MIS, because you may be delivering two versions of the same standard side by side. Check whether the assessment plan moved with the version, where it did, your assessment organisation will need to be working to the revised plan. And read the change against ' + rname + ' as a whole, since versions often move in batches when a regulator or sector body updates its own requirements.'
     );
     sources.push({ label: 'Skills England apprenticeship register', url: 'https://skillsengland.education.gov.uk/apprenticeships/' });
   }
@@ -763,7 +763,7 @@ function compiledArticle(s){
     urgency = 'medium'; icon = 'check';
     title = s.name + ': assessment plan revised';
     summary = 'The assessment plan has changed, which affects gateway, grading and who does what.';
-    standfirst = 'Assessment reform reaching one standard at a time — and the old rules apply until it does.';
+    standfirst = 'Assessment reform reaching one standard at a time, and the old rules apply until it does.';
     body.push(
       'The assessment plan for ' + s.name + ' at ' + level + ' has been revised. ' + spec,
       'Recorded change: ' + s.changed + '.',
@@ -771,7 +771,7 @@ function compiledArticle(s){
       'The direction of the reform is proportionality: assessment matched to the competency being tested, duplication removed, assessment able to take place throughout the apprenticeship rather than only at the end, and providers able to deliver and mark elements of it. Gateway is now called gateway to completion, reflecting exactly that.',
       'What to do about it: check whether your apprentices on this standard sit under the old plan or the revised one, because that determines which rules bind them. Talk to your assessment organisation about what changes operationally, and revisit internal quality assurance where the split of responsibility between you and them has moved.'
     );
-    sources.push({ label: 'GOV.UK — Changes to apprenticeship assessment', url: 'https://www.gov.uk/government/publications/apprenticeship-funding-rules-2025-to-2026/changes-to-apprenticeship-assessment-2025-to-2026' });
+    sources.push({ label: 'GOV.UK, Changes to apprenticeship assessment', url: 'https://www.gov.uk/government/publications/apprenticeship-funding-rules-2025-to-2026/changes-to-apprenticeship-assessment-2025-to-2026' });
   }
 
   else if(kind === 'noepa'){
@@ -783,7 +783,7 @@ function compiledArticle(s){
       s.name + ' at ' + level + ' is approved for delivery but has no assessment organisation appointed. ' + spec,
       'Historically a standard reaching approved status arrived with an assessment organisation already in place, so the two were treated as the same milestone. The volume of revisions moving through the system has separated them.',
       'The consequence is a timing gap rather than a block. On a ' + (s.months || 24) + '-month programme an organisation is usually appointed well before the first cohort reaches gateway. The shorter the programme, the thinner that margin.',
-      'What to do about it: before committing a cohort, check the register for an appointment and ask how long the process is expected to take against your planned end dates. Put the answer in your risk register rather than assuming it resolves itself. Where the gap is uncomfortable, an earlier version of the standard may still be open for starts, which buys time — but check which funding rules apply to that start date first.'
+      'What to do about it: before committing a cohort, check the register for an appointment and ask how long the process is expected to take against your planned end dates. Put the answer in your risk register rather than assuming it resolves itself. Where the gap is uncomfortable, an earlier version of the standard may still be open for starts, which buys time, but check which funding rules apply to that start date first.'
     );
     sources.push({ label: 'Skills England apprenticeship register', url: 'https://skillsengland.education.gov.uk/apprenticeships/' });
   }
@@ -807,7 +807,7 @@ function compiledArticle(s){
     urgency = 'medium'; icon = 'signpost';
     title = s.name + ' has been restructured';
     summary = 'The occupation has been reorganised, which changes the progression ladder rather than just the content.';
-    standfirst = 'A replacement is not a version change — the shape of the route moves.';
+    standfirst = 'A replacement is not a version change, the shape of the route moves.';
     body.push(
       s.name + ' at ' + level + ' has been restructured on the register. ' + spec,
       'A restructure differs from a version update. A new version revises content within the same standard. A restructure replaces one standard with another, sometimes at a different level, which changes where the occupation sits on the progression ladder.',
@@ -942,7 +942,7 @@ function findStandard(entry){
   if(within.length === 1) return within[0];
 
   /* 5. The other direction. A cohort saved before a register import can hold
-        a name the register has since changed — usually by adding or dropping
+        a name the register has since changed, usually by adding or dropping
         a bracketed qualifier, as in "Project Manager (integrated degree)".
         Compare with those stripped from both sides. */
   const bare = s => norm(String(s).replace(/\s*\([^)]*\)\s*/g, ' '));
@@ -983,7 +983,7 @@ function unmatchedNote(entry){
     .filter(s => norm(s.name).includes(norm(entry.name)) || norm(entry.name).includes(norm(s.name)))
     .slice(0, 2);
   return near.length
-    ? 'Not matched — did you mean ' + near.map(s => 'L' + s.level + ' ' + s.name).join(' or ') + '?'
+    ? 'Not matched, did you mean ' + near.map(s => 'L' + s.level + ' ' + s.name).join(' or ') + '?'
     : 'Not on the register under this name';
 }
 
@@ -1007,7 +1007,7 @@ function unmatchedNote(entry){
    the method DWP documented for setting them: 20% of 75% of the typical
    duration, at the historical off-the-job equivalent. That reproduces the
    worked example in the guidance (ST1398, 24 months, 418 hours) to within
-   a few hours — but it is an estimate, and the site says so everywhere it
+   a few hours, but it is an estimate, and the site says so everywhere it
    is shown.
    ========================================================================= */
 
@@ -1041,9 +1041,9 @@ function otjMinimum(entry){
 }
 
 /* Work out where a cohort stands.
-     published — the figure from the standard, or null to use the estimate
-     rpl       — hours of recognised prior learning
-     planned   — hours you actually plan to deliver  */
+     published, the figure from the standard, or null to use the estimate
+     rpl      , hours of recognised prior learning
+     planned  , hours you actually plan to deliver  */
 function otjPosition(entry, opts){
   opts = opts || {};
   const reg = findStandard(entry);
@@ -1108,7 +1108,7 @@ function articleLinkLabel(item){
 /* =========================================================================
    OCCUPATIONAL MAPS ENRICHMENT
 
-   occupations.js is written by the scheduled sync. It may not be there —
+   occupations.js is written by the scheduled sync. It may not be there  to 
    the site works without it, search is just less good. Everything below
    degrades quietly rather than failing.
    ========================================================================= */
@@ -1185,11 +1185,11 @@ function jobTitlesFor(standard){
        average monthly contribution the employer sets, so it reflects what
        is actually going in rather than what went in last year.
      - An alert when co-investment is approaching, stating the month it
-       starts — their prototype has this and it is the most useful thing
+       starts, their prototype has this and it is the most useful thing
        in it.
-     - Summary graphs of the levy trend — on their nice-to-have list.
+     - Summary graphs of the levy trend, on their nice-to-have list.
      - The ability to add forecast learners and see the effect on balance,
-       committed spend and expiry — also on their list, and the reason this
+       committed spend and expiry, also on their list, and the reason this
        exists at all.
 
    Everything here works from figures the employer enters. Nothing is
@@ -1306,7 +1306,7 @@ function forecastLevy(opts){
   };
 }
 
-/* A cohort the employer has not started yet — "what if we put twelve people
+/* A cohort the employer has not started yet, "what if we put twelve people
    on Business Administrator in January". */
 function forecastCohort(standard, count, startMonth, under25){
   return {

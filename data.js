@@ -1,5 +1,5 @@
 /* =========================================================================
-   SKILLS RADAR — SHARED DATA
+   SKILLS RADAR, SHARED DATA
 
    Every page on the site reads from this one file. Edit here and all
    pages update at once. Keep the commas between entries.
@@ -18,7 +18,7 @@ const DATA_SOURCE  = "hand";   // "hand" or "sync"
 
 /* ---------- 1. OCCUPATIONAL ROUTES -------------------------------------
    The 15 Skills England routes. "terms" are the words people actually
-   type when they mean that route — add to them freely to improve search.
+   type when they mean that route, add to them freely to improve search.
    ----------------------------------------------------------------------- */
 
 const ROUTES = {
@@ -326,7 +326,7 @@ const ARTICLES = [
   {
     id: "defunding-16",
     icon: "stop",
-    summary: "Sixteen standards including Team Leader and Operations Manager lose funding — existing learners are safe, new starts are not.",
+    summary: "Sixteen standards including Team Leader and Operations Manager lose funding, existing learners are safe, new starts are not.",
     title: "Sixteen standards lose funding from September 2026",
     date: "2026-09-01",
     route: "",
@@ -340,7 +340,7 @@ const ARTICLES = [
       "What follows: existing learners are unaffected and remain funded to completion. But no new starts can be funded after the cut-off, and the practical deadline is earlier than the formal one, because eligibility checks, contracting and onboarding typically take six to eight weeks. Providers with these standards in their portfolio face a real revenue question. Employers using them as a management pipeline need an alternative, and for most of the 16 no replacement standard has been announced."
     ],
     sources: [
-      { label: "Skills England — Streamlining apprenticeships", url: "https://help.apprenticeships.education.gov.uk/hc/en-gb/articles/34005717182226-Streamlining-apprenticeships" }
+      { label: "Skills England, Streamlining apprenticeships", url: "https://help.apprenticeships.education.gov.uk/hc/en-gb/articles/34005717182226-Streamlining-apprenticeships" }
     ]
   },
   {
@@ -359,10 +359,10 @@ const ARTICLES = [
       "Second, the top-up. Government previously added 10% to monthly levy contributions. That top-up has been removed on new funds, so employers now access only the value of what they actually paid in.",
       "Third, co-investment. When a levy payer exhausted their balance, they previously contributed 5% of further training costs with government paying 95%. That employer share rises to 25%, with government at 75%.",
       "What it changed from: a system where unspent levy was common and the cost of over-committing was low. What it changed to: one where underspending destroys money faster and overspending costs five times what it did.",
-      "What follows: levy forecasting stops being an annual exercise and becomes a rolling one. Employers who historically let funds lapse now lose them within a year. Employers who routinely exceed their balance face a materially larger bill and should model 2026/27 spend before committing to new cohorts. There is a partial offset — the wider Growth and Skills Levy allows shorter units and non-apprenticeship training to be funded, giving more ways to use a balance before it expires."
+      "What follows: levy forecasting stops being an annual exercise and becomes a rolling one. Employers who historically let funds lapse now lose them within a year. Employers who routinely exceed their balance face a materially larger bill and should model 2026/27 spend before committing to new cohorts. There is a partial offset, the wider Growth and Skills Levy allows shorter units and non-apprenticeship training to be funded, giving more ways to use a balance before it expires."
     ],
     sources: [
-      { label: "Apprenticeship Service — Budget 2025, Growth and Skills Levy", url: "https://help.apprenticeships.education.gov.uk/hc/en-gb/articles/31398346955154-Budget-2025-Growth-and-Skills-Levy" }
+      { label: "Apprenticeship Service, Budget 2025, Growth and Skills Levy", url: "https://help.apprenticeships.education.gov.uk/hc/en-gb/articles/31398346955154-Budget-2025-Growth-and-Skills-Levy" }
     ]
   },
   {
@@ -383,13 +383,13 @@ const ARTICLES = [
       "What follows: employers who used Level 7 to develop mid-career and senior staff have lost that funding route almost entirely and must either self-fund, use the wider Growth and Skills Levy flexibilities for shorter training, or redirect development spend. Providers with Level 7 portfolios have seen a demand cliff. There was a visible surge in Level 7 starts in late 2025 as employers enrolled ahead of the deadline, which contributed to the budget pressure now driving further streamlining decisions."
     ],
     sources: [
-      { label: "GOV.UK — Apprenticeship funding rules", url: "https://www.gov.uk/guidance/apprenticeship-funding-rules" }
+      { label: "GOV.UK, Apprenticeship funding rules", url: "https://www.gov.uk/guidance/apprenticeship-funding-rules" }
     ]
   },
   {
     id: "english-maths",
     icon: "book",
-    summary: "Adults aged 19+ no longer need Level 2 English and maths to complete — unless the standard makes it mandatory.",
+    summary: "Adults aged 19+ no longer need Level 2 English and maths to complete, unless the standard makes it mandatory.",
     title: "English and maths exit requirement made optional for apprentices aged 19+",
     date: "2025-02-11",
     route: "",
@@ -401,11 +401,11 @@ const ARTICLES = [
       "What it changed from: every apprentice had to hold or achieve English and maths at the relevant level before they could pass through gateway and complete. For adult apprentices returning to education after a long gap, functional skills was frequently the single reason a programme stalled or a learner withdrew.",
       "There is an important exception. Where English or maths forms an essential component of a mandatory qualification within the standard itself, it still has to be completed and evidenced before completion. That determination sits with the awarding organisation, so it must be confirmed standard by standard rather than assumed.",
       "The change applies to apprentices already on programme as well as new starts, and where content is removed from a training plan, the plan must be re-signed by the employer at the earliest opportunity and no later than the next progress review.",
-      "What follows: achievement rates on adult programmes should improve, and the delivery cost of long functional skills provision falls. The trade-off is genuine and has been raised by sector bodies including the CIPD — adults completing an apprenticeship may now do so without demonstrating Level 2 literacy and numeracy, which affects transferability. Learners who opt out can still access these qualifications separately through Adult Skills Funding."
+      "What follows: achievement rates on adult programmes should improve, and the delivery cost of long functional skills provision falls. The trade-off is genuine and has been raised by sector bodies including the CIPD, adults completing an apprenticeship may now do so without demonstrating Level 2 literacy and numeracy, which affects transferability. Learners who opt out can still access these qualifications separately through Adult Skills Funding."
     ],
     sources: [
-      { label: "GOV.UK — Apprenticeship funding rules 2024 to 2025 (the rules themselves)", url: "https://www.gov.uk/government/publications/apprenticeship-funding-rules-2024-to-2025" },
-      { label: "GOV.UK — Summary of changes, version 2, February 2025", url: "https://assets.publishing.service.gov.uk/media/67b32312b56d8b0856c2fd60/Apprenticeship_funding_rules_2024_to_2025_summary_of_changes.pdf" }
+      { label: "GOV.UK, Apprenticeship funding rules 2024 to 2025 (the rules themselves)", url: "https://www.gov.uk/government/publications/apprenticeship-funding-rules-2024-to-2025" },
+      { label: "GOV.UK, Summary of changes, version 2, February 2025", url: "https://assets.publishing.service.gov.uk/media/67b32312b56d8b0856c2fd60/Apprenticeship_funding_rules_2024_to_2025_summary_of_changes.pdf" }
     ]
   },
   {
@@ -426,8 +426,8 @@ const ARTICLES = [
       "The risks are practical. Off-the-job training requirements did not shrink proportionally, so a compressed programme concentrates the same hours into fewer months, which is harder on both employer release and learner workload. Providers should be careful that a shorter duration is a genuine judgement about occupational competence rather than a commercial reflex, because inspection and audit will look at whether the duration was justified for the individual apprentice."
     ],
     sources: [
-      { label: "GOV.UK — Apprenticeship funding rules 2024 to 2025 (the rules themselves)", url: "https://www.gov.uk/government/publications/apprenticeship-funding-rules-2024-to-2025" },
-      { label: "GOV.UK — Summary of changes, version 2, February 2025", url: "https://assets.publishing.service.gov.uk/media/67b32312b56d8b0856c2fd60/Apprenticeship_funding_rules_2024_to_2025_summary_of_changes.pdf" }
+      { label: "GOV.UK, Apprenticeship funding rules 2024 to 2025 (the rules themselves)", url: "https://www.gov.uk/government/publications/apprenticeship-funding-rules-2024-to-2025" },
+      { label: "GOV.UK, Summary of changes, version 2, February 2025", url: "https://assets.publishing.service.gov.uk/media/67b32312b56d8b0856c2fd60/Apprenticeship_funding_rules_2024_to_2025_summary_of_changes.pdf" }
     ]
   },
   {
@@ -448,7 +448,7 @@ const ARTICLES = [
       "For SMEs the practical effect is that an apprentice under 25 carries no direct training cost. That is worth knowing when you build a training budget or make the case for an apprenticeship programme internally. It is not a reason to prefer younger candidates: age is a protected characteristic under the Equality Act 2010, and selecting on it is unlawful regardless of the funding position."
     ],
     sources: [
-      { label: "Apprenticeship Service — Budget 2025, Growth and Skills Levy", url: "https://help.apprenticeships.education.gov.uk/hc/en-gb/articles/31398346955154-Budget-2025-Growth-and-Skills-Levy" }
+      { label: "Apprenticeship Service, Budget 2025, Growth and Skills Levy", url: "https://help.apprenticeships.education.gov.uk/hc/en-gb/articles/31398346955154-Budget-2025-Growth-and-Skills-Levy" }
     ]
   },
   {
@@ -470,7 +470,7 @@ const ARTICLES = [
     ],
     sources: [
       { label: "Skills England apprenticeship register", url: "https://skillsengland.education.gov.uk/apprenticeships/" },
-      { label: "GOV.UK — Funding rules for apprenticeships collection", url: "https://www.gov.uk/government/collections/funding-rules-for-apprenticeships" }
+      { label: "GOV.UK, Funding rules for apprenticeships collection", url: "https://www.gov.uk/government/collections/funding-rules-for-apprenticeships" }
     ]
   },
   {
@@ -484,14 +484,14 @@ const ARTICLES = [
     urgency: "medium",
     standfirst: "Every assessment plan is being rewritten, one group at a time, and both old and new rules are live simultaneously.",
     body: [
-      "Skills England is revising all apprenticeship assessment plans. The rollout began in October 2025 and runs in phases across a 12 to 18 month transition, prioritising Group 1 — standards aligned with the Industrial Strategy.",
+      "Skills England is revising all apprenticeship assessment plans. The rollout began in October 2025 and runs in phases across a 12 to 18 month transition, prioritising Group 1, standards aligned with the Industrial Strategy.",
       "The direction is towards proportionality. Assessment should match the competency being tested and remove duplication; where appropriate it can take place throughout the apprenticeship rather than only at the end; and providers will be able to deliver and mark elements of assessment. Assessment organisations, previously called end-point assessment organisations, continue to design assessments and assure the validity of outcomes. There is also more scope for remote assessment. Employers will be required to confirm behaviours before gateway.",
       "What it changed from: a uniform end-point assessment model where all assessment sat at the end, was delivered entirely by an independent EPAO, and followed a fixed plan per standard.",
       "Progress as of mid-2026: more than 100 reformed assessment plans are complete, and 328 standards are in development, with 108 having entered development in a single month. Draft plans are being published for public consultation.",
       "What follows, and this is the operational headache: until a given standard's revised plan is approved and available for starts, the existing EPA rules still apply to it. That means providers are running two assessment regimes side by side, sometimes within the same curriculum area, for a year or more. Track which of your standards have moved and which have not, because assuming either way will cause problems."
     ],
     sources: [
-      { label: "GOV.UK — Changes to apprenticeship assessment 2025 to 2026", url: "https://www.gov.uk/government/publications/apprenticeship-funding-rules-2025-to-2026/changes-to-apprenticeship-assessment-2025-to-2026" }
+      { label: "GOV.UK, Changes to apprenticeship assessment 2025 to 2026", url: "https://www.gov.uk/government/publications/apprenticeship-funding-rules-2025-to-2026/changes-to-apprenticeship-assessment-2025-to-2026" }
     ]
   },
   {
@@ -507,12 +507,12 @@ const ARTICLES = [
     body: [
       "Updated guidance for providers, published in June 2026, introduces a new delivery framework for T-Level industry placements. It gives providers more scope to determine the structure of a placement in a way that works for their students and local context.",
       "What it changed from: a more prescriptive model set out in the previous guidance, which included an annex on delivery approaches. That annex has been removed and replaced with a set of core principles for industry placements. Example industry placement objective templates for the hair and beauty and catering and hospitality routes were also removed.",
-      "The placement itself remains a substantial commitment — around 45 days with an employer — and remains the element providers most often report as the constraint on scaling T-Level delivery.",
+      "The placement itself remains a substantial commitment, around 45 days with an employer, and remains the element providers most often report as the constraint on scaling T-Level delivery.",
       "Supporting funding continues. For 2025/26, T-Level funding included a 5% uplift plus £550 per student towards industry placement costs. The Employer Support Fund continues into 2026/27, helping employers delivering the Health T-Level and SMEs delivering all T-Levels with essential placement costs. T-Levels benefit from nearly £800 million of additional investment in the 2026/27 financial year.",
       "What follows: if your placement model was built around the old annex, it needs revisiting against the core principles instead. The flexibility is real, but it moves judgement onto the provider, which means placement quality and the evidence for it now rest more heavily on local decision-making. DfE is also procuring new T-Level Industry Placement Support Services from September 2026."
     ],
     sources: [
-      { label: "GOV.UK — T-Level industry placements: guidance for providers", url: "https://www.gov.uk/government/publications/t-level-industry-placements-guidance-for-providers" }
+      { label: "GOV.UK, T-Level industry placements: guidance for providers", url: "https://www.gov.uk/government/publications/t-level-industry-placements-guidance-for-providers" }
     ]
   },
   {
@@ -529,13 +529,13 @@ const ARTICLES = [
       "The Level 2 Administration Assistant standard (ST1472) has been approved with a £4,000 funding band and a 12-month duration, and version 2.0 is approved for delivery from 1 August 2026. Alongside approval, the 2026/27 funding rules introduce an age restriction: apprentices are eligible only if aged 16 to 24 at the start of the apprenticeship.",
       "What it changed from: there was no funded Level 2 entry point in business administration. The Business Administrator standard sits at Level 3, which left a gap for genuine entry-level administrative roles and for learners not ready to start at Level 3.",
       "The age restriction is notable because it applies from the outset rather than being retrofitted, and it fits the wider pattern across the 2026/27 rules of directing funding towards younger apprentices.",
-      "On the pathway, this standard now forms the bottom rung of the business and administration route. Above it sit Business Administrator at Level 3 and, until September 2026, Team Leader at Level 3 — though Team Leader is one of the 16 standards losing funding, which removes the natural next step and leaves the route's progression ladder with a gap.",
+      "On the pathway, this standard now forms the bottom rung of the business and administration route. Above it sit Business Administrator at Level 3 and, until September 2026, Team Leader at Level 3, though Team Leader is one of the 16 standards losing funding, which removes the natural next step and leaves the route's progression ladder with a gap.",
       "What follows: providers can offer a funded Level 2 administrative programme for the first time, but only to under-25s, so adult career-changers into administration have no funded entry route at Level 2. Employers should map their administrative pipeline against both this restriction and the Team Leader defunding before planning 2026/27 cohorts."
     ],
     sources: [
       { label: "Skills England apprenticeship register", url: "https://skillsengland.education.gov.uk/apprenticeships/" },
-      { label: "GOV.UK — Funding rules for apprenticeships collection", url: "https://www.gov.uk/government/collections/funding-rules-for-apprenticeships" },
-      { label: "GOV.UK — Apprenticeship funding rules", url: "https://www.gov.uk/guidance/apprenticeship-funding-rules" }
+      { label: "GOV.UK, Funding rules for apprenticeships collection", url: "https://www.gov.uk/government/collections/funding-rules-for-apprenticeships" },
+      { label: "GOV.UK, Apprenticeship funding rules", url: "https://www.gov.uk/guidance/apprenticeship-funding-rules" }
     ]
   },
   {
@@ -552,7 +552,7 @@ const ARTICLES = [
       "A new occupational specialism in Low Carbon Heating Engineering has been added to the T-Level in Building Services Engineering for Construction, ready for delivery from September 2026.",
       "What it changed from: the Building Services Engineering T-Level covered electrical, plumbing, heating and ventilation systems, but had no specialism dedicated to heat pumps and low carbon heating specifically, despite this being one of the sharpest skills shortages in the sector.",
       "The pathway effect is the interesting part. On the construction route there is now a visible progression line: the Building Services Engineering foundation apprenticeship at Level 2 (FA0001, 8 months, £4,000); this T-Level specialism at Level 3; and the Low Carbon Heating Technician apprenticeship at Level 3 (ST1020, 36 months, £22,000), described as a skilled heat pump installer. There are also new Level 3 apprenticeship units in Solar PV Installation and Maintenance and EV Charging Point Installation at £950 each, giving employers a way to upskill existing staff without a full programme.",
-      "What follows: providers on the construction route can now offer a coherent 16-to-technician offer in low carbon heating rather than isolated qualifications. For employers in heating and renewables, this is the first year the full ladder exists, which matters for workforce planning against heat pump installation targets. Check local employer demand before committing — placement capacity in this specialism is untested."
+      "What follows: providers on the construction route can now offer a coherent 16-to-technician offer in low carbon heating rather than isolated qualifications. For employers in heating and renewables, this is the first year the full ladder exists, which matters for workforce planning against heat pump installation targets. Check local employer demand before committing, placement capacity in this specialism is untested."
     ],
     sources: [
       { label: "T-Levels update, 10 March 2026", url: "https://support.tlevels.gov.uk/hc/en-gb/articles/33892267278994-T-Levels-update-10-March-2026" }
@@ -571,12 +571,12 @@ const ARTICLES = [
     body: [
       "The 2026 to 2027 apprenticeship funding rules have been published as a separate document. This is routine, but the consequence is not always handled well.",
       "Funding rules apply according to each apprentice's start date. Apprenticeships starting between 1 August 2024 and 31 July 2025 follow the 2024/25 rules. Starts between 1 August 2025 and 31 July 2026 follow the 2025/26 rules, now at version 3. Starts from 1 August 2026 follow the 2026/27 rules. All three are live simultaneously and providers must follow the correct set per apprentice.",
-      "There are exceptions that cut across start dates. Some rules apply to all learners regardless of when they began — changes tied to a new version of a standard are one example, and the English and maths change from February 2025 was applied to existing learners too. These are set out explicitly in the rules and should not be assumed either way.",
+      "There are exceptions that cut across start dates. Some rules apply to all learners regardless of when they began, changes tied to a new version of a standard are one example, and the English and maths change from February 2025 was applied to existing learners too. These are set out explicitly in the rules and should not be assumed either way.",
       "What is new for 2026/27: the Level 7 age restriction is now baseline rather than transitional; the Administration Assistant Level 2 age restriction is added; the Skills Bootcamp exclusion is made explicit, so an individual on a government-funded Skills Bootcamp cannot receive apprenticeship funding at the same time; and the Growth and Skills Levy financial changes take effect.",
       "What follows: a single compliance question now has three possible correct answers depending on the learner. Audit exposure sits in assuming the current rulebook applies to everyone on programme."
     ],
     sources: [
-      { label: "GOV.UK — Apprenticeship funding rules", url: "https://www.gov.uk/guidance/apprenticeship-funding-rules" }
+      { label: "GOV.UK, Apprenticeship funding rules", url: "https://www.gov.uk/guidance/apprenticeship-funding-rules" }
     ]
   },
   {
@@ -613,7 +613,7 @@ const HORIZON = [
     title: "Enrolment cliff on the 16 defunded standards",
     confidence: "confirmed",
     risk: "high",
-    detail: "No new funded starts on Team Leader, Operations Manager, Coaching Professional and 13 others after the cut-off. The real deadline is earlier than the formal one — eligibility checks and contracting typically take six to eight weeks, so June was the practical last call for a clean start.",
+    detail: "No new funded starts on Team Leader, Operations Manager, Coaching Professional and 13 others after the cut-off. The real deadline is earlier than the formal one, eligibility checks and contracting typically take six to eight weeks, so June was the practical last call for a clean start.",
     watch: "Whether any replacement standards are announced. For most of the 16, none has been."
   },
   {
@@ -662,14 +662,14 @@ const HORIZON = [
     confidence: "confirmed",
     risk: "medium",
     detail: "The largest expansion of T-Level subjects since launch, including Care Services and Sports, Fitness and Exercise Science. Level 2 reform introduces Further Study and Occupational pathways which will gradually replace the Foundation Year from 2027. Finance T-Level takes its last enrolments in September 2026.",
-    watch: "The order in which subjects get a Further Study pathway — it sets the sequence your own offer has to change in."
+    watch: "The order in which subjects get a Further Study pathway, it sets the sequence your own offer has to change in."
   },
   {
     window: "Ongoing",
     title: "Budget pressure is the underlying driver",
     confidence: "confirmed",
     risk: "high",
-    detail: "DfE is expected to overspend its apprenticeships budget, driven by growth in older, higher-level and more expensive provision. Most recent restrictions — Level 7, defunding, age limits, the top-up removal — trace back to this. An additional £725m is being invested in the Growth and Skills Levy to support 50,000 more young people.",
+    detail: "DfE is expected to overspend its apprenticeships budget, driven by growth in older, higher-level and more expensive provision. Most recent restrictions, Level 7, defunding, age limits, the top-up removal, trace back to this. An additional £725m is being invested in the Growth and Skills Levy to support 50,000 more young people.",
     watch: "Treat any programme concentrated on older or higher-level apprentices as carrying policy risk, not just delivery risk."
   }
 ];
@@ -757,7 +757,7 @@ const MILESTONES = [
     scope:"route", standards:[], routes:["care-services"],
     type: "change", urgency: "low",
     who: "Care services providers",
-    action: "The Social Care T-Level becomes available. Begin employer placement conversations well ahead — care placements need safeguarding clearance and lead time.",
+    action: "The Social Care T-Level becomes available. Begin employer placement conversations well ahead, care placements need safeguarding clearance and lead time.",
     article: ""
   }
 ];
@@ -809,7 +809,7 @@ MILESTONES.push(
   { date:"2026-09-30", title:"Subcontracting review concludes",
     scope:"all", standards:[], routes:[],
     type:"watch", urgency:"medium", who:"Providers using subcontractors",
-    action:"DWP is reviewing the whole subcontracting section — policy, rules, evidence requirements and definitions — with sector bodies. Changes take effect from 2027 and new subcontractor definitions are likely from 1 January 2027.",
+    action:"DWP is reviewing the whole subcontracting section, policy, rules, evidence requirements and definitions, with sector bodies. Changes take effect from 2027 and new subcontractor definitions are likely from 1 January 2027.",
     article:"" }
 );
 
@@ -844,19 +844,19 @@ const FURTHER_READING = [
     url: "https://feweek.co.uk/"
   },
   {
-    name: "Skills England — Apprenticeship finder",
+    name: "Skills England, Apprenticeship finder",
     type: "official",
     what: "The register itself. Every standard, its version history, funding band, duration and status. Filter by route, level or approval date, and download the full list as a CSV.",
     url: "https://skillsengland.education.gov.uk/apprenticeships/"
   },
   {
-    name: "Skills England — Occupational maps",
+    name: "Skills England, Occupational maps",
     type: "official",
     what: "How standards, T-Levels and other technical qualifications connect across the 15 routes, plus progression maps showing where each one can lead. Has a public API.",
     url: "https://occupational-maps.skillsengland.education.gov.uk/"
   },
   {
-    name: "GOV.UK — Apprenticeship funding rules",
+    name: "GOV.UK, Apprenticeship funding rules",
     type: "official",
     what: "The rulebooks themselves, published per funding year with a summary of changes. If a Skills Radar article and the rules disagree, the rules win.",
     url: "https://www.gov.uk/guidance/apprenticeship-funding-rules"
@@ -892,13 +892,13 @@ const FURTHER_READING = [
     url: "https://www.aoc.co.uk/"
   },
   {
-    name: "NCFE — apprenticeship reform updates",
+    name: "NCFE, apprenticeship reform updates",
     type: "provider",
     what: "An awarding organisation tracking the reformed assessment plan rollout, with a status page showing which standards have moved and which are still in development.",
     url: "https://www.ncfe.org.uk/epa-and-apprenticeship-assessment/apprenticeship-assessment-reforms/apprenticeship-reform-updates/"
   },
   {
-    name: "Gateway Qualifications — apprenticeship reforms",
+    name: "Gateway Qualifications, apprenticeship reforms",
     type: "provider",
     what: "Assessment-organisation view of the reform programme, including the changes to apprenticeship assessment companion document and the indicative timeline.",
     url: "https://www.gatewayqualifications.org.uk/end-point-assessment/apprenticeship-reforms/"
@@ -943,7 +943,7 @@ const READING = [
 /* ---------- 8. 2026/27 FUNDING RULES INDEX ------------------------------
    A searchable index of the August 2026 to July 2027 apprenticeship funding
    rules. Paragraph numbers are the real ones from the published document.
-   "related" lists other sections a reader should check at the same time —
+   "related" lists other sections a reader should check at the same time  to 
    this drives the "you should also review" suggestions.
    ----------------------------------------------------------------------- */
 
@@ -999,7 +999,7 @@ const RULES_GROUPS = [
 const RULES_SECTIONS = [
   { id:"intro", name:"Introduction and purpose", paras:"2, 5, 13, 15, 26",
     terms:["introduction","purpose","scope","growth and skills levy","dwp","machinery of government","apprenticeship units","growth pilot","end-point assessment terminology"],
-    gist:"Confirms the rules may change at any time, including to funding and to the products available under the growth and skills levy. Language and definitions were updated following the transfer of responsibility for apprenticeships from DfE to DWP. Reference to Annex C is removed — minimum off-the-job volumes now sit on the Skills England website against each standard. Rules for apprenticeship units, live since April 2026, are included; the Growth Pilot ended in March 2026.",
+    gist:"Confirms the rules may change at any time, including to funding and to the products available under the growth and skills levy. Language and definitions were updated following the transfer of responsibility for apprenticeships from DfE to DWP. Reference to Annex C is removed, minimum off-the-job volumes now sit on the Skills England website against each standard. Rules for apprenticeship units, live since April 2026, are included; the Growth Pilot ended in March 2026.",
     related:["off-the-job","subcontracting"] },
 
   { id:"eligibility", name:"Learner eligibility", paras:"30.5, 33, 34.5, 34.6.4",
@@ -1044,7 +1044,7 @@ const RULES_SECTIONS = [
 
   { id:"off-the-job", name:"Off-the-job training", paras:"85, 90, 91, 95.1",
     terms:["off the job","otj","off-the-job","annex c","actual hours","evidence","subcontractor","active learning","minimum volume"],
-    gist:"Annex C has been removed — the minimum volume of off-the-job training for each standard is now published on the Skills England website against that standard. Only eligible off-the-job training can go in the actual hours field. The provider is responsible for evidencing all required off-the-job training even where a subcontractor or the employer delivers it. Active learning does not include standalone English and maths qualifications.",
+    gist:"Annex C has been removed, the minimum volume of off-the-job training for each standard is now published on the Skills England website against that standard. Only eligible off-the-job training can go in the actual hours field. The provider is responsible for evidencing all required off-the-job training even where a subcontractor or the employer delivers it. Active learning does not include standalone English and maths qualifications.",
     related:["training-plan","english-maths","subcontracting"] },
 
   { id:"training-plan", name:"The training plan", paras:"100.3, 101",
@@ -1089,7 +1089,7 @@ const RULES_SECTIONS = [
 
   { id:"price", name:"The price of an apprenticeship", paras:"207, 208, 208.1, 210, 211.1, 211.3",
     terms:["price","contract for services","tnp1","tnp2","total negotiated price","programme level","learner level","price change","epao"],
-    gist:"The contract for services with the employer can now be at programme level rather than learner level, and no longer needs the price broken down into eligible cost areas — though it must state funding will only be used on eligible costs. Learner level pricing is managed through the ILR and apprenticeship service. TNP1 must only contain the cost of training. Employers now only need to approve a price change where the total price increases, for changes on or after 1 August 2026.",
+    gist:"The contract for services with the employer can now be at programme level rather than learner level, and no longer needs the price broken down into eligible cost areas, though it must state funding will only be used on eligible costs. Learner level pricing is managed through the ILR and apprenticeship service. TNP1 must only contain the cost of training. Employers now only need to approve a price change where the total price increases, for changes on or after 1 August 2026.",
     related:["what-funded","service-account","co-investment"] },
 
   { id:"co-investment", name:"Employer co-investment", paras:"213, 213.1, 214, 214.2",
@@ -1109,20 +1109,20 @@ const RULES_SECTIONS = [
 
   { id:"transfers", name:"Apprentices funded by transfers of levy funds", paras:"234, 234.1, 242",
     terms:["transfer","levy transfer","top up","10%","pledge","allowance","apprenticeship units"],
-    gist:"The transfer allowance covers both apprenticeships and apprenticeship units. Reference to the 10% government top-up has been removed — it is no longer added to new funds entering levy accounts from 1 August 2026. How and when automated features operate within the online pledge service has been clarified.",
+    gist:"The transfer allowance covers both apprenticeships and apprenticeship units. Reference to the 10% government top-up has been removed, it is no longer added to new funds entering levy accounts from 1 August 2026. How and when automated features operate within the online pledge service has been clarified.",
     related:["co-investment","subsidy","service-account"] },
 
   { id:"subcontracting", name:"Subcontracting", paras:"262.3, 263, 267, 283, 283.1",
     terms:["subcontract","subcontracting","subcontractor","de-minimis","deminimis","apar","procurement act","itt","directly managed","review"],
-    gist:"The de-minimis exemption is extended to all providers from 1 August 2026 — it is no longer restricted to those who have achieved the subcontracting standard, and the separate ITT exemption has gone as a result. Providers remain responsible for the subcontracting rules however a subcontractor is selected. The Procurement Act 2023 replaced the Public Contract Regulations 2015 for new procurements. A full review of this section runs to September 2026 with changes from 2027.",
+    gist:"The de-minimis exemption is extended to all providers from 1 August 2026, it is no longer restricted to those who have achieved the subcontracting standard, and the separate ITT exemption has gone as a result. Providers remain responsible for the subcontracting rules however a subcontractor is selected. The Procurement Act 2023 replaced the Public Contract Regulations 2015 for new procurements. A full review of this section runs to September 2026 with changes from 2027.",
     related:["intro","off-the-job","what-funded"] },
 
   { id:"change-circumstance", name:"Change of circumstance and redundancy", paras:"301.2, 306.1, 306.2, 313.1, 313.2",
     terms:["change of circumstance","redundancy","new employer","4 weeks","8 weeks","12 weeks","self-employed","break in learning"],
-    gist:"Where an apprentice has not started new employment within 4 weeks of their apprenticeship agreement or employment ending, the provider must record a break in learning. Where they have not restarted with a new employer within 8 weeks of the break beginning — 12 weeks from the end of employment — the main provider must withdraw them. An apprentice being fully funded to completion may become self-employed, though not under the time-limited 12-week funding support.",
+    gist:"Where an apprentice has not started new employment within 4 weeks of their apprenticeship agreement or employment ending, the provider must record a break in learning. Where they have not restarted with a new employer within 8 weeks of the break beginning, 12 weeks from the end of employment, the main provider must withdraw them. An apprentice being fully funded to completion may become self-employed, though not under the time-limited 12-week funding support.",
     related:["breaks","qualifying-days","employment"] },
 
-  { id:"breaks", name:"Breaks in learning", paras:"—",
+  { id:"breaks", name:"Breaks in learning", paras:" to ",
     terms:["break in learning","bil","medical","absent","illness"],
     gist:"Following feedback, queries and further legal advice, the reference to apprentices absent from work for medical reasons being able to continue with their apprenticeship has been removed.",
     related:["change-circumstance","qualifying-days"] },
@@ -1132,17 +1132,17 @@ const RULES_SECTIONS = [
     gist:"For apprentices moving to a new version of a standard where the assessment plan has been revised, see Annex B and the changes to apprenticeship assessment guidance. Minimum duration requirements are those that applied to the standard on the apprentice's original start date.",
     related:["assessment","eligibility"] },
 
-  { id:"assessment", name:"Annex B — apprenticeship assessment", paras:"382, 383.1, 383.2, 387, 388, 389, 390, 393, 395, 397, 416",
+  { id:"assessment", name:"Annex B, apprenticeship assessment", paras:"382, 383.1, 383.2, 387, 388, 389, 390, 393, 395, 397, 416",
     terms:["assessment","annex b","epa","gateway","gateway to completion","assessment organisation","epao","certification","integrated","grading"],
     gist:"Gateway, or gateway to assessment, is replaced by gateway to completion, reflecting that assessment can now take place at any stage. The provider must engage an assessment organisation at the start of the apprenticeship, and the price negotiated must reflect each party's role in developing, designing and delivering the assessment including quality assurance. For revised plans where a mandatory qualification fully or substantially covers the required knowledge and skills, the requirement for an occupational participant in grading who was not involved in training no longer applies. Rules for certification and for moving to a new version following assessment reform are included.",
     related:["new-version","training-plan","price"] },
 
-  { id:"annex-a", name:"Annex A — residency", paras:"374.6",
+  { id:"annex-a", name:"Annex A, residency", paras:"374.6",
     terms:["annex a","residency","outside england","exemption"],
     gist:"An additional exemption has been added to those outside England who can be funded for an apprenticeship.",
     related:["eligibility"] },
 
-  { id:"glossary", name:"Glossary", paras:"—",
+  { id:"glossary", name:"Glossary", paras:" to ",
     terms:["glossary","definitions","growth and skills levy","gateway to completion","care leaver","irrefutable","ir35","subcontractor"],
     gist:"Definitions added or amended for additional payments, apprenticeship levy, care experienced, care leaver, co-investment, completion payment, directly managed and controlled, gateway to completion, growth and skills levy, irrefutable, IR35, learning actual and planned end dates, levy, on-the-job training, progression profiles, Skills England, subcontracting and subcontractor. Accelerated apprenticeship and on-programme assessment have been deleted.",
     related:["intro"] }
@@ -1161,7 +1161,7 @@ const RULES_CHANGES = [
   { section:"co-investment", when:"v3", paras:"213.1, 214.2", impact:"high",
     title:"Co-investment reworked around the apprentice's age, not just levy status",
     from:"A levy payer who exhausted their balance co-invested at a single rate regardless of who the apprentice was.",
-    to:"For new starts from 1 August 2026, a levy payer with insufficient funds pays 25% — but government funds 100% for apprentices aged 16 to 24 and 75% for those aged 25 and over. Non-levy employers pay 5% for apprentices aged 25 and above and nothing at all for those aged 16 to 24." },
+    to:"For new starts from 1 August 2026, a levy payer with insufficient funds pays 25%, but government funds 100% for apprentices aged 16 to 24 and 75% for those aged 25 and over. Non-levy employers pay 5% for apprentices aged 25 and above and nothing at all for those aged 16 to 24." },
 
   { section:"transfers", when:"draft", paras:"234.1", impact:"high",
     title:"The 10% government top-up is gone",
@@ -1173,7 +1173,7 @@ const RULES_CHANGES = [
     from:"The de-minimis could only be used by providers with written confirmation that they had fully achieved the subcontracting standard.",
     to:"From 1 August 2026 any provider can use the exemption. The separate exemption for initial teacher training provision has been removed as a result. A full review of the whole subcontracting section runs to September 2026, with changes expected from 2027 and new subcontractor definitions likely from 1 January 2027." },
 
-  { section:"intro", when:"draft", paras:"—", impact:"high",
+  { section:"intro", when:"draft", paras:" to ", impact:"high",
     title:"Apprenticeships moved from the Department for Education to the Department for Work and Pensions",
     from:"Apprenticeship policy, funding and the funding rules sat with the Department for Education.",
     to:"Following a Machinery of Government change on 1 April 2026, responsibility transferred to DWP. Language and definitions have been updated throughout the rules, and DWP now appears in the subcontracting section. The rules themselves are published by DWP." },
@@ -1184,7 +1184,7 @@ const RULES_CHANGES = [
     to:"Apprentices are only eligible for funding on ST1472 if aged 16 to 24 at the start, or 15 where their 16th birthday falls between the last Friday of June and 31 August." },
 
   { section:"off-the-job", when:"draft", paras:"85", impact:"medium",
-    title:"Annex C removed — off-the-job minimums move to the Skills England website",
+    title:"Annex C removed, off-the-job minimums move to the Skills England website",
     from:"The minimum volume of off-the-job training for each standard was listed in Annex C of the funding rules.",
     to:"Annex C is gone. Each standard's minimum volume is now published on the Skills England website against that standard, so it can change without a new version of the rules. Check the register rather than the rulebook." },
 
@@ -1221,9 +1221,9 @@ const RULES_CHANGES = [
   { section:"change-circumstance", when:"draft", paras:"306.1, 306.2", impact:"medium",
     title:"Hard timings on what happens when an apprentice loses their job",
     from:"The point at which a provider had to act was not tightly specified.",
-    to:"If new employment has not started within 4 weeks of the agreement or employment ending, the provider must record a break in learning. If there is no restart with a new employer within 8 weeks of that break — 12 weeks from the end of employment — the apprentice must be withdrawn." },
+    to:"If new employment has not started within 4 weeks of the agreement or employment ending, the provider must record a break in learning. If there is no restart with a new employer within 8 weeks of that break, 12 weeks from the end of employment, the apprentice must be withdrawn." },
 
-  { section:"breaks", when:"v1", paras:"—", impact:"medium",
+  { section:"breaks", when:"v1", paras:" to ", impact:"medium",
     title:"Medical absence no longer allows an apprenticeship to continue",
     from:"Apprentices absent from work for medical reasons could continue with their apprenticeship.",
     to:"Following feedback and further legal advice, that reference has been removed. Medical absence now falls to be handled through breaks in learning." },
@@ -1317,7 +1317,7 @@ const LEVY_MODEL = {
 };
 
 /* Incentives and additional payments worth checking.
-   These change frequently — every one links to the source to verify. */
+   These change frequently, every one links to the source to verify. */
 
 const INCENTIVES = [
   { article:"inc-hiring-payment", name:"£2,000 apprenticeship hiring payment", amount:"£2,000 per apprentice",
@@ -1363,18 +1363,18 @@ ARTICLES.push(
   icon: "check", tag: "Standard", urgency: "medium", route: "",
   date: "2026-08-15",
   title: "The 32 standards currently in review, and what that actually means",
-  summary: "A standard in review is still fully deliverable — but the version you start someone on may not be the version they finish under.",
+  summary: "A standard in review is still fully deliverable, but the version you start someone on may not be the version they finish under.",
   standfirst: "Being in development is not the same as being withdrawn, and confusing the two costs providers cohorts they could have run.",
   body: [
     "At the time of writing 32 apprenticeship standards sit in development, revision or a notice period on the Skills England register rather than simply being approved. They are spread unevenly: creative and design carries 9, digital 7, transport and logistics 5, and most other routes one or two apiece.",
-    "The register uses several statuses that mean subtly different things. A standard with an approved version alongside a new version in development is being revised — you can still start apprentices on the current version. A standard in a notice period is signalling that the current version will be withdrawn for new starts at a future date. A standard paused for starts, such as Space Engineering Technician at Level 4, cannot take new apprentices at all while the pause holds. A retirement consultation, currently open on Aviation Customer Service Operative at Level 2, means the standard may not survive.",
-    "What it changed from: for several years most of the register was static, so a status other than approved was unusual. The volume in development now reflects two things happening at once — the routine cycle of standards reviews, and the wider assessment plan reform touching every standard eventually.",
+    "The register uses several statuses that mean subtly different things. A standard with an approved version alongside a new version in development is being revised, you can still start apprentices on the current version. A standard in a notice period is signalling that the current version will be withdrawn for new starts at a future date. A standard paused for starts, such as Space Engineering Technician at Level 4, cannot take new apprentices at all while the pause holds. A retirement consultation, currently open on Aviation Customer Service Operative at Level 2, means the standard may not survive.",
+    "What it changed from: for several years most of the register was static, so a status other than approved was unusual. The volume in development now reflects two things happening at once, the routine cycle of standards reviews, and the wider assessment plan reform touching every standard eventually.",
     "What follows, and this is where providers get caught: contracts and curriculum plans written against a standard in revision can be overtaken. If a learner starts on version 1.1 and version 2.0 lands mid-programme, the funding rules determine which version applies, and it is usually the one in force at their start date. Check the register before each intake rather than annually, and be wary of building a new commercial offer on a standard carrying a notice period.",
     "Separately, 29 standards currently have no assessment organisation assigned. That is a distinct problem: you can recruit, but you may struggle to get anyone assessed at the end."
   ],
   sources: [
     { label: "Skills England apprenticeship register", url: "https://skillsengland.education.gov.uk/apprenticeships/" },
-    { label: "GOV.UK — Changes to apprenticeship assessment", url: "https://www.gov.uk/government/publications/apprenticeship-funding-rules-2025-to-2026/changes-to-apprenticeship-assessment-2025-to-2026" }
+    { label: "GOV.UK, Changes to apprenticeship assessment", url: "https://www.gov.uk/government/publications/apprenticeship-funding-rules-2025-to-2026/changes-to-apprenticeship-assessment-2025-to-2026" }
   ]
 },
 
@@ -1383,13 +1383,13 @@ ARTICLES.push(
   icon: "check", tag: "Standard", urgency: "high", route: "",
   date: "2026-08-01",
   title: "29 standards have no assessment organisation assigned",
-  summary: "You can recruit onto them, deliver them and reach gateway — and then find there is nobody to assess your apprentice.",
+  summary: "You can recruit onto them, deliver them and reach gateway, and then find there is nobody to assess your apprentice.",
   standfirst: "The quietest risk on the register, because nothing about it stops you enrolling.",
   body: [
     "Twenty-nine standards on the register are marked as waiting for an assessment organisation, or as pending because the standard itself is still in development. Several are newly approved versions: Bus, Coach and HGV Service and Maintenance Technician at Level 2, Interior Designer at Level 6, Production Manager at Level 6, Cold Forming Setter Technician at Level 3 and Dental Hygienist at Level 6 all show as approved for delivery while awaiting an organisation to assess against them.",
     "What it changed from: historically a standard reaching approved status arrived with an assessment organisation already in place, so the two were treated as the same milestone. The volume of revisions now moving through the system has separated them.",
     "The practical consequence is a timing gap rather than a block. You can start apprentices, and typically an organisation is appointed well before the first cohort reaches gateway on a two or three year programme. On a 12 to 18 month programme the margin is much thinner.",
-    "What follows: before committing to a cohort on any newly approved version, check the register for an assessment organisation and, if there is none, ask how long the appointment process is expected to take against your planned end dates. Build the answer into your risk register rather than assuming it resolves itself. Where the gap is genuinely uncomfortable, the previous version of the standard may still be available for starts, which buys time — but check the funding rules for the version that applies to each start date before relying on that."
+    "What follows: before committing to a cohort on any newly approved version, check the register for an assessment organisation and, if there is none, ask how long the appointment process is expected to take against your planned end dates. Build the answer into your risk register rather than assuming it resolves itself. Where the gap is genuinely uncomfortable, the previous version of the standard may still be available for starts, which buys time, but check the funding rules for the version that applies to each start date before relying on that."
   ],
   sources: [
     { label: "Skills England apprenticeship register", url: "https://skillsengland.education.gov.uk/apprenticeships/" }
@@ -1402,16 +1402,16 @@ ARTICLES.push(
   date: "2025-08-21",
   title: "Five funding bands raised, and what a band change actually does",
   summary: "Domestic Electrician, Urban Driver, General Farm Worker, Livestock Unit Technician and Early Years Lead Practitioner all moved up.",
-  standfirst: "Funding band reviews are quiet, infrequent and financially significant — and they only apply to starts after the change.",
+  standfirst: "Funding band reviews are quiet, infrequent and financially significant, and they only apply to starts after the change.",
   body: [
     "Five standards have had their maximum funding raised following routine band reviews. Domestic Electrician at Level 3 moved from £15,000 to £19,000. Urban Driver at Level 2 went from £5,000 to £8,000. General Farm Worker at Level 2 rose from £5,000 to £8,000 and Livestock Unit Technician at Level 3 from £5,000 to £9,000. Early Years Lead Practitioner at Level 5 moved from £8,000 to £9,000.",
     "What it changed from: each of these had a band set when the standard was first approved, in some cases years earlier, and the cost of delivering them had drifted well past it. The agricultural increases are the largest proportionally, reflecting how far below cost those two had fallen.",
     "The band is a maximum, not a price. It caps what can be drawn from a levy account or co-invested, but the actual price is negotiated between employer and provider. A band increase does not automatically raise what you charge, and it does not entitle you to more money for apprentices already on programme.",
-    "What follows: the band that applies is the one in force at the apprentice's start date. Apprentices already on programme stay on the old band for their duration, so you may be delivering the same standard at two prices simultaneously — check your MIS applies the right one per learner. For employers, a higher band means a higher potential draw on the levy account, which matters when funds now expire after 12 months. For providers, this is the moment to revisit pricing on those five, because the previous rates were set against costs that no longer exist."
+    "What follows: the band that applies is the one in force at the apprentice's start date. Apprentices already on programme stay on the old band for their duration, so you may be delivering the same standard at two prices simultaneously, check your MIS applies the right one per learner. For employers, a higher band means a higher potential draw on the levy account, which matters when funds now expire after 12 months. For providers, this is the moment to revisit pricing on those five, because the previous rates were set against costs that no longer exist."
   ],
   sources: [
     { label: "Skills England apprenticeship register", url: "https://skillsengland.education.gov.uk/apprenticeships/" },
-    { label: "GOV.UK — Apprenticeship technical funding guide", url: "https://www.gov.uk/government/collections/funding-rules-for-apprenticeships" }
+    { label: "GOV.UK, Apprenticeship technical funding guide", url: "https://www.gov.uk/government/collections/funding-rules-for-apprenticeships" }
   ]
 },
 
@@ -1439,13 +1439,13 @@ ARTICLES.push(
   icon: "blocks", tag: "Standard", urgency: "medium", route: "digital",
   date: "2026-08-15",
   title: "Digital: 18 changes, seven of them standards still in development",
-  summary: "The route with the most unfinished business — plus the first AI units to reach the register.",
+  summary: "The route with the most unfinished business, plus the first AI units to reach the register.",
   standfirst: "Digital moves faster than the standards process, and the register shows the strain.",
   body: [
     "Eighteen digital standards carry a recorded change, and seven of them are in development or a notice period rather than settled. Data Engineer at Level 5, Applications Support Lead at Level 4, Machine Learning Engineer at Level 6, Information Communications Technician at Level 3, Digital Product Manager at Level 4 and Digital Accessibility Specialist at Level 4 are all mid-revision.",
     "Against that, three new AI Leadership units at Level 5 were approved in April 2026, funded at £750 each, covering AI strategy and opportunity, AI adoption and procurement and governance, and AI delivery and organisational transformation. Artificial Intelligence and Automation Practitioner at Level 4 moved to version 2.1 in December 2025. The Software and Data and Hardware, Network and Infrastructure foundation apprenticeships at Level 2 give an entry route at eight months and £4,000.",
     "What it changed from: the digital route was built around job titles that were stable in the late 2010s. Several of those roles have either split, merged or been absorbed into work that did not exist when the standard was written.",
-    "What follows: the units are the interesting development. They let an employer fund a short, specific piece of AI capability from the levy without committing to a full apprenticeship, which suits a workforce that needs updating rather than qualifying. For providers, the volume of standards in revision means curriculum planning on this route should be provisional — check the register at each intake, particularly for Information Communications Technician, which is high volume and carries a notice period."
+    "What follows: the units are the interesting development. They let an employer fund a short, specific piece of AI capability from the levy without committing to a full apprenticeship, which suits a workforce that needs updating rather than qualifying. For providers, the volume of standards in revision means curriculum planning on this route should be provisional, check the register at each intake, particularly for Information Communications Technician, which is high volume and carries a notice period."
   ],
   sources: [
     { label: "Skills England apprenticeship register", url: "https://skillsengland.education.gov.uk/apprenticeships/" }
@@ -1482,7 +1482,7 @@ ARTICLES.push(
     "Three foundation apprenticeships give an eight-month entry route at Level 2 and £4,000 each: Building Services Engineering, Onsite Trades and Finishing Trades.",
     "On the craft standards, Craft Bricklayer moved to version 1.2, Craft Painter and Decorator to 1.2, Floorlayer Wood Based to 1.1 and Fire Safety Engineer to 1.2. Domestic Electrician at Level 3 had its funding band raised from £15,000 to £19,000, a substantial correction.",
     "Against all of that, Facilities Management Supervisor at Level 3 is one of the sixteen standards losing funding from September 2026, removing a supervisory progression step from the route.",
-    "What follows: construction now has the most complete ladder of any route for net zero work — foundation apprenticeship, T-Level specialism in low carbon heating from September 2026, full technician standard, and short units for upskilling existing installers. The constraint is no longer qualification structure but employer placement capacity, which is untested at volume in this specialism."
+    "What follows: construction now has the most complete ladder of any route for net zero work, foundation apprenticeship, T-Level specialism in low carbon heating from September 2026, full technician standard, and short units for upskilling existing installers. The constraint is no longer qualification structure but employer placement capacity, which is untested at volume in this specialism."
   ],
   sources: [
     { label: "Skills England apprenticeship register", url: "https://skillsengland.education.gov.uk/apprenticeships/" },
@@ -1495,7 +1495,7 @@ ARTICLES.push(
   icon: "desk", tag: "Standard", urgency: "low", route: "creative-design",
   date: "2026-04-14",
   title: "Creative and design: half the route is mid-revision",
-  summary: "Nine of eighteen changed standards are in development or a notice period — the highest proportion anywhere.",
+  summary: "Nine of eighteen changed standards are in development or a notice period, the highest proportion anywhere.",
   standfirst: "A route being substantially rewritten while it is being delivered.",
   body: [
     "Creative and design carries eighteen recorded changes, and nine of those standards are in development, a notice period, or otherwise unsettled. Publishing Professional at Level 4, Creative Industries Production Technician at Level 3, Scenic Artist at Level 3 and Hair, Wigs, Make-up and Prosthetics Technician at Level 3 are all mid-revision with notice periods attached.",
@@ -1519,12 +1519,12 @@ ARTICLES.push(
   body: [
     "Eleven standards on this route carry recorded changes, most of them moves to version 2.0 during 2026. Advanced Paralegal at Level 5 and Professional Taxation Technician at Level 4 both moved in July 2026. Barrister at Level 7 and Chartered Legal Executive Litigator and Advocate at Level 7 moved in May. Licensed Conveyancer or Licensed Probate Practitioner at Level 6 and Legal Technician at Level 4 moved in June. Internal Audit Technician at Level 4 moved to 2.0 in March.",
     "What it changed from: these standards map onto professional qualification routes controlled by regulators and professional bodies, so version changes tend to arrive in clusters when those bodies update their own requirements.",
-    "The context that matters more than any individual version change is the Level 7 restriction. Since January 2026, Level 7 apprenticeships are funded only for apprentices aged 16 to 21, or 22 to 24 with an EHC plan or care experience. Barrister at Level 7 over 72 months and Chartered Legal Executive at Level 7 over 66 months are exactly the programmes that restriction removes for mid-career entrants — which was much of their volume.",
+    "The context that matters more than any individual version change is the Level 7 restriction. Since January 2026, Level 7 apprenticeships are funded only for apprentices aged 16 to 21, or 22 to 24 with an EHC plan or care experience. Barrister at Level 7 over 72 months and Chartered Legal Executive at Level 7 over 66 months are exactly the programmes that restriction removes for mid-career entrants, which was much of their volume.",
     "What follows: a firm that used Level 7 apprenticeships to qualify existing paralegals has lost that funding route entirely. The Level 4 Legal Technician and Level 5 Advanced Paralegal standards become more important as a consequence, since they remain funded at any age. Expect demand to redistribute downward rather than disappear."
   ],
   sources: [
     { label: "Skills England apprenticeship register", url: "https://skillsengland.education.gov.uk/apprenticeships/" },
-    { label: "GOV.UK — Apprenticeship funding rules", url: "https://www.gov.uk/guidance/apprenticeship-funding-rules" }
+    { label: "GOV.UK, Apprenticeship funding rules", url: "https://www.gov.uk/guidance/apprenticeship-funding-rules" }
   ]
 },
 
@@ -1556,11 +1556,11 @@ ARTICLES.push(
   body: [
     "Three standards on this route lose funding from September 2026: Learning and Skills Assessor at Level 3, Learning and Skills Mentor at Level 4 and Outdoor Learning Specialist at Level 5. The first two are the standards the FE sector itself used to develop assessors and mentors.",
     "There is a circularity here worth stating plainly. Providers used the Learning and Skills Assessor apprenticeship to qualify the people who assess other apprentices. Removing it does not remove the need for assessors; it removes the funded route into becoming one, at a point when reformed assessment plans are increasing the demands on that workforce.",
-    "Elsewhere on the route, Specialist Teaching Assistant at Level 5 has a reformed assessment plan taking effect from 14 December 2026, one of the first cohort of standards to move under assessment reform. Teacher — Undergraduate at Level 6 moved to version 2.0 in August 2026. Early Years Lead Practitioner at Level 5 had its band raised from £8,000 to £9,000. Early Years Teacher with EYTS at Level 6 moved to version 1.1.",
+    "Elsewhere on the route, Specialist Teaching Assistant at Level 5 has a reformed assessment plan taking effect from 14 December 2026, one of the first cohort of standards to move under assessment reform. Teacher, Undergraduate at Level 6 moved to version 2.0 in August 2026. Early Years Lead Practitioner at Level 5 had its band raised from £8,000 to £9,000. Early Years Teacher with EYTS at Level 6 moved to version 1.1.",
     "What follows: if you deliver the assessor or mentor standards, September 2026 is a hard stop for new starts and there is no announced replacement. Existing apprentices remain funded to completion. Workforce planning for your own assessment capacity should assume self-funded or non-apprenticeship development from that point, and the Specialist Teaching Assistant reformed plan is worth reading early as an indicator of what the rest of the reform looks like."
   ],
   sources: [
-    { label: "Skills England — Streamlining apprenticeships", url: "https://help.apprenticeships.education.gov.uk/hc/en-gb/articles/34005717182226-Streamlining-apprenticeships" },
+    { label: "Skills England, Streamlining apprenticeships", url: "https://help.apprenticeships.education.gov.uk/hc/en-gb/articles/34005717182226-Streamlining-apprenticeships" },
     { label: "Skills England apprenticeship register", url: "https://skillsengland.education.gov.uk/apprenticeships/" }
   ]
 },
@@ -1580,7 +1580,7 @@ ARTICLES.push(
     "What follows: for both routes the practical question is whether an adjacent standard can absorb the demand, and in most cases it cannot at the same level. Employers using these as recruitment pipelines need an alternative in place before the September cut-off, and given contracting and eligibility checks typically take six to eight weeks, that decision is effectively already due."
   ],
   sources: [
-    { label: "Skills England — Streamlining apprenticeships", url: "https://help.apprenticeships.education.gov.uk/hc/en-gb/articles/34005717182226-Streamlining-apprenticeships" }
+    { label: "Skills England, Streamlining apprenticeships", url: "https://help.apprenticeships.education.gov.uk/hc/en-gb/articles/34005717182226-Streamlining-apprenticeships" }
   ]
 },
 
@@ -1595,7 +1595,7 @@ ARTICLES.push(
     "Eleven agriculture, environmental and animal care standards carry a recorded change. Two are funding band corrections and they are substantial: General Farm Worker at Level 2 moved from £5,000 to £8,000, and Livestock Unit Technician at Level 3 from £5,000 to £9,000. Both had been set at a level that made delivery marginal for providers working across dispersed rural employers.",
     "Elsewhere, Forestry Works Manager at Level 4 was approved in February 2025 at £8,000 over 15 months. Detection and Protection Working Dog Specialist at Level 3 was approved in June 2025 at £12,000. Fisher at Level 2 moved to version 1.1. Professional Arboriculturist at Level 6 has an integrated degree version in development.",
     "What it changed from: agricultural standards were among the earliest approved and several kept their original bands for the best part of a decade, through a period when travel costs, assessor time and employer engagement in rural areas all became more expensive.",
-    "What follows: the corrections make these programmes viable to deliver again, and providers who withdrew from agricultural provision on cost grounds should revisit the numbers. As with every band change, it applies to starts from the change date only, so learners already on programme continue at the old rate — worth checking your MIS handles both. The route still has no T-Level, with Agriculture, Land Management and Production in development, so foundation apprenticeships and direct entry remain the ways in."
+    "What follows: the corrections make these programmes viable to deliver again, and providers who withdrew from agricultural provision on cost grounds should revisit the numbers. As with every band change, it applies to starts from the change date only, so learners already on programme continue at the old rate, worth checking your MIS handles both. The route still has no T-Level, with Agriculture, Land Management and Production in development, so foundation apprenticeships and direct entry remain the ways in."
   ],
   sources: [
     { label: "Skills England apprenticeship register", url: "https://skillsengland.education.gov.uk/apprenticeships/" }
@@ -1616,7 +1616,7 @@ ARTICLES.push(
     "What follows: an employer developing supervisors and managers through the levy has, from September, essentially no funded route at Levels 3 to 6 on this route. The realistic responses are apprenticeship units for specific capability, self-funded management development, or moving people onto a sector-specific standard where one exists. Skills England has signalled further streamlining is under discussion and sector bodies have publicly warned more management standards could follow, so treat any remaining management provision as carrying policy risk."
   ],
   sources: [
-    { label: "Skills England — Streamlining apprenticeships", url: "https://help.apprenticeships.education.gov.uk/hc/en-gb/articles/34005717182226-Streamlining-apprenticeships" },
+    { label: "Skills England, Streamlining apprenticeships", url: "https://help.apprenticeships.education.gov.uk/hc/en-gb/articles/34005717182226-Streamlining-apprenticeships" },
     { label: "Skills England apprenticeship register", url: "https://skillsengland.education.gov.uk/apprenticeships/" }
   ]
 },
@@ -1627,17 +1627,17 @@ ARTICLES.push(
   date: "2026-04-01",
   title: "Hospitality and retail: new foundation apprenticeships, one standard defunded",
   summary: "Two eight-month Level 2 foundation routes arrive at £3,500 as Cleaning Hygiene Operative loses funding.",
-  standfirst: "Entry-level provision reshaped rather than reduced — though not for everyone.",
+  standfirst: "Entry-level provision reshaped rather than reduced, though not for everyone.",
   body: [
     "Two foundation apprenticeships were approved in April 2026: Catering and Hospitality at Level 2 and Retail Service, Supply and Administration at Level 2, both running eight months at £3,500. They are aimed at 16 to 21 year olds, and at 22 to 24 year olds with an EHC plan or care experience.",
     "At the same time Cleaning Hygiene Operative at Level 2 is one of the sixteen standards losing funding from September 2026, removing a funded entry route into facilities and cleaning work.",
     "The rest of the route is stable. Hospitality Accommodation Team Member at Level 2 and Food and Beverage Team Member at Level 2 sit at £6,000, Pastry Chef at Level 3 at £11,000 and Lead Baker at Level 3 at £9,000, none carrying recent changes.",
     "What it changed from: entry into hospitality and retail through apprenticeships previously meant a full Level 2 standard running twelve months or more, which suited neither the seasonal shape of the sector nor learners who were not yet ready to commit.",
-    "What follows: the eight-month foundation route fits the sector's rhythm considerably better and is worth building recruitment around, particularly for September and January intakes. The age restriction is the constraint — there is no equivalent funded entry route for an adult career-changer into hospitality, and with Cleaning Hygiene Operative going, the options for over-25s at Level 2 on this route narrow further."
+    "What follows: the eight-month foundation route fits the sector's rhythm considerably better and is worth building recruitment around, particularly for September and January intakes. The age restriction is the constraint, there is no equivalent funded entry route for an adult career-changer into hospitality, and with Cleaning Hygiene Operative going, the options for over-25s at Level 2 on this route narrow further."
   ],
   sources: [
     { label: "Skills England apprenticeship register", url: "https://skillsengland.education.gov.uk/apprenticeships/" },
-    { label: "Skills England — Streamlining apprenticeships", url: "https://help.apprenticeships.education.gov.uk/hc/en-gb/articles/34005717182226-Streamlining-apprenticeships" }
+    { label: "Skills England, Streamlining apprenticeships", url: "https://help.apprenticeships.education.gov.uk/hc/en-gb/articles/34005717182226-Streamlining-apprenticeships" }
   ]
 }
 
@@ -1654,7 +1654,7 @@ const OTHER_DOCS = [
   { name:"Changes to apprenticeship assessment", url:"https://www.gov.uk/government/publications/apprenticeship-funding-rules-2025-to-2026/changes-to-apprenticeship-assessment-2025-to-2026",
     note:"How reformed assessment plans are being introduced, and which rules apply while a standard still waits for its revised plan." },
   { name:"Apprenticeship technical funding guide", url:"https://www.gov.uk/government/collections/funding-rules-for-apprenticeships",
-    note:"How payments are actually calculated — monthly instalments, the 20% completion payment, and what happens on breaks and withdrawals." },
+    note:"How payments are actually calculated, monthly instalments, the 20% completion payment, and what happens on breaks and withdrawals." },
   { name:"Funding for employers who do not pay the levy", url:"https://www.gov.uk/government/collections/funding-rules-for-apprenticeships",
     note:"Co-investment, reservations, full funding for 16 to 24 year olds, and the new £2,000 hiring payment from October 2026." },
   { name:"Transferring your apprenticeship levy to another business", url:"https://www.gov.uk/government/collections/funding-rules-for-apprenticeships",
@@ -1684,14 +1684,14 @@ ARTICLES.push(
   standfirst: "The most substantial new money in the 2026/27 rules, and the eligibility condition most likely to be missed.",
   body: [
     "From October 2026, employers who do not pay the apprenticeship levy can claim a £2,000 hiring payment when they recruit a new apprentice aged 16 to 24. It applies to apprenticeships starting on or after 1 October 2026, and is paid in two instalments, the first once the apprentice has completed 90 days on programme.",
-    "The condition that trips people up is the job-start window. The apprentice must have started their job with that employer within the previous three months. This is a hiring payment, not a training payment — it is designed to support recruitment of someone new, not to reward putting a long-standing member of staff onto an apprenticeship. If your apprentice has been with you a year and you enrol them, the payment does not apply.",
+    "The condition that trips people up is the job-start window. The apprentice must have started their job with that employer within the previous three months. This is a hiring payment, not a training payment, it is designed to support recruitment of someone new, not to reward putting a long-standing member of staff onto an apprenticeship. If your apprentice has been with you a year and you enrol them, the payment does not apply.",
     "It applies to foundation apprenticeships as well as full standards, which matters because those are eight-month Level 2 programmes aimed squarely at this age group.",
     "It also sits outside subsidy control from 1 August 2026 to 31 July 2027, so it does not count against an employer's minimal financial assistance allowance for that year. That is worth knowing for employers already close to their threshold through other support.",
     "What follows: check that your onboarding records capture the date the apprentice started their job separately from the date they started their apprenticeship, because eligibility turns on the gap between the two. Providers should build this into enrolment paperwork now rather than reconstructing it later. It stacks with the existing £1,000 additional payment where the apprentice is 16 to 18, so a single eligible apprentice can attract £3,000 to the employer."
   ],
   sources: [
-    { label: "DWP — Apprenticeship funding rules: summary of changes (version 3), paragraphs 133 to 141", url: "https://www.gov.uk/government/publications/apprenticeship-funding-rules-and-assessment-plan-guidance-2026-to-2027/apprenticeship-funding-rules-summary-of-changes-version-1" },
-    { label: "GOV.UK — Apprenticeship funding rules: 2026 to 2027", url: "https://www.gov.uk/government/publications/apprenticeship-funding-rules-and-assessment-plan-guidance-2026-to-2027" }
+    { label: "DWP, Apprenticeship funding rules: summary of changes (version 3), paragraphs 133 to 141", url: "https://www.gov.uk/government/publications/apprenticeship-funding-rules-and-assessment-plan-guidance-2026-to-2027/apprenticeship-funding-rules-summary-of-changes-version-1" },
+    { label: "GOV.UK, Apprenticeship funding rules: 2026 to 2027", url: "https://www.gov.uk/government/publications/apprenticeship-funding-rules-and-assessment-plan-guidance-2026-to-2027" }
   ]
 },
 
@@ -1705,12 +1705,12 @@ ARTICLES.push(
   body: [
     "Employers receive an additional payment of £1,000 for an apprentice aged 16 to 18 at the start of their apprenticeship, or aged 19 to 24 where the apprentice has an Education, Health and Care plan or has been in the care of their local authority. The training provider receives a matching £1,000.",
     "It is paid in two instalments: the first once the apprentice has completed 90 days on programme, and the second at 365 days. It is separate from the funding band, so it does not come out of a levy account or count towards co-investment.",
-    "The 2026/27 rules clarified two operational points. Both the provider and the employer receive the payment where the apprentice meets the criteria — this had been a source of confusion. And there are now minimum expectations on providers when contacting employers for their bank details, because the most common reason the payment goes unclaimed is simply that nobody collected the details.",
+    "The 2026/27 rules clarified two operational points. Both the provider and the employer receive the payment where the apprentice meets the criteria, this had been a source of confusion. And there are now minimum expectations on providers when contacting employers for their bank details, because the most common reason the payment goes unclaimed is simply that nobody collected the details.",
     "The rules also set out what information providers must give apprentices about declaring care leaver status. An apprentice who does not know they can declare it will not, and the payment is lost along with the apprentice's own £3,000 bursary.",
     "What follows: this is money left on the table more often than it should be. If you are a provider, audit which of your current apprentices are eligible and whether the employer bank details are on file. If you are an employer, check your finance team knows to expect two payments rather than one, and that they are not being coded as training income."
   ],
   sources: [
-    { label: "DWP — Summary of changes, paragraphs 125, 127.1 and 132", url: "https://www.gov.uk/government/publications/apprenticeship-funding-rules-and-assessment-plan-guidance-2026-to-2027/apprenticeship-funding-rules-summary-of-changes-version-1" }
+    { label: "DWP, Summary of changes, paragraphs 125, 127.1 and 132", url: "https://www.gov.uk/government/publications/apprenticeship-funding-rules-and-assessment-plan-guidance-2026-to-2027/apprenticeship-funding-rules-summary-of-changes-version-1" }
   ]
 },
 
@@ -1722,14 +1722,14 @@ ARTICLES.push(
   summary: "£3,000 paid directly to apprentices who have been in local authority care, and it depends entirely on them knowing to declare it.",
   standfirst: "A payment that only reaches the people it is meant for if somebody tells them it exists.",
   body: [
-    "Apprentices who have been in the care of their local authority can receive a bursary of £3,000. Unlike the additional payments, it goes directly to the apprentice rather than to the employer or provider, and it is separate from — not instead of — the £1,000 additional payment the employer and provider receive for the same apprentice.",
+    "Apprentices who have been in the care of their local authority can receive a bursary of £3,000. Unlike the additional payments, it goes directly to the apprentice rather than to the employer or provider, and it is separate from, not instead of, the £1,000 additional payment the employer and provider receive for the same apprentice.",
     "The whole mechanism depends on declaration. An apprentice who does not know the bursary exists, or does not realise their circumstances count, will not declare their status and will not receive it. This is why the 2026/27 rules added a clarification about what information providers must give apprentices, specifically to reduce the risk that providers do not share everything an apprentice needs in order to declare.",
-    "Care experience is also one of the two routes by which someone aged 19 to 24 attracts the £1,000 additional payment, and one of the two exceptions to the Level 7 age restriction — a 22 to 24 year old who has been in care remains eligible for a Level 7 apprenticeship when others of the same age do not.",
+    "Care experience is also one of the two routes by which someone aged 19 to 24 attracts the £1,000 additional payment, and one of the two exceptions to the Level 7 age restriction, a 22 to 24 year old who has been in care remains eligible for a Level 7 apprenticeship when others of the same age do not.",
     "What follows: the practical task is making declaration easy and unembarrassing. That means clear information at enrolment rather than a box buried in a form, wording that covers the range of care arrangements people may not think of as care, and an offer to discuss it privately. For an apprentice on a Level 2 wage, £3,000 is not a marginal sum."
   ],
   sources: [
-    { label: "GOV.UK — Apprenticeships bursary for care leavers", url: "https://www.gov.uk/government/collections/funding-rules-for-apprenticeships" },
-    { label: "DWP — Summary of changes, paragraph 127.1", url: "https://www.gov.uk/government/publications/apprenticeship-funding-rules-and-assessment-plan-guidance-2026-to-2027/apprenticeship-funding-rules-summary-of-changes-version-1" }
+    { label: "GOV.UK, Apprenticeships bursary for care leavers", url: "https://www.gov.uk/government/collections/funding-rules-for-apprenticeships" },
+    { label: "DWP, Summary of changes, paragraph 127.1", url: "https://www.gov.uk/government/publications/apprenticeship-funding-rules-and-assessment-plan-guidance-2026-to-2027/apprenticeship-funding-rules-summary-of-changes-version-1" }
   ]
 },
 
@@ -1745,11 +1745,11 @@ ARTICLES.push(
     "Eligibility does not require an Education, Health and Care plan. Providers can determine it through a thorough, evidence-based assessment of a learning difficulty or disability, and a detailed assessment can be carried out at any point during the apprenticeship rather than only at the start. That matters because needs are often identified months in, once someone is struggling with a specific element.",
     "The 2026/27 rules added a proportionality clarification: where the need is stable because of a permanent disability and is unlikely to change, reviews may be light-touch rather than a full reassessment each time. Reviews otherwise run alongside progress reviews.",
     "The same evidence base also unlocks the English and maths flexibilities, including offering Entry Level 3 functional skills in the adjusted subject where that is appropriate.",
-    "What follows: the under-claiming here is usually procedural rather than deliberate — the assessment is done, the support is delivered, and nobody records it in a way that triggers the claim. Check that your learning support process produces the evidence the funding requires as a by-product, rather than as a separate task somebody has to remember."
+    "What follows: the under-claiming here is usually procedural rather than deliberate, the assessment is done, the support is delivered, and nobody records it in a way that triggers the claim. Check that your learning support process produces the evidence the funding requires as a by-product, rather than as a separate task somebody has to remember."
   ],
   sources: [
-    { label: "GOV.UK — Supporting learners with learning difficulties and disabilities", url: "https://www.gov.uk/government/collections/funding-rules-for-apprenticeships" },
-    { label: "DWP — Summary of changes, paragraph 44.5", url: "https://www.gov.uk/government/publications/apprenticeship-funding-rules-and-assessment-plan-guidance-2026-to-2027/apprenticeship-funding-rules-summary-of-changes-version-1" }
+    { label: "GOV.UK, Supporting learners with learning difficulties and disabilities", url: "https://www.gov.uk/government/collections/funding-rules-for-apprenticeships" },
+    { label: "DWP, Summary of changes, paragraph 44.5", url: "https://www.gov.uk/government/publications/apprenticeship-funding-rules-and-assessment-plan-guidance-2026-to-2027/apprenticeship-funding-rules-summary-of-changes-version-1" }
   ]
 },
 
@@ -1758,19 +1758,19 @@ ARTICLES.push(
   icon: "shop", tag: "Levy", urgency: "high", route: "",
   date: "2026-08-01",
   title: "Full funding for 16 to 24 year olds, and the new co-investment map",
-  summary: "Since August 2026 what you pay depends on the apprentice's age as well as your levy status — and for one group it is nothing at all.",
+  summary: "Since August 2026 what you pay depends on the apprentice's age as well as your levy status, and for one group it is nothing at all.",
   standfirst: "The single change most likely to alter a training budget this year.",
   body: [
     "Version 3 of the 2026/27 rules, published on 29 July 2026, set out a co-investment position that now turns on two things: whether you pay the levy, and how old the apprentice is at the start of their training.",
     "If you do not pay the levy, government funds all training and assessment costs up to the funding band maximum for apprentices aged 16 to 24. For apprentices aged 25 and over, you co-invest at 5%.",
-    "If you do pay the levy and your account balance is exhausted, government funds all costs up to the band maximum for apprentices aged 16 to 24, and 75% for those aged 25 and over — leaving you co-investing at 25% for that group only.",
+    "If you do pay the levy and your account balance is exhausted, government funds all costs up to the band maximum for apprentices aged 16 to 24, and 75% for those aged 25 and over, leaving you co-investing at 25% for that group only.",
     "What it changed from: co-investment was previously a single rate applied regardless of who the apprentice was, with full funding available only in much narrower circumstances.",
     "What follows: this changes what a levy shortfall actually costs, sometimes dramatically, and it is worth remodelling your budget rather than assuming last year's figures hold. It also weakens the case for levy transfers as a way of supporting smaller employers with younger apprentices, since those employers can now access full funding directly.",
     "One thing it is not: a reason to prefer younger candidates. Age is a protected characteristic under the Equality Act 2010 and selecting on it is unlawful, whatever the funding position. This is information for building and defending a budget, not for shaping a shortlist."
   ],
   sources: [
-    { label: "DWP — Summary of changes, paragraphs 213, 213.1, 214 and 214.2", url: "https://www.gov.uk/government/publications/apprenticeship-funding-rules-and-assessment-plan-guidance-2026-to-2027/apprenticeship-funding-rules-summary-of-changes-version-1" },
-    { label: "GOV.UK — Funding for employers who do not pay the levy", url: "https://www.gov.uk/government/collections/funding-rules-for-apprenticeships" }
+    { label: "DWP, Summary of changes, paragraphs 213, 213.1, 214 and 214.2", url: "https://www.gov.uk/government/publications/apprenticeship-funding-rules-and-assessment-plan-guidance-2026-to-2027/apprenticeship-funding-rules-summary-of-changes-version-1" },
+    { label: "GOV.UK, Funding for employers who do not pay the levy", url: "https://www.gov.uk/government/collections/funding-rules-for-apprenticeships" }
   ]
 },
 
@@ -1779,7 +1779,7 @@ ARTICLES.push(
   icon: "handshake", tag: "Levy", urgency: "medium", route: "",
   date: "2026-08-01",
   title: "Levy transfers: what they are still good for",
-  summary: "Up to 50% of your annual funds, now covering apprenticeship units too — but the strongest reason for doing it has weakened.",
+  summary: "Up to 50% of your annual funds, now covering apprenticeship units too, but the strongest reason for doing it has weakened.",
   standfirst: "A mechanism worth revisiting rather than continuing on autopilot.",
   body: [
     "A levy-paying employer can transfer up to 50% of their annual funds to another business. With new funds now expiring after 12 months rather than 24, a transfer is one of the ways to use a balance that would otherwise be lost.",
@@ -1789,8 +1789,8 @@ ARTICLES.push(
     "What follows: transfers remain genuinely useful for apprentices aged 25 and over at smaller employers, for supply chain development, and for using funds that would otherwise expire. If your organisation reports levy transfer as a social value metric, check what you are actually claiming, because the underlying need has changed."
   ],
   sources: [
-    { label: "DWP — Summary of changes, paragraphs 234, 234.1 and 242", url: "https://www.gov.uk/government/publications/apprenticeship-funding-rules-and-assessment-plan-guidance-2026-to-2027/apprenticeship-funding-rules-summary-of-changes-version-1" },
-    { label: "GOV.UK — Transferring your apprenticeship levy to another business", url: "https://www.gov.uk/government/collections/funding-rules-for-apprenticeships" }
+    { label: "DWP, Summary of changes, paragraphs 234, 234.1 and 242", url: "https://www.gov.uk/government/publications/apprenticeship-funding-rules-and-assessment-plan-guidance-2026-to-2027/apprenticeship-funding-rules-summary-of-changes-version-1" },
+    { label: "GOV.UK, Transferring your apprenticeship levy to another business", url: "https://www.gov.uk/government/collections/funding-rules-for-apprenticeships" }
   ]
 },
 
@@ -1800,17 +1800,17 @@ ARTICLES.push(
   date: "2026-08-01",
   title: "English and maths is funded separately from the band",
   summary: "It does not consume your levy balance against the apprenticeship, and apprentices can use their adult skills entitlement alongside it.",
-  standfirst: "Optional for most adults since 2025, but still funded — and the funding route is often misunderstood.",
+  standfirst: "Optional for most adults since 2025, but still funded, and the funding route is often misunderstood.",
   body: [
     "English and maths training is funded separately from the apprenticeship funding band. It does not come out of the amount available for the apprenticeship itself, so delivering it does not reduce what you can spend on training the occupational content.",
-    "Since February 2025 it has been optional for apprentices who began their training aged 19 or over, except where English or maths forms an essential component of a mandatory qualification within the standard — a determination that sits with the awarding organisation and must be checked standard by standard rather than assumed. Apprentices who began aged 16 to 18 remain subject to the requirement.",
+    "Since February 2025 it has been optional for apprentices who began their training aged 19 or over, except where English or maths forms an essential component of a mandatory qualification within the standard, a determination that sits with the awarding organisation and must be checked standard by standard rather than assumed. Apprentices who began aged 16 to 18 remain subject to the requirement.",
     "The 2026/27 rules added several clarifications. The provider must establish at initial assessment whether the apprentice will study a standalone qualification. Training must not be delivered entirely by self-directed distance learning. If an apprentice aged 19 or over opts in and later withdraws, the provider must withdraw them to the last day of learning. And apprentices may use their statutory adult skills fund entitlement to study English or maths while on an apprenticeship.",
     "Providers must also support apprentices who are exempt to develop these skills anyway, which can draw on Level 1 or Level 2 course material without the apprentice being enrolled on the qualification.",
     "What follows: because it is funded outside the band, there is rarely a funding reason to discourage an apprentice from taking it. The reasons to think carefully are workload and completion risk, not cost."
   ],
   sources: [
-    { label: "DWP — Summary of changes, paragraphs 47 to 60", url: "https://www.gov.uk/government/publications/apprenticeship-funding-rules-and-assessment-plan-guidance-2026-to-2027/apprenticeship-funding-rules-summary-of-changes-version-1" },
-    { label: "GOV.UK — Apprenticeship funding rules", url: "https://www.gov.uk/guidance/apprenticeship-funding-rules" }
+    { label: "DWP, Summary of changes, paragraphs 47 to 60", url: "https://www.gov.uk/government/publications/apprenticeship-funding-rules-and-assessment-plan-guidance-2026-to-2027/apprenticeship-funding-rules-summary-of-changes-version-1" },
+    { label: "GOV.UK, Apprenticeship funding rules", url: "https://www.gov.uk/guidance/apprenticeship-funding-rules" }
   ]
 }
 
