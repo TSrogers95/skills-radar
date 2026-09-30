@@ -271,6 +271,41 @@ async function openBilling(){
 
 /* ---------- Page views ---------- */
 
+/* =========================================================================
+   WHAT PEOPLE DO
+
+   Page views tell you where someone landed. They do not tell you what they
+   searched for and did not find, which article they opened, or which part of
+   the members area they actually use — and those are the things that change
+   what you build next.
+
+   Still no cookies and no identifiers: an action, a label, and a day. It
+   cannot be tied back to a person, so it needs no banner and no consent.
+   ========================================================================= */
+
+async function recordEvent(event, label, meta){
+  const c = sbClient();
+  if(!c) return;
+  try {
+    await c.from('page_views').insert({
+      path: location.pathname,
+      event: event,
+      label: label ? String(label).slice(0, 120) : null,
+      meta: meta || null
+    });
+  } catch(e){}
+}
+
+/* Searching is the single most useful thing to record: it is people telling
+   you, in their own words, what they expected this site to have. Debounced,
+   so a term is logged once the typing stops rather than letter by letter. */
+let searchLogTimer = null;
+function recordSearch(term){
+  if(!term || term.trim().length < 2) return;
+  clearTimeout(searchLogTimer);
+  searchLogTimer = setTimeout(() => recordEvent('search', term.trim()), 1500);
+}
+
 /* Path and day only. No identifiers, no cookies, nothing that needs a
    consent banner. */
 async function recordView(){

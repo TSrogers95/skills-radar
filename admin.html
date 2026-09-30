@@ -7,7 +7,7 @@
 <meta name="robots" content="noindex, nofollow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -250,7 +250,7 @@ let view = 'overview';
 
 function render(){
   const p = document.getElementById('apanel');
-  if(view === 'overview'){ p.innerHTML = overviewView(); loadTraffic(p); }
+  if(view === 'overview'){ p.innerHTML = overviewView(); loadTraffic(p); loadSearches(); }
   if(view === 'members'){ p.innerHTML = membersView(); loadMembers(p); }
   if(view === 'content'){ p.innerHTML = contentView(); wireRemove(p); }
   if(view === 'email'){   p.innerHTML = emailView(); loadEmails(); }
@@ -311,7 +311,27 @@ function overviewView(){
     '</div>' +
 
     '<div id="traffic"></div>' +
+    '<div class="grouphead"><h2>What people search for</h2><div class="rule"></div></div>' +
+    '<div id="searches"><p class="hint">Loading…</p></div>' +
     '';
+}
+
+/* Searches are the most useful thing collected: people telling you, in their
+   own words, what they expected to find. A term that comes up repeatedly and
+   returns nothing is a gap worth filling. */
+async function loadSearches(){
+  const el = document.getElementById('searches');
+  if(!el) return;
+  if(!accountsLive()){ el.innerHTML = '<p class="hint">Available once Supabase is connected.</p>'; return; }
+
+  const out = await adminFetch('searches');
+  if(!out || out.failed || !out.terms){ el.innerHTML = failureHTML(out, 'searches'); return; }
+  if(!out.terms.length){ el.innerHTML = '<p class="hint">Nothing recorded yet.</p>'; return; }
+
+  el.innerHTML = '<table class="std"><thead><tr><th>Term</th><th>Searches</th><th>Last used</th></tr></thead><tbody>' +
+    out.terms.map(t => '<tr><td class="nm">' + t.term + '</td><td class="num">' + t.searches + '</td>' +
+      '<td class="num">' + fmtLong(t.last_searched) + '</td></tr>').join('') +
+    '</tbody></table>';
 }
 
 async function loadTraffic(panel){
