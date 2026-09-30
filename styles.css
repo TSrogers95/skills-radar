@@ -3609,3 +3609,347 @@ table.levytable td.neg{ color:var(--high); font-weight:600; }
   flex-basis:100%; font-size:12.5px; color:var(--med);
   background:var(--med-bg); padding:9px 12px; margin:-4px 0 4px;
 }
+
+
+/* =========================================================================
+   =========================================================================
+
+   EDITORIAL PASS
+
+   Everything below overrides what came before it. The brief was that the
+   site read as machine-made, and it did. The tells were all house-style
+   choices rather than anything structural:
+
+     a gradient across the wordmark
+     rounded corners and soft drop shadows on everything
+     pill-shaped badges in pastel fills
+     a trendy display face paired with a geometric sans
+     even, weightless spacing with no hierarchy tension
+
+   What replaces them is borrowed from how newspapers and government
+   publications actually set information. Serif headlines with tight leading
+   and real size contrast. Hairline rules instead of floating cards. Square
+   corners. Colour used to mean something rather than to decorate. Small caps
+   kickers over headlines. Dense, confident spacing.
+
+   Colours are unchanged throughout.
+   ========================================================================= */
+
+:root{
+  /* Newsreader for anything editorial: headlines, standfirsts, article
+     bodies. It has proper optical sizing and a real italic, which is what
+     stops a serif looking like a default. */
+  --display: 'Newsreader', Georgia, 'Times New Roman', serif;
+
+  /* Public Sans for interface: tables, labels, buttons, data. Plain and
+     civic rather than fashionable, which suits a compliance product and
+     dates far more slowly. */
+  --sans: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+
+  --serif: 'Newsreader', Georgia, serif;
+}
+
+/* ---------- Square everything ---------- */
+
+*, *::before, *::after{ border-radius:0 !important; }
+
+/* ---------- Typography ---------- */
+
+body{
+  font-family:var(--sans);
+  font-size:16px;
+  -webkit-font-smoothing:antialiased;
+}
+
+h1, h2, h3, h4, .wordmark, .ctahook, .rgname, .repbrand{
+  font-family:var(--serif);
+  font-weight:600;
+  letter-spacing:-0.011em;
+  line-height:1.14;
+}
+
+/* Headlines want to be bigger and tighter than the previous set. Size
+   contrast is what makes a page feel edited rather than generated. */
+.pagehead h1{ font-size:clamp(30px, 4vw, 46px); line-height:1.08; letter-spacing:-0.018em; }
+.pagehead p{
+  font-family:var(--serif); font-size:clamp(17px, 1.5vw, 20px);
+  line-height:1.5; color:var(--text-2); max-width:62ch; font-weight:400;
+}
+
+.piece h1{ font-size:clamp(30px, 4.2vw, 48px); line-height:1.06; letter-spacing:-0.02em; }
+.pstand{
+  font-family:var(--serif); font-size:clamp(18px, 1.7vw, 22px);
+  font-weight:400; font-style:italic; line-height:1.45; color:var(--text-2);
+}
+.pbody p{
+  font-family:var(--serif); font-size:18px; line-height:1.62;
+  color:var(--text); max-width:64ch;
+}
+.pbody p:first-child{ font-size:19px; }
+
+/* A dropped capital on the opening paragraph. Unmistakably editorial, and
+   the sort of thing a generated layout never does. */
+.pbody > p:first-child::first-letter{
+  float:left; font-family:var(--serif); font-weight:600;
+  font-size:3.4em; line-height:0.82; padding:0.06em 0.09em 0 0; color:var(--ink);
+}
+
+/* ---------- The masthead ---------- */
+
+.masthead{
+  background:var(--ink);
+  border-bottom:none;
+}
+.masthead::after{
+  /* a heavy rule under the masthead, the way a paper separates its flag */
+  content:''; display:block; height:3px; background:var(--low);
+}
+
+.wordmark{
+  font-family:var(--serif);
+  font-weight:700;
+  font-size:clamp(40px, 6vw, 66px);
+  letter-spacing:-0.035em;
+  line-height:0.92;
+}
+/* no gradient: one colour, one accent word */
+.wordmark a{ color:#fff; }
+.wordmark em{
+  font-style:italic; font-weight:400;
+  background:none !important; -webkit-text-fill-color:currentColor !important;
+  color:#6ED0B6;
+}
+.wordmark::after{ display:none; }
+
+.hero{
+  font-family:var(--serif); font-style:italic; font-weight:400;
+  font-size:clamp(17px, 1.6vw, 21px); color:#BDD2CD; max-width:52ch;
+}
+.herosub{
+  font-family:var(--sans); font-style:normal;
+  font-size:14px; color:#8FAEA8; margin-top:9px; letter-spacing:0;
+}
+
+.markrule .lbl{
+  font-family:var(--sans); font-size:10.5px; font-weight:600;
+  letter-spacing:0.16em; color:#6ED0B6;
+}
+
+/* ---------- Rules instead of cards ---------- */
+
+.card, .mcard, .readcard, .todo, .soon, .relcard, .demopoint, .setupstep,
+.benefit, .rulegroup, .evrow, .dlrow, .planstep{
+  box-shadow:none !important;
+}
+
+.mcard{
+  background:none; border:none;
+  border-top:2px solid var(--ink);
+  padding:14px 18px 16px 0;
+}
+.mcard .n{
+  font-family:var(--serif); font-size:32px; font-weight:600;
+  letter-spacing:-0.02em; line-height:1;
+}
+.mcard .l{
+  font-family:var(--sans); font-size:11.5px; font-weight:500;
+  letter-spacing:0.02em; color:var(--text-2); margin-top:6px;
+}
+.mcard.bad{ border-top-color:var(--high); }
+.mcard.warm{ border-top-color:var(--med); }
+.mcard.cool{ border-top-color:var(--low); }
+.mgrid{ gap:0 26px; border-bottom:1px solid var(--line); padding-bottom:4px; }
+
+/* Feed items read as a news list: a kicker, a headline, a line of summary,
+   a timestamp. No box. */
+.card{
+  background:none; border:none;
+  border-bottom:1px solid var(--line);
+  border-left:3px solid transparent;
+  padding:15px 16px 15px 14px;
+}
+.card:hover{ background:var(--paper); border-left-color:var(--ink-3); }
+.card.high{ border-left-color:var(--high); }
+.card.medium{ border-left-color:var(--med); }
+.card.low{ border-left-color:var(--low); }
+.card h3{
+  font-family:var(--serif); font-size:17.5px; font-weight:600;
+  line-height:1.2; letter-spacing:-0.012em; margin:5px 0 5px;
+}
+.card p{ font-family:var(--sans); font-size:13.5px; line-height:1.5; color:var(--text-2); }
+.cdate{
+  font-family:var(--sans); font-size:11px; font-weight:500;
+  letter-spacing:0.04em; text-transform:uppercase; color:var(--text-3);
+}
+
+/* ---------- Kickers, not pills ---------- */
+
+.ctag, .tag, .chg, .est, .warnpill{
+  border-radius:0 !important;
+  font-family:var(--sans);
+  font-size:10.5px; font-weight:700;
+  letter-spacing:0.07em; text-transform:uppercase;
+  padding:3px 0 3px 0;
+  background:none !important;
+  border-left:3px solid currentColor;
+  padding-left:8px; margin-right:12px;
+  display:inline-block;
+}
+.ctag.stop, .tag.t-high{ color:var(--high); }
+.ctag.money{ color:#443E86; }
+.ctag.warn, .tag.t-medium{ color:var(--med); }
+.ctag.new, .tag.t-low{ color:var(--low); }
+.ctag.info{ color:var(--text-3); }
+.wclabel{ display:none; }
+.whatchanged{ margin-bottom:2px; }
+
+/* ---------- Section headers ---------- */
+
+.grouphead{
+  background:none;
+  border-bottom:2px solid var(--ink);
+  padding:0 0 9px;
+  margin:38px 0 0;
+  align-items:baseline;
+}
+.grouphead h2{
+  font-family:var(--serif); font-size:21px; font-weight:600;
+  color:var(--text); letter-spacing:-0.015em;
+}
+.grouphead .rule{ display:none; }
+.grouphead .linkbtn{ color:var(--ink-3); font-family:var(--sans); font-size:13px; }
+
+.lhead h2{
+  background:none; color:var(--text); padding:0 0 8px;
+  border-bottom:2px solid var(--ink); display:block;
+  font-family:var(--serif); font-size:20px;
+}
+.csub{
+  background:none; color:var(--text); padding:0 0 7px;
+  border-bottom:1px solid var(--line-strong);
+  font-family:var(--sans); font-size:11.5px; font-weight:700;
+  letter-spacing:0.09em; text-transform:uppercase; display:block;
+}
+
+/* ---------- Column headers on the board ---------- */
+
+.colhead{ background:none; border-bottom:2px solid var(--ink); }
+.colhead h2{ font-family:var(--serif); color:var(--text); font-size:19px; }
+.colhead p{ font-family:var(--sans); color:var(--text-2); font-size:12.5px; }
+.colhead h2 em{
+  font-family:var(--sans); font-size:11px; font-weight:700;
+  color:var(--text-3); border:none; letter-spacing:0.06em;
+}
+.band:not(.lead) .colhead{ background:none; border-bottom-color:var(--line-strong); }
+
+/* ---------- Tables ---------- */
+
+table.std th{
+  font-family:var(--sans); font-size:10.5px; font-weight:700;
+  letter-spacing:0.08em; text-transform:uppercase; color:var(--text-3);
+  border-bottom:2px solid var(--ink);
+}
+table.std td.nm{ font-family:var(--serif); font-size:16px; font-weight:500; }
+table.std td.nm small{
+  font-family:var(--sans); font-size:11.5px; font-weight:400;
+  letter-spacing:0.01em; color:var(--text-3);
+}
+
+/* ---------- Buttons ---------- */
+
+.btn, .ctabtn, .todoact, .fixbtn, .tabs button{
+  font-family:var(--sans); font-weight:600; letter-spacing:0.01em;
+}
+.btn{ border-radius:0; }
+.tabs button{
+  font-size:13.5px; padding:11px 15px;
+  border-bottom:3px solid transparent; background:none;
+}
+.tabs button.active{
+  background:none; color:var(--text);
+  border-bottom-color:var(--ink);
+}
+.tabs button:hover{ background:var(--paper); }
+
+/* ---------- Navigation ---------- */
+
+.nav a{
+  font-family:var(--sans); font-size:13.5px; font-weight:600;
+  letter-spacing:0.02em; text-transform:uppercase;
+  padding:13px 15px;
+}
+.nav a:first-child{ padding-left:0; }
+
+/* ---------- Articles index ---------- */
+
+a.arow{ border-bottom:1px solid var(--line); background:none; }
+a.arow:hover{ background:var(--paper); }
+a.arow h3{ font-family:var(--serif); font-size:18px; font-weight:600; line-height:1.22; }
+a.arow p{ font-family:var(--sans); font-size:13.5px; color:var(--text-2); }
+a.arow .when{ font-family:var(--sans); font-size:11px; letter-spacing:0.04em; text-transform:uppercase; }
+
+/* ---------- Call to action ---------- */
+
+.herocta{
+  background:none;
+  border:none; border-top:1px solid #23504A;
+  padding:24px 0 0;
+}
+.ctahook{
+  font-family:var(--serif); font-size:clamp(20px, 2.1vw, 27px);
+  font-weight:600; line-height:1.18; letter-spacing:-0.017em; color:#F2F7F5;
+}
+.ctahook em{ font-style:italic; color:#6ED0B6; border-bottom:none; }
+.ctasub{ font-family:var(--sans); font-size:13.5px; color:#9DB7B2; }
+.ctabtn{ background:#6ED0B6; color:#06211C; }
+.ctabtn b{ font-family:var(--sans); }
+
+/* ---------- Footer ---------- */
+
+footer{ border-top:3px solid var(--low); }
+footer p{ font-family:var(--sans); font-size:12.5px; }
+
+/* ---------- Sign-up ---------- */
+
+.joinhero h1{ font-family:var(--serif); letter-spacing:-0.022em; }
+.joinhero h1 em{ font-style:italic; border-bottom:none; color:var(--low); }
+.joinlede{ font-family:var(--serif); font-style:italic; font-weight:400; }
+.joinproof b{ font-family:var(--serif); }
+.whatyouget > h2{
+  background:none; color:var(--text); padding:0 0 8px;
+  border-bottom:2px solid var(--ink);
+  font-family:var(--serif); font-size:19px; letter-spacing:-0.012em;
+}
+.benefit summary{ font-family:var(--serif); font-size:16px; }
+
+/* ---------- Report ---------- */
+
+.rephead h1{ font-family:var(--serif); font-size:27px; }
+.repbrand{ font-family:var(--serif); }
+.repbrand em{ font-style:italic; color:var(--low); }
+.repsec h2{
+  background:none; color:var(--text); padding:0 0 6px;
+  border-bottom:1.5px solid var(--ink); display:block;
+  font-family:var(--sans); font-size:11px; font-weight:700; letter-spacing:0.1em;
+}
+.repstat b{ font-family:var(--serif); }
+
+@media print{
+  .repsec h2{ background:none; color:#000; border-bottom:1pt solid #000; padding:0 0 4pt; }
+}
+
+/* ---------- Details that read as edited ---------- */
+
+.piece{ border-top:3px solid var(--ink); }
+.piece.high{ border-top-color:var(--high); }
+.piece.medium{ border-top-color:var(--med); }
+.piece.low{ border-top-color:var(--low); }
+
+.factbox{ border-left:none; border-top:2px solid var(--ink); background:var(--paper); }
+.factbox h2{ font-family:var(--serif); font-size:18px; }
+.factbox dd{ font-family:var(--sans); }
+
+.notice, .alert, .okbox{ border-radius:0; }
+.notice{ border-left:3px solid var(--ink-3); }
+
+blockquote, .standfirst{ font-family:var(--serif); font-style:italic; }
