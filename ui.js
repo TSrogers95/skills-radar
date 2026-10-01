@@ -64,6 +64,23 @@ function scribbleRing(){
   '</svg>';
 }
 
+/* The wordmark is the page's h1 on the home page, where there is no other
+   heading to carry it. Everywhere else the page's own title is the h1 and
+   the wordmark is just a link, so each page has exactly one h1 describing
+   that page rather than the site. Same appearance either way. */
+function isHomePage(){
+  if(typeof location === 'undefined') return false;
+  const p = location.pathname.replace(/\/+$/, '');
+  return p === '' || /\/index\.html$/.test(p) || p === '/index';
+}
+
+function wordmarkHTML(){
+  const inner = '<a href="index.html">Skills <em>Radar</em></a>';
+  return isHomePage()
+    ? '<h1 class="wordmark">' + inner + '</h1>'
+    : '<p class="wordmark">' + inner + '</p>';
+}
+
 function ctaHTML(){
   const price = (typeof MEMBERSHIP !== 'undefined' && MEMBERSHIP.price) ? MEMBERSHIP.price : '\u00A35';
   const period = (typeof MEMBERSHIP !== 'undefined' && MEMBERSHIP.period) ? MEMBERSHIP.period : 'a month';

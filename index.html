@@ -384,7 +384,12 @@ let currentFilter = 'all', currentQuery = '';
    searching for a standard by name wants its last change whenever it
    happened, not silence. */
 const FEED = allUpdates();
-const FEED_ALL = allUpdatesUnfiltered();
+
+/* Searching reaches into changes older than the feed window. If app.js is an
+   older copy without that function, fall back to the feed rather than
+   throwing, which would take the whole page down with it. One missing
+   helper should cost a feature, not the site. */
+const FEED_ALL = (typeof allUpdatesUnfiltered === 'function') ? allUpdatesUnfiltered() : FEED;
 renderBoard(currentFilter, currentQuery);
 wireCollapse();
 
