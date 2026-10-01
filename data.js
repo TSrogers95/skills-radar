@@ -13,7 +13,7 @@
    automatically when it commits a change.
    ----------------------------------------------------------------------- */
 
-const DATA_UPDATED = "2026-09-26";
+const DATA_UPDATED = "2026-10-01";
 const DATA_SOURCE  = "hand";   // "hand" or "sync"
 
 /* ---------- 1. OCCUPATIONAL ROUTES -------------------------------------
@@ -109,6 +109,15 @@ const ROUTES = {
    ----------------------------------------------------------------------- */
 
 const UPDATES = [
+  {
+    date: "2026-10-01",
+    title: "£2,000 hiring payment opens for non-levy employers",
+    tag: { label: "New payment", tone: "new" },
+    category: "funding-rules", route: "", standard: "", article: "hiring-payment",
+    status: "updated", urgency: "high", pinned: false,
+    summary: "Non-levy employers can claim up to £2,000 for an apprentice aged 16 to 24 whose practical period starts on or after 1 October 2026, where the apprentice joined them in the previous 90 days. Paid in two parts: the first once the apprentice completes 90 days, the second at 365 days, with the apprentice still in learning each time. It is on top of training already fully funded for under-25s at non-levy employers, and it is tied to levy status rather than company size.",
+    url: "https://find-employer-schemes.education.gov.uk/interim/growth-and-skills-levy"
+  },
   {
     date: "2026-09-01",
     title: "Sixteen apprenticeship standards lose funding",
@@ -323,6 +332,32 @@ const UPDATES = [
    ----------------------------------------------------------------------- */
 
 const ARTICLES = [
+  {
+    id: "hiring-payment",
+    date: "2026-10-01",
+    title: "The £2,000 hiring payment: who can actually claim it",
+    standfirst: "It is tied to levy status, not company size, and the ninety-day rule catches people out.",
+    tag: { label: "New payment", tone: "new" },
+    category: "funding-rules", urgency: "high",
+    summary: "Non-levy employers can claim up to £2,000 for an apprentice aged 16 to 24 starting from 1 October 2026. The eligibility test is narrower than it first appears.",
+    body: [
+      "From 1 October 2026 a non-levy-paying employer can claim up to £2,000 when they take on an apprentice aged 16 to 24. It is paid in two parts: the first once the apprentice has completed ninety days, the second at 365 days, and the apprentice has to still be in learning on each occasion.",
+
+      "The condition people miss is at the other end. The apprentice must have joined the employer within the ninety days before the apprenticeship starts. It is a hiring payment in the literal sense, for recruiting someone new, and it does not apply to an existing member of staff being put through an apprenticeship however recently they joined the team.",
+
+      "The second thing worth being precise about is who qualifies. This is tied to levy status, not to company size. An employer with a pay bill under £3 million does not pay the levy and can claim; a larger employer cannot, regardless of how few apprentices they run. The apprenticeship service account checks this against PAYE data, so an account with out-of-date PAYE details can fail the check for an employer who is genuinely eligible.",
+
+      "A non-levy employer using gifted levy funds from another organisation remains eligible, which is not obvious and is worth knowing if you are brokering transfers.",
+
+      "This sits on top of training that is already fully funded for under-25s at non-levy employers since 1 August. For a small employer taking on a nineteen-year-old, the position from October is free training, free assessment, and £2,000 towards the cost of employing them. That is a materially different proposition from a year ago, and it is the strongest recruitment argument providers have had in some time.",
+
+      "For providers the practical action is to check which of your employers are genuinely non-levy, make sure their apprenticeship service accounts have current PAYE information, and get the ninety-day window into your conversations early. An employer who hires in July and starts the apprenticeship in November has missed it by a fortnight, and nobody finds that out until the claim fails."
+    ],
+    sources: [
+      { label: "Growth and Skills Levy, Department for Education", url: "https://find-employer-schemes.education.gov.uk/interim/growth-and-skills-levy" },
+      { label: "Apprenticeship funding rules 2026 to 2027", url: "https://www.gov.uk/guidance/apprenticeship-funding-rules" }
+    ]
+  },
   {
     id: "defunding-16",
     icon: "stop",
@@ -1815,3 +1850,58 @@ ARTICLES.push(
 }
 
 );
+
+/* The payments available this year. These existed only as reference entries
+   in INCENTIVES, which meant someone reading the feed never learned they
+   had come in, and never learned they stack. Each is dated to when it
+   actually changed. */
+UPDATES.push(
+  { date: "2026-08-01",
+    title: "Full funding for apprentices aged 16 to 24 at non-levy employers",
+    tag: { label: "Co-investment removed", tone: "new" },
+    category: "funding-rules", route: "", standard: "",
+    article: "inc-full-funding", status: "updated", urgency: "high", pinned: false,
+    summary: "Employers who do not pay the levy now get 100 per cent government funding for apprentices aged 16 to 24, replacing the 5 per cent co-investment. It applies to starts from 1 August 2026. For apprentices aged 25 and over the 5 per cent co-investment still applies, so age at the start date decides it.",
+    url: "https://www.gov.uk/government/publications/apprenticeship-funding/apprenticeship-funding" },
+
+  { date: "2026-08-01",
+    title: "£1,000 employer payment continues for younger apprentices and care leavers",
+    tag: { label: "Payment unchanged", tone: "info" },
+    category: "funding-rules", route: "", standard: "",
+    article: "inc-additional-payment", status: "updated", urgency: "medium", pinned: false,
+    summary: "Both the employer and the provider receive £1,000 for an apprentice aged 16 to 18, or aged 19 to 24 with an education, health and care plan or care experience. Paid in two equal instalments at day 90 and one year in, or at day 242 where the apprenticeship runs under twelve months. It is separate from the hiring payment and from full funding, so one apprentice can attract more than one.",
+    url: "https://www.gov.uk/government/publications/apprenticeship-funding/apprenticeship-funding" },
+
+  { date: "2026-08-01",
+    title: "Care leavers' bursary: providers must now ask every apprentice under 25",
+    tag: { label: "Rule clarified", tone: "info" },
+    category: "funding-rules", route: "", standard: "",
+    article: "inc-care-leavers", status: "updated", urgency: "medium", pinned: false,
+    summary: "The £3,000 bursary for apprentices who are care leavers or still in care is unchanged, but the rules now require providers to give every apprentice aged 24 or under the chance to say whether they are eligible, and to record that as part of initial assessment evidence. It is paid to the apprentice in three instalments and does not affect the employer's £1,000 payment for the same person.",
+    url: "https://www.gov.uk/guidance/apprenticeship-bursary-for-care-leavers" },
+
+  { date: "2026-08-01",
+    title: "£2,000 incentive for foundation apprenticeships, first payments from January 2027",
+    tag: { label: "New payment", tone: "new" },
+    category: "funding-rules", route: "", standard: "",
+    article: "inc-foundation-incentive", status: "upcoming", urgency: "medium", pinned: false,
+    summary: "Employers taking on an eligible foundation apprenticeship receive up to £2,000, for apprentices aged 16 to 21, or under 25 with an education, health and care plan, care experience, or prison leaver status. Paid in three instalments at day 90, day 242, and when the apprentice progresses onto their next apprenticeship. The earliest payments land in January 2027.",
+    url: "https://www.gov.uk/government/publications/resources-for-promoting-the-growth-and-skills-levy/growth-and-skills-levy-accessible-version-of-gsl-reforms-factsheet" }
+);
+
+ARTICLES.push({
+  id: "inc-foundation-incentive",
+  date: "2026-08-01",
+  title: "The £2,000 foundation apprenticeship incentive",
+  standfirst: "A new payment for employers taking on a foundation apprentice, with the first instalments landing in January 2027.",
+  category: "funding-rules", route: "", urgency: "medium",
+  summary: "Up to £2,000 for employers taking on an eligible foundation apprenticeship, paid in three instalments, with the last tied to the apprentice progressing onto a full apprenticeship.",
+  body: [
+    "Foundation apprenticeships are the shorter programmes, around eight months, introduced in April 2026 as a route into a full apprenticeship. From August 2026 employers taking one on can claim up to £2,000.",
+    "It applies to apprentices aged 16 to 21, or under 25 where they have an education, health and care plan, care experience, or are a prisoner or prison leaver. The payment goes to the employer through the training provider, and is not taken from a levy account.",
+    "The structure is different from the other payments, and worth understanding before you plan around it. It comes in three instalments: at day 90, at day 242, and a final one when the apprentice progresses onto their next apprenticeship. That last instalment is conditional on progression actually happening, so it is not money you can count on at the point of hiring.",
+    "The earliest payments land in January 2027, because of the day-90 rule applied to the first eligible starts.",
+    "It stacks with the other support available. A foundation apprentice can also attract the £1,000 additional payment where they are 16 to 18 or meet the other criteria, and training is already fully funded for under-25s at non-levy employers."
+  ],
+  source: { name: "Growth and Skills Levy reforms factsheet", url: "https://www.gov.uk/government/publications/resources-for-promoting-the-growth-and-skills-levy/growth-and-skills-levy-accessible-version-of-gsl-reforms-factsheet" }
+});
