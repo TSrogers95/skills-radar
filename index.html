@@ -126,7 +126,7 @@
 
 <footer>
   <div class="wrap">
-    <p>Skills Radar is maintained by hand from the Skills England apprenticeship register, the Skills England occupational maps, and GOV.UK apprenticeship funding and T-Level guidance. Every entry links to its source. Always check the source before acting on a compliance deadline.</p>
+    <p>Skills Radar is built from the Skills England apprenticeship register and occupational maps, taken directly from their published API and data downloads, together with the GOV.UK apprenticeship funding rules and T-Level guidance. The register and the occupational maps refresh weekly. Funding rules and analysis are read and written up as they are published. Every entry links to its source, and you should check that source before acting on a compliance deadline.</p>
   </div>
     <div class="wrap"><p class="legal"><a href="privacy.html">Privacy notice</a> &middot; <a href="terms.html">Terms</a> &middot; <a href="account.html">Members</a></p>
       <div class="attribution"><a href="https://www.gov.uk/government/organisations/skills-england" target="_blank" rel="noopener" class="selogo"><img src="https://occupational-maps.skillsengland.education.gov.uk/media/cyropis5/skills-england_lesser_arms_landscape-se-logo-white.svg" alt="Skills England" width="150" height="40" loading="lazy"></a><p>Contains data from Skills England. &copy; Skills England 2026. This information is licensed under the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3" target="_blank" rel="noopener">Open Government Licence v3.0</a>. Funding rules content is Crown copyright, also under the Open Government Licence.</p></div></div>
@@ -145,26 +145,13 @@
 const LAST = lastUpdated();
 
 document.getElementById('heroblock').innerHTML = titleBlockHTML(
-  '<strong>Data reviewed ' + (LAST.date ? fmtLong(LAST.date) : 'unknown') + '</strong>' +
-  '<span class="agenote" id="agenote"></span>',
+  '<strong>Updated ' + (LAST.date ? fmtLong(LAST.date) : 'unknown') + '</strong>',
   true
 );
 document.getElementById('navslot').innerHTML = navHTML('index.html');
 document.getElementById('navmain').innerHTML = navHTML('index.html');
 
-/* Say plainly how old the data is. A site that quietly looks live while
-   running on months-old data is worse than one that admits its age. */
-(function(){
-  const el = document.getElementById('agenote');
-  if(!el || !LAST.date) return;
-  const days = Math.floor(daysAgo(LAST.date));
-  const via  = LAST.by ? ' · ' + LAST.by : '';
 
-  if(days <= 1){ el.textContent = 'Updated today' + via; return; }
-  if(days <= 10){ el.textContent = days + ' days ago' + via; return; }
-  el.textContent = days + ' days ago, may be out of date' + via;
-  el.classList.add('stale');
-})();
 
 /* The counters are computed from exactly the same tests the board uses,
    so the number at the top always equals the number in the column. */
