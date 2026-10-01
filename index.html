@@ -433,7 +433,12 @@ document.querySelectorAll('.tabs button').forEach(btn => {
   const box = document.getElementById('joinprompt');
   if(!box) return;
 
-  try { if(sessionStorage.getItem('sr-prompt-closed') === '1') return; } catch(e){}
+  /* ?prompt=1 forces it, which is how you check it without clearing storage
+     or opening a private window. */
+  const forced = /[?&]prompt=1/.test(location.search);
+  if(!forced){
+    try { if(sessionStorage.getItem('sr-prompt-closed') === '1') return; } catch(e){}
+  }
 
   const count = document.getElementById('jpcount');
   if(count && typeof FEED !== 'undefined') count.textContent = FEED.length;
@@ -464,9 +469,19 @@ document.querySelectorAll('.tabs button').forEach(btn => {
     }
   }
 
-  /* Signed-in visitors are not prospects. */
+  /* Signed-in visitors are not prospects, so they never see it. Worth
+     knowing when testing: if you are signed in as an admin on your own site,
+     this is why nothing appears. Add ?prompt=1 to see it anyway. */
+  if(forced){
+    window.addEventListener('scroll', check, { passive: true });
+    check();
+    return;
+  }
+
   if(typeof accountsLive === 'function' && accountsLive() && typeof currentUser === 'function'){
-    currentUser().then(u => { if(!u) window.addEventListener('scroll', check, { passive: true }); });
+    currentUser()
+      .then(u => { if(!u) window.addEventListener('scroll', check, { passive: true }); })
+      .catch(() => window.addEventListener('scroll', check, { passive: true }));
   } else {
     window.addEventListener('scroll', check, { passive: true });
   }

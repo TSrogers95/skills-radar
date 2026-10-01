@@ -4775,3 +4775,45 @@ blockquote, .standfirst{ font-family:var(--serif); font-style:italic; }
 /* The prompt's header rule stays mint, so the brand is still present even
    though the button is not. */
 .jptop{ border-top-color:#6ED0B6; }
+
+
+/* ---------- The accent phrase, underlined ----------
+
+   Underlining "personalised feed" does what the rule under the wordmark
+   does: it marks the two words that carry the promise. Drawn as a border
+   rather than text-decoration so the weight and the gap are controlled.
+*/
+
+.herocta .ctahook em{
+  font-style:normal; font-weight:600; color:#6ED0B6;
+  border-bottom:2px solid #6ED0B6;
+  padding-bottom:2px;
+}
+
+/* ---------- The action colour, second attempt ----------
+
+   White read as cold on the dark masthead. This is the deep green instead:
+   still unmistakably a button, still outside the mint used for the brand
+   accent, and warm enough against the ink that it looks deliberate rather
+   than borrowed from the system.
+*/
+
+.herocta .ctabtn,
+.gcta .btn:not(.ghost),
+.demobtns .ctabtn{
+  background:#0E8A74;
+  color:#FFFFFF;
+  border:1px solid #0E8A74;
+  font-weight:600;
+}
+.herocta .ctabtn:hover,
+.gcta .btn:not(.ghost):hover,
+.demobtns .ctabtn:hover{
+  background:#12A88C;
+  border-color:#12A88C;
+  color:#FFFFFF;
+}
+
+/* On light grounds the ink button stays: it has the contrast, and a green
+   button on paper would sit too close to the "for information" green used
+   in the feed. */
