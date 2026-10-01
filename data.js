@@ -1894,7 +1894,8 @@ ARTICLES.push({
   date: "2026-08-01",
   title: "The £2,000 foundation apprenticeship incentive",
   standfirst: "A new payment for employers taking on a foundation apprentice, with the first instalments landing in January 2027.",
-  category: "funding-rules", route: "", urgency: "medium",
+  tag: { label: "New payment", tone: "new" },
+  category: "funding-rules", urgency: "medium",
   summary: "Up to £2,000 for employers taking on an eligible foundation apprenticeship, paid in three instalments, with the last tied to the apprentice progressing onto a full apprenticeship.",
   body: [
     "Foundation apprenticeships are the shorter programmes, around eight months, introduced in April 2026 as a route into a full apprenticeship. From August 2026 employers taking one on can claim up to £2,000.",
@@ -1903,5 +1904,5 @@ ARTICLES.push({
     "The earliest payments land in January 2027, because of the day-90 rule applied to the first eligible starts.",
     "It stacks with the other support available. A foundation apprentice can also attract the £1,000 additional payment where they are 16 to 18 or meet the other criteria, and training is already fully funded for under-25s at non-levy employers."
   ],
-  source: { name: "Growth and Skills Levy reforms factsheet", url: "https://www.gov.uk/government/publications/resources-for-promoting-the-growth-and-skills-levy/growth-and-skills-levy-accessible-version-of-gsl-reforms-factsheet" }
+  sources: [{ name: "Growth and Skills Levy reforms factsheet", url: "https://www.gov.uk/government/publications/resources-for-promoting-the-growth-and-skills-levy/growth-and-skills-levy-accessible-version-of-gsl-reforms-factsheet" }]
 });
