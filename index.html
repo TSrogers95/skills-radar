@@ -385,6 +385,22 @@ let currentFilter = 'all', currentQuery = '';
    happened, not silence. */
 const FEED = allUpdates();
 
+/* A change that comes into force today gets said so, once, above the board.
+   Tomorrow it is an ordinary recent item and this disappears on its own. */
+(function today(){
+  const strip = document.getElementById('todaystrip');
+  if(!strip || typeof liveToday !== 'function') return;
+  const live = liveToday();
+  if(!live.length) return;
+
+  strip.innerHTML = live.map(u =>
+    '<a class="todaybar" href="' + (u.article ? 'a/' + u.article + '.html' : '#') + '">' +
+      '<span class="tbflag">In force today</span>' +
+      '<span class="tbtitle">' + u.title + '</span>' +
+      '<span class="tbmore">What it means &rarr;</span>' +
+    '</a>').join('');
+})();
+
 /* Searching reaches into changes older than the feed window. If app.js is an
    older copy without that function, fall back to the feed rather than
    throwing, which would take the whole page down with it. One missing

@@ -314,6 +314,14 @@ function placeByDate(u){
   return u;
 }
 
+/* Anything that takes effect today. Worth surfacing on the day: a change
+   that came into force this morning is the one thing a visitor most needs to
+   see, and by tomorrow it is just another recent item. */
+function liveToday(){
+  const today = new Date().toISOString().slice(0, 10);
+  return allUpdatesUnfiltered().filter(u => u.date === today);
+}
+
 /* What the feed shows: changes still current, and anything still ahead. */
 function allUpdates(){
   return allUpdatesUnfiltered()
