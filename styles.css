@@ -4171,3 +4171,27 @@ blockquote, .standfirst{ font-family:var(--serif); font-style:italic; }
   .herocta{ margin-top:18px; padding-top:18px; }
   .wordmark{ font-size:38px; }
 }
+
+/* ---------- Admin: who delivers what ---------- */
+
+.delivers{ max-width:280px; }
+.dchip{
+  display:inline-block; font-family:var(--sans); font-size:11px;
+  background:var(--paper); border:1px solid var(--line-strong);
+  padding:2px 7px; margin:0 4px 4px 0; color:var(--text-2);
+}
+.dchip.more{ background:var(--ink); color:#fff; border-color:var(--ink); }
+.delivers small{ display:block; font-size:11px; color:var(--text-3); margin-top:2px; }
+
+.audlist{ margin-top:4px; }
+.audgroup{ background:var(--surface); border:1px solid var(--line); margin-bottom:6px; }
+.audgroup summary{
+  display:flex; align-items:center; justify-content:space-between; gap:14px;
+  cursor:pointer; list-style:none; padding:14px 18px;
+}
+.audgroup summary::-webkit-details-marker{ display:none; }
+.audgroup summary:hover{ background:var(--paper); }
+.audname{ font-family:var(--serif); font-size:16px; font-weight:500; }
+.audcount{ font-size:12px; color:var(--text-3); white-space:nowrap; }
+.audgroup[open] summary{ border-bottom:1px solid var(--line); background:var(--paper); }
+.audbody{ padding:16px 18px 18px; }

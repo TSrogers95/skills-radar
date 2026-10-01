@@ -868,8 +868,8 @@ function emailView(){
   }
 
   return '<div class="pagehead"><h1>Email lists</h1>' +
-    '<p>Download the addresses and send from wherever you write the newsletter. ' +
-    'Nothing is sent from this site.</p></div>' +
+    '<p>Who to write to, and what to write to them about. Grouped by the standards people deliver, ' +
+    'because that is the thing they signed up to hear about.</p></div>' +
     '<div id="maillists"><p class="hint">Loading…</p></div>';
 }
 
@@ -878,74 +878,82 @@ async function loadEmails(){
   if(!el || !accountsLive()) return;
 
   const out = await adminFetch('members');
-  if(!out || out.failed || !out.members){
-    el.innerHTML = failureHTML(out, 'the email lists');
-    return;
-  }
+  if(!out || out.failed || !out.members){ el.innerHTML = failureHTML(out, 'the member list'); return; }
+
+  const aud = await adminFetch('audience');
+  const groups = (aud && aud.groups) ? aud.groups : [];
 
   const all = out.members;
   const optedIn = all.filter(m => !m.email_opt_out);
   const optedOut = all.filter(m => m.email_opt_out);
-  const paying = optedIn.filter(m => ['active','trialing'].indexOf(m.subscription.status) > -1);
+  const noCohort = all.filter(m => !m.cohort || !m.cohort.length);
 
   el.innerHTML =
     '<div class="mgrid">' +
-      '<div class="mcard cool"><div class="n">' + optedIn.length + '</div><div class="l">Newsletter list</div></div>' +
-      '<div class="mcard"><div class="n">' + paying.length + '</div><div class="l">Of those, paying</div></div>' +
-      '<div class="mcard warm"><div class="n">' + optedOut.length + '</div><div class="l">Opted out</div></div>' +
+      '<div class="mcard cool"><div class="n">' + optedIn.length + '</div><div class="l">Opted in</div></div>' +
+      '<div class="mcard"><div class="n">' + groups.length + '</div><div class="l">Standards covered</div></div>' +
+      '<div class="mcard warm"><div class="n">' + noCohort.length + '</div><div class="l">No cohort set</div></div>' +
       '<div class="mcard"><div class="n">' + all.length + '</div><div class="l">All accounts</div></div>' +
     '</div>' +
 
-    '<div class="grouphead"><h2>Newsletter list</h2><div class="rule"></div></div>' +
-    '<div class="todolist">' +
-      '<div class="todo watch"><div class="todotext"><h3>' + optedIn.length + ' addresses</h3>' +
-      '<p>Everyone who has not opted out. This is the list to use for the newsletter and for anything else ' +
-      'that counts as marketing.</p></div>' +
-      '<div class="mailbtns">' +
-        '<button class="todoact" data-dl="news-csv">CSV</button>' +
-        '<button class="todoact" data-dl="news-copy">Copy addresses</button>' +
-      '</div></div>' +
+    (noCohort.length
+      ? '<div class="notice"><b>' + noCohort.length + ' member' + (noCohort.length === 1 ? ' has' : 's have') +
+        ' not chosen any standards yet.</b> They cannot receive a personalised digest, because there is nothing ' +
+        'to personalise it from. Worth a one-off email asking them to set their cohort, which is the single ' +
+        'thing that makes the rest of the product work for them.</div>'
+      : '') +
 
-      '<div class="todo stop"><div class="todotext"><h3>All accounts, ' + all.length + ' addresses</h3>' +
-      '<p>Everyone, including the ' + optedOut.length + ' who opted out. Use this only for messages about ' +
-      'someone&rsquo;s account: a payment failing, a change to the terms, the site closing. ' +
-      'Sending marketing to this list would breach PECR.</p></div>' +
-      '<div class="mailbtns">' +
-        '<button class="todoact" data-dl="all-csv">CSV</button>' +
-      '</div></div>' +
+    '<div class="grouphead"><h2>Who to write to about what</h2><div class="rule"></div>' +
+      '<span class="hint" style="margin:0">Members grouped by the standards they deliver</span></div>' +
+
+    (groups.length
+      ? '<div class="audlist">' +
+          groups.map((g, i) =>
+            '<details class="audgroup">' +
+              '<summary>' +
+                '<span class="audname">L' + g.level + ' ' + g.standard + '</span>' +
+                '<span class="audcount">' + g.members.length + ' member' + (g.members.length === 1 ? '' : 's') +
+                  ' &middot; ' + g.apprentices + ' apprentice' + (g.apprentices === 1 ? '' : 's') + '</span>' +
+              '</summary>' +
+              '<div class="audbody">' +
+                '<div class="addrow" style="margin:0 0 12px">' +
+                  '<button class="btn small" data-grp="' + i + '" data-act="copy">Copy ' + g.optedIn + ' addresses</button>' +
+                  '<button class="btn small ghost" data-grp="' + i + '" data-act="csv">CSV</button>' +
+                  '<span class="hint" style="align-self:center;margin:0">Opted-in members only</span>' +
+                '</div>' +
+                '<table class="std"><thead><tr><th>Email</th><th>Organisation</th><th class="num">Apprentices</th><th>Newsletter</th></tr></thead><tbody>' +
+                  g.members.map(m => '<tr><td class="nm">' + m.email + '</td>' +
+                    '<td>' + (m.org || '&mdash;') + '</td>' +
+                    '<td class="num">' + m.count + '</td>' +
+                    '<td>' + (m.optedIn ? '<span class="ctag new">in</span>' : '<span class="ctag stop">out</span>') + '</td></tr>').join('') +
+                '</tbody></table>' +
+              '</div>' +
+            '</details>').join('') +
+        '</div>'
+      : '<p class="hint">No members have chosen standards yet.</p>') +
+
+    '<div class="grouphead"><h2>Whole-list exports</h2><div class="rule"></div></div>' +
+    '<div class="todolist">' +
+      '<div class="todo watch"><div class="todotext"><h3>Opted in, with their standards</h3>' +
+      '<p>' + optedIn.length + ' addresses, each row listing the standards that member delivers and how many ' +
+      'apprentices are on each. This is the file to work from when writing anything targeted.</p></div>' +
+      '<div class="mailbtns"><button class="todoact" data-dl="news-csv">CSV</button>' +
+      '<button class="todoact" data-dl="news-copy">Copy addresses</button></div></div>' +
+
+      '<div class="todo stop"><div class="todotext"><h3>All accounts</h3>' +
+      '<p>Everyone, including the ' + optedOut.length + ' who opted out. Account messages only: a payment ' +
+      'failing, a change to the terms. Marketing to this list would breach PECR.</p></div>' +
+      '<div class="mailbtns"><button class="todoact" data-dl="all-csv">CSV</button></div></div>' +
     '</div>' +
 
     '<div id="mailout"></div>' +
 
-    '<div class="grouphead"><h2>Members</h2><div class="rule"></div></div>' +
-    '<div style="max-height:360px;overflow-y:auto;border:1px solid var(--line)">' +
-    '<table class="std"><thead><tr><th>Email</th><th>Organisation</th><th>Newsletter</th><th>Status</th></tr></thead><tbody>' +
-    all.map(m => '<tr><td class="nm">' + m.email + '</td>' +
-      '<td>' + (m.org_name || ',') + '</td>' +
-      '<td>' + (m.email_opt_out
-        ? '<span class="ctag stop">opted out</span>'
-        : '<span class="ctag new">' + (m.frequency || 'monthly') + '</span>') + '</td>' +
-      '<td>' + statusTag(m.subscription) + '</td></tr>').join('') +
-    '</tbody></table></div>' +
-
-    '<div class="grouphead"><h2>Sending it</h2><div class="rule"></div></div>' +
-    '<div class="readgrid" style="margin-top:0">' +
-      '<div class="readcard"><a href="https://buttondown.com" target="_blank" rel="noopener">Buttondown</a>' +
-        '<p>Free to 100 subscribers. Built for writing rather than marketing, which suits a weekly policy note. ' +
-        'Paste the CSV straight in.</p></div>' +
-      '<div class="readcard"><a href="https://www.mailerlite.com" target="_blank" rel="noopener">MailerLite</a>' +
-        '<p>Free to 1,000. Worth it if you want to segment by route or standard later.</p></div>' +
-      '<div class="readcard"><a href="https://mail.google.com" target="_blank" rel="noopener">Your inbox</a>' +
-        '<p>Under about thirty members, BCC from ' + (typeof CONTACT !== 'undefined' ? CONTACT.email : 'your address') +
-        ' is perfectly respectable and costs nothing.</p></div>' +
-    '</div>' +
-
     '<div class="notice" style="margin-top:20px"><b>What every newsletter has to carry.</b> ' +
     'A working unsubscribe link, your organisation&rsquo;s name, and a postal address. That is PECR, not etiquette. ' +
-    'When somebody unsubscribes at the mailing service, tick their opt-out here too, otherwise the next export ' +
-    'puts them straight back on the list.</div>';
+    'When somebody unsubscribes at the mailing service, tick their opt-out here too, or the next export puts ' +
+    'them straight back on the list.</div>';
 
-  wireEmail(el, optedIn, all);
+  wireEmail(el, optedIn, all, groups);
 }
 
 function wireEmail(el, optedIn, all){
@@ -971,6 +979,26 @@ function wireEmail(el, optedIn, all){
   };
 
   const stamp = new Date().toISOString().slice(0, 10);
+
+  /* Per-standard actions: the list for one change, rather than everyone. */
+  el.querySelectorAll('[data-grp]').forEach(b => b.addEventListener('click', () => {
+    const g = groups[+b.dataset.grp];
+    if(!g) return;
+    const inOnly = g.members.filter(m => m.optedIn);
+
+    if(b.dataset.act === 'copy'){
+      navigator.clipboard.writeText(inOnly.map(m => m.email).join(', '));
+      b.textContent = 'Copied';
+      setTimeout(() => { b.textContent = 'Copy ' + inOnly.length + ' addresses'; }, 1600);
+      note(inOnly.length + ' addresses for L' + g.level + ' ' + g.standard +
+        ', comma separated. Paste into BCC, never To or Cc.');
+    }
+    if(b.dataset.act === 'csv'){
+      download(groupCsv({ members: inOnly }),
+        'skills-radar-' + g.standard.toLowerCase().replace(/[^a-z0-9]+/g,'-') + '-' + stamp + '.csv');
+      note(inOnly.length + ' members who deliver L' + g.level + ' ' + g.standard + ' downloaded.');
+    }
+  }));
 
   el.querySelectorAll('[data-dl]').forEach(b => b.addEventListener('click', () => {
     const what = b.dataset.dl;

@@ -25,14 +25,63 @@ module.exports = async function handler(req, res){
     if(what === 'members'){
       const profiles = await admin('profiles?select=id,email,org_name,member_type,levy_payer,routes,frequency,email_opt_out,is_admin,created_at&order=created_at.desc');
       const subs = await admin('subscriptions?select=user_id,status,current_period_end,cancel_at_period_end');
+
+      /* What each member actually delivers. Without this the member list
+         tells you who to email and nothing about what to say to them, which
+         is the thing that makes a personalised newsletter possible. */
+      const standards = await admin('member_standards?select=user_id,standard_name,level,head_count');
+
       const byUser = {};
       (subs || []).forEach(s => { byUser[s.user_id] = s; });
+
+      const cohortBy = {};
+      (standards || []).forEach(s => {
+        (cohortBy[s.user_id] = cohortBy[s.user_id] || []).push({
+          name: s.standard_name, level: s.level, count: s.head_count || 0
+        });
+      });
 
       return res.status(200).json({
         members: (profiles || []).map(p => ({
           ...p,
-          subscription: byUser[p.id] || { status: 'none' }
+          subscription: byUser[p.id] || { status: 'none' },
+          cohort: cohortBy[p.id] || [],
+          apprentices: (cohortBy[p.id] || []).reduce((n, s) => n + s.count, 0)
         }))
+      });
+    }
+
+    /* The audience grouped by what they deliver. This is the view that
+       answers "who do I write to about this change", which is the question
+       the member list could not answer. */
+    if(what === 'audience'){
+      const profiles = await admin('profiles?select=id,email,org_name,email_opt_out,deleted_at');
+      const standards = await admin('member_standards?select=user_id,standard_name,level,head_count');
+      const subs = await admin('subscriptions?select=user_id,status');
+
+      const live = new Set((subs || [])
+        .filter(s => ['active','trialing','past_due'].indexOf(s.status) > -1)
+        .map(s => s.user_id));
+      const prof = {};
+      (profiles || []).forEach(p => { if(!p.deleted_at) prof[p.id] = p; });
+
+      const groups = {};
+      (standards || []).forEach(s => {
+        const p = prof[s.user_id];
+        if(!p) return;
+        const key = 'L' + s.level + ' ' + s.standard_name;
+        const g = groups[key] = groups[key] || {
+          standard: s.standard_name, level: s.level,
+          members: [], apprentices: 0, optedIn: 0
+        };
+        g.members.push({ email: p.email, org: p.org_name || '', count: s.head_count || 0,
+                         optedIn: !p.email_opt_out, paying: live.has(p.id) });
+        g.apprentices += (s.head_count || 0);
+        if(!p.email_opt_out) g.optedIn++;
+      });
+
+      return res.status(200).json({
+        groups: Object.values(groups).sort((a, b) => b.members.length - a.members.length)
       });
     }
 
