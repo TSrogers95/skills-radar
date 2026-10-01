@@ -77,6 +77,7 @@
         <button data-view="import">Import data</button>
         <span class="tabsep" aria-hidden="true"></span>
         <button data-view="email">Email lists</button>
+        <button data-view="brand">Brand</button>
       </div>
     </div>
   </div>
@@ -257,6 +258,7 @@ function render(){
   if(view === 'members'){ p.innerHTML = membersView(); loadMembers(p); }
   if(view === 'content'){ p.innerHTML = contentView(); wireRemove(p); }
   if(view === 'email'){   p.innerHTML = emailView(); loadEmails(); }
+  if(view === 'brand'){   p.innerHTML = brandView();  wireBrand(p); }
   if(view === 'write'){   p.innerHTML = writeView(); wireWrite(p); }
   if(view === 'import')   renderImportTool(p);
   window.scrollTo({ top:0, behavior:'smooth' });
@@ -845,6 +847,207 @@ function removeArticle(id){
     document.getElementById('removeout').innerHTML = '';
   });
   document.getElementById('removeout').scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+/* =========================================================================
+   BRAND
+
+   Everything needed to put the mark on something that is not this site: a
+   deck, an invoice, a LinkedIn banner, a letterhead.
+
+   The logos are drawn as SVG rather than stored as image files, which means
+   they are sharp at any size, weigh almost nothing, and cannot drift out of
+   step with the site. Each downloads as a real .svg; the colour values
+   copy to the clipboard.
+   ========================================================================= */
+
+const BRAND = {
+  ink:   '#0D1B1E',
+  teal:  '#6ED0B6',
+  deep:  '#10796A',
+  paper: '#FAF9F6',
+  line:  '#E4E0D6',
+  text:  '#152023',
+  high:  '#B3261E',
+  med:   '#A96A06'
+};
+
+/* One function draws every variant. Horizontal or square, light ground or
+   dark, so the four files are guaranteed to stay consistent with each
+   other. */
+function logoSVG(shape, mode, forDownload){
+  const dark = mode === 'dark';
+  const bg   = dark ? BRAND.ink : BRAND.paper;
+  const word = dark ? '#FFFFFF' : BRAND.text;
+  const mark = dark ? BRAND.teal : BRAND.deep;
+
+  /* The radar: three arcs and a sweep, open to the right. Simple enough to
+     read at favicon size, which is the test any mark has to pass. */
+  const radar = (cx, cy, r) =>
+    '<g fill="none" stroke="' + mark + '" stroke-linecap="round">' +
+      '<path d="M' + cx + ' ' + (cy - r) + ' A ' + r + ' ' + r + ' 0 1 1 ' + (cx - 0.001) + ' ' + (cy - r) + '" ' +
+        'stroke-width="' + (r * 0.1) + '" opacity="0.28"/>' +
+      '<path d="M' + cx + ' ' + (cy - r * 0.64) + ' A ' + (r * 0.64) + ' ' + (r * 0.64) + ' 0 1 1 ' + (cx - 0.001) + ' ' + (cy - r * 0.64) + '" ' +
+        'stroke-width="' + (r * 0.1) + '" opacity="0.45"/>' +
+      '<path d="M' + cx + ' ' + cy + ' L ' + (cx + r * 0.92) + ' ' + (cy - r * 0.52) + '" stroke-width="' + (r * 0.13) + '"/>' +
+      '<circle cx="' + cx + '" cy="' + cy + '" r="' + (r * 0.13) + '" fill="' + mark + '" stroke="none"/>' +
+    '</g>';
+
+  const open = (w, h) =>
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + w + ' ' + h + '" width="' + w + '" height="' + h + '">' +
+    (forDownload
+      ? '<style>text{font-family:Newsreader,Georgia,serif}</style>'
+      : '') +
+    '<rect width="' + w + '" height="' + h + '" fill="' + bg + '"/>';
+
+  if(shape === 'square'){
+    return open(400, 400) +
+      radar(200, 150, 78) +
+      '<text x="200" y="300" text-anchor="middle" font-family="Newsreader, Georgia, serif" ' +
+        'font-size="60" font-weight="700" letter-spacing="-2.4" fill="' + word + '">Skills</text>' +
+      '<text x="200" y="356" text-anchor="middle" font-family="Newsreader, Georgia, serif" ' +
+        'font-size="60" font-weight="400" font-style="italic" letter-spacing="-2" fill="' + mark + '">Radar</text>' +
+    '</svg>';
+  }
+
+  return open(760, 200) +
+    radar(104, 100, 60) +
+    '<text x="196" y="122" font-family="Newsreader, Georgia, serif" font-size="68" ' +
+      'font-weight="700" letter-spacing="-2.8" fill="' + word + '">Skills</text>' +
+    '<text x="196" y="122" font-family="Newsreader, Georgia, serif" font-size="68" ' +
+      'font-weight="400" font-style="italic" letter-spacing="-2.4" fill="' + mark + '" dx="186">Radar</text>' +
+  '</svg>';
+}
+
+function brandView(){
+  const swatch = (name, hex, note) =>
+    '<button class="swatch" data-hex="' + hex + '">' +
+      '<span class="sw" style="background:' + hex + '"></span>' +
+      '<span class="swname">' + name + '</span>' +
+      '<span class="swhex">' + hex + '</span>' +
+      '<span class="swnote">' + note + '</span>' +
+    '</button>';
+
+  const logoCard = (shape, mode) =>
+    '<div class="logocard ' + mode + '">' +
+      '<div class="logoart">' + logoSVG(shape, mode, false) + '</div>' +
+      '<div class="logofoot">' +
+        '<b>' + (shape === 'square' ? 'Square' : 'Horizontal') + ', ' +
+          (mode === 'dark' ? 'dark ground' : 'light ground') + '</b>' +
+        '<button class="todoact" data-logo="' + shape + '-' + mode + '">Download SVG</button>' +
+      '</div>' +
+    '</div>';
+
+  return '<div class="pagehead"><h1>Brand</h1>' +
+    '<p>The mark, the colours and the type, in a form you can put on something that is not this site. ' +
+    'Everything here is drawn rather than stored, so it is sharp at any size and always matches the live site.</p></div>' +
+
+    '<div class="grouphead" style="margin-top:0"><h2>The mark</h2><div class="rule"></div>' +
+      '<span class="hint" style="margin:0">SVG, so it scales to a billboard without blurring</span></div>' +
+
+    '<div class="logogrid">' +
+      logoCard('horizontal', 'dark') +
+      logoCard('horizontal', 'light') +
+      logoCard('square', 'dark') +
+      logoCard('square', 'light') +
+    '</div>' +
+
+    '<div class="notice"><b>Which to use.</b> ' +
+    'Horizontal for anything with a header: a letterhead, a slide, an email signature, a LinkedIn banner. ' +
+    'Square for anything that crops to a circle or a tile: a profile picture, an app icon, a favicon. ' +
+    'Dark ground is the default and the one that looks like the site. Use light only where a dark block would ' +
+    'fight the page.</div>' +
+
+    '<div class="grouphead"><h2>Colours</h2><div class="rule"></div>' +
+      '<span class="hint" style="margin:0">Click to copy</span></div>' +
+
+    '<div class="swatches">' +
+      swatch('Ink', BRAND.ink, 'Backgrounds, headings, the masthead') +
+      swatch('Teal', BRAND.teal, 'The accent. On dark only') +
+      swatch('Deep green', BRAND.deep, 'The accent on light grounds, and buttons') +
+      swatch('Paper', BRAND.paper, 'Page background') +
+      swatch('Line', BRAND.line, 'Rules and borders') +
+      swatch('Text', BRAND.text, 'Body copy on light') +
+      swatch('Red', BRAND.high, 'Act now. Sparingly') +
+      swatch('Amber', BRAND.med, 'Plan ahead') +
+    '</div>' +
+
+    '<div class="notice"><b>One rule about the teal.</b> ' +
+    'It does not have enough contrast on a light background to be readable. On white or paper, use the deep ' +
+    'green instead. Teal is for dark grounds only, which is why the site uses it almost entirely inside the ' +
+    'masthead.</div>' +
+
+    '<div class="grouphead"><h2>Type</h2><div class="rule"></div></div>' +
+
+    '<div class="typegrid">' +
+      '<div class="typecard">' +
+        '<p class="tspec">Newsreader &middot; headlines, articles, anything editorial</p>' +
+        '<p class="tsample serif">Sixteen standards lose funding</p>' +
+        '<p class="tsample serif small">Regular, medium, semibold. Use the italic for standfirsts and ' +
+        'publication titles, and nothing else.</p>' +
+        '<a class="todoact" href="https://fonts.google.com/specimen/Newsreader" target="_blank" rel="noopener">Get it free &nearr;</a>' +
+      '</div>' +
+      '<div class="typecard">' +
+        '<p class="tspec">Public Sans &middot; interface, tables, labels, buttons</p>' +
+        '<p class="tsample sans">348 hours off-the-job</p>' +
+        '<p class="tsample sans small">Regular, medium, semibold, bold. Labels and kickers go uppercase ' +
+        'at 10 to 11px with wide letter spacing.</p>' +
+        '<a class="todoact" href="https://fonts.google.com/specimen/Public+Sans" target="_blank" rel="noopener">Get it free &nearr;</a>' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="notice"><b>If you cannot load them.</b> ' +
+    'In Word, PowerPoint or anywhere else without web fonts: Georgia in place of Newsreader, Arial or ' +
+    'Calibri in place of Public Sans. Both are close enough in proportion that a document still looks related ' +
+    'to the site.</div>' +
+
+    '<div class="grouphead"><h2>Writing</h2><div class="rule"></div></div>' +
+    '<div class="todolist">' +
+      '<div class="todo watch"><div class="todotext"><h3>No em dashes</h3>' +
+      '<p>A comma, a colon or a full stop instead. They are the clearest tell of machine-written copy and ' +
+      'the site removes them on import.</p></div></div>' +
+      '<div class="todo watch"><div class="todotext"><h3>Italics mean something</h3>' +
+      '<p>A publication title, a standfirst, or real emphasis inside a sentence. Not for decoration and not ' +
+      'for whole paragraphs.</p></div></div>' +
+      '<div class="todo watch"><div class="todotext"><h3>British spelling, and the date written out</h3>' +
+      '<p>Organisation, not organization. 1 September 2026, not 01/09/2026, which is read differently on ' +
+      'either side of the Atlantic.</p></div></div>' +
+      '<div class="todo watch"><div class="todotext"><h3>Say the number</h3>' +
+      '<p>&ldquo;Sixteen standards lose funding&rdquo; beats &ldquo;several standards are affected&rdquo;. ' +
+      'The specific figure is the whole reason anyone believes the rest of it.</p></div></div>' +
+    '</div>' +
+
+    '<div id="brandout"></div>';
+}
+
+function wireBrand(panel){
+  /* Downloads build the file at full size with the download flag set, so
+     the saved SVG carries its own font declaration rather than relying on
+     whatever the opening application happens to have. */
+  panel.querySelectorAll('[data-logo]').forEach(b => b.addEventListener('click', () => {
+    const [shape, mode] = b.dataset.logo.split('-');
+    const svg = logoSVG(shape, mode, true);
+    const blob = new Blob([svg], { type: 'image/svg+xml' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'skills-radar-' + shape + '-' + mode + '.svg';
+    a.click();
+    URL.revokeObjectURL(a.href);
+    say('Downloaded skills-radar-' + shape + '-' + mode + '.svg. ' +
+      'Opens in anything, including Word and PowerPoint, and stays sharp at any size.');
+  }));
+
+  panel.querySelectorAll('.swatch').forEach(b => b.addEventListener('click', () => {
+    navigator.clipboard.writeText(b.dataset.hex);
+    const was = b.querySelector('.swhex').textContent;
+    b.querySelector('.swhex').textContent = 'copied';
+    setTimeout(() => { b.querySelector('.swhex').textContent = was; }, 1300);
+  }));
+
+  function say(text){
+    const out = document.getElementById('brandout');
+    if(out) out.innerHTML = '<div class="okbox" style="margin-top:18px">' + text + '</div>';
+  }
 }
 
 /* ---------- Email lists ----------

@@ -4538,3 +4538,53 @@ blockquote, .standfirst{ font-family:var(--serif); font-style:italic; }
 @media (prefers-reduced-motion: reduce){
   .ctaarrow{ animation:none; stroke-dashoffset:0; }
 }
+
+/* ---------- Admin: brand ---------- */
+
+.logogrid{
+  display:grid; grid-template-columns:repeat(auto-fit, minmax(290px, 1fr));
+  gap:16px; margin-top:4px;
+}
+.logocard{ border:1px solid var(--line); background:var(--surface); }
+.logoart{ padding:0; line-height:0; }
+.logoart svg{ width:100%; height:auto; display:block; }
+.logofoot{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:12px; padding:12px 14px; border-top:1px solid var(--line);
+}
+.logofoot b{ font-family:var(--sans); font-size:12.5px; font-weight:600; }
+
+.swatches{
+  display:grid; grid-template-columns:repeat(auto-fit, minmax(190px, 1fr));
+  gap:1px; background:var(--line); border:1px solid var(--line); margin-top:4px;
+}
+.swatch{
+  background:var(--surface); border:none; cursor:pointer;
+  text-align:left; padding:0 0 13px; font-family:var(--sans);
+  display:block; width:100%;
+}
+.swatch:hover{ background:var(--paper); }
+.sw{ display:block; height:62px; width:100%; }
+.swname{ display:block; font-size:13.5px; font-weight:600; color:var(--text); padding:11px 14px 0; }
+.swhex{
+  display:block; font-size:12px; color:var(--text-2);
+  font-family:ui-monospace, 'SF Mono', Menlo, monospace;
+  padding:3px 14px 0; letter-spacing:0.02em;
+}
+.swnote{ display:block; font-size:11.5px; color:var(--text-3); padding:5px 14px 0; line-height:1.4; }
+
+.typegrid{
+  display:grid; grid-template-columns:repeat(auto-fit, minmax(290px, 1fr));
+  gap:16px; margin-top:4px;
+}
+.typecard{ border:1px solid var(--line); background:var(--surface); padding:20px 22px 22px; }
+.tspec{
+  font-family:var(--sans); font-size:11px; font-weight:700;
+  letter-spacing:0.09em; text-transform:uppercase; color:var(--text-3);
+  margin:0 0 14px; padding-bottom:9px; border-bottom:2px solid var(--ink);
+}
+.tsample{ margin:0 0 12px; line-height:1.2; }
+.tsample.serif{ font-family:var(--serif); font-size:27px; font-weight:600; letter-spacing:-0.02em; }
+.tsample.sans{ font-family:var(--sans); font-size:25px; font-weight:600; letter-spacing:-0.01em; }
+.tsample.small{ font-size:13px; font-weight:400; line-height:1.55; color:var(--text-2); letter-spacing:0; }
+.typecard .todoact{ text-decoration:none; display:inline-block; }
