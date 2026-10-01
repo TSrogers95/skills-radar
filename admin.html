@@ -874,14 +874,15 @@ const BRAND = {
 
 /* One function draws every variant, so the files cannot drift apart.
 
-   The mark is the words. No symbol, and no italic: the italic read as
-   decorative at small sizes and disappeared entirely once a social platform
-   scaled it down. Weight does the work instead, which survives being shrunk
-   to a 32px avatar.
+   The mark is the words, joined by the hyphen from the domain. That hyphen
+   is doing three jobs at once: it ties the logo to skills-radar.co.uk, it
+   carries the accent colour, and it fills the gap between the two words
+   rather than leaving a hole in the middle of the mark. A tight logo holds
+   together at small sizes; a loose one falls into two separate words.
 
-   The square is tight to the type, because every social platform crops to a
-   circle or near-square and generous padding is cropped away, leaving the
-   wordmark smaller than it needs to be.
+   Set as one text element with tspans rather than two positioned separately,
+   so the spacing comes from the typeface itself and cannot drift when the
+   font loads or the size changes.
 */
 function logoSVG(shape, mode, forDownload){
   const dark = mode === 'dark';
@@ -897,23 +898,25 @@ function logoSVG(shape, mode, forDownload){
   }
 
   if(shape === 'square'){
-    /* Stacked, and tight. The type nearly fills the frame so it still reads
-       after a platform has cropped it to a circle. */
+    /* Stacked and tight, with the hyphen set between the two lines where it
+       reads as both a link and a rule. Nearly fills the frame, because every
+       platform crops a square and padding is the first thing lost. */
     return open(400, 400) +
-      '<text x="200" y="186" text-anchor="middle" font-family="' + font + '" ' +
-        'font-size="104" font-weight="700" letter-spacing="-5" fill="' + word + '">Skills</text>' +
-      '<text x="200" y="300" text-anchor="middle" font-family="' + font + '" ' +
-        'font-size="104" font-weight="500" letter-spacing="-5" fill="' + mark + '">Radar</text>' +
-      '<rect x="150" y="330" width="100" height="6" fill="' + mark + '"/>' +
+      '<text x="200" y="176" text-anchor="middle" font-family="' + font + '" ' +
+        'font-size="112" font-weight="700" letter-spacing="-6" fill="' + word + '">Skills</text>' +
+      '<rect x="178" y="202" width="44" height="11" fill="' + mark + '"/>' +
+      '<text x="200" y="320" text-anchor="middle" font-family="' + font + '" ' +
+        'font-size="112" font-weight="500" letter-spacing="-6" fill="' + mark + '">Radar</text>' +
     '</svg>';
   }
 
-  /* One line, set tight, with the accent word carrying the colour. */
-  return open(720, 180) +
-    '<text x="48" y="118" font-family="' + font + '" font-size="88" ' +
-      'font-weight="700" letter-spacing="-4" fill="' + word + '">Skills</text>' +
-    '<text x="294" y="118" font-family="' + font + '" font-size="88" ' +
-      'font-weight="500" letter-spacing="-4" fill="' + mark + '">Radar</text>' +
+  /* One line, one text element, hyphen in the accent colour. */
+  return open(680, 170) +
+    '<text x="340" y="116" text-anchor="middle" font-family="' + font + '" ' +
+      'font-size="92" font-weight="700" letter-spacing="-5" fill="' + word + '">' +
+      'Skills<tspan fill="' + mark + '">-</tspan>' +
+      '<tspan font-weight="500" fill="' + mark + '">Radar</tspan>' +
+    '</text>' +
   '</svg>';
 }
 
@@ -956,10 +959,16 @@ function brandView(){
     'a favicon. The square is set tight on purpose, because every platform crops it and padding is the first ' +
     'thing lost. Dark ground is the default and the one that looks like the site.</div>' +
 
+    '<div class="notice"><b>Why the hyphen.</b> ' +
+    'It is the one from skills-radar.co.uk, so the mark and the address teach each other. It also solves a ' +
+    'real problem: two words side by side leave a gap in the middle, and at small sizes a logo with a hole in ' +
+    'it stops reading as one thing. The hyphen fills that gap and carries the accent colour at the same time.' +
+    '</div>' +
+
     '<div class="notice"><b>No symbol, and no italic.</b> ' +
     'The mark is the words. A symbol has to earn its place by being recognised, which takes years and a budget, ' +
     'and until then it is something else competing with the name. The italic went the same way: it read as ' +
-    'decorative rather than deliberate, and vanished entirely once a platform scaled it to a 32-pixel avatar. ' +
+    'decorative rather than deliberate, and vanished once a platform scaled it to a 32-pixel avatar. ' +
     'Weight carries the difference instead, and weight survives being shrunk.</div>' +
 
     '<div class="grouphead"><h2>Colours</h2><div class="rule"></div>' +
