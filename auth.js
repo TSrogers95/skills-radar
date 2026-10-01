@@ -9,14 +9,14 @@
    protects the data is Row Level Security in the database, which is why
    every table in schema.sql has it switched on. The service-role key is a
    different thing entirely and must never appear in a file the browser
-   downloads — it lives only in Vercel environment variables.
+   downloads, it lives only in Vercel environment variables.
    ========================================================================= */
 
 let sb = null;
 
 /* The Supabase library publishes itself as window.supabase. This file used
    to declare `function supabase()`, which at global scope IS window.supabase
-   — so our own function silently overwrote the library and every call to
+  , so our own function silently overwrote the library and every call to
    createClient failed. The library reference is now grabbed the instant this
    script runs, and our accessor is called sbClient so nothing can collide. */
 const SUPABASE_LIB = (typeof window !== 'undefined' && window.supabase &&
@@ -130,8 +130,43 @@ async function getSubscription(){
    them.
 
    comp_access exists so you can hand someone the full product without taking
-   money — your own demo account, a prospect on trial, a journalist. It is set
+   money, your own demo account, a prospect on trial, a journalist. It is set
    in the database, never from the browser. */
+/* =========================================================================
+   WHICH TIER
+
+   Three states, and the difference matters on nearly every page:
+
+     member   paying, or inside the trial. Everything.
+     free     had an account, trial is over, did not continue. A small feed
+              and the monthly digest. Their whole cohort is still stored;
+              only the first few stay live.
+     none     not signed in.
+
+   A lapsed account is deliberately not closed. Deleting someone's work is
+   the one thing that guarantees they never come back.
+   ========================================================================= */
+
+function memberTier(sub, profile){
+  if(profile && profile.comp_access) return 'member';
+  if(!sub) return 'none';
+  if(['active','trialing','past_due'].indexOf(sub.status) > -1) return 'member';
+  if(['canceled','unpaid','incomplete_expired'].indexOf(sub.status) > -1) return 'free';
+  return sub.status === 'none' ? 'none' : 'free';
+}
+
+function freeStandardLimit(){
+  return (typeof TRIAL !== 'undefined' && TRIAL.freeStandards) ? TRIAL.freeStandards : 1;
+}
+
+/* Days left in a trial, or null when not in one. */
+function trialDaysLeft(sub){
+  if(!sub || sub.status !== 'trialing' || !sub.current_period_end) return null;
+  const end = new Date(sub.current_period_end);
+  const days = Math.ceil((end - new Date()) / 86400000);
+  return days >= 0 ? days : 0;
+}
+
 function hasAccess(sub, profile){
   if(profile && profile.comp_access) return true;
   if(!sub) return false;
@@ -217,7 +252,7 @@ async function deleteEvent(id){
 
 /* ---------- Payment ---------- */
 
-/* Sends the member to Stripe Checkout. Card details never touch this site —
+/* Sends the member to Stripe Checkout. Card details never touch this site  to 
    Stripe hosts the payment page, handles 3-D Secure, and sends them back. */
 async function startCheckout(){
   const c = sbClient();
@@ -276,7 +311,7 @@ async function openBilling(){
 
    Page views tell you where someone landed. They do not tell you what they
    searched for and did not find, which article they opened, or which part of
-   the members area they actually use — and those are the things that change
+   the members area they actually use, and those are the things that change
    what you build next.
 
    Still no cookies and no identifiers: an action, a label, and a day. It
@@ -322,7 +357,7 @@ async function recordView(){
    A MEMBER'S OWN DATA
 
    Export and erasure, exercised by the person themselves. Both are rights
-   under UK GDPR — Article 15 for access, Article 17 for erasure — and
+   under UK GDPR, Article 15 for access, Article 17 for erasure, and
    putting them behind an email request makes them slower for the member and
    more work for you.
    ========================================================================= */

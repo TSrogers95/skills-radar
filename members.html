@@ -121,6 +121,14 @@ function refreshBar(){
    ========================================================================= */
 
 let ACCOUNT = null;
+let TIER = 'none';
+
+/* The tabs that need a paid membership. The feed, cohort and newsletter stay
+   open on the free tier: the first two prove the product still works, and
+   the third is the only thing that brings a lapsed member back. */
+const PAID_TABS = ['forecast', 'otj', 'cal', 'report'];
+
+function isPaid(){ return TIER === 'member'; }
 
 /* If the register file is missing or broken, every lookup fails and the page
    looks as though the member's cohort is wrong. Say what has actually
@@ -170,9 +178,14 @@ async function checkAccess(){
     return 'blocked';
   }
 
-  if(!hasAccess(sub, profile)){ location.replace('account.html'); return 'redirect'; }
+  TIER = memberTier(sub, profile);
 
-  ACCOUNT = { user: user, subscription: sub, profile: profile };
+  /* A lapsed account still gets in. It drops to the free tier rather than
+     being turned away, because someone who signed up once is the most likely
+     person to pay later, and being locked out entirely is how you lose them. */
+  if(TIER === 'none'){ location.replace('account.html'); return 'redirect'; }
+
+  ACCOUNT = { user: user, subscription: sub, profile: profile, tier: TIER };
   return 'member';
 }
 
@@ -280,7 +293,9 @@ document.getElementById('signout').addEventListener('click', async () => {
 /* ---------- Matching updates to the member's own standards ---------- */
 
 function myStandardNames(){
-  return COHORT.map(s => s.name.toLowerCase());
+  /* The free tier narrows the feed by narrowing this list. Everything else
+     follows from it without needing to know about tiers. */
+  return activeCohort().map(s => s.name.toLowerCase());
 }
 
 function isMine(item){
@@ -1019,6 +1034,50 @@ function cohortStatsHTML(){
     '<div class="mcard warm"><div class="n">' + allUpdates().filter(isMyStandardOnly).length +
       '</div><div class="l">Changes to them</div></div>' +
   '</div>';
+}
+
+/* The standards that are live on the free tier. The rest stay stored and
+   visible, greyed, so nobody loses work they did during the trial. */
+function activeCohort(){
+  return isPaid() ? COHORT : COHORT.slice(0, freeStandardLimit());
+}
+
+function isActiveIndex(i){
+  return isPaid() || i < freeStandardLimit();
+}
+
+function statusBanner(){
+  const sub = ACCOUNT && ACCOUNT.subscription;
+  const left = trialDaysLeft(sub);
+  const nudgeFrom = (typeof TRIAL !== 'undefined' && TRIAL.nudgeFromDay) ? TRIAL.nudgeFromDay : 10;
+  const total = (typeof TRIAL !== 'undefined' && TRIAL.trialDays) ? TRIAL.trialDays : 14;
+
+  if(left !== null){
+    const urgent = left <= (total - nudgeFrom);
+    return '<div class="trialbar' + (urgent ? ' soon' : '') + '">' +
+      '<span class="tbdays">' + (left === 0 ? 'Last day' : left + ' day' + (left === 1 ? '' : 's') + ' left') + '</span>' +
+      '<span class="tbtext">' +
+        (urgent
+          ? 'Your trial ends soon. Nothing happens automatically that you have not already agreed: billing starts at ' +
+            MEMBERSHIP.price + ' ' + MEMBERSHIP.period + ' unless you cancel.'
+          : 'Full access while you try it. ' + MEMBERSHIP.price + ' ' + MEMBERSHIP.period + ' afterwards, cancel any time.') +
+      '</span>' +
+      '<button class="linkbtn" data-go="account">Manage</button>' +
+    '</div>';
+  }
+
+  if(!isPaid()){
+    const hidden = Math.max(0, COHORT.length - freeStandardLimit());
+    return '<div class="trialbar free">' +
+      '<span class="tbdays">Free</span>' +
+      '<span class="tbtext">Your feed is limited to ' + freeStandardLimit() + ' standard' +
+        (freeStandardLimit() === 1 ? '' : 's') +
+        (hidden ? ', with ' + hidden + ' more saved but not showing' : '') +
+        '. Levy forecasting, off-the-job and the calendar need a membership.</span>' +
+      '<button class="btn small" id="bar-upgrade">Upgrade</button>' +
+    '</div>';
+  }
+  return '';
 }
 
 function cohortView(){
@@ -2560,6 +2619,33 @@ function goTo(to){
   document.querySelectorAll('#mtabs button').forEach(x => x.classList.toggle('active', x.dataset.view === to));
   view = to;
   render();
+}
+
+function lockedView(tab){
+  const names = {
+    forecast: { t: 'Levy forecast',
+      d: 'Month by month on your own pay bill and your own cohorts, naming the month co-investment starts and showing what expires unused. Add apprentices you are only considering and see what they would cost before committing.' },
+    otj: { t: 'Off-the-job position',
+      d: 'Your planned hours against the published minimum for each standard, with the apprentices who are behind and by how much.' },
+    cal: { t: 'Compliance calendar',
+      d: 'Twelve months of deadlines filtered to the standards you deliver, with the action each one needs and your own dates alongside.' },
+    report: { t: 'Board report',
+      d: 'Your funding position, risks and commitments written up and ready to print.' }
+  };
+  const n = names[tab] || { t: 'This area', d: '' };
+
+  return '<div class="locked">' +
+    '<div class="lockmark" aria-hidden="true">&#9679;</div>' +
+    '<h1>' + n.t + '</h1>' +
+    '<p>' + n.d + '</p>' +
+    '<div class="lockacts">' +
+      '<button class="btn" id="lock-upgrade">Become a member &middot; ' +
+        MEMBERSHIP.price + ' ' + MEMBERSHIP.period + '</button>' +
+      '<button class="btn ghost" data-go="dash">Back to your feed</button>' +
+    '</div>' +
+    '<p class="lockfoot">Your feed and the monthly digest stay free. ' +
+    'Everything you have entered is still here, and comes back the moment you upgrade.</p>' +
+  '</div>';
 }
 
 function render(){

@@ -99,6 +99,22 @@
 
 </main>
 
+<!-- The prompt. Shown once someone has read enough to have seen the point,
+     dismissible, and remembered so it never appears twice in a session. -->
+<div class="joinprompt" id="joinprompt" hidden>
+  <button class="jpclose" id="jpclose" aria-label="Close">&times;</button>
+  <p class="jpkick">Free for 14 days</p>
+  <h2>Only three of these affect you</h2>
+  <p class="jpbody">There are <span id="jpcount">180</span> live changes on this page and almost none are
+  your problem. Tell us which standards you deliver and the feed shows those, with a levy forecast
+  on your own numbers.</p>
+  <div class="jpacts">
+    <a class="btn" href="account.html?join=1">Start the free trial</a>
+    <button class="btn ghost" id="jplater">Not now</button>
+  </div>
+  <p class="jpfoot">Cancel any time. <a href="demo.html">See what members get</a>.</p>
+</div>
+
 <footer>
   <div class="wrap">
     <p>Skills Radar is maintained by hand from the Skills England apprenticeship register, the Skills England occupational maps, and GOV.UK apprenticeship funding and T-Level guidance. Every entry links to its source. Always check the source before acting on a compliance deadline.</p>
@@ -371,6 +387,57 @@ document.querySelectorAll('.tabs button').forEach(btn => {
     renderBoard(currentFilter, currentQuery);
   });
 });
+
+/* =========================================================================
+   THE PROMPT
+
+   Appears after enough scrolling that someone has actually read the feed and
+   seen how much of it is irrelevant to them, which is the argument. Not on
+   arrival, where it is an obstacle before any value has been shown.
+
+   Dismissing it is remembered for the session, so it never appears twice.
+   It also does not show at all to anyone already signed in.
+   ========================================================================= */
+
+(function joinPrompt(){
+  const box = document.getElementById('joinprompt');
+  if(!box) return;
+
+  try { if(sessionStorage.getItem('sr-prompt-closed') === '1') return; } catch(e){}
+
+  const count = document.getElementById('jpcount');
+  if(count && typeof FEED !== 'undefined') count.textContent = FEED.length;
+
+  let shown = false;
+
+  function close(remember){
+    box.classList.remove('on');
+    setTimeout(() => { box.hidden = true; }, 240);
+    if(remember){ try { sessionStorage.setItem('sr-prompt-closed', '1'); } catch(e){} }
+  }
+
+  document.getElementById('jpclose').addEventListener('click', () => close(true));
+  document.getElementById('jplater').addEventListener('click', () => close(true));
+
+  function check(){
+    if(shown) return;
+    const read = window.scrollY + window.innerHeight;
+    const depth = read / document.body.scrollHeight;
+    if(depth > 0.45 || window.scrollY > 1600){
+      shown = true;
+      box.hidden = false;
+      requestAnimationFrame(() => box.classList.add('on'));
+      window.removeEventListener('scroll', check);
+    }
+  }
+
+  /* Signed-in visitors are not prospects. */
+  if(typeof accountsLive === 'function' && accountsLive() && typeof currentUser === 'function'){
+    currentUser().then(u => { if(!u) window.addEventListener('scroll', check, { passive: true }); });
+  } else {
+    window.addEventListener('scroll', check, { passive: true });
+  }
+})();
 
 wireSearch('search', 'clear', 'radar', q => {
   currentQuery = q;
