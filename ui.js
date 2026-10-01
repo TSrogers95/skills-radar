@@ -3,12 +3,13 @@
    Builds the masthead and navigation so every page stays consistent.
    ========================================================================= */
 
-/* What the site does, in the words someone would use to describe the
-   problem to a colleague. The previous line said what the site was rather
-   than what it saved you, and "intelligence platform" is a category nobody
-   searches for. */
-const HERO = "Work out what the funding rules mean, in minutes rather than evenings.";
-const HERO_SUB = "Every change to apprenticeship funding, standards and T-Levels, with what it means for the programmes you run.";
+/* The headline carries the phrase people actually search for, at the front
+   where it counts, and then says what the site does with it. "Apprenticeship
+   funding rules" is the highest-volume term in this sector; a headline that
+   does not contain it is throwing away the one place on the page where the
+   words are both prominent and natural. */
+const HERO = "Apprenticeship funding rules, cut down to the changes that affect you.";
+const HERO_SUB = "Track funding rules, standards and T-Levels in one place, and spend the time you save building better early careers programmes.";
 
 const PAGES = [
   { file: "index.html",      label: "Feed" },
