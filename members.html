@@ -2120,6 +2120,231 @@ function wireAccount(panel){
   });
 }
 
+/* =========================================================================
+   THE NEWSLETTER
+
+   This tab used to collect a preference and do nothing with it, which is
+   worse than not offering it. The site already knows which standards each
+   member delivers, so the digest does not need anyone to pick interests from
+   a list: it is built from their cohort.
+
+   What this view does is show them exactly what their next one will contain.
+   That makes the preference meaningful, and it makes the promise checkable.
+   ========================================================================= */
+
+function digestFor(){
+  const mine = allUpdates().filter(isMyStandardOnly);
+  const general = allUpdates().filter(u => isMine(u) && !isMyStandardOnly(u));
+  const attention = attentionItems();
+  const soon = comingUp(60);
+  return { mine: mine, general: general, attention: attention, soon: soon,
+           empty: !mine.length && !general.length && !attention.length && !soon.length };
+}
+
+function prefsView(){
+  const from = contactAddress();
+  const d = digestFor();
+  const optedOut = ACCOUNT && ACCOUNT.profile && ACCOUNT.profile.email_opt_out;
+
+  return '<div class="pagehead"><h1>Newsletter</h1>' +
+    '<p>One email a month, built from the standards in your cohort. Not a general bulletin, ' +
+    'and not something you have to configure.</p></div>' +
+
+    '<div class="notice" style="margin-top:0"><b>How it works.</b> ' +
+    'There is nothing to set up. The digest is assembled from the ' + COHORT.length + ' standard' +
+    (COHORT.length === 1 ? '' : 's') + ' in ' +
+    '<button class="linkbtn" data-go="cohort">your cohort</button>, plus the funding rules that apply ' +
+    'to everyone. Change your cohort and the next one changes with it. It is sent from ' + from + ', ' +
+    'so adding that address to your contacts is worth doing.</div>' +
+
+    '<div class="grouphead"><h2>Your next digest</h2><div class="rule"></div>' +
+      '<span class="hint" style="margin:0">Live preview, as it stands today</span></div>' +
+
+    (d.empty
+      ? '<div class="alert"><b>There would be nothing to send.</b> ' +
+        'Add the standards you deliver and this fills up. ' +
+        '<button class="linkbtn" data-go="cohort">Add your cohort</button></div>'
+      : '<div class="digest">' +
+          '<div class="dighead">' +
+            '<span class="digfrom">Skills Radar &middot; ' + from + '</span>' +
+            '<b>What changed for ' + (MEMBER.org || 'you') + ' this month</b>' +
+          '</div>' +
+
+          (d.attention.length
+            ? '<div class="digsec"><h3>Needs your attention</h3>' +
+              d.attention.slice(0, 4).map(a =>
+                '<div class="digrow ' + a.level + '"><b>' + a.title + '</b><span>' + a.detail + '</span></div>').join('') +
+              '</div>'
+            : '') +
+
+          (d.mine.length
+            ? '<div class="digsec"><h3>Changes to your standards</h3>' +
+              d.mine.slice(0, 6).map(u =>
+                '<div class="digrow"><b>' + u.title + '</b><span>' + (u.short || u.summary) + '</span></div>').join('') +
+              '</div>'
+            : '<div class="digsec"><h3>Changes to your standards</h3>' +
+              '<p class="dignone">Nothing this month. That is worth knowing too.</p></div>') +
+
+          (d.general.length
+            ? '<div class="digsec"><h3>Funding rules, everyone</h3>' +
+              d.general.slice(0, 4).map(u =>
+                '<div class="digrow"><b>' + u.title + '</b><span>' + (u.short || u.summary) + '</span></div>').join('') +
+              '</div>'
+            : '') +
+
+          (d.soon.length
+            ? '<div class="digsec"><h3>Coming up in 60 days</h3>' +
+              d.soon.slice(0, 4).map(mi =>
+                '<div class="digrow"><b>' + fmtLong(mi.date) + ' &middot; ' + mi.title + '</b>' +
+                '<span>' + mi.action + '</span></div>').join('') +
+              '</div>'
+            : '') +
+
+          '<div class="digfoot">Sent monthly. Unsubscribe in one click, from the link in every email ' +
+          'or the setting below.</div>' +
+        '</div>') +
+
+    '<div class="grouphead"><h2>Your preference</h2><div class="rule"></div></div>' +
+
+    '<div class="optbox" style="margin-top:14px">' +
+      '<label class="optrow" for="p-optout">' +
+        '<input type="checkbox" id="p-optout"' + (optedOut ? ' checked' : '') + '>' +
+        '<span class="optmark" aria-hidden="true"></span>' +
+        '<span class="opttext"><b>Do not send me the monthly digest</b>' +
+        'You keep full access to everything on the site. We will still email you about your account ' +
+        'and your payment, which we are required to do.</span>' +
+      '</label>' +
+    '</div>' +
+    '<div id="prefout"></div>';
+}
+
+function wirePrefs(panel){
+  const box = document.getElementById('p-optout');
+  if(box) box.addEventListener('change', async () => {
+    const out = document.getElementById('prefout');
+    try {
+      await saveProfile({ email_opt_out: box.checked });
+      if(ACCOUNT && ACCOUNT.profile) ACCOUNT.profile.email_opt_out = box.checked;
+      out.innerHTML = '<div class="okbox" style="margin-top:14px">' +
+        (box.checked
+          ? 'Saved. You will not get the monthly digest. Account and payment emails still come through.'
+          : 'Saved. Your next digest goes out at the start of the month.') + '</div>';
+    } catch(e){
+      out.innerHTML = '<div class="alert" style="margin-top:14px">Could not save that. Try again shortly.</div>';
+    }
+  });
+
+  panel.querySelectorAll('[data-go]').forEach(b =>
+    b.addEventListener('click', () => goTo(b.dataset.go)));
+}
+
+function accountView(){
+  const p = ACCOUNT && ACCOUNT.profile;
+  const s = ACCOUNT && ACCOUNT.subscription;
+
+  return '<div class="pagehead"><h1>Your account</h1>' +
+    '<p>What we hold, what it costs, and how to take it away.</p></div>' +
+
+    '<div class="grouphead"><h2>Details</h2><div class="rule"></div></div>' +
+    '<table class="std levytable"><tbody>' +
+      '<tr><td class="nm">Email</td><td class="num big">' + (p ? p.email : '') + '</td>' +
+        '<td>Used to sign in, and to send what you have asked for</td></tr>' +
+      '<tr><td class="nm">Organisation</td><td class="num big">' + ((p && p.org_name) || 'not set') + '</td>' +
+        '<td>Shown on your board report</td></tr>' +
+      '<tr><td class="nm">Newsletter</td><td class="num big">' + (p && p.email_opt_out ? 'Opted out' : 'Subscribed') + '</td>' +
+        '<td>Change it on the Newsletter tab</td></tr>' +
+      '<tr><td class="nm">Membership</td><td class="num big">' + subLabel(s) + '</td><td>' +
+        (s && s.current_period_end ? 'Next renewal ' + fmtLong(s.current_period_end.slice(0,10)) : 'No renewal date') +
+        '</td></tr>' +
+    '</tbody></table>' +
+
+    '<div class="addrow" style="margin-top:18px">' +
+      '<button class="btn" id="acc-billing">Manage billing and cancel</button>' +
+      '<a class="btn ghost" href="mailto:' + contactAddress() +
+        '?subject=' + encodeURIComponent('Skills Radar, ' + ((p && p.org_name) || 'member enquiry')) +
+        '">Contact us</a>' +
+    '</div>' +
+    '<p class="hint" style="margin-top:10px">Card, invoices and cancellation are handled by Stripe. ' +
+    'For anything else, email us and you will get a reply from a person.</p>' +
+
+    '<div class="grouphead"><h2>Your data</h2><div class="rule"></div></div>' +
+    '<div class="todolist">' +
+      '<div class="todo watch"><div class="todotext"><h3>Download everything we hold</h3>' +
+      '<p>Your profile, the standards you follow, your calendar entries, your subscription record and your account ' +
+      'history, as a single file. This is the same export we would send if you asked formally.</p></div>' +
+      '<button class="todoact" id="acc-export">Download</button></div>' +
+
+      '<div class="todo stop"><div class="todotext"><h3>Delete your account</h3>' +
+      '<p>Removes your profile, your standards, your calendar entries and your history. It cannot be undone. ' +
+      'Cancel your membership first, or you will keep being charged for an account that no longer exists, ' +
+      'the billing button above does that.</p></div>' +
+      '<button class="todoact" id="acc-delete">Delete</button></div>' +
+    '</div>' +
+
+    '<div id="acc-out"></div>' +
+
+    '<div class="notice" style="margin-top:22px"><b>What happens to a deleted account.</b> ' +
+    'Everything listed above is removed immediately. Stripe keeps a record of payments taken, because tax law ' +
+    'requires it to be kept for six years, that is a legal obligation nobody can override, and it holds your email ' +
+    'and payment history, nothing else from this site. The <a href="privacy.html">privacy notice</a> sets out the detail.</div>';
+}
+
+function contactAddress(){
+  return (typeof CONTACT !== 'undefined' && CONTACT.email) ? CONTACT.email : 'hello@skills-radar.co.uk';
+}
+
+function subLabel(s){
+  if(!s) return 'None';
+  const map = { active:'Active', trialing:'Trial', past_due:'Payment failing', canceled:'Cancelled', none:'Not subscribed' };
+  return (map[s.status] || s.status) + (s.cancel_at_period_end ? ', ending at period end' : '');
+}
+
+function wireAccount(panel){
+  const say = (t, k) => {
+    const o = document.getElementById('acc-out');
+    if(o) o.innerHTML = '<div class="' + (k || 'okbox') + '" style="margin-top:18px">' + t + '</div>';
+  };
+
+  const b = document.getElementById('acc-billing');
+  if(b) b.addEventListener('click', async () => {
+    try { await openBilling(); } catch(e){ say(e.message, 'alert'); }
+  });
+
+  const ex = document.getElementById('acc-export');
+  if(ex) ex.addEventListener('click', async () => {
+    ex.disabled = true; ex.textContent = 'Preparing…';
+    try {
+      const data = await exportMyData();
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type:'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'skills-radar-my-data.json';
+      a.click();
+      URL.revokeObjectURL(a.href);
+      say('Downloaded. That file is everything this site holds about you.');
+    } catch(e){ say('Could not build the export: ' + e.message, 'alert'); }
+    ex.disabled = false; ex.textContent = 'Download';
+  });
+
+  const del = document.getElementById('acc-delete');
+  if(del) del.addEventListener('click', async () => {
+    const typed = prompt('This permanently deletes your account and everything in it.\n\nType DELETE to confirm.');
+    if(typed !== 'DELETE') return;
+    del.disabled = true; del.textContent = 'Deleting…';
+    try {
+      await deleteMyAccount();
+      document.body.innerHTML = '<div class="wrap"><div class="pagehead centred" style="padding-top:70px">' +
+        '<h1>Your account has been deleted</h1>' +
+        '<p>Everything we held about you is gone.</p>' +
+        '<p style="margin-top:18px"><a class="btn" href="index.html" style="text-decoration:none">Back to the site</a></p>' +
+        '</div></div>';
+    } catch(e){
+      say('Could not delete the account: ' + e.message + '. Email us and we will do it by hand.', 'alert');
+      del.disabled = false; del.textContent = 'Delete';
+    }
+  });
+}
+
 function prefsView(){
   /* Set once here rather than repeated through the view. */
   const from = (typeof CONTACT !== 'undefined' && CONTACT.email) ? CONTACT.email : 'us';
@@ -2380,19 +2605,7 @@ function render(){
 
   if(view === 'prefs'){
     panel.innerHTML = prefsView();
-    panel.querySelectorAll('.chipx').forEach(b =>
-      b.addEventListener('click', () => { removeStandard(+b.dataset.i); render(); }));
-    wirePicker('prefspick', render);
-    panel.querySelectorAll('.opt input').forEach(i =>
-      i.addEventListener('change', () => {
-        i.closest('.opts').querySelectorAll('.opt').forEach(o =>
-          o.classList.toggle('sel', o.querySelector('input').checked));
-      }));
-    document.getElementById('savep').addEventListener('click', () => {
-      const b = document.getElementById('savep');
-      b.textContent = 'Saved for this session';
-      setTimeout(() => { b.textContent = 'Save preferences'; }, 2200);
-    });
+    wirePrefs(panel);
   }
   refreshBar();
   window.scrollTo({ top:0, behavior:'smooth' });

@@ -3,8 +3,21 @@
   "outputDirectory": ".",
   "cleanUrls": true,
   "crons": [
-    { "path": "/api/check-sources", "schedule": "0 7 * * 1" },
-    { "path": "/api/sync-standards", "schedule": "0 6 * * 1" },
-    { "path": "/api/sync-occupations", "schedule": "0 5 * * 1" }
+    {
+      "path": "/api/check-sources",
+      "schedule": "0 7 * * 1"
+    },
+    {
+      "path": "/api/sync-standards",
+      "schedule": "0 6 * * 1"
+    },
+    {
+      "path": "/api/sync-occupations",
+      "schedule": "0 5 * * 1"
+    },
+    {
+      "path": "/api/send-digest",
+      "schedule": "0 8 1 * *"
+    }
   ]
 }

@@ -76,15 +76,24 @@ function ctaHTML(){
     changes = (typeof allUpdates === 'function') ? allUpdates().length : 0;
   } catch(e){}
 
-  const hook = 'Create an account and build a <em>personalised feed</em>.';
+  /* Two lengths. The long one has room to make the argument on a desktop;
+     on a phone the header is most of the first screen, so it says the
+     minimum and gets out of the way. */
+  const narrow = (typeof window !== 'undefined' && window.matchMedia)
+    ? !window.matchMedia('(min-width: 760px)').matches : false;
 
-  const sub = (standards && changes)
-    ? 'Choose the standards you deliver from all ' + standards.toLocaleString('en-GB') +
-      ' on the register. Your feed then shows changes to those, alongside the funding rules that apply to everyone. ' +
-      'A monthly newsletter explains what moved and why, and the levy forecast runs on figures you enter yourself.'
-    : 'Choose the standards you deliver, and your feed shows changes to those alongside the funding rules that ' +
-      'apply to everyone. A monthly newsletter explains what moved and why, and the levy forecast runs on figures ' +
-      'you enter yourself.';
+  const hook = narrow
+    ? 'Build a <em>personalised feed</em>.'
+    : 'Create an account and build a <em>personalised feed</em>.';
+
+  const sub = narrow
+    ? 'Pick your standards. See only what affects them, plus a levy forecast on your own numbers.'
+    : (standards
+        ? 'Choose the standards you deliver from all ' + standards.toLocaleString('en-GB') +
+          ' on the register. Your feed then shows changes to those, alongside the funding rules that apply to ' +
+          'everyone, with a levy forecast that runs on figures you enter yourself.'
+        : 'Choose the standards you deliver and your feed shows changes to those, alongside the funding rules ' +
+          'that apply to everyone, with a levy forecast on figures you enter yourself.');
 
   return '<div class="herocta">' +
     '<div class="ctacopy">' +
