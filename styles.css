@@ -4615,3 +4615,163 @@ blockquote, .standfirst{ font-family:var(--serif); font-style:italic; }
   .todaybar{ padding:13px 16px; gap:7px; }
   .tbtitle{ flex-basis:100%; font-size:16px; }
 }
+
+/* ---------- The wordmark, with its rule ----------
+
+   The hyphen is the one from the domain. The rule beneath traces itself once
+   when the page loads, left to right, lifting at the end.
+
+   Drawn as SVG inside the link rather than as a CSS border, so the hook at
+   the right is a real curve and the whole mark stays one object when it is
+   scaled or copied.
+*/
+
+.wordmark a{
+  position:relative; display:inline-block;
+  padding-bottom:0.16em;
+}
+.wdash{
+  color:#6ED0B6;
+  padding:0 0.045em;          /* air either side, or it reads as a typo */
+  font-weight:400;
+}
+.wordmark em{
+  font-style:normal; font-weight:400; color:#6ED0B6;
+}
+
+.wrule{
+  position:absolute; left:0; right:0; bottom:0;
+  width:100%; height:0.17em;
+  color:#6ED0B6; overflow:visible;
+  stroke-dasharray:420; stroke-dashoffset:420;
+  animation:wsweep 1.05s cubic-bezier(0.32, 0, 0.18, 1) 0.3s forwards;
+}
+@keyframes wsweep{ to { stroke-dashoffset:0; } }
+
+/* The sticky bar carries the small version. No animation there: it appears
+   mid-scroll, and something drawing itself as you scroll past is a
+   distraction rather than a flourish. */
+.mini .wdash{ color:#6ED0B6; padding:0 0.04em; }
+.mini .wrule{ display:none; }
+
+@media (prefers-reduced-motion: reduce){
+  .wrule{ animation:none; stroke-dashoffset:0; }
+}
+
+
+/* ---------- Prompt: two real choices ----------
+
+   "See it first" was a link in the small print under the price, which made
+   it look like a footnote. It is the better option for most people seeing
+   the prompt for the first time, so it is now a button beside the trial.
+   Dismissing moved down into the small print, where it belongs.
+*/
+
+.jpacts{ display:flex; gap:9px; padding:8px 24px 0; }
+.jpacts .btn{ flex:1; text-align:center; text-decoration:none; min-width:0; }
+.jpacts .jpgo{
+  background:var(--low); border:1px solid var(--low); color:#fff;
+  font-weight:600; font-size:14.5px; padding:13px 14px;
+}
+.jpacts .jpgo:hover{ background:#0C6456; border-color:#0C6456; }
+.jpacts .jpsee{
+  background:transparent; border:1px solid var(--line-strong);
+  color:var(--text); font-weight:600; font-size:14.5px; padding:13px 14px;
+}
+.jpacts .jpsee:hover{ background:var(--paper); border-color:var(--ink-3); }
+
+.jpnot{
+  background:none; border:none; padding:0; cursor:pointer;
+  font-family:var(--sans); font-size:11.5px; color:var(--text-3);
+  text-decoration:underline; text-underline-offset:2px;
+}
+.jpnot:hover{ color:var(--text-2); }
+
+@media (max-width:560px){
+  .jpacts{ padding:6px 20px 0; flex-wrap:wrap; }
+  .jpacts .btn{ flex:1 1 100%; }
+}
+
+/* ---------- Demo page panels ---------- */
+
+.demopoint{ position:relative; padding:24px 24px 22px; }
+.dpnum{
+  display:block; font-family:var(--serif);
+  font-size:13px; font-weight:700; letter-spacing:0.1em;
+  color:var(--low); margin-bottom:9px;
+}
+.demopoint h3{ margin-bottom:8px; }
+.dplink{
+  display:inline-block; margin-top:11px;
+  font-family:var(--sans); font-size:13px; font-weight:600;
+  color:var(--ink-3); text-decoration:none;
+  border-bottom:1px solid var(--line-strong); padding-bottom:1px;
+}
+.dplink:hover{ border-bottom-color:var(--ink-3); }
+
+/* =========================================================================
+   THE ACTION COLOUR
+
+   The mint was doing two jobs and diluting both. It is the accent, which on
+   this site carries meaning: it marks the brand, the wordmark rule, and
+   "for information" in the feed. Using it on buttons as well meant the
+   strongest colour on the page appeared both where something had to be read
+   and where something had to be clicked.
+
+   The other three are already spoken for: red is act now, amber is plan
+   ahead, green is for information. Any of them on a button would say
+   something about urgency that is not true.
+
+   So the action colour sits outside the semantic set entirely. White on
+   dark, ink on light. It is the highest contrast available, it cannot be
+   confused with a status, and it is what a newspaper does with a subscribe
+   button for exactly these reasons.
+   ========================================================================= */
+
+/* ---------- On dark grounds ---------- */
+
+.herocta .ctabtn,
+.gcta .btn:not(.ghost),
+.demobtns .ctabtn{
+  background:#FFFFFF;
+  color:var(--ink);
+  border:1px solid #FFFFFF;
+  font-weight:600;
+}
+.herocta .ctabtn:hover,
+.gcta .btn:not(.ghost):hover,
+.demobtns .ctabtn:hover{
+  background:#DCE8E5;
+  border-color:#DCE8E5;
+  color:var(--ink);
+}
+
+/* ---------- On light grounds ---------- */
+
+.jpacts .jpgo,
+.lockacts .btn:not(.ghost),
+.waitacts .btn:not(.ghost),
+.joinpanel .btn.wide,
+.signin-panel .btn:not(.ghost):not(.fill){
+  background:var(--ink);
+  border:1px solid var(--ink);
+  color:#FFFFFF;
+  font-weight:600;
+}
+.jpacts .jpgo:hover,
+.lockacts .btn:not(.ghost):hover,
+.waitacts .btn:not(.ghost):hover,
+.joinpanel .btn.wide:hover,
+.signin-panel .btn:not(.ghost):not(.fill):hover{
+  background:#1E3D3A;
+  border-color:#1E3D3A;
+  color:#FFFFFF;
+}
+
+/* The trial badge keeps the green: it is a label, not an action, and the
+   colour is doing its usual job of marking something good. */
+.jpbadge, .thbadge{ background:var(--low); color:#fff; }
+
+/* The prompt's header rule stays mint, so the brand is still present even
+   though the button is not. */
+.jptop{ border-top-color:#6ED0B6; }

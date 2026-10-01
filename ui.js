@@ -80,7 +80,17 @@ function isHomePage(){
 }
 
 function wordmarkHTML(){
-  const inner = '<a href="index.html">Skills <em>Radar</em></a>';
+  /* The hyphen from the domain joins the two words, and the rule beneath
+     traces itself once on load. Both are drawn here rather than in CSS so
+     the mark is one thing in the markup and cannot come apart. */
+  const inner = '<a href="index.html">' +
+      'Skills<span class="wdash">-</span><em>Radar</em>' +
+      '<svg class="wrule" viewBox="0 0 300 14" preserveAspectRatio="none" aria-hidden="true">' +
+        '<path d="M2 8 L288 8 Q297 8 297 2" fill="none" stroke="currentColor" ' +
+          'stroke-width="3.5" stroke-linecap="round" vector-effect="non-scaling-stroke"/>' +
+      '</svg>' +
+    '</a>';
+
   return isHomePage()
     ? '<h1 class="wordmark">' + inner + '</h1>'
     : '<p class="wordmark">' + inner + '</p>';

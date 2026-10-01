@@ -32,7 +32,7 @@
 
   <div class="pagehead centred">
     <h1>A walk through Skills Radar</h1>
-    <p>Five minutes on what it tracks, how the feed narrows to your provision,
+    <p>What it tracks, how the feed narrows to the standards you deliver,
     and what the levy forecast does with your own numbers.</p>
   </div>
 
@@ -40,29 +40,36 @@
 
   <section class="demopoints">
     <div class="demopoint">
-      <h3>The feed</h3>
+      <span class="dpnum">1</span>
+      <h3>Start with the feed</h3>
       <p>Every change to funding rules, standards and T-Levels, with what changed,
-      what it changed from, and what follows. Free to read without an account.</p>
+      what it changed from, and what follows. Free to read without an account,
+      and the quickest way to see whether this is useful to you.</p>
+      <a class="dplink" href="index.html">See the feed</a>
     </div>
     <div class="demopoint">
-      <h3>Your cohort</h3>
-      <p>Choose the standards you deliver. The feed, the calendar and the compliance
-      position all narrow to those, and nothing else.</p>
+      <span class="dpnum">2</span>
+      <h3>Then pick your standards</h3>
+      <p>Choose what you deliver and everything narrows to those: the feed, the
+      calendar, the compliance position. Out of hundreds of live changes you see
+      the handful that touch your provision.</p>
     </div>
     <div class="demopoint">
-      <h3>Levy forecasting</h3>
-      <p>Month by month on your own pay bill. It names the month co-investment starts,
-      shows what expires unused, and prices cohorts you are only considering.</p>
+      <span class="dpnum">3</span>
+      <h3>And forecast the levy</h3>
+      <p>Month by month on your own pay bill and your own cohorts. It names the
+      month co-investment starts, shows what expires unused, and prices apprentices
+      you are only considering before you commit.</p>
     </div>
   </section>
 
   <div class="demoact">
     <h2>Try it yourself</h2>
-    <p>The feed, the standards register and every article are free to read.
-    A membership adds the personalised feed, the monthly newsletter and the levy forecast.</p>
+    <p>Fourteen days of everything, free. Afterwards it drops to a smaller free account
+    rather than closing, so nothing you set up is lost.</p>
     <div class="demobtns">
-      <a class="ctabtn" href="account.html?join=1">Create an account</a>
-      <a class="btn ghost" href="index.html">Look round first</a>
+      <a class="ctabtn" href="account.html?join=1">Start 14 days free</a>
+      <a class="btn ghost" href="guides/">Read the guides</a>
     </div>
     <p class="demofoot" id="demoprice"></p>
   </div>
@@ -137,10 +144,14 @@ else if(D.file){
   '</video>';
 }
 else {
-  box.innerHTML = '<div class="notice" style="margin:0"><b>No video set yet.</b> ' +
-    'Open <code>config.js</code> and fill in the <code>DEMO</code> block, either a YouTube id ' +
-    '(upload as Unlisted), a Vimeo id, or the filename of an mp4 in your repo. ' +
-    'The rest of this page works either way.</div>';
+  /* No video set. Rather than leave an empty frame, which tells a visitor the
+     site is half finished, the page carries on without it. The three panels
+     below already explain the product, so nothing is missing except the video.
+
+     The reminder goes to the console, where the person who needs it will see
+     it and a visitor never will. */
+  box.remove();
+  console.info('Skills Radar: no demo video set. Add a YouTube id to the DEMO block in config.js.');
 }
 
 const price = document.getElementById('demoprice');
