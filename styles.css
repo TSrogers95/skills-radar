@@ -4409,3 +4409,49 @@ blockquote, .standfirst{ font-family:var(--serif); font-style:italic; }
 }
 .twrow.last b{ color:var(--text-2); }
 .twrow span{ flex:1; font-size:13px; line-height:1.5; color:var(--text-2); }
+
+/* ---------- Call to action, slimmed ----------
+
+   One line and a button. The three-benefit version moved into the prompt
+   that appears part-way down the feed, where it has been earned. This exists
+   so someone who already knows what they want has somewhere to click.
+*/
+
+.herocta{
+  display:flex; align-items:baseline; justify-content:space-between;
+  gap:14px 26px; flex-wrap:wrap;
+  margin-top:22px; padding-top:18px;
+  border-top:1px solid #23504A;
+  background:none; border-left:none; border-right:none; border-bottom:none;
+}
+.herocta .ctahook{
+  font-family:var(--serif); font-size:clamp(17px, 1.85vw, 23px);
+  font-weight:500; letter-spacing:-0.014em; line-height:1.25;
+  color:#EAF3F1; margin:0; flex:1 1 auto; min-width:min(100%, 240px);
+}
+.herocta .ctahook em{ font-style:normal; color:#6ED0B6; font-weight:600; }
+
+.herocta .ctaact{
+  display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+  flex:0 0 auto; margin:0;
+}
+.herocta .ctabtn{
+  display:inline-block; padding:11px 22px;
+  font-family:var(--sans); font-size:14.5px; font-weight:600;
+  background:#6ED0B6; color:#06211C; text-decoration:none;
+}
+.herocta .ctabtn:hover{ background:#8CE7CE; }
+.ctaterms{ font-size:12.5px; color:#8FAEA8; white-space:nowrap; }
+.herocta .ctalink{
+  font-size:12.5px; color:#A9C2BC; text-decoration:none;
+  border-bottom:1px solid #2A5049; padding-bottom:1px;
+}
+.herocta .ctalink:hover{ color:#fff; border-bottom-color:#6ED0B6; }
+
+@media (max-width:759px){
+  .herocta{ margin-top:16px; padding-top:15px; gap:11px; }
+  .herocta .ctahook{ font-size:16.5px; flex-basis:100%; }
+  .herocta .ctaact{ width:100%; gap:11px; }
+  .herocta .ctabtn{ flex:1 1 auto; text-align:center; padding:12px 18px; }
+  .ctaterms{ order:3; flex-basis:100%; }
+}

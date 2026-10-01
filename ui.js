@@ -67,67 +67,20 @@ function scribbleRing(){
 function ctaHTML(){
   const price = (typeof MEMBERSHIP !== 'undefined' && MEMBERSHIP.price) ? MEMBERSHIP.price : '\u00A35';
   const period = (typeof MEMBERSHIP !== 'undefined' && MEMBERSHIP.period) ? MEMBERSHIP.period : 'a month';
+  const days = (typeof TRIAL !== 'undefined' && TRIAL.trialDays) ? TRIAL.trialDays : 14;
 
-  /* The argument, in the site's own numbers rather than adjectives. Counted
-     live so it can never drift from what the site actually holds. */
-  let standards = 0, changes = 0;
-  try {
-    standards = (typeof STANDARDS !== 'undefined') ? STANDARDS.length : 0;
-    changes = (typeof allUpdates === 'function') ? allUpdates().length : 0;
-  } catch(e){}
-
-  /* Two lengths. The long one has room to make the argument on a desktop;
-     on a phone the header is most of the first screen, so it says the
-     minimum and gets out of the way. */
-  const narrow = (typeof window !== 'undefined' && window.matchMedia)
-    ? !window.matchMedia('(min-width: 760px)').matches : false;
-
-  const hook = narrow
-    ? 'Build a <em>personalised feed</em>.'
-    : 'Create an account and build a <em>personalised feed</em>.';
-
-  const sub = narrow
-    ? 'Pick your standards. See only what affects them, plus a levy forecast on your own numbers.'
-    : (standards
-        ? 'Choose the standards you deliver from all ' + standards.toLocaleString('en-GB') +
-          ' on the register. Your feed then shows changes to those, alongside the funding rules that apply to ' +
-          'everyone, with a levy forecast that runs on figures you enter yourself.'
-        : 'Choose the standards you deliver and your feed shows changes to those, alongside the funding rules ' +
-          'that apply to everyone, with a levy forecast on figures you enter yourself.');
-
+  /* One line and a button. The case for membership is made by the prompt
+     that appears part-way down the feed, where someone has read enough to
+     see how little of it applies to them. Making it twice, once before they
+     have seen anything, only pushes the feed below the fold. */
   return '<div class="herocta">' +
-    '<div class="ctacopy">' +
-      '<p class="ctahook">' + hook + '</p>' +
-      '<p class="ctasub">' + sub + '</p>' +
-    '</div>' +
-
+    '<p class="ctahook">Build a <em>personalised feed</em>.</p>' +
     '<div class="ctaact">' +
-      '<div class="ctaring">' +
-        (roomToScribble() ? scribbleRing() : '') +
-        '<a class="ctabtn" href="account.html?join=1">' +
-          '<b>Become a member</b><span>' + price + ' ' + period + ' &middot; cancel any time</span>' +
-        '</a>' +
-      '</div>' +
+      '<a class="ctabtn" href="account.html?join=1">Start ' + days + ' days free</a>' +
+      '<span class="ctaterms">then ' + price + ' ' + period + '</span>' +
       '<a class="ctalink" href="account.html">Already a member? Sign in</a>' +
     '</div>' +
   '</div>';
-}
-
-/* The wordmark is the page's h1 on the home page, where there is no other
-   heading to carry it. Everywhere else the page's own title is the h1 and
-   the wordmark is just a link, so each page has exactly one h1 that
-   describes that page rather than the site. Same appearance either way. */
-function isHomePage(){
-  if(typeof location === 'undefined') return false;
-  const p = location.pathname.replace(/\/+$/, '');
-  return p === '' || /\/index\.html$/.test(p) || p === '/index';
-}
-
-function wordmarkHTML(){
-  const inner = '<a href="index.html">Skills <em>Radar</em></a>';
-  return isHomePage()
-    ? '<h1 class="wordmark">' + inner + '</h1>'
-    : '<p class="wordmark">' + inner + '</p>';
 }
 
 function titleBlockHTML(stampHTML, withCta){
