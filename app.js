@@ -418,12 +418,19 @@ function articleFor(s, defunded, dev){
    register keeps everything.
    ========================================================================= */
 
-const FEED_MONTHS = 9;
-const FEED_DAYS = FEED_MONTHS * 31;
+const FEED_MONTHS = 12;
+const FEED_DAYS = FEED_MONTHS * 30.44;   // mean month length, so 12 means a year
 
+/* Where a change sits, decided only by its date against today.
+
+   Nothing is stored about which column an item belongs in, and nothing is
+   cached: daysAgo reads the clock on every call, so an item dated 1 March
+   is upcoming until 1 March and recent from the moment the page is opened on
+   the day. It needs no weekly job to move things along, and it cannot drift
+   out of step with a stale status written months ago. */
 function feedPlacement(date){
   if(!date) return 'background';
-  const age = daysAgo(date);
+  const age = daysAgo(date);          // negative means the date is ahead of today
   if(isNaN(age)) return 'background';
   if(age < 0) return 'upcoming';
   return age <= FEED_DAYS ? 'recent' : 'background';

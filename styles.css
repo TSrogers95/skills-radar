@@ -4455,3 +4455,86 @@ blockquote, .standfirst{ font-family:var(--serif); font-style:italic; }
   .herocta .ctabtn{ flex:1 1 auto; text-align:center; padding:12px 18px; }
   .ctaterms{ order:3; flex-basis:100%; }
 }
+
+/* ---------- Hero, reworded ----------
+
+   The sub-line used to be a span inside the hero paragraph. Hiding it on a
+   phone left its margin behind, which is the empty gap under the headline.
+   It is its own paragraph now, so hiding it removes the space too.
+*/
+
+.hero{
+  font-family:var(--serif); font-style:normal;
+  font-size:clamp(17px, 1.7vw, 22px); line-height:1.35;
+  color:#DCE8E5; max-width:30ch; margin:16px 0 0;
+}
+.herosub{
+  display:block; font-family:var(--sans); font-style:normal;
+  font-size:13.5px; line-height:1.55; color:#8FAEA8;
+  max-width:52ch; margin:9px 0 0;
+}
+
+@media (max-width:759px){
+  .hero{ font-size:17px; max-width:none; margin-top:12px; }
+  .herosub{ display:none; }
+}
+
+/* ---------- Call to action: promise, arrow, action ---------- */
+
+.herocta{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:16px 24px; flex-wrap:wrap;
+  margin-top:24px; padding-top:18px;
+  border-top:1px solid #23504A;
+}
+
+.ctapitch{
+  display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+  flex:1 1 auto;
+}
+.herocta .ctahook{
+  display:flex; align-items:center; gap:10px;
+  font-family:var(--serif); font-size:clamp(17px, 1.75vw, 22px);
+  font-weight:500; letter-spacing:-0.014em; line-height:1.2;
+  color:#EAF3F1; margin:0; white-space:nowrap;
+}
+.herocta .ctahook em{ font-style:normal; color:#6ED0B6; font-weight:600; }
+
+.ctaarrow{
+  width:46px; height:18px; flex:none;
+  color:#3E6B64;
+  /* drawn on once, so the eye is led from the line to the button */
+  stroke-dasharray:70; stroke-dashoffset:70;
+  animation:ctadraw .7s cubic-bezier(.4,0,.2,1) .5s forwards;
+}
+@keyframes ctadraw{ to { stroke-dashoffset:0; } }
+
+.herocta .ctabtn{
+  display:inline-block; padding:11px 22px; flex:none;
+  font-family:var(--sans); font-size:14.5px; font-weight:600;
+  background:#6ED0B6; color:#06211C; text-decoration:none;
+  transition:background .15s ease;
+}
+.herocta .ctabtn:hover{ background:#8CE7CE; }
+.ctaterms{ font-size:12.5px; color:#8FAEA8; white-space:nowrap; }
+
+.herocta .ctalink{
+  font-size:12.5px; color:#A9C2BC; text-decoration:none;
+  border-bottom:1px solid #2A5049; padding-bottom:1px; flex:none;
+}
+.herocta .ctalink:hover{ color:#fff; border-bottom-color:#6ED0B6; }
+
+@media (max-width:860px){
+  .ctaarrow{ display:none; }
+  .herocta .ctahook{ white-space:normal; }
+}
+@media (max-width:759px){
+  .herocta{ margin-top:16px; padding-top:15px; gap:11px; }
+  .ctapitch{ width:100%; gap:11px; }
+  .herocta .ctahook{ flex-basis:100%; font-size:17px; }
+  .herocta .ctabtn{ flex:1 1 auto; text-align:center; padding:12px 18px; }
+  .herocta .ctalink{ width:100%; }
+}
+@media (prefers-reduced-motion: reduce){
+  .ctaarrow{ animation:none; stroke-dashoffset:0; }
+}

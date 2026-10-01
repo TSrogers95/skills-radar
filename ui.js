@@ -3,8 +3,12 @@
    Builds the masthead and navigation so every page stays consistent.
    ========================================================================= */
 
-const HERO = "The intelligence platform for early-career programmes.";
-const HERO_SUB = "Spend less time interpreting guidance and more time building great programmes.";
+/* What the site does, in the words someone would use to describe the
+   problem to a colleague. The previous line said what the site was rather
+   than what it saved you, and "intelligence platform" is a category nobody
+   searches for. */
+const HERO = "Work out what the funding rules mean, in minutes rather than evenings.";
+const HERO_SUB = "Every change to apprenticeship funding, standards and T-Levels, with what it means for the programmes you run.";
 
 const PAGES = [
   { file: "index.html",      label: "Feed" },
@@ -90,13 +94,24 @@ function ctaHTML(){
      that appears part-way down the feed, where someone has read enough to
      see how little of it applies to them. Making it twice, once before they
      have seen anything, only pushes the feed below the fold. */
+  /* The line and the button sit together on the left rather than being
+     pushed to opposite edges, with a drawn arrow between them so the eye
+     goes from the promise to the action. Sign-in stays right, out of the
+     way of people who are not signing in. */
   return '<div class="herocta">' +
-    '<p class="ctahook">Build a <em>personalised feed</em>.</p>' +
-    '<div class="ctaact">' +
+    '<div class="ctapitch">' +
+      '<p class="ctahook">Build a <em>personalised feed</em>' +
+        '<svg class="ctaarrow" viewBox="0 0 54 22" aria-hidden="true">' +
+          '<path d="M2 11 C16 11 32 11 48 11" fill="none" stroke="currentColor" ' +
+            'stroke-width="2" stroke-linecap="round"/>' +
+          '<path d="M40 5 L49 11 L40 17" fill="none" stroke="currentColor" ' +
+            'stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' +
+        '</svg>' +
+      '</p>' +
       '<a class="ctabtn" href="account.html?join=1">Start ' + days + ' days free</a>' +
       '<span class="ctaterms">then ' + price + ' ' + period + '</span>' +
-      '<a class="ctalink" href="account.html">Already a member? Sign in</a>' +
     '</div>' +
+    '<a class="ctalink" href="account.html">Already a member? Sign in</a>' +
   '</div>';
 }
 
@@ -115,7 +130,8 @@ function titleBlockHTML(stampHTML, withCta){
     '<div class="brandrow">' +
       '<div class="brandmain">' +
         wordmarkHTML() +
-        '<p class="hero">' + HERO + '<span class="herosub">' + HERO_SUB + '</span></p>' +
+        '<p class="hero">' + HERO + '</p>' +
+        (HERO_SUB ? '<p class="herosub">' + HERO_SUB + '</p>' : '') +
       '</div>' +
       (stampHTML ? '<div class="stamp">' + stampHTML + '</div>' : '') +
     '</div>' +
