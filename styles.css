@@ -4270,3 +4270,114 @@ blockquote, .standfirst{ font-family:var(--serif); font-style:italic; }
   .joinprompt{ transition:opacity .1s linear; transform:none; }
   .joinprompt.on{ transform:none; }
 }
+
+/* =========================================================================
+   THE FREE TRIAL PROMPT
+
+   Overrides the plainer version above. The teal is the site's own accent and
+   it is doing a specific job here: it marks the three things a member gets,
+   so the eye lands on the benefits rather than on the price or the button.
+   Used anywhere else in this box it would just be decoration.
+   ========================================================================= */
+
+.joinprompt{
+  position:fixed; right:22px; bottom:22px; z-index:70;
+  width:min(410px, calc(100vw - 32px));
+  background:var(--surface);
+  border:1px solid var(--line-strong);
+  border-top:none;
+  box-shadow:0 20px 56px rgba(13,27,30,0.26);
+  padding:0; overflow:hidden;
+  opacity:0; transform:translateY(16px);
+  transition:opacity .26s ease, transform .26s ease;
+}
+.joinprompt.on{ opacity:1; transform:translateY(0); }
+
+/* ---------- The head, on the dark ground ---------- */
+
+.jptop{
+  background:var(--ink);
+  border-top:3px solid #6ED0B6;
+  padding:22px 24px 20px;
+}
+.jpbadge{
+  display:inline-block;
+  background:#6ED0B6; color:#06211C;
+  font-family:var(--sans); font-size:10.5px; font-weight:700;
+  letter-spacing:0.1em; text-transform:uppercase;
+  padding:4px 10px; margin-bottom:12px;
+}
+.joinprompt h2{
+  font-family:var(--serif); font-size:21px; font-weight:600;
+  line-height:1.22; letter-spacing:-0.015em; margin:0; color:#F2F7F5;
+}
+.joinprompt h2 em{
+  font-style:normal; color:#6ED0B6; font-weight:700;
+}
+.joinprompt h2 #jpcount{ color:#6ED0B6; }
+
+.jpclose{
+  position:absolute; top:8px; right:10px; z-index:2;
+  background:none; border:none; font-size:22px; line-height:1;
+  color:#7FA79F; cursor:pointer; padding:4px 7px;
+}
+.jpclose:hover{ color:#fff; }
+
+/* ---------- The three things, each marked in teal ---------- */
+
+.jpwins{
+  list-style:none; margin:0; padding:18px 24px 4px;
+}
+.jpwins li{
+  position:relative;
+  padding:0 0 14px 24px;
+  font-size:12.5px; line-height:1.5; color:var(--text-2);
+}
+.jpwins li::before{
+  content:''; position:absolute; left:0; top:5px;
+  width:10px; height:6px;
+  border-left:2.5px solid var(--low);
+  border-bottom:2.5px solid var(--low);
+  transform:rotate(-45deg);
+}
+.jpwins li b{
+  display:block; font-family:var(--serif);
+  font-size:15px; font-weight:600; color:var(--text);
+  letter-spacing:-0.01em; margin-bottom:2px;
+}
+
+/* ---------- Actions ---------- */
+
+.jpacts{ display:flex; gap:9px; padding:8px 24px 0; flex-wrap:wrap; }
+.jpacts .btn{ flex:1; text-align:center; text-decoration:none; min-width:130px; }
+.jpacts .jpgo{
+  background:var(--low); border-color:var(--low); color:#fff;
+  font-weight:600; font-size:15px; padding:13px 20px;
+}
+.jpacts .jpgo:hover{ background:#0C6456; border-color:#0C6456; }
+.jpacts .btn.ghost{ flex:0 0 auto; min-width:0; padding:13px 16px; font-size:13.5px; }
+
+.jpfoot{
+  margin:0; padding:14px 24px 20px;
+  font-size:11.5px; line-height:1.5; color:var(--text-3);
+}
+.jpfoot b{ color:var(--text-2); font-weight:600; }
+.jpfoot a{ color:var(--low); font-weight:500; }
+
+@media (max-width:560px){
+  .joinprompt{
+    right:8px; left:8px; bottom:8px; width:auto;
+    padding-bottom:env(safe-area-inset-bottom, 0px);
+  }
+  .jptop{ padding:18px 20px 16px; }
+  .joinprompt h2{ font-size:18.5px; }
+  .jpwins{ padding:15px 20px 2px; }
+  .jpwins li{ padding-bottom:11px; }
+  .jpwins li b{ font-size:14px; }
+  .jpacts{ padding:6px 20px 0; }
+  .jpfoot{ padding:12px 20px 16px; }
+}
+@media (prefers-reduced-motion: reduce){
+  .joinprompt{ transition:opacity .1s linear; transform:none; }
+  .joinprompt.on{ transform:none; }
+}

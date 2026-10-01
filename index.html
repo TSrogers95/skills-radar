@@ -103,16 +103,25 @@
      dismissible, and remembered so it never appears twice in a session. -->
 <div class="joinprompt" id="joinprompt" hidden>
   <button class="jpclose" id="jpclose" aria-label="Close">&times;</button>
-  <p class="jpkick">Free for 14 days</p>
-  <h2>Only three of these affect you</h2>
-  <p class="jpbody">There are <span id="jpcount">180</span> live changes on this page and almost none are
-  your problem. Tell us which standards you deliver and the feed shows those, with a levy forecast
-  on your own numbers.</p>
+
+  <div class="jptop">
+    <span class="jpbadge">14 days free</span>
+    <h2>You are reading <span id="jpcount">180</span> changes to find the <em>three</em> that are yours</h2>
+  </div>
+
+  <ul class="jpwins">
+    <li><b>A feed that is only yours</b>Pick your standards. Everything else disappears.</li>
+    <li><b>Levy forecasting</b>The month co-investment starts, on your own numbers.</li>
+    <li><b>Off-the-job and deadlines</b>Where you stand against the published minimum.</li>
+  </ul>
+
   <div class="jpacts">
-    <a class="btn" href="account.html?join=1">Start the free trial</a>
+    <a class="btn jpgo" href="account.html?join=1">Start 14 days free</a>
     <button class="btn ghost" id="jplater">Not now</button>
   </div>
-  <p class="jpfoot">Cancel any time. <a href="demo.html">See what members get</a>.</p>
+
+  <p class="jpfoot">Then <b id="jpprice">£5 a month</b>. Cancel any time, in two clicks.
+  <a href="demo.html">See it first</a>.</p>
 </div>
 
 <footer>
@@ -407,6 +416,9 @@ document.querySelectorAll('.tabs button').forEach(btn => {
 
   const count = document.getElementById('jpcount');
   if(count && typeof FEED !== 'undefined') count.textContent = FEED.length;
+
+  const price = document.getElementById('jpprice');
+  if(price && typeof MEMBERSHIP !== 'undefined') price.textContent = MEMBERSHIP.price + ' ' + MEMBERSHIP.period;
 
   let shown = false;
 
