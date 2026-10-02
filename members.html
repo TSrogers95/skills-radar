@@ -2206,15 +2206,16 @@ function prefsView(){
   const optedOut = ACCOUNT && ACCOUNT.profile && ACCOUNT.profile.email_opt_out;
 
   return '<div class="pagehead"><h1>Newsletter</h1>' +
-    '<p>One email a month, built from the standards in your cohort. Not a general bulletin, ' +
+    '<p>An occasional digest, built from the standards in your cohort. Not a general bulletin, ' +
     'and not something you have to configure.</p></div>' +
 
     '<div class="notice" style="margin-top:0"><b>How it works.</b> ' +
     'There is nothing to set up. The digest is assembled from the ' + COHORT.length + ' standard' +
     (COHORT.length === 1 ? '' : 's') + ' in ' +
     '<button class="linkbtn" data-go="cohort">your cohort</button>, plus the funding rules that apply ' +
-    'to everyone. Change your cohort and the next one changes with it. It is sent from ' + from + ', ' +
-    'so adding that address to your contacts is worth doing.</div>' +
+    'to everyone. Change your cohort and the next one changes with it. It comes from ' + from + ', ' +
+    'written by a person rather than generated, which is why it goes out when there is something worth ' +
+    'saying rather than on a fixed day. Adding that address to your contacts is worth doing.</div>' +
 
     '<div class="grouphead"><h2>Your next digest</h2><div class="rule"></div>' +
       '<span class="hint" style="margin:0">Live preview, as it stands today</span></div>' +
@@ -2259,8 +2260,8 @@ function prefsView(){
               '</div>'
             : '') +
 
-          '<div class="digfoot">Sent monthly. Unsubscribe in one click, from the link in every email ' +
-          'or the setting below.</div>' +
+          '<div class="digfoot">This is what your next one would contain, as it stands today. ' +
+          'Unsubscribe any time, from the link in every email or the setting below.</div>' +
         '</div>') +
 
     '<div class="grouphead"><h2>Your preference</h2><div class="rule"></div></div>' +
@@ -2269,7 +2270,7 @@ function prefsView(){
       '<label class="optrow" for="p-optout">' +
         '<input type="checkbox" id="p-optout"' + (optedOut ? ' checked' : '') + '>' +
         '<span class="optmark" aria-hidden="true"></span>' +
-        '<span class="opttext"><b>Do not send me the monthly digest</b>' +
+        '<span class="opttext"><b>Do not send me the digest</b>' +
         'You keep full access to everything on the site. We will still email you about your account ' +
         'and your payment, which we are required to do.</span>' +
       '</label>' +
@@ -2286,8 +2287,8 @@ function wirePrefs(panel){
       if(ACCOUNT && ACCOUNT.profile) ACCOUNT.profile.email_opt_out = box.checked;
       out.innerHTML = '<div class="okbox" style="margin-top:14px">' +
         (box.checked
-          ? 'Saved. You will not get the monthly digest. Account and payment emails still come through.'
-          : 'Saved. Your next digest goes out at the start of the month.') + '</div>';
+          ? 'Saved. You will not get the digest. Account and payment emails still come through.'
+          : 'Saved. You are on the list for the next one.') + '</div>';
     } catch(e){
       out.innerHTML = '<div class="alert" style="margin-top:14px">Could not save that. Try again shortly.</div>';
     }
@@ -2503,7 +2504,7 @@ function lockedView(tab){
         MEMBERSHIP.price + ' ' + MEMBERSHIP.period + '</button>' +
       '<button class="btn ghost" data-go="dash">Back to your feed</button>' +
     '</div>' +
-    '<p class="lockfoot">Your feed and the monthly digest stay free. ' +
+    '<p class="lockfoot">Your feed and the digest stay free. ' +
     'Everything you have entered is still here, and comes back the moment you upgrade.</p>' +
   '</div>';
 }

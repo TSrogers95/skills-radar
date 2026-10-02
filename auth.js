@@ -139,7 +139,7 @@ async function getSubscription(){
 
      member   paying, or inside the trial. Everything.
      free     had an account, trial is over, did not continue. A small feed
-              and the monthly digest. Their whole cohort is still stored;
+              and the digest. Their whole cohort is still stored;
               only the first few stay live.
      none     not signed in.
 

@@ -80,7 +80,7 @@ const DEMO = {
    The shape: everyone can read the public feed without an account. Signing
    up starts a trial of the full members area. When that ends the account
    drops to the free tier rather than being closed, keeping a small feed and
-   the monthly digest, with the paid tools locked but visible.
+   the digest, with the paid tools locked but visible.
 
    These are the two numbers worth revising once real behaviour tells you
    something, which is why they are here rather than buried in the code.

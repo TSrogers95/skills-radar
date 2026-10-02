@@ -176,7 +176,7 @@ function joinView(message){
           '<label class="optrow" for="optout">' +
             '<input type="checkbox" id="optout" name="optout">' +
             '<span class="optmark" aria-hidden="true"></span>' +
-            '<span class="opttext"><b>Do not send me the monthly newsletter</b>' +
+            '<span class="opttext"><b>Do not send me the digest</b>' +
             'You will still get emails about your account and your payment.</span>' +
           '</label>' +
 
@@ -205,9 +205,9 @@ function joinView(message){
           'All ' + counts.standards + ' standards on the register are tracked here, with ' + counts.changes +
           ' live changes between them. Choose the ones you deliver and the feed shows changes to those, ' +
           'alongside the funding rules that apply to everyone, what changed, what it changed from, and what follows.') +
-        benefit('The monthly newsletter', false,
-          'What moved and what it means, once a month. Written rather than generated, and focused on what you ' +
-          'have to do about it. Turn it off in one click without losing your account.') +
+        benefit('A digest built around you', false,
+          'What moved on your standards and what it means, written rather than generated, and sent when there ' +
+          'is something worth saying. Turn it off in one click without losing your account.') +
         benefit('Compliance, in one place', false,
           'Off-the-job hours against the published minimum for each of ' + counts.otj + ' standards. A calendar ' +
           'of the deadlines that touch your provision. And a board report you can print, with your funding ' +
@@ -367,7 +367,7 @@ async function payView(message){
           '<li>A feed showing only what affects your standards</li>' +
           '<li>Levy forecasting against your own figures</li>' +
           '<li>Off-the-job position and a compliance calendar</li>' +
-          '<li>The monthly newsletter, built from your cohort</li>' +
+          '<li>A digest built from your cohort</li>' +
           '<li>A board report you can print</li>' +
         '</ul>' +
 
