@@ -1641,7 +1641,7 @@ ARTICLES.push(
   id: "route-business-admin",
   icon: "desk", tag: "Standard", urgency: "high", route: "business-administration",
   date: "2026-09-01",
-  title: "Business and administration: six standards defunded, gutting the management ladder",
+  title: "Business and administration: six management standards defunded, from Team Leader to Chartered Manager",
   summary: "Team Leader, Operations Manager, Coaching Professional, Improvement Practitioner, Improvement Leader and Chartered Manager all go.",
   standfirst: "The route that loses most, and the one where almost every employer in the country has provision.",
   body: [

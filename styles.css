@@ -4817,3 +4817,58 @@ blockquote, .standfirst{ font-family:var(--serif); font-style:italic; }
 /* On light grounds the ink button stays: it has the contrast, and a green
    button on paper would sit too close to the "for information" green used
    in the feed. */
+
+
+/* =========================================================================
+   ARTICLE PAGES, AFTER THE REVIEW
+
+   A compliance notice is read fast and acted on. Several things here were
+   working against that: an ornamental drop cap, a tall header pushing the
+   headline below the fold, and a red urgency badge competing with it.
+
+   The drop cap in particular was splitting the first word, which is exactly
+   the sort of decoration that looks considered in a sample and wrong on a
+   real page.
+   ========================================================================= */
+
+/* No drop cap on article pages. It belongs in a magazine, not on a notice
+   about a funding deadline. */
+.pbody > p:first-child::first-letter{
+  float:none; font-size:inherit; line-height:inherit;
+  padding:0; font-weight:inherit; color:inherit;
+}
+
+/* A compact header, so the headline is on the first screen */
+.piece .ptags{ margin-bottom:12px; }
+.piece h1{ font-size:clamp(26px, 3.2vw, 38px); line-height:1.1; }
+.piece{ padding-top:26px; }
+
+/* Nothing on these pages waits for a scroll to appear. Someone skimming a
+   compliance notice should never meet a blank screen. */
+.reveal, [data-reveal]{ opacity:1 !important; transform:none !important; }
+
+/* ---------- The eyebrow, as links ----------
+   It was three words separated by dots, standing in for navigation without
+   being navigable. Now it goes where it says.
+*/
+.markrule .lbl{ display:inline-flex; gap:0; align-items:center; }
+.markrule .lbl a{
+  color:#6ED0B6; text-decoration:none;
+  padding:0 10px; border-right:1px solid #2A5049;
+  font-family:var(--sans); font-size:10.5px; font-weight:600;
+  letter-spacing:0.16em; text-transform:uppercase;
+}
+.markrule .lbl a:first-child{ padding-left:0; }
+.markrule .lbl a:last-child{ border-right:none; }
+.markrule .lbl a:hover{ color:#fff; }
+
+/* ---------- Subheadings inside compiled articles ----------
+   "What changes:" and "What to do about it:" were colon labels in running
+   prose. They are headings doing a heading's job, so they look like one.
+*/
+.psub{
+  display:block; font-family:var(--sans);
+  font-size:11px; font-weight:700; letter-spacing:0.1em;
+  text-transform:uppercase; color:var(--text-3);
+  margin-bottom:6px;
+}

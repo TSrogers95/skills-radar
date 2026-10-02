@@ -152,10 +152,7 @@ function page(a, api){
 
   <article class="piece ${a.urgency}">
     <div class="ptags">
-      <span class="tag ${api.tagClass(a.tag)}">${esc(a.tag)}</span>
-      ${api.urgencyTag(a.urgency)}
       ${route ? `<span class="tag t-standard">${esc(route.label)}</span>` : ''}
-      ${a.compiled ? '<span class="tag t-info">Compiled from the register</span>' : ''}
       <span class="pdate"><time datetime="${a.date}">${api.fmtLong(a.date)}</time></span>
     </div>
 
@@ -168,10 +165,9 @@ function page(a, api){
       ${a.body.map(p => '<p>' + p + '</p>').join('\n      ')}
     </div>
 
-    ${a.compiled ? `<div class="notice"><b>This page is compiled, not written.</b>
-      Every figure in it comes from this standard&rsquo;s own record on the Skills England register.
-      The guidance is general to this type of change rather than specific to your provision  to 
-      check the source before acting on it.</div>` : ''}
+    ${a.compiled ? `<div class="notice">The figures in the box above come from this standard&rsquo;s
+      record on the Skills England register. The context and guidance below are ours, and are general to
+      this kind of change rather than specific to your provision.</div>` : ''}
 
     ${a.onRoute && a.onRoute.length ? routeList(a) : ''}
 
@@ -184,7 +180,7 @@ function page(a, api){
 
     <div class="sharebox">
       <a class="btn small ghost" href="../articles.html">All articles</a>
-      <span class="hint">Published ${api.fmtLong(a.date)}. Always check the source before acting on a compliance deadline.</span>
+      <span class="hint">Published ${api.fmtLong(a.date)}</span>
     </div>
   </article>
 
@@ -194,7 +190,7 @@ function page(a, api){
 
 <footer>
   <div class="wrap">
-    <p>Analysis reflects the position at the date shown. Skills Radar is not a substitute for the funding rules themselves.</p>
+    <p>Reflects the Skills England register on ${api.fmtLong(a.date)}. Check the funding rules before acting.</p>
     <div class="attribution">
       <a href="https://www.gov.uk/government/organisations/skills-england" target="_blank" rel="noopener" class="selogo"><img src="https://occupational-maps.skillsengland.education.gov.uk/media/cyropis5/skills-england_lesser_arms_landscape-se-logo-white.svg" alt="Skills England" width="150" height="40" loading="lazy"></a>
       <p>Contains data from Skills England. &copy; Skills England 2026. This information is licensed under the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3" target="_blank" rel="noopener">Open Government Licence v3.0</a>. Funding rules content is Crown copyright, also under the Open Government Licence.</p>
@@ -217,7 +213,7 @@ function page(a, api){
   /* Generated pages live in /a/, so every link out of them needs one level
    up. The nav was already rewritten; the wordmark was not, which is why
    clicking the logo landed on /a/ and 404'd. */
-document.getElementById('heroblock').innerHTML = titleBlockHTML('').replace(/href="index\.html"/g, 'href="../index.html"');
+document.getElementById('heroblock').innerHTML = titleBlockHTML('').replace(/href="(?!\.\.\/|https?:|#|mailto:)/g, 'href="../');
   document.getElementById('navslot').innerHTML = navHTML('articles.html').replace(/href="/g, 'href="../');
   if(typeof recordView === 'function') recordView();
   if(typeof recordEvent === 'function') recordEvent('article', ${JSON.stringify(a.id)});
@@ -232,10 +228,12 @@ function factBox(s, api){
     ['Level', s.level],
     ['Duration', s.months ? s.months + ' months' : 'delivered as a unit'],
     ['Maximum funding', api.band(s.funding)],
-    ['Reference', s.code || 'not confirmed'],
+    ['Reference', s.code || null],
     ['Version', s.version],
     ['Status', s.status],
-    ['Assessment', s.epa || 'Assigned']
+    ['Assessment', s.epa === 'Assigned'
+      ? 'Assigned, an assessment organisation is in place'
+      : (s.epa || null)]
   ];
   if(otj) facts.push(['Off-the-job minimum', otj + ' hours']);
 
@@ -244,7 +242,8 @@ function factBox(s, api){
 
   return `<aside class="factbox">
       <h2>${esc(s.name)}</h2>
-      <dl>${facts.map(f => `<div><dt>${esc(f[0])}</dt><dd>${esc(f[1])}</dd></div>`).join('')}</dl>
+      <dl>${facts.filter(f => f[1] !== null && f[1] !== undefined && f[1] !== '')
+        .map(f => `<div><dt>${esc(f[0])}</dt><dd>${esc(f[1])}</dd></div>`).join('')}</dl>
       ${path.length ? `<div class="fbextra"><b>Pathway</b> ${esc(path.join(' · '))}</div>` : ''}
       ${jobs.length ? `<div class="fbextra"><b>Typical job titles</b> ${esc(jobs.slice(0,8).join(', '))}</div>` : ''}
       <a class="fblink" href="${esc(api.standardURL(s))}" target="_blank" rel="noopener">View on the Skills England register &nearr;</a>
@@ -600,9 +599,10 @@ ${ld.map(x => '<script type="application/ld+json">' + JSON.stringify(x) + '</scr
 
 <footer>
   <div class="wrap">
-    <p>Skills Radar is maintained by hand from the Skills England apprenticeship register,
-    the Skills England occupational maps, and GOV.UK apprenticeship funding and T-Level guidance.
-    Always check the source before acting on a compliance deadline.</p>
+    <p>Skills Radar is built from the Skills England apprenticeship register and occupational maps,
+    taken from their published API and data downloads, together with the GOV.UK apprenticeship funding
+    rules and T-Level guidance. The register and occupational maps refresh weekly. Every entry links to
+    its source, and you should check that source before acting on a compliance deadline.</p>
     <p class="legal"><a href="../privacy.html">Privacy notice</a> ·
       <a href="../terms.html">Terms</a> · <a href="../account.html">Members</a></p>
     <div class="attribution">
@@ -625,7 +625,7 @@ ${ld.map(x => '<script type="application/ld+json">' + JSON.stringify(x) + '</scr
 <script src="../auth.js"></script>
 <script defer src="/_vercel/insights/script.js"></script>
 <script>
-  document.getElementById('heroblock').innerHTML = titleBlockHTML('').replace(/href="index\.html"/g, 'href="../index.html"');
+  document.getElementById('heroblock').innerHTML = titleBlockHTML('').replace(/href="(?!\.\.\/|https?:|#|mailto:)/g, 'href="../');
   document.getElementById('navmain').innerHTML = navHTML('').replace(/href="/g, 'href="../');
   document.getElementById('navslot').innerHTML = navHTML('').replace(/href="/g, 'href="../');
   if(typeof recordView === 'function') recordView();
@@ -719,7 +719,7 @@ function guidesIndex(all, fmtLong){
 <script src="../auth.js"></script>
 <script defer src="/_vercel/insights/script.js"></script>
 <script>
-  document.getElementById('heroblock').innerHTML = titleBlockHTML('').replace(/href="index\.html"/g, 'href="../index.html"');
+  document.getElementById('heroblock').innerHTML = titleBlockHTML('').replace(/href="(?!\.\.\/|https?:|#|mailto:)/g, 'href="../');
   document.getElementById('navmain').innerHTML = navHTML('').replace(/href="/g, 'href="../');
   document.getElementById('navslot').innerHTML = navHTML('').replace(/href="/g, 'href="../');
   if(typeof recordView === 'function') recordView();

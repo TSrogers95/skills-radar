@@ -135,7 +135,11 @@ function titleBlockHTML(stampHTML, withCta){
   return '<div class="titleblock">' + backdropHTML() +
     '<div class="markrule">' +
       '<span class="pulse" aria-hidden="true"></span>' +
-      '<span class="lbl">Apprenticeships &middot; Funding &middot; T-Levels</span>' +
+      '<span class="lbl">' +
+        '<a href="standards.html">Apprenticeships</a>' +
+        '<a href="rules.html">Funding</a>' +
+        '<a href="articles.html?route=t-levels">T-Levels</a>' +
+      '</span>' +
       '<span class="line"></span>' +
     '</div>' +
     '<div class="brandrow">' +

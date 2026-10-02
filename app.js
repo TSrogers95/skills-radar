@@ -647,10 +647,12 @@ function compiledArticle(s){
   const route = ROUTES[s.route];
   const level = 'Level ' + s.level;
   const dur   = s.months ? s.months + ' months' : 'delivered as a unit';
-  const rname = route ? route.label : 'its route';
+  const rname = route ? route.label : 'the same';
 
-  const spec = level + ', ' + dur + ', maximum funding ' + gbp(s.funding) +
-    (s.code ? ', reference ' + s.code : '') + ', currently at version ' + s.version + '.';
+  /* No spec sentence. The fact box directly above the body already carries
+     level, duration, funding band and version, and repeating it in the first
+     paragraph was the clearest sign the page was assembled rather than
+     written. */
 
   const body = [], sources = [];
   let title, summary, standfirst, urgency, icon;
@@ -658,14 +660,15 @@ function compiledArticle(s){
   if(kind === 'defunded'){
     urgency = 'high'; icon = 'stop';
     title = s.name + ' loses funding from September 2026';
-    summary = 'One of the sixteen standards being defunded. Existing apprentices are safe; no new starts after the cut-off.';
-    standfirst = 'A funded route into this occupation closes, and for most of the sixteen no replacement has been announced.';
+    summary = level + ', ' + dur + ', ' + gbp(s.funding) + ' band. ' +
+      'Funding closed to new starts on 1 September 2026.';
+    standfirst = 'New starts on this standard can no longer be funded. Apprentices already on programme are unaffected.';
     body.push(
-      s.name + ' at ' + level + ' is one of sixteen apprenticeship standards losing funding from no earlier than 1 September 2026. ' + spec,
-      'What changes: government funding is withdrawn for new starts. Apprentices already on programme are unaffected and remain funded through to completion. What you cannot do is start anyone new after the cut-off.',
-      'The practical deadline is earlier than the formal one. Eligibility checks, contracting and onboarding typically take six to eight weeks, so a start that has not been set up well before September will not be funded.',
+      s.name + ' at ' + level + ' is one of sixteen apprenticeship standards that lost funding for new starts on 1 September 2026.',
+      '<b class="psub">What changes</b>government funding is withdrawn for new starts. Apprentices already on programme are unaffected and remain funded through to completion.',
+      'The cut-off has passed. Apprentices who started on or before 31 August 2026 remain funded through to completion, including their end-point assessment, and nothing about their programme changes. What is closed is new starts: anyone beginning from 1 September 2026 cannot be funded on this standard, whatever stage the paperwork had reached.',
       'The reason given is budget pressure combined with a policy shift towards younger apprentices. Skills England has noted the offer grew beyond 700 standards while starts among 16 to 24 year olds fell around 40% over a decade, with growth concentrated in older, higher-level and more expensive provision.',
-      'What to do about it: if you deliver this standard, decide now whether learners can move to an adjacent standard on ' + rname + ', whether apprenticeship units can cover the same capability, or whether development here moves outside the levy entirely. If you are an employer using it as a pipeline, you need that answer before the cut-off rather than after it.'
+      '<b class="psub">What to do about it</b>if you deliver this standard, decide now whether learners can move to an adjacent standard in the ' + rname + ' route, whether apprenticeship units can cover the same capability, or whether development here moves outside the levy entirely. If you are an employer using it as a pipeline, you need that answer before the cut-off.'
     );
     sources.push({ label: 'Skills England, Streamlining apprenticeships', url: 'https://help.apprenticeships.education.gov.uk/hc/en-gb/articles/34005717182226-Streamlining-apprenticeships' });
   }
@@ -676,11 +679,11 @@ function compiledArticle(s){
     summary = 'Skills England is consulting on withdrawing this standard. Consultation is the only point at which the outcome can be influenced.';
     standfirst = 'Not yet a decision, which is exactly why it is worth responding to.';
     body.push(
-      'A retirement consultation is open on ' + s.name + ' at ' + level + '. ' + spec,
+      'A retirement consultation is open on ' + s.name + ' at ' + level + '.',
       'A retirement consultation means Skills England is asking whether the standard should continue. It is not a decision, and outcomes do vary, some standards emerge revised rather than withdrawn.',
       'What changes today: nothing. The standard remains approved for delivery and you can continue to start apprentices on it while the consultation runs.',
       'What could change: if the outcome is retirement, the standard closes to new starts from a date to be announced, with existing apprentices funded to completion as usual.',
-      'What to do about it: respond. Consultation is the only stage at which employer and provider demand is formally counted, and standards on ' + rname + ' with quiet consultations are the ones most likely to go. In the meantime, avoid building a new commercial offer on this standard until the outcome is known, and have an alternative identified.'
+      '<b class="psub">What to do about it</b>respond. Consultation is the only stage at which employer and provider demand is formally counted, and standards in the ' + rname + ' route with quiet consultations are the ones most likely to go. In the meantime, avoid building a new commercial offer on this standard until the outcome is known, and have an alternative identified.'
     );
     sources.push({ label: 'Skills England apprenticeship register', url: 'https://skillsengland.education.gov.uk/apprenticeships/' });
   }
@@ -691,10 +694,10 @@ function compiledArticle(s){
     summary = 'Closed to new starts. Apprentices already on programme continue to completion.';
     standfirst = 'The standard is gone for new starts, and the question is what replaces it.';
     body.push(
-      s.name + ' at ' + level + ' has been retired on the Skills England register. ' + spec,
+      s.name + ' at ' + level + ' has been retired on the Skills England register.',
       'A retired standard cannot take new starts. Apprentices who began before the retirement date continue under the rules and version that applied when they started, and remain funded to completion.',
       'Where a standard is retired because it has been replaced by a newer version or a restructured occupation, the replacement will be on the register under its own reference. Where it is retired because the occupation no longer warrants an apprenticeship, there is no replacement.',
-      'What to do about it: check the register for a successor standard on ' + rname + ' before assuming either. Then confirm which version each apprentice on programme sits under, because the funding rules that apply are those in force on their individual start date rather than today.'
+      '<b class="psub">What to do about it</b>check the register for a successor standard in the ' + rname + ' route before assuming either. Then confirm which version each apprentice on programme sits under, because the funding rules that apply are those in force on their individual start date rather than today.'
     );
     sources.push({ label: 'Skills England apprenticeship register', url: 'https://skillsengland.education.gov.uk/apprenticeships/' });
   }
@@ -705,11 +708,11 @@ function compiledArticle(s){
     summary = 'You cannot enrol anyone while the pause holds, though existing apprentices continue.';
     standfirst = 'The most disruptive status on the register, because it arrives without notice.';
     body.push(
-      s.name + ' at ' + level + ' is currently paused for starts. ' + spec,
+      s.name + ' at ' + level + ' is currently paused for starts.',
       'A pause is different from a revision. A standard in revision can still take new apprentices on the current version. A paused standard cannot take anyone at all until the pause lifts.',
       'Apprentices already on programme are unaffected and continue to completion.',
       'Pauses are usually applied while something material is being resolved, an assessment plan problem, a regulatory change, or a funding review. No end date is normally published.',
-      'What to do about it: if you had a cohort planned, you need an alternative on ' + rname + ' now rather than a wait-and-see. Check the register weekly, since a pause can lift as suddenly as it appeared, and tell any employer expecting to recruit onto this standard before they advertise a vacancy they cannot fill.'
+      '<b class="psub">What to do about it</b>if you had a cohort planned, you need an alternative in the ' + rname + ' route now rather than a wait-and-see. Check the register weekly, since a pause can lift as suddenly as it appeared, and tell any employer expecting to recruit onto this standard before they advertise a vacancy they cannot fill.'
     );
     sources.push({ label: 'Skills England apprenticeship register', url: 'https://skillsengland.education.gov.uk/apprenticeships/' });
   }
@@ -730,12 +733,12 @@ function compiledArticle(s){
     body.push(
       'The funding band for ' + s.name + ' at ' + level + ' has moved' +
         (from !== null ? ' from ' + gbp(from) + ' to ' + gbp(to) : ' to ' + gbp(to)) +
-        (pct ? ', an increase of around ' + pct + '%' : '') + '. ' + spec,
+        (pct ? ', an increase of around ' + pct + '%' : '') + '.',
       'The band is a maximum, not a price. It caps what can be drawn from a levy account or co-invested. The actual price is negotiated between employer and provider, so a band increase does not automatically raise what you charge.',
       'The band that applies is the one in force at the apprentice\'s start date. Apprentices already on programme stay on the old band for their full duration, which means you may be delivering the same standard at two prices at once. Check your MIS applies the right one per learner rather than the current one to everybody.',
       up
-        ? 'What to do about it: if you withdrew from this standard on cost grounds, the arithmetic has changed and it is worth revisiting. For employers, a higher band means a larger potential draw on the levy account, which matters more now that new funds expire after twelve months.'
-        : 'What to do about it: re-cost the programme before your next cohort, and check the reduction does not take delivery below viability on ' + rname + '.'
+        ? '<b class="psub">What to do about it</b>if you withdrew from this standard on cost grounds, the arithmetic has changed and it is worth revisiting. For employers, a higher band means a larger potential draw on the levy account, which matters more now that new funds expire after twelve months.'
+        : '<b class="psub">What to do about it</b>re-cost the programme before your next cohort, and check the reduction does not take delivery below viability in the ' + rname + ' route.'
     );
     sources.push({ label: 'Skills England apprenticeship register', url: 'https://skillsengland.education.gov.uk/apprenticeships/' });
   }
@@ -746,11 +749,11 @@ function compiledArticle(s){
     summary = 'Eligibility now depends on the apprentice\'s age at the start of training.';
     standfirst = 'An eligibility rule rather than a funding rate, get it wrong and the whole start is unfunded.';
     body.push(
-      'An age restriction now applies to ' + s.name + ' at ' + level + '. ' + spec,
+      'An age restriction now applies to ' + s.name + ' at ' + level + '.',
       'This is an eligibility condition, not a co-investment rate. An apprentice outside the age range cannot be funded on this standard at all, rather than being funded at a different percentage.',
       'Age is assessed at the start of the apprenticeship, using the learning start date recorded in the ILR. Someone who turns 25 during their programme remains eligible; someone who was already 25 on day one never was.',
       'Age restrictions of this kind fit the wider pattern across the 2026/27 rules of directing funding towards younger apprentices, alongside the Level 7 restriction and the changes to co-investment.',
-      'What to do about it: check the eligibility gate in your enrolment process actually tests this, rather than relying on someone remembering. An ineligible start discovered at audit is a clawback, not a correction. And be aware there is now no funded route at this level on ' + rname + ' for adults outside the range.'
+      '<b class="psub">What to do about it</b>check the eligibility gate in your enrolment process actually tests this, rather than relying on someone remembering. An ineligible start discovered at audit is a clawback, not a correction. And be aware there is now no funded route at this level in the ' + rname + ' route for adults outside the range.'
     );
     sources.push({ label: 'GOV.UK, Apprenticeship funding rules', url: 'https://www.gov.uk/guidance/apprenticeship-funding-rules' });
   }
@@ -764,12 +767,12 @@ function compiledArticle(s){
       : 'Version ' + s.version + ' is the one to deliver against for new starts.';
     standfirst = 'A version change is routine, but which version an apprentice sits under is not.';
     body.push(
-      s.name + ' at ' + level + ' is now at version ' + s.version + '. ' + spec,
+      s.name + ' at ' + level + ' is now at version ' + s.version + '.',
       'Recorded change: ' + s.changed + '.',
       inDev
         ? 'In development means a new version is being prepared while the current one remains available for starts. You are not blocked, but anything you build on the current version, curriculum, marketing, employer agreements, may need revisiting when the revision lands.'
         : 'A new version typically revises the knowledge, skills and behaviours, the assessment plan, or both. Apprentices already on programme continue under the version they started on, and the funding rules that apply are those in force on their individual start date.',
-      'What to do about it: confirm which version each cohort is recorded against in your MIS, because you may be delivering two versions of the same standard side by side. Check whether the assessment plan moved with the version, where it did, your assessment organisation will need to be working to the revised plan. And read the change against ' + rname + ' as a whole, since versions often move in batches when a regulator or sector body updates its own requirements.'
+      '<b class="psub">What to do about it</b>confirm which version each cohort is recorded against in your MIS, because you may be delivering two versions of the same standard side by side. Check whether the assessment plan moved with the version, where it did, your assessment organisation will need to be working to the revised plan. And read the change against the ' + rname + ' route as a whole, since versions often move in batches when a regulator or sector body updates its own requirements.'
     );
     sources.push({ label: 'Skills England apprenticeship register', url: 'https://skillsengland.education.gov.uk/apprenticeships/' });
   }
@@ -780,11 +783,11 @@ function compiledArticle(s){
     summary = 'The assessment plan has changed, which affects gateway, grading and who does what.';
     standfirst = 'Assessment reform reaching one standard at a time, and the old rules apply until it does.';
     body.push(
-      'The assessment plan for ' + s.name + ' at ' + level + ' has been revised. ' + spec,
+      'The assessment plan for ' + s.name + ' at ' + level + ' has been revised.',
       'Recorded change: ' + s.changed + '.',
       'Skills England is revising every assessment plan in phases, and until a standard\'s revised plan is approved and available for starts, the existing rules continue to apply to it. That means providers are running two assessment regimes side by side, sometimes within the same curriculum area.',
       'The direction of the reform is proportionality: assessment matched to the competency being tested, duplication removed, assessment able to take place throughout the apprenticeship rather than only at the end, and providers able to deliver and mark elements of it. Gateway is now called gateway to completion, reflecting exactly that.',
-      'What to do about it: check whether your apprentices on this standard sit under the old plan or the revised one, because that determines which rules bind them. Talk to your assessment organisation about what changes operationally, and revisit internal quality assurance where the split of responsibility between you and them has moved.'
+      '<b class="psub">What to do about it</b>check whether your apprentices on this standard sit under the old plan or the revised one, because that determines which rules bind them. Talk to your assessment organisation about what changes operationally, and revisit internal quality assurance where the split of responsibility between you and them has moved.'
     );
     sources.push({ label: 'GOV.UK, Changes to apprenticeship assessment', url: 'https://www.gov.uk/government/publications/apprenticeship-funding-rules-2025-to-2026/changes-to-apprenticeship-assessment-2025-to-2026' });
   }
@@ -795,10 +798,10 @@ function compiledArticle(s){
     summary = 'You can recruit and deliver, but nobody is currently appointed to assess your apprentices.';
     standfirst = 'The quietest risk on the register, because nothing about it stops you enrolling.';
     body.push(
-      s.name + ' at ' + level + ' is approved for delivery but has no assessment organisation appointed. ' + spec,
+      s.name + ' at ' + level + ' is approved for delivery but has no assessment organisation appointed.',
       'Historically a standard reaching approved status arrived with an assessment organisation already in place, so the two were treated as the same milestone. The volume of revisions moving through the system has separated them.',
       'The consequence is a timing gap rather than a block. On a ' + (s.months || 24) + '-month programme an organisation is usually appointed well before the first cohort reaches gateway. The shorter the programme, the thinner that margin.',
-      'What to do about it: before committing a cohort, check the register for an appointment and ask how long the process is expected to take against your planned end dates. Put the answer in your risk register rather than assuming it resolves itself. Where the gap is uncomfortable, an earlier version of the standard may still be open for starts, which buys time, but check which funding rules apply to that start date first.'
+      '<b class="psub">What to do about it</b>before committing a cohort, check the register for an appointment and ask how long the process is expected to take against your planned end dates. Put the answer in your risk register rather than assuming it resolves itself. Where the gap is uncomfortable, an earlier version of the standard may still be open for starts, which buys time, but check which funding rules apply to that start date first.'
     );
     sources.push({ label: 'Skills England apprenticeship register', url: 'https://skillsengland.education.gov.uk/apprenticeships/' });
   }
@@ -809,11 +812,11 @@ function compiledArticle(s){
     summary = s.changed + '.';
     standfirst = 'A change to the shape of the programme, not just its paperwork.';
     body.push(
-      s.name + ' has changed specification. ' + spec,
+      s.name + ' has changed specification.',
       'Recorded change: ' + s.changed + '.',
       'Duration and level are not cosmetic. Typical duration drives the published off-the-job training minimum, the drawdown profile against a levy account, and what you can reasonably promise an employer about when someone will be competent. Level affects entry requirements, funding band and progression.',
       'The version in force at each apprentice\'s start date is the one that binds them, so a change like this will leave you delivering two shapes of the same programme for a while.',
-      'What to do about it: re-check the published off-the-job minimum for this standard, re-cost the programme, and confirm your MIS is holding the right duration per cohort rather than the current one for everybody. On ' + rname + ' this is worth reading alongside any other specification changes, since they often move together.'
+      '<b class="psub">What to do about it</b>re-check the published off-the-job minimum for this standard, re-cost the programme, and confirm your MIS is holding the right duration per cohort rather than the current one for everybody. On ' + rname + ' this is worth reading alongside any other specification changes, since they often move together.'
     );
     sources.push({ label: 'Skills England apprenticeship register', url: 'https://skillsengland.education.gov.uk/apprenticeships/' });
   }
@@ -824,10 +827,10 @@ function compiledArticle(s){
     summary = 'The occupation has been reorganised, which changes the progression ladder rather than just the content.';
     standfirst = 'A replacement is not a version change, the shape of the route moves.';
     body.push(
-      s.name + ' at ' + level + ' has been restructured on the register. ' + spec,
+      s.name + ' at ' + level + ' has been restructured on the register.',
       'A restructure differs from a version update. A new version revises content within the same standard. A restructure replaces one standard with another, sometimes at a different level, which changes where the occupation sits on the progression ladder.',
       'For apprentices already on programme, the standard and version they started under continues to apply through to completion.',
-      'What to do about it: map the new structure against your existing offer on ' + rname + ' before your next intake. Entry requirements, duration and funding may all differ from the standard it replaces, and marketing written for the old one will be wrong. Check whether learners you would previously have placed here now belong at a different level.'
+      '<b class="psub">What to do about it</b>map the new structure against your existing offer on ' + rname + ' before your next intake. Entry requirements, duration and funding may all differ from the standard it replaces, and marketing written for the old one will be wrong. Check whether learners you would previously have placed here now belong at a different level.'
     );
     sources.push({ label: 'Skills England apprenticeship register', url: 'https://skillsengland.education.gov.uk/apprenticeships/' });
   }
