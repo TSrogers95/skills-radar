@@ -287,10 +287,43 @@ function firstClause(text, max){
 
 /* Skills England does not publish a stable per-standard permalink, so this
    opens their register pre-filtered by the standard's name or code. */
-function standardURL(s){
-  const q = encodeURIComponent(s.code || s.name);
-  return 'https://skillsengland.education.gov.uk/apprenticeships/?keywords=' + q;
+/* The register has a page per standard, addressed by its reference:
+     https://skillsengland.education.gov.uk/apprenticeships/st0070
+   and a page per version:
+     https://skillsengland.education.gov.uk/apprenticeships/st0070-v1-0
+
+   This used to produce a keyword search instead, which landed people on a
+   results list and made them find the standard themselves. Where we hold a
+   reference we now link to the standard, and where we hold a version too we
+   link to that exact version, which matters because the funding rules that
+   apply to an apprentice are those of the version they started on.
+
+   Without a reference there is nothing to address, so the search is the
+   honest fallback. */
+const REGISTER = 'https://skillsengland.education.gov.uk/apprenticeships/';
+
+function standardURL(s, exact){
+  if(!s) return REGISTER;
+
+  const code = String(s.code || '').trim().toLowerCase();
+  if(!/^st\d{4,}$/.test(code)){
+    return REGISTER + '?keywords=' + encodeURIComponent(s.code || s.name || '');
+  }
+
+  /* A version of "1.1" addresses as "-v1-1". Only used when asked for, since
+     a version page is right for an apprentice on programme and the plain
+     standard page is right for someone looking it up. */
+  if(exact && s.version){
+    const v = String(s.version).trim().replace(/\./g, '-');
+    if(/^\d+(-\d+)?$/.test(v)){
+      return REGISTER + code + '-v' + (v.indexOf('-') > -1 ? v : v + '-0');
+    }
+  }
+  return REGISTER + code;
 }
+
+/* The exact version an apprentice started on. */
+function standardVersionURL(s){ return standardURL(s, true); }
 
 /* The full feed: hand-written policy updates plus every recorded register
    change, with the curated version winning if both cover the same standard. */

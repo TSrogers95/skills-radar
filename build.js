@@ -33,7 +33,7 @@ function load(){
     'var window={addEventListener:function(){},location:{}};var location={hash:"",search:""};' +
     'var navigator={};var sessionStorage={getItem:function(){return null},setItem:function(){},removeItem:function(){}};';
   return new Function(stub + src + '; return {allArticles:allArticles, allUpdates:allUpdates, ROUTES:ROUTES, STANDARDS:STANDARDS, ' +
-    'READING:(typeof READING!=="undefined"?READING:[]), GUIDES:(typeof GUIDES!=="undefined"?GUIDES:[]), fmtLong:fmtLong, money:money, band:band, ' +
+    'READING:(typeof READING!=="undefined"?READING:[]), GUIDES:(typeof GUIDES!=="undefined"?GUIDES:[]), fmtLong:fmtLong, money:money, band:band, standardVersionURL:standardVersionURL, ' +
     'tagClass:tagClass, urgencyTag:urgencyTag, iconHTML:iconHTML, standardURL:standardURL, ' +
     'otjMinimum:(typeof otjMinimum==="function"?otjMinimum:null), ' +
     'pathwaysFor:(typeof pathwaysFor==="function"?pathwaysFor:null), ' +
@@ -246,7 +246,7 @@ function factBox(s, api){
         .map(f => `<div><dt>${esc(f[0])}</dt><dd>${esc(f[1])}</dd></div>`).join('')}</dl>
       ${path.length ? `<div class="fbextra"><b>Pathway</b> ${esc(path.join(' · '))}</div>` : ''}
       ${jobs.length ? `<div class="fbextra"><b>Typical job titles</b> ${esc(jobs.slice(0,8).join(', '))}</div>` : ''}
-      <a class="fblink" href="${esc(api.standardURL(s))}" target="_blank" rel="noopener">View on the Skills England register &nearr;</a>
+      <a class="fblink" href="${esc(api.standardVersionURL ? api.standardVersionURL(s) : api.standardURL(s))}" target="_blank" rel="noopener">${esc(s.name)} on the Skills England register &nearr;</a>
     </aside>`;
 }
 
