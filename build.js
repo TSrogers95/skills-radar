@@ -739,12 +739,21 @@ function run(){
   // clear stale pages, so a removed article does not linger
   fs.readdirSync(OUT).filter(f => f.endsWith('.html')).forEach(f => fs.unlinkSync(path.join(OUT, f)));
 
-  let written = 0;
+  /* Only pages that exist go in the sitemap. Listing an address that was
+     never written is a 404 handed straight to Google, and an article id used
+     twice would mean one page quietly overwriting another. */
+  const live = [], used = new Set();
   articles.forEach(a => {
     if(!a.id || !a.body || !a.body.length) return;
+    if(used.has(a.id)){
+      console.warn('Skipped duplicate article id: ' + a.id);
+      return;
+    }
+    used.add(a.id);
     fs.writeFileSync(path.join(OUT, a.id + '.html'), page(a, api));
-    written++;
+    live.push(a);
   });
+  const written = live.length;
 
   injectMeta();
 
@@ -756,11 +765,12 @@ function run(){
     console.log('Built ' + api.GUIDES.length + ' guides');
   }
 
-  fs.writeFileSync('sitemap.xml', sitemap(articles, api.GUIDES || []));
+  const map = sitemap(live, api.GUIDES || []);
+  fs.writeFileSync('sitemap.xml', map);
   fs.writeFileSync('robots.txt', robots());
 
   console.log('Built ' + written + ' article pages');
-  console.log('Sitemap: ' + (articles.length + 5) + ' urls');
+  console.log('Sitemap: ' + (map.match(/<loc>/g) || []).length + ' urls');
   console.log('Site URL: ' + SITE + (process.env.SITE_URL ? '' : '  (set SITE_URL to change this)'));
 }
 

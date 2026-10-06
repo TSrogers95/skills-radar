@@ -652,6 +652,87 @@ function rankBySearch(list, query, getFields){
    articles page so nobody mistakes them for analysis.
    ========================================================================= */
 
+/* =========================================================================
+   PAGE ADDRESSES FOR COMPILED STANDARDS
+
+   A standard can sit on the register more than once. An earlier version
+   stays open for starts while a newer one takes new recruits, so both have
+   their own date, their own version and their own recorded change, and both
+   earn an article.
+
+   The address used to come from the code alone, so two versions of ST0229
+   both produced std-ST0229 and the build wrote two pages to one filename.
+   Whichever was written last survived and the other was simply gone, which
+   is why the sitemap carried the same address twice and the earlier
+   version's analysis could not be reached.
+
+   Now the current version keeps the clean address, so every link already
+   out in the world still lands where it did, and earlier versions carry
+   their version number.
+   ========================================================================= */
+
+let STD_IDS = null, STD_IDS_FROM = null;
+
+function stdIdBase(s){
+  return 'std-' + (s.code || String(s.name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-'));
+}
+
+/* Sortable version number, so 1.2 beats 1.1 and 2.0 beats both. */
+function versionRank(v){
+  const m = String(v == null ? '' : v).match(/(\d+)(?:[.\-_](\d+))?/);
+  if(!m) return -1;
+  return parseInt(m[1], 10) * 1000 + parseInt(m[2] || '0', 10);
+}
+
+function buildStdIds(){
+  const ids = new Map(), groups = new Map(), taken = new Set();
+
+  /* Only standards that earn an article need an address, so the clean one
+     goes to the newest version that actually has a page. */
+  STANDARDS.forEach(s => {
+    if(!significance(s)) return;
+    const base = stdIdBase(s);
+    if(!groups.has(base)) groups.set(base, []);
+    groups.get(base).push(s);
+  });
+
+  groups.forEach((list, base) => {
+    const ranked = list.slice().sort((a, b) => {
+      const d = versionRank(b.version) - versionRank(a.version);
+      if(d) return d;
+      return new Date(b.since || 0) - new Date(a.since || 0);
+    });
+
+    ranked.forEach((s, n) => {
+      let id = base;
+      if(n > 0){
+        const v = String(s.version == null ? '' : s.version)
+          .trim().replace(/[^0-9]+/g, '-').replace(/^-+|-+$/g, '');
+        id = base + (v ? '-v' + v : '-' + (n + 1));
+      }
+      /* Same code and same version twice should not happen, but if an
+         import ever produces it, keep the addresses apart rather than
+         losing a page all over again. */
+      let unique = id, n2 = 2;
+      while(taken.has(unique)) unique = id + '-' + (n2++);
+      taken.add(unique);
+      ids.set(s, unique);
+    });
+  });
+
+  return ids;
+}
+
+/* Rebuilt whenever the register is replaced, which an import does. */
+function stdArticleId(s){
+  if(!s) return '';
+  if(STD_IDS === null || STD_IDS_FROM !== STANDARDS){
+    STD_IDS_FROM = STANDARDS;
+    STD_IDS = buildStdIds();
+  }
+  return STD_IDS.get(s) || stdIdBase(s);
+}
+
 /* Which changes are significant enough to warrant their own article. */
 function significance(s){
   if(!s.changed) return null;
@@ -869,7 +950,7 @@ function compiledArticle(s){
   }
 
   return {
-    id: 'std-' + (s.code || s.name.toLowerCase().replace(/[^a-z0-9]+/g,'-')),
+    id: stdArticleId(s),
     compiled: true,
     icon: icon,
     tag: 'Standard',
@@ -889,8 +970,17 @@ function compiledArticle(s){
 /* Every article the site can show: written first, then compiled. */
 function allArticles(){
   const compiled = STANDARDS.map(compiledArticle).filter(Boolean);
+
+  /* Last line of defence. Every page is written to a file named after its
+     id, so two articles sharing one id means one page silently replaces the
+     other. Addresses are made unique upstream now, and this keeps it true
+     whatever the register throws at it. */
   const seen = new Set(ARTICLES.map(a => a.id));
-  const all = ARTICLES.concat(compiled.filter(a => !seen.has(a.id)));
+  const all = ARTICLES.concat(compiled.filter(a => {
+    if(seen.has(a.id)) return false;
+    seen.add(a.id);
+    return true;
+  }));
 
   // A route round-up is written before the data moves, so it can end up being
   // linked from a standard it never mentions. Attaching the current list of
@@ -907,7 +997,7 @@ function allArticles(){
       .map(s => ({
         name: s.name, level: s.level, code: s.code, changed: s.changed,
         since: s.since, status: s.status,
-        article: significance(s) ? 'std-' + (s.code || s.name.toLowerCase().replace(/[^a-z0-9]+/g,'-')) : ''
+        article: significance(s) ? stdArticleId(s) : ''
       }));
   });
 
@@ -917,7 +1007,7 @@ function allArticles(){
 /* Point a feed item at its own compiled article where one exists, and fall
    back to the route round-up where the change is routine. */
 function articleForStandard(s, defunded, dev){
-  if(significance(s)) return 'std-' + (s.code || s.name.toLowerCase().replace(/[^a-z0-9]+/g,'-'));
+  if(significance(s)) return stdArticleId(s);
   return articleFor(s, defunded, dev);
 }
 
