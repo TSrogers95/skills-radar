@@ -32,8 +32,8 @@
 
   <div class="pagehead centred">
     <h1>A walk through Skills Radar</h1>
-    <p>What it tracks, how the feed narrows to the standards you deliver,
-    and what the levy forecast does with your own numbers.</p>
+    <p>The members area in 25 seconds: the changes that touch the standards
+    you deliver, your levy forecast, off-the-job hours, and the board report.</p>
   </div>
 
   <div class="videowrap" id="video"></div>
@@ -116,32 +116,18 @@ document.getElementById('navmain').innerHTML = navHTML('');
    quality on a phone, and costs you no bandwidth.
 
    Local file: drop the mp4 in your repo and set DEMO.file to its name. It
-   works, but a 60MB file is served in full to every viewer, and Vercel's
-   free tier allows 100GB a month, about 1,700 views. Fine for a handful of
-   demos, not for a link you share widely.
+   is served in full to every viewer; the members tour is under 10MB, so
+   Vercel's 100GB free tier covers roughly 10,000 plays a month.
+
+   The player is built by demoVideoHTML() in ui.js, shared with the join
+   page and the members dashboard.
    ========================================================================= */
 
-const D = (typeof DEMO !== 'undefined') ? DEMO : {};
 const box = document.getElementById('video');
+const player = demoVideoHTML('metadata');
 
-if(D.youtube){
-  box.innerHTML = '<div class="ratio"><iframe src="https://www.youtube-nocookie.com/embed/' + D.youtube +
-    '?rel=0&modestbranding=1" title="Skills Radar walkthrough" frameborder="0" ' +
-    'allow="accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture" ' +
-    'allowfullscreen loading="lazy"></iframe></div>';
-}
-else if(D.vimeo){
-  box.innerHTML = '<div class="ratio"><iframe src="https://player.vimeo.com/video/' + D.vimeo +
-    '" title="Skills Radar walkthrough" frameborder="0" allow="fullscreen; picture-in-picture" ' +
-    'allowfullscreen loading="lazy"></iframe></div>';
-}
-else if(D.file){
-  box.innerHTML = '<video controls preload="metadata" playsinline' +
-    (D.poster ? ' poster="' + D.poster + '"' : '') + '>' +
-    '<source src="' + D.file + '" type="video/mp4">' +
-    'Your browser cannot play this video. ' +
-    '<a href="' + D.file + '">Download it instead</a>.' +
-  '</video>';
+if(player){
+  box.innerHTML = player;
 }
 else {
   /* No video set. Rather than leave an empty frame, which tells a visitor the

@@ -195,6 +195,7 @@ function joinView(message){
       '</div>' +
 
       '<section class="whatyouget">' +
+        tourHTML() +
         '<h2>What you get for ' + price + ' ' + period + '</h2>' +
         benefit('Levy forecasting on your own numbers', true,
           'Enter your pay bill and your current cohort and it forecasts month by month: what goes in, what ' +
@@ -215,6 +216,17 @@ function joinView(message){
         '<p class="getfoot">Your data is yours. Export or delete all of it at any time, from your own account page.</p>' +
       '</section>' +
     '</div>';
+}
+
+/* The members area in 25 seconds, above the list of what you get. Seeing
+   the dashboard, forecast and report working does more than describing them.
+   Nothing is downloaded until someone presses play. */
+function tourHTML(){
+  const player = (typeof demoVideoHTML === 'function') ? demoVideoHTML('none') : '';
+  return player
+    ? '<figure class="jointour">' + player +
+        '<figcaption>The members area in 25 seconds</figcaption></figure>'
+    : '';
 }
 
 /* Read from the data rather than written into the copy, so the numbers

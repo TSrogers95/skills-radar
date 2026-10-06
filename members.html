@@ -625,6 +625,8 @@ function setupView(){
     '<div class="setupbar"><div class="setupfill" style="width:' + Math.round(done / steps.length * 100) + '%"></div></div>' +
     '<p class="setupcount">' + done + ' of ' + steps.length + ' done</p>' +
 
+    tourHTML(true) +
+
     '<div class="setuplist">' +
       steps.map((s, i) =>
         '<div class="setupstep' + (s.done ? ' done' : '') + '">' +
@@ -638,6 +640,30 @@ function setupView(){
     '<div class="notice" style="margin-top:24px"><b>Nothing here is published anywhere.</b> ' +
     'Your standards, numbers and pay bill are yours alone. You can export the lot or delete the account outright ' +
     'from <button class="linkbtn" data-go="account">your account page</button>, at any time.</div>';
+}
+
+/* A 25-second tour of the members area. Open on the setup list, where
+   someone has just joined; folded away on the dashboard, where it is a
+   reminder rather than the point. "Hide the tour" puts it away for good on
+   this browser. */
+function tourHidden(){
+  try { return localStorage.getItem('sr-tour-hidden') === '1'; } catch(e){ return false; }
+}
+function tourHTML(open){
+  const player = (typeof demoVideoHTML === 'function') ? demoVideoHTML('none') : '';
+  if(!player || tourHidden()) return '';
+  return '<details class="tourcard"' + (open ? ' open' : '') + '>' +
+      '<summary>Watch the 25-second tour of the members area</summary>' +
+      '<div class="tourbody">' + player +
+        '<button type="button" class="linkbtn" data-hidetour>Hide the tour</button></div>' +
+    '</details>';
+}
+function wireTour(panel){
+  panel.querySelectorAll('[data-hidetour]').forEach(b => b.addEventListener('click', () => {
+    try { localStorage.setItem('sr-tour-hidden', '1'); } catch(e){}
+    const card = b.closest('.tourcard');
+    if(card) card.remove();
+  }));
 }
 
 function dashView(){
@@ -672,6 +698,8 @@ function dashView(){
 
   return '<div class="pagehead"><h1>' + MEMBER.org + '</h1>' +
     '<p>What has changed on the standards you deliver, what needs doing, and what is coming.</p></div>' +
+
+    tourHTML(false) +
 
     /* The feed leads. It is the reason someone opens this page, and it is
        filtered live to whatever is in My cohort, add or remove a standard
@@ -2515,6 +2543,7 @@ function render(){
     panel.innerHTML = dashView();
     panel.querySelectorAll('[data-go]').forEach(b =>
       b.addEventListener('click', () => goTo(b.dataset.go)));
+    wireTour(panel);
   }
   if(view === 'cal'){  panel.innerHTML = calView(); buildCalendar(); wireEvents(); }
   if(view === 'cohort'){

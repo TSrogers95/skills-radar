@@ -50,7 +50,8 @@ const CONTACT = {
    THE DEMO VIDEO
 
    Used by demo.html, which is not linked from the site and is excluded from
-   search engines. Share the address with whoever you want to show it to.
+   search engines, and also shown on the join page (account.html) and the
+   members dashboard. Share the demo address with whoever you want to show it to.
 
    Set ONE of these.
 
@@ -62,15 +63,17 @@ const CONTACT = {
    vimeo    the numeric id, if you would rather use Vimeo.
 
    file     the filename of an mp4 committed to your repo. Works, but the
-            whole file is sent to every viewer. At 60MB that is roughly
-            1,700 views before you hit Vercel's monthly free allowance.
+            whole file is sent to every viewer. members-tour.mp4 is under
+            10MB, roughly 10,000 plays on Vercel's monthly free allowance.
+            The join page and the dashboard only fetch it when someone
+            presses play.
    ========================================================================= */
 
 const DEMO = {
-  youtube: "FNC6twEtAr8",
+  youtube: "",          // the previous walkthrough was "FNC6twEtAr8"
   vimeo:   "",
-  file:    "",          // e.g. "skills-radar-demo.mp4"
-  poster:  ""           // optional still image shown before play
+  file:    "members-tour.mp4",
+  poster:  "members-tour.jpg"   // optional still image shown before play
 };
 
 

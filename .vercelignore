@@ -1,0 +1,4 @@
+# Video build folders: frames, scripts and node_modules, not part of the site.
+# The finished video ships as members-tour.mp4 at the root.
+brag-output/
+brag-output-*/
