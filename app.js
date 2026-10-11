@@ -154,7 +154,27 @@ const ART_ICONS = {
   "rules-2627":
     '<rect x="8" y="30" width="32" height="8" rx="1"/><rect x="10" y="20" width="28" height="8" rx="1" class="fade"/><rect x="12" y="10" width="24" height="8" rx="1" class="hg"/>',
   "foundation-year":
-    '<line x1="24" y1="10" x2="24" y2="41"/><path d="M24 14h14l-4 5 4 5H24z" class="hg"/><path d="M24 28H10l4 4-4 4h14z" class="fade"/>'
+    '<line x1="24" y1="10" x2="24" y2="41"/><path d="M24 14h14l-4 5 4 5H24z" class="hg"/><path d="M24 28H10l4 4-4 4h14z" class="fade"/>',
+  "budget-2026":
+    '<rect x="8" y="16" width="32" height="24" rx="2" fill="none"/><line x1="8" y1="23" x2="40" y2="23"/><path d="M18 12h12v4H18z" class="hg"/>' +
+    '<line x1="15" y1="31" x2="33" y2="31" class="fade"/><line x1="15" y1="36" x2="26" y2="36" class="fade"/>',
+  "v-levels":
+    '<path d="M10 11l8 26 8-26" fill="none" class="hg"/><rect x="29" y="11" width="9" height="26" rx="1.5" class="fade"/>' +
+    '<line x1="8" y1="42" x2="40" y2="42"/>',
+  "t-level-roadmap":
+    '<path d="M8 38h10l6-13h8l6-13h6" fill="none" class="hg"/><circle cx="18" cy="38" r="2.5"/><circle cx="30" cy="25" r="2.5" class="fade"/><circle cx="42" cy="12" r="2.5" class="fade"/>',
+  "level-2-certificates":
+    '<rect x="7" y="14" width="15" height="11" rx="1.5" class="hg"/><rect x="26" y="14" width="15" height="22" rx="1.5" fill="none"/>' +
+    '<line x1="29" y1="21" x2="38" y2="21" class="fade"/><line x1="29" y1="27" x2="38" y2="27" class="fade"/><line x1="7" y1="31" x2="22" y2="31" class="fade"/>',
+  "legacy-defunding":
+    '<rect x="9" y="10" width="13" height="28" rx="1.5"/><rect x="26" y="10" width="13" height="28" rx="1.5" class="fade"/>' +
+    '<line x1="5" y1="41" x2="27" y2="7" class="slash"/>',
+  "mayoral-brokerage":
+    '<circle cx="12" cy="24" r="5"/><circle cx="36" cy="24" r="5" class="fade"/><path d="M17 24h14" class="hg"/>' +
+    '<path d="M24 13v-4M24 39v-4" class="fade"/>',
+  "starts-data-2526":
+    '<line x1="8" y1="40" x2="42" y2="40"/><rect x="11" y="26" width="7" height="14"/><rect x="21" y="18" width="7" height="22" class="hg"/>' +
+    '<rect x="31" y="30" width="7" height="10" class="fade"/><path d="M11 14l10 6 10-10" fill="none" class="slash"/>'
 };
 
 function artIcon(id){

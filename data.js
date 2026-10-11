@@ -13,7 +13,7 @@
    automatically when it commits a change.
    ----------------------------------------------------------------------- */
 
-const DATA_UPDATED = "2026-10-01";
+const DATA_UPDATED = "2026-10-11";
 const DATA_SOURCE  = "hand";   // "hand" or "sync"
 
 /* ---------- 1. OCCUPATIONAL ROUTES -------------------------------------
@@ -109,6 +109,69 @@ const ROUTES = {
    ----------------------------------------------------------------------- */
 
 const UPDATES = [
+  {
+    date: "2026-10-28",
+    title: "Budget 2026: the skills decisions still outstanding",
+    tag: { label: "Watch this", tone: "warn" },
+    category: "funding-rules", route: "", standard: "", article: "budget-2026",
+    status: "upcoming", urgency: "medium", pinned: true,
+    summary: "The Chancellor delivers the Budget on Wednesday 28 October. Government has already said that further detail on the mayoral apprenticeship brokerage pilots comes at the Budget, and the August changes to co-investment and the October hiring payment are both open-ended commitments that have not yet run for a full year. Three things worth watching: any further defunding, how the youth offer is paid for, and whether the twelve month expiry on levy funds survives its first year.",
+    url: "https://www.gov.uk/government/publications/chancellor-letter-to-the-treasury-select-committee-tsc-budget-2026-date"
+  },
+  {
+    date: "2026-09-17",
+    title: "V Levels confirmed for September 2027, three subjects first",
+    tag: { label: "New qualification", tone: "new" },
+    category: "t-levels", route: "", standard: "", article: "v-levels",
+    status: "updated", urgency: "high", pinned: true,
+    summary: "The post-16 pathways implementation plan was updated on 17 September and V Levels now have dates. First teaching is September 2027 in education, accounting and finance, and digital systems and data, with further subjects in 2028, 2029 and 2030. They are 360 guided learning hours, the same scale as an A Level, and carry matching UCAS tariff points for grades A* to E from September 2026.",
+    url: "https://www.gov.uk/government/publications/post-16-pathways-implementation-plan/post-16-pathways-implementation-plan"
+  },
+  {
+    date: "2026-09-17",
+    title: "T Level roadmap reshuffled, four subject areas pushed back",
+    tag: { label: "Dates moved", tone: "warn" },
+    category: "t-levels", route: "", standard: "", article: "t-level-roadmap",
+    status: "updated", urgency: "medium", pinned: false,
+    summary: "The final finance T Level cohort started this September. Social care and sport, physical activity and health arrive in 2028. Catering and hospitality moves to 2029, hair and beauty to 2030, and creative and design from 2029 to 2030. Digital T Levels gain AI content with revised specifications before 2027/28.",
+    url: "https://www.gov.uk/government/publications/post-16-pathways-implementation-plan/post-16-pathways-implementation-plan"
+  },
+  {
+    date: "2026-09-17",
+    title: "Level 2 rebuilt around Foundation and Occupational Certificates",
+    tag: { label: "Level 2 reform", tone: "info" },
+    category: "t-levels", route: "", standard: "", article: "level-2-certificates",
+    status: "updated", urgency: "medium", pinned: false,
+    summary: "Two new level 2 routes are confirmed for first teaching in September 2027. Foundation Certificates run one year at 240 to 300 guided learning hours for progression to level 3. Occupational Certificates run two years at 540 to 720 hours, with up to half the content shared across a sector, aimed at level 2 jobs and level 2 apprenticeships. Four occupational areas have been dropped from planned delivery altogether.",
+    url: "https://www.gov.uk/government/publications/post-16-pathways-implementation-plan/post-16-pathways-implementation-plan"
+  },
+  {
+    date: "2027-07-01",
+    title: "Large legacy level 3 qualifications start losing funding",
+    tag: { label: "Funding withdrawn", tone: "stop" },
+    category: "t-levels", route: "", standard: "", article: "legacy-defunding",
+    status: "upcoming", urgency: "high", pinned: false,
+    summary: "From July 2027 large legacy qualifications in T Level subject areas lose funding, with health and social care an exception, followed by further waves on 1 August 2028, 2029 and 2030 as each subject area rolls out. Only three V Levels exist in September 2027, so there is a gap in most subjects between the old qualifications going and the replacements arriving. Funding removal affects new learners only.",
+    url: "https://www.gov.uk/government/publications/post-16-pathways-implementation-plan/post-16-pathways-implementation-plan"
+  },
+  {
+    date: "2026-10-07",
+    title: "£100 million more for mayoral apprenticeship brokerage",
+    tag: { label: "New funding", tone: "money" },
+    category: "levy", route: "", standard: "", article: "mayoral-brokerage",
+    status: "updated", urgency: "medium", pinned: false,
+    summary: "The Mayoral Strategic Authority Apprenticeship Brokerage Pilots expand to all 14 areas with directly elected mayors, with an extra £100 million behind them. The job is matching 16 to 24 year olds, particularly those not in education, employment or training, to apprenticeship vacancies. First wave is early 2027 in seven areas, with the rest from spring 2027.",
+    url: "https://www.gov.uk/government/publications/dfe-update-7-october-2026/dfe-update-further-education-7-october-2026"
+  },
+  {
+    date: "2026-07-16",
+    title: "Starts up 8.7%, but under-19s are the only age group falling",
+    tag: { label: "New data", tone: "info" },
+    category: "funding-rules", route: "", standard: "", article: "starts-data-2526",
+    status: "updated", urgency: "medium", pinned: false,
+    summary: "Provisional 2025/26 figures to April 2026 show 308,770 starts, up 8.7%, and achievements up 14%. Underneath that, starts among the under 19s fell 5.4% while starts among the 25s and over rose 17.5%, and level 5 starts rose 20.6%. More than half of all apprenticeship starts are now aged 25 or over. The full year release lands in November.",
+    url: "https://explore-education-statistics.service.gov.uk/find-statistics/apprenticeships/2025-26"
+  },
   {
     date: "2026-10-01",
     title: "£2,000 hiring payment opens for non-levy employers",
@@ -332,6 +395,167 @@ const UPDATES = [
    ----------------------------------------------------------------------- */
 
 const ARTICLES = [
+  {
+    id: "budget-2026",
+    icon: "coin",
+    summary: "Three skills questions the Budget on 28 October has to answer, and why the levy mechanics are the one to watch.",
+    title: "Budget 2026: what to watch on 28 October",
+    date: "2026-10-28",
+    route: "",
+    tag: "Funding rules",
+    urgency: "medium",
+    standfirst: "Nothing to do before the date. Plenty to have modelled before it.",
+    body: [
+      "The Budget is on Wednesday 28 October. For anyone running early careers programmes there are three open questions rather than one, and only one of them has been flagged in advance.",
+      "The flagged one is brokerage. Government confirmed on 7 October that the mayoral apprenticeship brokerage pilots expand to all 14 areas with directly elected mayors, with an extra £100 million, and said in terms that further detail follows at the Budget. So the spending is announced and the mechanism is not. What is worth knowing by the end of October is whether brokers route candidates to a training provider or straight to the employer, because that decides whether this is a recruitment channel or a competitor.",
+      "The second question is what the August and October changes cost over a full year. Co-investment was rewritten from 1 August so that government funds the whole cost for apprentices aged 16 to 24 at both levy and non-levy employers. The £2,000 hiring payment opened on 1 October. Both are open-ended commitments whose cost depends on employer behaviour that nobody has measured yet, because the behaviour has not happened. A first-year underspend invites expansion. A first-year overspend invites a cap, and caps in this system usually arrive as eligibility conditions rather than as a stated budget limit.",
+      "The third is whether anything else gets defunded. Sixteen standards went in September. Skills England has separately been reviewing standards to clarify which qualifications inside them are mandatory and which are not, and a review that produces one list has a habit of producing a second.",
+      "What it changed from: for the last two years the direction has been set at fiscal events and the detail has followed in the funding rules three to six months later. What follows: that pattern means nothing in the rules changes on the day, so there is no compliance action to take on 28 October.",
+      "The useful preparation is in the modelling. If you are costing 2027/28 provision now, build it so a co-investment rate, an age threshold and the twelve month expiry on levy funds are each a single input you can change, rather than assumptions baked through a spreadsheet. Every one of those three has moved once already in eighteen months."
+    ],
+    sources: [
+      { label: "Chancellor's letter to the Treasury Select Committee on the Budget 2026 date", url: "https://www.gov.uk/government/publications/chancellor-letter-to-the-treasury-select-committee-tsc-budget-2026-date" },
+      { label: "DfE update, further education, 7 October 2026", url: "https://www.gov.uk/government/publications/dfe-update-7-october-2026/dfe-update-further-education-7-october-2026" }
+    ]
+  },
+  {
+    id: "v-levels",
+    icon: "layers",
+    summary: "First teaching September 2027 in three subjects only, at 360 hours, with A Level equivalent UCAS points.",
+    title: "V Levels are now dated: three subjects from September 2027",
+    date: "2026-09-17",
+    route: "",
+    tag: "T-Levels",
+    urgency: "high",
+    standfirst: "The qualification is settled. The transition around it is the part that will hurt.",
+    body: [
+      "The post-16 pathways implementation plan was updated on 17 September and V Levels now have firm dates. Ofqual published the regulations and the funding approval information in September. First teaching is September 2027, in three subjects: education, accounting and finance, and digital systems and data. Further subjects follow in September 2028, 2029 and 2030, with the full rollout taking four years and running route by route.",
+      "What they are: a level 3 vocational qualification sitting alongside A Levels and T Levels, regulated by Ofqual in much the same way as an A Level, with awarding organisation branding banned from the title. They run at roughly 360 guided learning hours, the same scale as an A Level, which is the design decision that matters most. It means a student can combine a V Level with A Levels rather than choosing between them. Rules of combination are not being implemented, so a V Level can sit alongside existing funded qualifications without a prescribed package.",
+      "UCAS tariff points for grades A* to E match A Level points from September 2026, which removes the progression argument before the first cohort starts.",
+      "What it changed from: a level 3 applied general market with six different grading scales and wide variation in assessment, content and grading between awarding organisations. What it changed to: one regulated qualification per subject with consistent rules. That is the stated case for the reform and it is a reasonable one.",
+      "The dates underneath are where the problem sits. Three subjects in September 2027 means the overwhelming majority of students entering level 3 in 2027 are still on legacy qualifications, while the first wave of funding removal has already begun. The real transition is 2028 to 2030, and in most subject areas there is a period with the old qualification gone and the replacement not yet available.",
+      "What follows, if you recruit school leavers: the applicant pool from 2028 holds a messier mix of qualifications than usual, for several years. Entry criteria written around specific BTEC grades will need rewriting, and probably more than once. The sequencing to track is which subjects get a V Level in which year, because that is what determines when your own entry requirements have to change. Content consultation for the 2028 subjects runs from November 2026 to January 2027, so the subject list for the second wave is decided this winter."
+    ],
+    sources: [
+      { label: "Post-16 pathways implementation plan", url: "https://www.gov.uk/government/publications/post-16-pathways-implementation-plan/post-16-pathways-implementation-plan" },
+      { label: "New V Levels and post-16 qualifications explained, DfE", url: "https://educationhub.blog.gov.uk/2026/03/new-v-levels-and-post-16-qualifications-explained/" }
+    ]
+  },
+  {
+    id: "t-level-roadmap",
+    icon: "signpost",
+    summary: "Finance has run its last cohort, social care and sport arrive in 2028, and catering, hair and beauty and creative have all slipped.",
+    title: "The T Level roadmap has moved again",
+    date: "2026-09-17",
+    route: "",
+    tag: "T-Levels",
+    urgency: "medium",
+    standfirst: "If you plan industry placements three years out, the subject list you are planning against is out of date.",
+    body: [
+      "The September implementation plan rewrote the T Level subject timetable, and the changes are mostly delays.",
+      "The final finance T Level cohort started this September, so that subject is now closing rather than expanding. Two new T Levels are confirmed for 2028: social care, and sport, physical activity and health. Final subject content for both is due in autumn 2026, and Ofqual begins awarding organisation recognition for the 2028 subjects in October 2026.",
+      "Four subject areas have moved back. Catering and hospitality goes to 2029. Hair and beauty goes to 2030. Creative and design, previously 2029, is now 2030. Against the earlier published dates that is a two to three year slip in provision for sectors that employ large numbers of young people and that have persistent recruitment problems.",
+      "Existing T Levels are also being revised rather than left alone. Digital T Levels gain artificial intelligence content, with revised specifications before 2027/28. Revised specifications for accounting, management and administration, and engineering and manufacturing are due in early 2027 for teaching from September 2027. Ofqual's proposal to allow separate resits of individual core exam papers is being implemented, with a timing update due in autumn 2026, which is a meaningful change for retention: a student who fails one core paper no longer has to retake the whole core.",
+      "The employer support fund for industry placements continues through 2026/27, so there is no change to the placement funding position this year.",
+      "What follows: placement capacity planning is the practical consequence. An employer committing to a placement pipeline for 2028 onwards should be planning for social care and sport arriving, and should not be building capacity for catering, hair and beauty or creative placements on the old dates. For providers, the finance closure means a subject coming off the offer with no direct replacement, since accounting and finance moves into the V Level route instead.",
+      "What it changed from: a published roadmap that most curriculum plans were written against. What it changed to: a roadmap that has now moved twice. The reasonable planning assumption is that dates three or more years out are indicative, and that anything within eighteen months is firm."
+    ],
+    sources: [
+      { label: "Post-16 pathways implementation plan", url: "https://www.gov.uk/government/publications/post-16-pathways-implementation-plan/post-16-pathways-implementation-plan" },
+      { label: "What we know about V Levels, new T Levels and the end of the T Level foundation year, FE Week", url: "https://feweek.co.uk/what-we-know-about-v-levels-new-t-levels-and-the-end-of-the-t-level-foundation-year/" }
+    ]
+  },
+  {
+    id: "level-2-certificates",
+    icon: "blocks",
+    summary: "A one year Foundation Certificate for progression and a two year Occupational Certificate for work, both from September 2027.",
+    title: "Level 2 is being rebuilt around two new certificates",
+    date: "2026-09-17",
+    route: "",
+    tag: "T-Levels",
+    urgency: "medium",
+    standfirst: "The two year occupational route is the one that changes who applies for your level 2 apprenticeships.",
+    body: [
+      "Level 2 reform is confirmed, with two new qualification types first taught in September 2027.",
+      "Foundation Certificates are the further study route: one year, 240 to 300 guided learning hours, combined with English or maths where the student needs it, plus enrichment. They are linked to T Level and V Level subjects and lead to level 3 study, whether that is an apprenticeship, A Levels, a V Level or a T Level. Subjects roll out through to 2030.",
+      "Occupational Certificates are the employment route: two years, 540 to 720 guided learning hours, with a core of up to half the content shared across a sector and a technical qualification linked to an occupational standard. They lead to level 2 jobs and level 2 apprenticeships. The two year length is deliberate, and the stated reasons are keeping students in education until 18 and giving more time to pass GCSE English and maths.",
+      "That second point is the one worth sitting with if you recruit at level 2. The profile of a seventeen or eighteen year old applying for a level 2 apprenticeship in 2029 is intended to be different from today: more occupational content behind them, a sector core rather than a narrow qualification, and more likely to hold the GCSEs. Whether it works out that way is another matter, but it is what the design is aiming at, and it changes what a sensible entry requirement looks like.",
+      "Some areas have already moved or gone. Hair and beauty Occupational Certificates go to 2030. Domestic plumber is deferred to 2029. Stonemasonry, furniture making operative, healthcare science assistant and pharmacy services assistant have been removed from planned delivery altogether, with funding for the current qualifications kept until 2029 or 2030. For employers in those four areas that means legacy provision for a few more years and nothing confirmed after it.",
+      "The T Level foundation year runs in its current form for 2026/27, is renamed simply Foundation Year from September 2027, and is then phased out subject by subject as Foundation Certificates arrive, with full replacement by 2030/31. Delivery guidance is due before 2027/28. A response on level 1 English and maths is due later this year.",
+      "What follows: if you take level 2 apprentices, the planning question is which sector cores exist in your area by 2029, because the Occupational Certificate core is what your applicants will have in common. If you run foundation year provision, the order in which Foundation Certificates arrive by subject is what determines when your own offer has to change."
+    ],
+    sources: [
+      { label: "Post-16 pathways implementation plan", url: "https://www.gov.uk/government/publications/post-16-pathways-implementation-plan/post-16-pathways-implementation-plan" }
+    ]
+  },
+  {
+    id: "legacy-defunding",
+    icon: "stop",
+    summary: "Four waves of funding removal from July 2027 to August 2030, and a gap in most subjects before replacements arrive.",
+    title: "When legacy level 3 qualifications actually lose funding",
+    date: "2027-07-01",
+    route: "",
+    tag: "T-Levels",
+    urgency: "high",
+    standfirst: "The dates are now firm, and the first one is inside most providers' current planning cycle.",
+    body: [
+      "Funding removal from legacy level 3 qualifications now has published dates, and it runs in four waves.",
+      "July 2027 is the first. Large legacy qualifications in T Level subject areas lose funding, with health and social care an exception. Legacy digital, accounting and finance, and education qualifications also lose funding at that point, except those of 720 guided learning hours or more in V Level subject areas, which are kept until 2028.",
+      "1 August 2028 removes funding from legacy qualifications in the subject areas rolling out that September, including qualifications of 1,080 hours or more in health and social care. 1 August 2029 and 1 August 2030 repeat the pattern for their own rollout years, with 2030 also covering subject areas that are not aligned to any new qualification. Catering legacy qualifications keep funding until at least 2029/30.",
+      "Some qualifications are being kept rather than replaced. Access to HE diplomas stay for students aged 18 and over. The International Baccalaureate, Core maths, extended project qualifications, advanced extension awards and performing arts graded examinations all continue. Criminology and applied psychology legacy qualifications keep funding until replacements are decided, with more detail due in early 2027.",
+      "One detail does a lot of work: funding removal affects new learners only. Anyone already on a qualification when its funding goes continues and is funded through. The cliff is at recruitment, not mid-programme, which is the same shape as apprenticeship defunding and the same trap, because the practical deadline for a provider is a recruitment cycle earlier than the formal one.",
+      "The gap is the real story. In September 2027 exactly three V Levels exist. In most subject areas the large legacy qualification has gone, or is about to, and the replacement does not arrive until 2028, 2029 or 2030. The Sixth Form Colleges Association has warned about precisely this, and it is not a rounding error: it is a multi-year hole in level 3 vocational provision in several sectors.",
+      "What follows: providers have strategic transition plans due in July 2027, 2028, 2029 and 2030, so the sequencing has to be written down whether or not it is resolved. If you are an employer recruiting at level 3, the thing to do is stop writing entry criteria that name a specific qualification and grade. Criteria expressed as a level and a subject area will survive this. Criteria that say BTEC Extended Diploma, Merit, will not."
+    ],
+    sources: [
+      { label: "Post-16 pathways implementation plan", url: "https://www.gov.uk/government/publications/post-16-pathways-implementation-plan/post-16-pathways-implementation-plan" },
+      { label: "Government to keep BTECs until V Levels come online, Sixth Form Colleges Association", url: "https://www.sixthformcolleges.org/380/news-and-comment/post/83/government-to-keep-btecs-until-v-levels-come-online-sfca-response" }
+    ]
+  },
+  {
+    id: "mayoral-brokerage",
+    icon: "handshake",
+    summary: "All 14 mayoral areas, an extra £100 million, seven areas live in early 2027 and the rest from spring.",
+    title: "£100 million more for mayoral apprenticeship brokerage",
+    date: "2026-10-07",
+    route: "",
+    tag: "Levy",
+    urgency: "medium",
+    standfirst: "A free recruitment channel for 16 to 24 roles, if your employers happen to sit in the right place.",
+    body: [
+      "The Mayoral Strategic Authority Apprenticeship Brokerage Pilots are expanding to all 14 areas with directly elected mayors, with an extra £100 million behind them. The job is matching 16 to 24 year olds, with a particular focus on those not in education, employment or training, to live apprenticeship vacancies.",
+      "The first wave starts in early 2027 in Greater London, Greater Manchester, Liverpool City Region, South Yorkshire, Tees Valley, West Midlands and West of England. Further areas join from spring 2027, and the department has said more detail follows at the Budget.",
+      "What it changed from: a small set of pilots. What it changed to: national coverage of mayoral areas with real money behind it, which makes it the largest piece of apprenticeship recruitment infrastructure outside the apprenticeship service itself.",
+      "For an employer in one of the seven first wave areas this is worth treating as a recruitment channel from early 2027, and it stacks with the £2,000 hiring payment if you do not pay the levy. A non-levy employer in Greater Manchester taking on a nineteen year old next year is looking at free training, free assessment, £2,000 towards employing them, and somebody else doing the candidate sourcing.",
+      "For providers the position is less comfortable, and it depends on a design detail that has not been published: whether a broker routes a matched candidate to a training provider or straight to the employer. If the former, brokerage is a lead source. If the latter, it is competing with your own employer engagement. That is the thing to find out locally before early 2027 rather than after it.",
+      "The limitation is geographic and worth saying plainly. This covers mayoral areas only, which leaves a large share of the country, including much of the south and east outside London, with no equivalent provision. If your employers sit outside a mayoral area, the practical answer is the hiring payment and your own pipeline, and it is reasonable to ask your local authority and careers hub what the plan is for areas the pilots do not reach."
+    ],
+    sources: [
+      { label: "DfE update, further education, 7 October 2026", url: "https://www.gov.uk/government/publications/dfe-update-7-october-2026/dfe-update-further-education-7-october-2026" }
+    ]
+  },
+  {
+    id: "starts-data-2526",
+    icon: "cap",
+    summary: "Starts up 8.7% and achievements up 14%, but under-19 starts fell 5.4% while the 25s and over rose 17.5%.",
+    title: "Starts are up, and under-19s are the only age group falling",
+    date: "2026-07-16",
+    route: "",
+    tag: "Funding rules",
+    urgency: "medium",
+    standfirst: "Every lever pulled in the last two years points at young people. The data points the other way.",
+    body: [
+      "Provisional figures published on 16 July cover the first three quarters of 2025/26, August 2025 to April 2026. The headline is good. Starts reached 308,770, up 8.7% on 284,190. Participation reached 735,500, up 4.6%. Achievements reached 146,210, up 14%, which is the strongest of the three numbers and the one least often quoted.",
+      "The age breakdown is where it gets awkward. Starts among the under 19s fell 5.4% to 63,530. Starts among 19 to 24 year olds rose 5.1% to 83,570. Starts among those aged 25 and over rose 17.5% to 161,670. More than half of all apprenticeship starts in England are now aged 25 or over, and the only age group going backwards is the one every recent policy decision has been aimed at.",
+      "The level breakdown tells the same story from a different angle. Higher level starts reached 126,660, up 13.6%. Level 4 rose 15.7%, level 5 rose 20.6%, level 6 rose 4.9% and level 7 rose 11.6% to 28,800.",
+      "That level 7 figure needs reading carefully. Funding for level 7 was withdrawn for new starters aged 22 and over from January 2026, part way through the period these figures cover, and starts still rose. That is the pre-deadline rush rather than growth, and it will not repeat.",
+      "What it changed from: a decade in which starts among 16 to 24 year olds fell roughly 40% while spend concentrated in older, higher and more expensive provision. That is the pattern the sixteen defunded standards, the level 7 restriction, the age-based co-investment and the hiring payment were all designed to break. What it changed to, on this evidence: not much yet. The interventions landed from January 2026 onwards and most of this period predates them.",
+      "What follows: the full year release lands in November, and it is the first set of figures that will partly reflect the new policy. If it repeats this pattern, it is the strongest available argument for further intervention, and on recent form the most likely shape that takes is more defunding at the top of the system rather than more money at the bottom. If you deliver level 5 provision, that 20.6% is a number worth knowing someone is looking at."
+    ],
+    sources: [
+      { label: "Apprenticeships, academic year 2025/26, Explore Education Statistics", url: "https://explore-education-statistics.service.gov.uk/find-statistics/apprenticeships/2025-26" }
+    ]
+  },
   {
     id: "hiring-payment",
     date: "2026-10-01",
@@ -627,11 +851,12 @@ const ARTICLES = [
     body: [
       "From 2027 the T-Level Foundation Year will be renamed the Foundation Year, reflecting its role in supporting progression to a broader range of Level 3 options rather than only T-Levels. It remains unchanged for 2026.",
       "What it changed from: the Foundation Year was explicitly framed as a pre-T-Level programme, for students who were not yet ready to start a T-Level. In practice many students used it to progress to other Level 3 routes, so the name understated what it did.",
-      "The larger context is Level 2 reform. Two new pathways are being introduced: a Further Study Pathway with Foundation Certificates, leading to Level 3 study including T-Levels, and an Occupational Pathway with Occupational Certificates, leading to employment. As the Further Study pathway is introduced subject by subject, it will gradually replace the Foundation Year.",
-      "Alongside this sits the largest expansion of T-Level subjects since the programme began, including new T-Levels in Care Services and in Sports, Fitness and Exercise Science. Existing T-Levels are also being adjusted: awarding organisations are working on further reductions to assessment burden and streamlined content, and Ofqual is to consult on allowing learners to retake core exams individually.",
-      "What follows: curriculum planning for 2027 entry needs to account for a programme that is being renamed and then progressively withdrawn. Providers running Foundation Year provision should track which subjects get a Further Study pathway first, as that determines the order in which their own offer needs to change."
+      "The larger context is Level 2 reform. Two new qualifications arrive in September 2027: Foundation Certificates on a one year further study pathway, leading to Level 3 study including T-Levels, and Occupational Certificates on a two year occupational pathway, leading to employment and Level 2 apprenticeships. As Foundation Certificates are introduced subject by subject, they gradually replace the Foundation Year, with full replacement by 2030/31.",
+      "Alongside this sits a reworked T-Level timetable. The September 2026 implementation plan confirms new T-Levels in social care and in sport, physical activity and health for 2028, with several other subjects pushed back. Existing T-Levels are being revised rather than left alone, and Ofqual's proposal to allow learners to resit individual core exam papers is now being implemented rather than consulted on.",
+      "What follows: curriculum planning for 2027 entry needs to account for a programme that is being renamed and then progressively withdrawn. Providers running Foundation Year provision should track which subjects get a Foundation Certificate first, as that determines the order in which their own offer needs to change. Delivery guidance for the renamed programme is due before 2027/28."
     ],
     sources: [
+      { label: "Post-16 pathways implementation plan", url: "https://www.gov.uk/government/publications/post-16-pathways-implementation-plan/post-16-pathways-implementation-plan" },
       { label: "T-Levels update, 10 March 2026", url: "https://support.tlevels.gov.uk/hc/en-gb/articles/33892267278994-T-Levels-update-10-March-2026" }
     ]
   }
