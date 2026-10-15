@@ -146,7 +146,13 @@ function titleBlockHTML(stampHTML, withCta){
       '<div class="brandmain">' +
         wordmarkHTML() +
         '<p class="hero">' + HERO + '</p>' +
-        (HERO_SUB ? '<p class="herosub">' + HERO_SUB + '</p>' : '') +
+        /* The sub line is dropped wherever the call to action runs, which in
+           practice means the home page. Two paragraphs and a button before
+           anyone has seen a single change is the main reason a first visit
+           feels heavy, and the call to action already says what the sub line
+           says. On every other page it is the only context there is, so it
+           stays. */
+        ((HERO_SUB && !withCta) ? '<p class="herosub">' + HERO_SUB + '</p>' : '') +
       '</div>' +
       (stampHTML ? '<div class="stamp">' + stampHTML + '</div>' : '') +
     '</div>' +
@@ -239,41 +245,3 @@ function wireCollapse(){
   update();
 }
 
-
-/* =========================================================================
-   THE DEMO VIDEO
-
-   One player for every page that shows the walkthrough: demo.html, the join
-   page and the members dashboard. Which source it uses is set once, in the
-   DEMO block of config.js. Returns an empty string when nothing is set, so a
-   page can simply leave the video out.
-
-   preload is "metadata" where the video is the point of the page, and "none"
-   where it sits beside other things, so a visitor who never presses play
-   downloads nothing but the poster.
-   ========================================================================= */
-
-function demoVideoHTML(preload){
-  const D = (typeof DEMO !== 'undefined') ? DEMO : {};
-  const title = 'Skills Radar members area walkthrough';
-  if(D.youtube){
-    return '<div class="ratio"><iframe src="https://www.youtube-nocookie.com/embed/' + D.youtube +
-      '?rel=0&modestbranding=1" title="' + title + '" frameborder="0" ' +
-      'allow="accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture" ' +
-      'allowfullscreen loading="lazy"></iframe></div>';
-  }
-  if(D.vimeo){
-    return '<div class="ratio"><iframe src="https://player.vimeo.com/video/' + D.vimeo +
-      '" title="' + title + '" frameborder="0" allow="fullscreen; picture-in-picture" ' +
-      'allowfullscreen loading="lazy"></iframe></div>';
-  }
-  if(D.file){
-    return '<video controls preload="' + (preload || 'metadata') + '" playsinline' +
-      (D.poster ? ' poster="' + D.poster + '"' : '') + ' aria-label="' + title + '">' +
-      '<source src="' + D.file + '" type="video/mp4">' +
-      'Your browser cannot play this video. ' +
-      '<a href="' + D.file + '">Download it instead</a>.' +
-    '</video>';
-  }
-  return '';
-}

@@ -57,6 +57,32 @@
   </div>
 </div>
 
+<!-- First visit only, and it takes the place of the four counters above
+     rather than being added on top of them, so the page gets simpler for a
+     newcomer instead of busier. Each of the first two steps performs the
+     action rather than describing it, and neither needs an account. -->
+<div class="wrap">
+  <section class="starthere" id="starthere" hidden>
+    <button class="shclose" id="shclose" aria-label="Hide this">&times;</button>
+    <p class="shintro">Every change to apprenticeship funding rules, standards and T-Levels in England, in one feed. The quickest way in:</p>
+    <ol class="shsteps">
+      <li><button type="button" class="shstep" data-go="search">
+        <span class="shnum">1</span>
+        <span class="shtext"><b>Find your standard</b>Search a standard, a route or a job title.</span>
+      </button></li>
+      <li><button type="button" class="shstep" data-go="board">
+        <span class="shnum">2</span>
+        <span class="shtext"><b>Open any card</b>What moved, what it means, and a link to the source.</span>
+      </button></li>
+      <li><a class="shstep" href="account.html?join=1">
+        <span class="shnum">3</span>
+        <span class="shtext"><b>Keep only what is yours</b>Pick your standards and the rest disappears.</span>
+      </a></li>
+    </ol>
+    <p class="shfoot">The first two need no account.</p>
+  </section>
+</div>
+
 <div class="controls">
   <div class="wrap controlgrid">
     <div class="tabs">
@@ -82,10 +108,17 @@
 </div>
 
 <div class="wrap">
-  <div class="key">
-    <span><i class="h"></i> Act now, affects live delivery or compliance</span>
-    <span><i class="m"></i> Plan ahead, confirmed, not yet in force</span>
-    <span><i class="l"></i> For information</span>
+  <!-- Reference, not an entry point, so it is one line until asked for. -->
+  <div class="keyrow">
+    <details class="keywrap">
+      <summary>What the colours mean</summary>
+      <div class="key">
+        <span><i class="h"></i> Act now, affects live delivery or compliance</span>
+        <span><i class="m"></i> Plan ahead, confirmed, not yet in force</span>
+        <span><i class="l"></i> For information</span>
+      </div>
+    </details>
+    <a class="keyhelp" href="#starthere" id="showstart">New here?</a>
   </div>
   <div id="routecontext"></div>
   <div id="board"></div>
@@ -192,12 +225,12 @@ function renderRouteContext(routeKey, query, results){
 
 let FEEDINDEX = [];
 
-function cardHTML(item, i){
+function cardHTML(item, i, folded){
   const older = typeof feedPlacement === 'function' && feedPlacement(item.date) === 'background';
   const flag = item.pinned ? '<span class="dotflag" title="Priority"></span>' : '';
   const line = item.short || firstClause(item.summary);
   const tag  = itemTagHTML(item);
-  return '<button class="card ' + item.urgency + '" data-i="' + i + '">' +
+  return '<button class="card ' + item.urgency + (folded ? ' fold' : '') + '" data-i="' + i + '">' +
     flag + '<h3>' + item.title + '</h3>' +
     '<div class="whatchanged"><span class="wclabel">What changed</span>' + tag +
       (older ? '<span class="ctag info">earlier change</span>' : '') + '</div>' +
@@ -267,6 +300,12 @@ function columnsFor(filter, band){
   if(filter === 'funding-rules' || filter === 'levy' || filter === 't-levels') return [gen];
   return [std, gen];
 }
+
+/* How many cards a column shows before the rest are folded behind a button.
+   Eight roughly fills the visible height of a column, so someone who was
+   going to scroll still sees a full list, and someone who was not sees
+   where it ends. */
+const COLUMN_CAP = 8;
 
 const BANDS = [
   {
@@ -338,8 +377,18 @@ function renderBoard(filter, query){
         counts[band.key + (ci === 0 ? '' : 'G')] = rows.length;
       }
 
+      /* Only the first few are shown. A column can hold two hundred cards,
+         and a scrollbar gives no sense of where that ends, so arriving on
+         one reads as a wall rather than a list. The rest are rendered but
+         folded away, so showing them is instant and the card indexes behind
+         the drawer stay correct. */
+      const shown = rows.map((r, n) => cardHTML(r, FEEDINDEX.push(r) - 1, n >= COLUMN_CAP)).join('');
+      const more  = rows.length - COLUMN_CAP;
+
       const body = rows.length
-        ? rows.map(r => cardHTML(r, FEEDINDEX.push(r) - 1)).join('')
+        ? shown + (more > 0
+            ? '<button class="showall" type="button">Show the other ' + more + '</button>'
+            : '')
         : '<div class="colempty">Nothing here' + (query ? ' for that search' : '') + '.</div>';
 
       return '<section class="col"><div class="colhead">' +
@@ -360,6 +409,14 @@ function renderBoard(filter, query){
 
   document.querySelectorAll('.card').forEach(c => {
     c.addEventListener('click', () => openDetail(FEEDINDEX[+c.dataset.i]));
+  });
+
+  document.querySelectorAll('.showall').forEach(b => {
+    b.addEventListener('click', () => {
+      const body = b.closest('.colbody');
+      if(body) body.classList.add('open');
+      b.remove();
+    });
   });
 
   renderReadings(counts, columnsFor(filter, BANDS[0]).length === 1);
@@ -395,6 +452,75 @@ const FEED = allUpdates();
 const FEED_ALL = (typeof allUpdatesUnfiltered === 'function') ? allUpdatesUnfiltered() : FEED;
 renderBoard(currentFilter, currentQuery);
 wireCollapse();
+
+/* =========================================================================
+   START HERE
+
+   A first visit lands on several hundred changes, four counters, five
+   filters, a search box and a colour key, which is a lot to take in before
+   you know what the site is for. This shows three steps in place of the
+   counters, once, and then never again.
+
+   Remembering the dismissal uses localStorage rather than a cookie, and
+   stores one flag that says nothing about the person. Every read and write
+   is wrapped, because a browser in private mode throws rather than
+   returning null, and failing open is harmless here.
+   ========================================================================= */
+
+(function startHere(){
+  const box   = document.getElementById('starthere');
+  const stats = document.getElementById('readingsblock');
+  const statsBlock = stats ? stats.closest('.masthead') : null;
+  if(!box) return;
+
+  const KEY = 'sr_oriented';
+
+  function remember(){ try { localStorage.setItem(KEY, '1'); } catch(e){} }
+  function hide(){
+    box.hidden = true;
+    if(statsBlock) statsBlock.hidden = false;
+    remember();
+  }
+  function show(){
+    box.hidden = false;
+    if(statsBlock) statsBlock.hidden = true;
+  }
+
+  let seen = false;
+  try { seen = localStorage.getItem(KEY) === '1'; } catch(e){ seen = false; }
+  if(!seen) show();
+
+  document.getElementById('shclose').addEventListener('click', hide);
+
+  box.querySelectorAll('.shstep[data-go]').forEach(b => {
+    b.addEventListener('click', () => {
+      const where = b.dataset.go;
+      hide();
+      if(where === 'search'){
+        const s = document.getElementById('search');
+        if(!s) return;
+        s.scrollIntoView({ behavior:'smooth', block:'center' });
+        // After the scroll, or the focus fights it on iOS.
+        setTimeout(() => s.focus(), 400);
+      } else {
+        const board = document.getElementById('board');
+        if(board) board.scrollIntoView({ behavior:'smooth', block:'start' });
+      }
+    });
+  });
+
+  // Step three leaves the page, so the flag has to be set before it does.
+  const join = box.querySelector('a.shstep');
+  if(join) join.addEventListener('click', remember);
+
+  // A way back, for anyone who closed it and wants it again.
+  const again = document.getElementById('showstart');
+  if(again) again.addEventListener('click', e => {
+    e.preventDefault();
+    show();
+    window.scrollTo({ top:0, behavior:'smooth' });
+  });
+})();
 
 document.querySelectorAll('.tabs button').forEach(btn => {
   btn.addEventListener('click', () => {
