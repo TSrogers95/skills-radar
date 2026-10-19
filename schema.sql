@@ -83,11 +83,17 @@ create table if not exists member_standards (
   funding        integer,
   months         integer,
   head_count     integer default 0,
+  under_25       integer default 0,           -- how many of head_count are aged 16 to 24
   otj_published  integer,                     -- the figure they read from the register
   otj_rpl        integer,
   otj_planned    integer,
   created_at     timestamptz default now()
 );
+
+-- Added after launch. Co-investment depends on the apprentice's age, and the
+-- age mix differs by standard, so it has to be held per standard rather than
+-- as one figure for the whole programme. Safe to run on an existing table.
+alter table member_standards add column if not exists under_25 integer default 0;
 
 alter table member_standards enable row level security;
 

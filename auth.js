@@ -186,6 +186,7 @@ async function loadStandards(){
     name: r.standard_name, code: r.standard_code,
     level: r.level, funding: r.funding, months: r.months,
     count: r.head_count,
+    young: r.under_25 || 0,
     otj: { published: r.otj_published, rpl: r.otj_rpl, planned: r.otj_planned }
   }));
 }
@@ -200,19 +201,41 @@ async function saveStandard(s){
     standard_name: s.name, standard_code: s.code || null,
     level: s.level, funding: s.funding, months: s.months,
     head_count: s.count || 0,
+    under_25: Math.min(s.young || 0, s.count || 0),
     otj_published: (s.otj && s.otj.published) || null,
     otj_rpl: (s.otj && s.otj.rpl) || null,
     otj_planned: (s.otj && s.otj.planned) || null
   };
 
-  if(s.dbId){
-    const { error } = await c.from('member_standards').update(row).eq('id', s.dbId);
+  /* under_25 was added to the table after launch. If the column is not
+     there yet the whole save fails, which would take the headcount and the
+     off-the-job figures down with it, so drop that one field and save the
+     rest rather than losing everything. Ages then live only in this
+     browser until the column exists. */
+  const missingColumn = e =>
+    e && /under_25/.test(e.message || '') &&
+    (/column/i.test(e.message) || /schema cache/i.test(e.message));
+
+  async function write(body){
+    if(s.dbId){
+      const { error } = await c.from('member_standards').update(body).eq('id', s.dbId);
+      if(error) throw error;
+      return s.dbId;
+    }
+    const { data, error } = await c.from('member_standards').insert(body).select('id').single();
     if(error) throw error;
-    return s.dbId;
+    return data.id;
   }
-  const { data, error } = await c.from('member_standards').insert(row).select('id').single();
-  if(error) throw error;
-  return data.id;
+
+  try {
+    return await write(row);
+  } catch(e){
+    if(!missingColumn(e)) throw e;
+    console.info('member_standards.under_25 is not in the database yet, saving without it. ' +
+                 'Run: alter table member_standards add column if not exists under_25 integer default 0;');
+    const { under_25, ...rest } = row;
+    return await write(rest);
+  }
 }
 
 async function deleteStandard(dbId){

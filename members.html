@@ -267,7 +267,7 @@ async function persist(){
       payroll: SETTINGS.payroll || null,
       monthly_in: SETTINGS.monthlyIn || null,
       opening: SETTINGS.opening || null,
-      young_count: SETTINGS.young,
+      young_count: youngCount(),
       levy_payer: !!SETTINGS.levyPayer
     });
     for(const c of COHORT){
@@ -465,10 +465,14 @@ function levyFigures(payroll, standards, under25, levyPayer){
     const months  = s.months || 12;
     const monthly = ((s.funding * 0.8) / months) * s.count;
     const annual  = s.funding * (12 / months) * s.count;
+    const young   = Math.max(0, Math.min(s.young || 0, s.count || 0));
     return {
       name: s.name, level: s.level, count: s.count,
-      funding: s.funding, months: months,
-      monthlyAll: monthly, annual: annual, total: s.funding * s.count
+      funding: s.funding, months: months, young: young,
+      monthlyAll: monthly, annual: annual, total: s.funding * s.count,
+      // what the under-25s on this standard draw in a year, which is what
+      // the co-investment split has to be weighted by
+      annualYoung: s.count ? (s.funding * (12 / months) * young) : 0
     };
   });
 
@@ -481,9 +485,16 @@ function levyFigures(payroll, standards, under25, levyPayer){
   const surplus   = balance > 0 ? balance : 0;
   const shortfall = balance < 0 ? -balance : 0;
 
+  /* The shortfall is split by the funding each age group draws, not by how
+     many of them there are. A £14,000 Level 7 and a £5,000 Level 3 are one
+     head each but nearly three times the money, and because older
+     apprentices cluster on the higher levels, splitting by headcount
+     understates what co-investment actually costs. */
   const young      = Math.min(under25, heads);
   const pctYoung   = heads ? young / heads : 0;
-  const shortYoung = shortfall * pctYoung;
+  const drawYoung  = lines.reduce((t, l) => t + l.annualYoung, 0);
+  const shareYoung = annualDraw > 0 ? drawYoung / annualDraw : 0;
+  const shortYoung = shortfall * shareYoung;
   const shortOlder = shortfall - shortYoung;
 
   const rates     = levyPayer ? LEVY_MODEL.levyExhausted : LEVY_MODEL.nonLevy;
@@ -495,7 +506,7 @@ function levyFigures(payroll, standards, under25, levyPayer){
   return {
     gross, available, monthlyIn, lines, heads, commitment,
     annualDraw, monthlyOut, surplus, shortfall,
-    young, older: heads - young, pctYoung,
+    young, older: heads - young, pctYoung, shareYoung, drawYoung,
     shortYoung, shortOlder, costYoung, costOlder, youCost, govCost,
     rates, liable: payroll > LEVY_MODEL.threshold
   };
@@ -867,10 +878,13 @@ function saveSettings(){
 
 /* Default the age split to just under half the cohort until someone sets it,
    and never let it exceed the number of apprentices actually on programme. */
+/* Added up from the per-standard figures the member entered. This used to
+   fall back to 45% of headcount when nothing had been entered, which was a
+   national-ish average standing in for their own data and the one thing the
+   forecast is not supposed to do. Nothing entered now means nobody counted,
+   which is at least visibly wrong rather than quietly wrong. */
 function youngCount(){
-  const heads = cohortHeads();
-  if(SETTINGS.young == null) return Math.round(heads * 0.45);
-  return Math.min(SETTINGS.young, heads);
+  return COHORT.reduce((t, c) => t + Math.min(c.young || 0, c.count || 0), 0);
 }
 
 function loadCohort(){
@@ -893,7 +907,7 @@ function addStandard(name){
   if(!s) return false;
   COHORT.push({
     name: s.name, code: s.code, level: s.level,
-    funding: s.funding, months: s.months || 12, count: 1
+    funding: s.funding, months: s.months || 12, count: 1, young: 0
   });
   saveCohort();
   return true;
@@ -1122,6 +1136,7 @@ function cohortView(){
           ' &middot; ' + (reg.months || s.months || 12) + ' months &middot; ' + money(reg.funding || s.funding) + '</small>'
         : s.name + '<small>' + unmatchedNote(s) + '</small>') + '</td>' +
       '<td class="num"><input class="cnt" type="number" min="0" data-i="' + i + '" value="' + (s.count || 0) + '"></td>' +
+      '<td class="num"><input class="yng" type="number" min="0" max="' + (s.count || 0) + '" data-i="' + i + '" value="' + Math.min(s.young || 0, s.count || 0) + '"></td>' +
       '<td>' + (reg
         ? (reg.changed ? changeTagHTML(reg.changed, reg.status) : '<span class="chg none">' + reg.status + '</span>')
         : '<span class="chg yes">Check the name</span>') + '</td>' +
@@ -1149,10 +1164,15 @@ function cohortView(){
 
     '<div class="grouphead"><h2>What you deliver</h2><div class="rule"></div></div>' +
     '<table class="std cohort"><thead><tr>' +
-      '<th>Standard</th><th>Apprentices</th><th>Status</th><th></th>' +
+      '<th>Standard</th><th>Apprentices</th><th>Of those, under 25</th><th>Status</th><th></th>' +
     '</tr></thead><tbody id="cohortrows">' +
-      (rows || '<tr><td colspan="4" class="cohortempty">Nothing added yet. Search below to add the standards you deliver.</td></tr>') +
+      (rows || '<tr><td colspan="5" class="cohortempty">Nothing added yet. Search below to add the standards you deliver.</td></tr>') +
     '</tbody></table>' +
+
+    '<p class="hint" style="margin:10px 0 0">Age is asked per standard because co-investment depends on it. ' +
+    'If your levy balance runs out, government funds the whole cost for apprentices aged 16 to 24 and ' +
+    (SETTINGS.levyPayer ? '75%' : '95%') + ' for those aged 25 and over, so the same shortfall costs you ' +
+    'very different amounts depending on who is on which programme.</p>' +
 
     '<div class="addpanel">' +
       pickerHTML('cohortpick') +
@@ -1168,13 +1188,34 @@ function cohortView(){
 }
 
 function wireCohort(panel){
+  function afterEdit(){
+    saveCohort(); queueSave(); refreshBar();
+    const stats = document.getElementById('cohortstats');
+    if(stats) stats.innerHTML = cohortStatsHTML();
+  }
+
   panel.querySelectorAll('#cohortrows .cnt').forEach(inp => {
     inp.addEventListener('input', () => {
-      COHORT[+inp.dataset.i].count = Math.max(0, parseInt(inp.value, 10) || 0);
-      saveCohort(); queueSave(); refreshBar();
+      const c = COHORT[+inp.dataset.i];
+      c.count = Math.max(0, parseInt(inp.value, 10) || 0);
 
-      const stats = document.getElementById('cohortstats');
-      if(stats) stats.innerHTML = cohortStatsHTML();
+      /* The under-25 figure cannot exceed the headcount, so dropping the
+         headcount pulls it down with it rather than leaving a row that
+         claims more young apprentices than apprentices. */
+      const yng = panel.querySelector('#cohortrows .yng[data-i="' + inp.dataset.i + '"]');
+      if(c.young > c.count) c.young = c.count;
+      if(yng){ yng.max = c.count; yng.value = c.young || 0; }
+
+      afterEdit();
+    });
+  });
+
+  panel.querySelectorAll('#cohortrows .yng').forEach(inp => {
+    inp.addEventListener('input', () => {
+      const c = COHORT[+inp.dataset.i];
+      c.young = Math.max(0, Math.min(parseInt(inp.value, 10) || 0, c.count || 0));
+      if(String(c.young) !== inp.value) inp.value = c.young;
+      afterEdit();
     });
   });
   panel.querySelectorAll('#cohortrows .rm').forEach(btn => {
@@ -1589,26 +1630,35 @@ function forecastInputs(){
   };
 }
 
+/* Each standard becomes up to two entries, one for the apprentices aged 16
+   to 24 on it and one for those 25 and over, because co-investment is
+   charged at a different rate for each and the age mix is not the same on
+   every programme. The forecast engine already blends the two rates by the
+   funding each group draws; splitting here is what finally gives it
+   something to blend. */
+
 function liveCohorts(){
-  return COHORT.filter(c => c.count > 0).map(c => {
-    const reg = findStandard(c);
-    return {
-      name: c.name, level: c.level,
-      funding: (reg && reg.funding) || c.funding,
-      months: (reg && reg.months) || c.months || 12,
-      count: c.count,
-      // assume they are part way through, spread across the programme
-      startMonth: -Math.round(((reg && reg.months) || c.months || 12) / 2),
-      under25: false
-    };
+  const out = [];
+  COHORT.filter(c => c.count > 0).forEach(c => {
+    const reg     = findStandard(c);
+    const funding = (reg && reg.funding) || c.funding;
+    const months  = (reg && reg.months) || c.months || 12;
+    // assume they are part way through, spread across the programme
+    const startMonth = -Math.round(months / 2);
+
+    const young = Math.max(0, Math.min(c.young || 0, c.count));
+    const older = c.count - young;
+
+    if(young > 0) out.push({ name: c.name, level: c.level, funding, months,
+                             count: young, startMonth, under25: true });
+    if(older > 0) out.push({ name: c.name, level: c.level, funding, months,
+                             count: older, startMonth, under25: false });
   });
+  return out;
 }
 
 function allCohorts(){
-  const live = liveCohorts();
-  const youngShare = cohortHeads() ? youngCount() / cohortHeads() : 0;
-  live.forEach(c => { c.under25 = youngShare >= 0.5; });
-  return live.concat(PLANNED);
+  return liveCohorts().concat(PLANNED);
 }
 
 function runForecast(){
