@@ -207,14 +207,35 @@ async function saveStandard(s){
     otj_planned: (s.otj && s.otj.planned) || null
   };
 
-  if(s.dbId){
-    const { error } = await c.from('member_standards').update(row).eq('id', s.dbId);
+  /* under_25 was added to the table after launch. If the column is not
+     there yet the whole save fails, which would take the headcount and the
+     off-the-job figures down with it, so drop that one field and save the
+     rest rather than losing everything. Ages then live only in this
+     browser until the column exists. */
+  const missingColumn = e =>
+    e && /under_25/.test(e.message || '') &&
+    (/column/i.test(e.message) || /schema cache/i.test(e.message));
+
+  async function write(body){
+    if(s.dbId){
+      const { error } = await c.from('member_standards').update(body).eq('id', s.dbId);
+      if(error) throw error;
+      return s.dbId;
+    }
+    const { data, error } = await c.from('member_standards').insert(body).select('id').single();
     if(error) throw error;
-    return s.dbId;
+    return data.id;
   }
-  const { data, error } = await c.from('member_standards').insert(row).select('id').single();
-  if(error) throw error;
-  return data.id;
+
+  try {
+    return await write(row);
+  } catch(e){
+    if(!missingColumn(e)) throw e;
+    console.info('member_standards.under_25 is not in the database yet, saving without it. ' +
+                 'Run: alter table member_standards add column if not exists under_25 integer default 0;');
+    const { under_25, ...rest } = row;
+    return await write(rest);
+  }
 }
 
 async function deleteStandard(dbId){
