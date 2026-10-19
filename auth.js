@@ -186,6 +186,7 @@ async function loadStandards(){
     name: r.standard_name, code: r.standard_code,
     level: r.level, funding: r.funding, months: r.months,
     count: r.head_count,
+    young: r.under_25 || 0,
     otj: { published: r.otj_published, rpl: r.otj_rpl, planned: r.otj_planned }
   }));
 }
@@ -200,6 +201,7 @@ async function saveStandard(s){
     standard_name: s.name, standard_code: s.code || null,
     level: s.level, funding: s.funding, months: s.months,
     head_count: s.count || 0,
+    under_25: Math.min(s.young || 0, s.count || 0),
     otj_published: (s.otj && s.otj.published) || null,
     otj_rpl: (s.otj && s.otj.rpl) || null,
     otj_planned: (s.otj && s.otj.planned) || null
