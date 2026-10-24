@@ -13,7 +13,7 @@
    automatically when it commits a change.
    ----------------------------------------------------------------------- */
 
-const DATA_UPDATED = "2026-10-11";
+const DATA_UPDATED = "2026-10-24";
 const DATA_SOURCE  = "hand";   // "hand" or "sync"
 
 /* ---------- 1. OCCUPATIONAL ROUTES -------------------------------------
@@ -109,6 +109,33 @@ const ROUTES = {
    ----------------------------------------------------------------------- */
 
 const UPDATES = [
+  {
+    date: "2026-10-19",
+    title: "Industry commits to tens of thousands of apprenticeships a year",
+    tag: { label: "New commitments", tone: "new" },
+    category: "funding-rules", route: "", standard: "", article: "jobs-plans",
+    status: "updated", urgency: "medium", pinned: true,
+    summary: "Four sector jobs plans landed in three days. Professional and business services committed to 22,400 new apprenticeships a year for under-25s over five years. Construction committed to 40,000 placements a year. Defence will take apprenticeships to at least 14,000 a year by 2035. The digital and technologies plan followed on 21 October. Advanced manufacturing and creative industries are still to come.",
+    url: "https://www.gov.uk/government/news/over-100000-job-and-training-opportunities-a-year-to-give-young-people-a-route-into-britains-growth-industries-as-part-of-industrial-strategy"
+  },
+  {
+    date: "2026-10-22",
+    title: "Skills England misses its own deadline on assessment reform",
+    tag: { label: "Reform delayed", tone: "warn" },
+    category: "funding-rules", route: "", standard: "", article: "assessment-reform-slips",
+    status: "updated", urgency: "medium", pinned: false,
+    summary: "Skills England set itself August 2026 to review all 700 or so apprenticeship standards. Around 270 reformed assessment plans have been published. The agency says it has adapted the pace of change, which awarding organisations and employers heard about after the deadline rather than before it.",
+    url: "https://feweek.co.uk/frustration-at-skills-englands-apprenticeship-review-slowdown/"
+  },
+  {
+    date: "2026-06-30",
+    title: "£3,000 Youth Jobs Grant, and it is not the apprenticeship one",
+    tag: { label: "New payment", tone: "money" },
+    category: "funding-rules", route: "", standard: "", article: "youth-jobs-grant",
+    status: "updated", urgency: "medium", pinned: false,
+    summary: "A separate DWP grant of £3,000 for hiring an 18 to 24 year old who has been out of work and on Universal Credit for six months. Different department, different eligibility, Great Britain rather than England, and nothing to do with the apprenticeship hiring payment. It runs to October 2028 and the caps on how many you can claim catch smaller employers out.",
+    url: "https://www.gov.uk/government/publications/youth-jobs-grant/youth-jobs-grant-grant-guidance"
+  },
   {
     date: "2026-10-28",
     title: "Budget 2026: the skills decisions still outstanding",
@@ -396,6 +423,81 @@ const UPDATES = [
 
 const ARTICLES = [
   {
+    id: "jobs-plans",
+    icon: "handshake",
+    summary: "Four sector plans in three days, with numbers attached, and a procurement change that matters more than the headlines.",
+    title: "What the sector jobs plans actually commit to",
+    date: "2026-10-19",
+    route: "",
+    tag: "Funding rules",
+    urgency: "medium",
+    standfirst: "Pledges rather than rules, but one of them changes how public contracts are scored.",
+    body: [
+      "Between 19 and 21 October the government and industry published a run of sector jobs plans under the industrial strategy. Four landed, two more are promised, and the numbers are worth separating from the press release language.",
+      "<b class=\"psub\">Professional and business services</b>22,400 new apprenticeships a year for under-25s, sustained over five years, plus a 20% increase in work experience places. The roles named are accountancy, business, law, artificial intelligence, cyber security and data analytics. This is the largest single apprenticeship commitment in the set, and the age restriction is part of it rather than incidental.",
+      "<b class=\"psub\">Construction</b>40,000 placements a year, inside a wider ambition of 100,000 job opportunities a year. It covers skilled trades and professional roles, bricklaying through to surveying and planning. It is backed by the Construction Skills Mission Board and the Construction Leadership Council, and a new Construction Apprenticeship Network aimed specifically at smaller firms, which is the part worth watching if your employers are SMEs.",
+      "<b class=\"psub\">Defence</b>A 25% increase in work experience and pathways aimed at young people not in education, employment or training, and apprenticeships rising to at least 14,000 a year by 2035. The longest timescale of the four and the only one framed around NEET recruitment rather than volume.",
+      "<b class=\"psub\">Digital and technologies</b>Published separately on 21 October. 800,000 roles over ten years including 200,000 entry level, and more than 10,000 work experience, placement and learning opportunities from TechFirst partners including Microsoft, Cisco, IBM, Cognizant, Arm, Kainos, QinetiQ and AtkinsRéalis. No apprenticeship volume target, which stands out against the other three.",
+      "Two details in the digital plan will do more work than any of the headline figures. On public contracts of £5 million or more, the social value weighting rises from 10% to 20%, with apprenticeships, T Level placements and work experience named as ways to deliver it. That is a procurement lever rather than a pledge, and it gives anyone bidding for public work a direct commercial reason to take apprentices. And from April 2027 the BCS will give free professional recognition to anyone completing a digital T Level, V Level or apprenticeship.",
+      "<b class=\"psub\">What to be careful about</b>The surrounding £2.5 billion youth employment package is described as including a new incentive of up to £2,000 for small and medium employers taking on a 16 to 24 year old apprentice. That is not a new scheme. It is the apprenticeship hiring payment that opened on 1 October, restated. Anyone treating it as a second £2,000 will be disappointed.",
+      "<b class=\"psub\">What follows</b>None of this changes a funding rule, so there is nothing to action in your compliance position. What it changes is the conversation with large employers, who now have public numbers against their sector and a reason to want providers who can fill them. Advanced manufacturing and creative industries plans are still to come, and the whole set lands ahead of the final Milburn review into young people and employment, which reports after the Budget."
+    ],
+    sources: [
+      { label: "Over 100,000 job and training opportunities a year, GOV.UK, 19 October 2026", url: "https://www.gov.uk/government/news/over-100000-job-and-training-opportunities-a-year-to-give-young-people-a-route-into-britains-growth-industries-as-part-of-industrial-strategy" },
+      { label: "Digital and Technologies Jobs Plan, 21 October 2026", url: "https://wired-gov.net/wg/news.nsf/articles/Digital+and+Technologies+Jobs+Plan+21102026162500?open=" }
+    ]
+  },
+  {
+    id: "assessment-reform-slips",
+    icon: "clock",
+    summary: "August 2026 was the deadline to review every standard. About 270 reformed plans are published out of roughly 700.",
+    title: "Assessment reform has slipped, and nobody was told",
+    date: "2026-10-22",
+    route: "",
+    tag: "Funding rules",
+    urgency: "medium",
+    standfirst: "The reform is still happening. The timetable you planned against is not.",
+    body: [
+      "Skills England set itself a deadline of August 2026 to review all 700 or so apprenticeship standards and publish reformed apprenticeship assessment plans for them. That deadline has passed with around 270 published.",
+      "The agency has said it has adapted the pace of change after a year of pushing the sector to meet an ambitious timetable. Awarding organisations and employers largely found that out after the deadline rather than before it, and the complaint being made is about communication rather than the slip itself.",
+      "<b class=\"psub\">What it changed from</b>A published timetable that providers, awarding organisations and employers built delivery plans around, with group deadlines running through 2026. What it changed to: a rolling programme with no restated end date.",
+      "The progress figures tell the story on their own. In March the count was 210 standards in revision with 32 plans complete. By April that was 41 complete. By July, 328 standards in development and more than 100 plans complete. Now around 270 published against roughly 700 standards, so somewhere under half the register, more than a year in.",
+      "<b class=\"psub\">What follows</b>If you built a curriculum or assessment plan around a standard being reformed by a particular date, check it rather than assume it. The practical risk is not that reform stops, it is that you prepare for a revised plan that does not arrive, or get one at short notice for a standard you were not watching.",
+      "Standards currently showing as in revision on the register include Early years educator ST0135 and Early years practitioner ST0888, both high volume and both moving at the same time, along with Professional accounting technician ST0003, Improvement technician ST0193, Applications support lead ST0949, and Dental technician ST1432 with Clinical dental technician ST1433.",
+      "The register is the only reliable source for where an individual standard has got to, because the published progress figures are summaries and lag. Check the standard itself before you plan around it."
+    ],
+    sources: [
+      { label: "Frustration at Skills England's apprenticeship review slowdown, FE Week, 22 October 2026", url: "https://feweek.co.uk/frustration-at-skills-englands-apprenticeship-review-slowdown/" },
+      { label: "Apprenticeship reform updates, NCFE", url: "https://www.ncfe.org.uk/epa-and-apprenticeship-assessment/apprenticeship-assessment-reforms/apprenticeship-reform-updates/" },
+      { label: "Skills England apprenticeship register", url: "https://skillsengland.education.gov.uk/apprenticeships/" }
+    ]
+  },
+  {
+    id: "youth-jobs-grant",
+    icon: "coin",
+    summary: "£3,000 from DWP for hiring an 18 to 24 year old on Universal Credit. Separate from the apprenticeship hiring payment.",
+    title: "The £3,000 Youth Jobs Grant is not the £2,000 one",
+    date: "2026-06-30",
+    route: "",
+    tag: "Funding rules",
+    urgency: "medium",
+    standfirst: "Two payments, two departments, two sets of rules, and they are being confused constantly.",
+    body: [
+      "The Youth Jobs Grant launched on 30 June 2026 and pays an employer £3,000 for hiring an eligible young person. It is run by the Department for Work and Pensions, it covers Great Britain rather than England, and it has nothing to do with apprenticeship funding. It is being mixed up with the £2,000 apprenticeship hiring payment constantly, and the two have almost no eligibility criteria in common.",
+      "<b class=\"psub\">Who counts as eligible</b>The young person must be 18 to 24, out of work, and on Universal Credit for six months, and must not be eligible for the Jobs Guarantee, which is normally reached at 18 months. So it sits in a specific window of unemployment, not simply any young hire.",
+      "<b class=\"psub\">What the employer has to be</b>Any size and any sector, sole traders included, trading for at least six months, registered with HMRC with an active PAYE scheme, and holding a D-U-N-S number. Central government departments, executive agencies and non-departmental public bodies are excluded. Local authorities are eligible.",
+      "<b class=\"psub\">What the job has to be</b>At least 25 hours a week, lasting at least 16 weeks, paid at or above the minimum or living wage, not displacing existing staff, and no more than half of it online training. The vacancy also must not displace an existing apprentice.",
+      "<b class=\"psub\">How it pays</b>£1,800 after about six weeks and £1,200 after about eighteen, so not an even split. The first payment needs at least 50 hours worked by week six, rechecked at week ten for 100 hours. The second needs 300 hours by week eighteen, rechecked at week twenty-two. Earnings are verified through HMRC Real Time Information, and payslips are not accepted as evidence.",
+      "<b class=\"psub\">The cap that catches people</b>One funded hire for an employer with nought to three employees, two for four to nine, and up to 20% of staff for anyone with ten or more. A small employer planning several of these will hit the ceiling quickly.",
+      "<b class=\"psub\">Can you claim both?</b>This is the question worth getting a written answer to. The grant guidance does not address the apprenticeship hiring payment at all. FE Week has reported an understanding that an eligible business could claim both for the same person, but that is not confirmed in the guidance, and the two schemes sit in different departments. If it matters to a case you are working on, ring the Employer Services Line on 0800 169 0178 and get the answer in writing rather than relying on either of us.",
+      "<b class=\"psub\">What follows</b>Apply through Find a Grant on GOV.UK, which needs a One Login, then submit vacancies and send a pre-start form before the young person starts. The scheme aims at roughly 60,000 opportunities over three years and closes to new vacancies in October 2028."
+    ],
+    sources: [
+      { label: "Youth Jobs Grant: grant guidance, GOV.UK", url: "https://www.gov.uk/government/publications/youth-jobs-grant/youth-jobs-grant-grant-guidance" },
+      { label: "Employers offered £3,000 sweeteners to hire unemployed young people, FE Week", url: "https://feweek.co.uk/employers-offered-3000-sweeteners-to-hire-unemployed-young-people/" }
+    ]
+  },
+  {
     id: "budget-2026",
     icon: "coin",
     summary: "Three skills questions the Budget on 28 October has to answer, and why the levy mechanics are the one to watch.",
@@ -565,9 +667,11 @@ const ARTICLES = [
     category: "funding-rules", urgency: "high",
     summary: "Non-levy employers can claim up to £2,000 for an apprentice aged 16 to 24 starting from 1 October 2026. The eligibility test is narrower than it first appears.",
     body: [
-      "From 1 October 2026 a non-levy-paying employer can claim up to £2,000 when they take on an apprentice aged 16 to 24. It is paid in two parts: the first once the apprentice has completed ninety days, the second at 365 days, and the apprentice has to still be in learning on each occasion.",
+      "From 1 October 2026 a non-levy-paying employer can claim £2,000 when they take on an apprentice aged 16 to 24 at the start of training. It is paid as two instalments of £1,000, the first ninety days after the apprenticeship starts and the second a year later, or after 242 days on a foundation apprenticeship. The employer is paid only if the apprentice is still employed when each one falls due, and the provider has thirty working days to pass the money on once government has released it.",
 
       "The condition people miss is at the other end. The apprentice must have joined the employer within the ninety days before the apprenticeship starts. It is a hiring payment in the literal sense, for recruiting someone new, and it does not apply to an existing member of staff being put through an apprenticeship however recently they joined the team.",
+
+      "One edge case is worth knowing because it will come up once a year: a fifteen year old qualifies if their sixteenth birthday falls between the last Friday of June and 31 August, which covers school leavers who start before they turn sixteen.",
 
       "The second thing worth being precise about is who qualifies. This is tied to levy status, not to company size. An employer with a pay bill under £3 million does not pay the levy and can claim; a larger employer cannot, regardless of how few apprentices they run. The apprenticeship service account checks this against PAYE data, so an account with out-of-date PAYE details can fail the check for an employer who is genuinely eligible.",
 

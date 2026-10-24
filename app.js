@@ -172,6 +172,15 @@ const ART_ICONS = {
   "mayoral-brokerage":
     '<circle cx="12" cy="24" r="5"/><circle cx="36" cy="24" r="5" class="fade"/><path d="M17 24h14" class="hg"/>' +
     '<path d="M24 13v-4M24 39v-4" class="fade"/>',
+  "jobs-plans":
+    '<circle cx="14" cy="16" r="5"/><circle cx="30" cy="16" r="5" class="fade"/><circle cx="22" cy="33" r="5" class="hg"/>' +
+    '<path d="M8 41h32" /><path d="M14 21v6h16v-6" fill="none" class="fade"/>',
+  "assessment-reform-slips":
+    '<circle cx="22" cy="24" r="14" fill="none"/><line x1="22" y1="24" x2="22" y2="15"/><line x1="22" y1="24" x2="29" y2="28" class="hg"/>' +
+    '<path d="M36 34l6 6M42 34l-6 6" class="slash"/>',
+  "youth-jobs-grant":
+    '<rect x="7" y="14" width="20" height="14" rx="1.5" class="hg"/><rect x="19" y="22" width="20" height="14" rx="1.5" fill="none"/>' +
+    '<line x1="11" y1="21" x2="23" y2="21" class="fade"/><line x1="23" y1="29" x2="35" y2="29" class="fade"/>',
   "starts-data-2526":
     '<line x1="8" y1="40" x2="42" y2="40"/><rect x="11" y="26" width="7" height="14"/><rect x="21" y="18" width="7" height="22" class="hg"/>' +
     '<rect x="31" y="30" width="7" height="10" class="fade"/><path d="M11 14l10 6 10-10" fill="none" class="slash"/>'
