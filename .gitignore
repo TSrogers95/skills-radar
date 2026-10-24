@@ -1,0 +1,13 @@
+# Everything below is written by `node build.js`, which Vercel runs on every
+# deploy. Committing it would put a stale copy of the site in the repo and
+# fight whatever the next build produces.
+
+a/
+guides/
+sitemap.xml
+robots.txt
+
+# Local noise
+node_modules/
+.DS_Store
+.vercel
