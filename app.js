@@ -777,7 +777,14 @@ function significance(s){
   if(/assessment plan/.test(c))                           return 'assessment';
   if(/waiting|no assessment organisation/.test(c + (s.epa || '').toLowerCase())) return 'noepa';
   if(/duration changed|level changed/.test(c))            return 'spec';
-  if(/version|approved for delivery|in development|notice period/.test(c + st)) return 'version';
+  /* A revision underway is worth a page: it tells you something is coming
+     that you can still plan around. A version number that has simply moved
+     is not. It was generating 212 near-identical pages, which is most of
+     the site, and they say little more than the feed card already does.
+
+     Those changes still appear in the feed. They just point at the route
+     round-up rather than a page of their own. */
+  if(/in development|notice period/.test(c + st)) return 'version';
   return null;
 }
 
