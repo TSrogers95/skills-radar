@@ -17,7 +17,10 @@
 
 const { readFile, writeFile, sendEmail, authorised, today } = require('./_lib');
 
-const API   = 'https://occupational-maps-api.skillsengland.education.gov.uk/api/v1';
+/* The public register. No key, no sign-in, one request. The keyed
+   occupational-maps API needed a subscription key that could expire
+   without anyone noticing; this one cannot. */
+const API   = 'https://skillsengland.education.gov.uk/api/apprenticeshipstandards';
 const PATH  = 'standards.js';
 const BEGIN = '/* STANDARDS:BEGIN';
 const END   = '/* STANDARDS:END */';
@@ -30,22 +33,13 @@ const SAFETY_LIMIT = 60;
 module.exports = async function handler(req, res){
   if(!authorised(req)) return res.status(401).json({ error: 'Unauthorised' });
 
-  const key = process.env.SKILLS_ENGLAND_API_KEY;
-  if(!key){
-    return res.status(200).json({
-      ok: false,
-      skipped: 'No SKILLS_ENGLAND_API_KEY set. Request a key from ' +
-               'https://occupational-maps.skillsengland.education.gov.uk/public-api/'
-    });
-  }
-
   const dryRun = req.query && req.query.dry === '1';
 
   /* ---- 1. Fetch the register ---- */
 
   let remote;
   try {
-    remote = await fetchAll(key);
+    remote = await fetchAll();
   } catch(err){
     await sendEmail('Skills Radar — register sync failed',
       '<p>The sync could not read the Skills England API.</p><pre>' + esc(err.message) + '</pre>' +
@@ -84,7 +78,16 @@ module.exports = async function handler(req, res){
   const seen = new Set();
 
   remote.forEach(r => {
-    const existing = byCode[r.code] || byName[norm(r.name)];
+    /* Names are not unique on the register: a retired standard and its live
+       replacement often share one, at different levels and bands. Matching a
+       retired record to a live one by name rewrites the live standard with
+       the dead one's figures, so a retired record only ever matches on code. */
+    const existing = byCode[r.code] || (isRetired(r) ? null : byName[norm(r.name)]);
+
+    /* A standard that is already retired and that the site has never carried
+       is not news, it is history. One the site DOES carry is the opposite:
+       somebody may be delivering it, so the change has to come through. */
+    if(!existing && isRetired(r)) return;
 
     if(!existing){
       added.push(r);
@@ -106,6 +109,7 @@ module.exports = async function handler(req, res){
 
     const base = {
       ...existing,                        // keep common, article, route
+      code: r.code,                       // the register is the authority on codes
       level: r.level,
       months: r.months || existing.months,
       funding: r.funding || existing.funding,
@@ -192,28 +196,53 @@ module.exports = async function handler(req, res){
 
 /* ---------- Fetching ---------- */
 
-async function fetchAll(key){
-  const out = [];
-  let page = 1;
+/* One request, about 80MB, roughly ten seconds. That is well inside the
+   function's limit and the parsed result sits around 260MB, so there is no
+   need to page. The endpoint does not support paging or field selection
+   anyway: every query string returns the whole register. */
+async function fetchAll(){
+  const r = await fetch(API, { headers: { 'Accept': 'application/json' } });
+  if(!r.ok) throw new Error('Register API returned ' + r.status);
 
-  while(page <= 30){
-    const url = API + '/Standards?page=' + page + '&pageSize=100';
-    const r = await fetch(url, {
-      headers: { 'Ocp-Apim-Subscription-Key': key, 'Accept': 'application/json' }
-    });
+  const json = await r.json();
+  const rows = Array.isArray(json) ? json : (json.standards || json.items || json.data || []);
+  if(!rows.length) throw new Error('Register API returned no records');
 
-    if(!r.ok) throw new Error('API returned ' + r.status + ' on page ' + page);
-
-    const json = await r.json();
-    const rows = Array.isArray(json) ? json : (json.standards || json.items || json.data || []);
-    if(!rows.length) break;
-
-    rows.forEach(x => out.push(shape(x)));
-    if(rows.length < 100) break;
-    page++;
-  }
-  return out;
+  return pickCurrent(rows).map(shape);
 }
+
+/* The register carries one record per VERSION, so roughly 2,000 records
+   describe roughly 800 standards. Keep the one a provider would actually
+   start someone on: open for delivery first, then the highest version, then
+   the most recently changed. */
+function pickCurrent(rows){
+  const rank = x => {
+    const st = String(x.status || '').toLowerCase();
+    if(/retired|withdrawn/.test(st)) return 0;
+    if(/approved for delivery/.test(st)) return 3;
+    if(/development|proposal/.test(st)) return 1;
+    return 2;
+  };
+
+  const best = new Map();
+  rows.forEach(x => {
+    const code = String(x.referenceNumber || '').trim();
+    if(!code) return;
+
+    const held = best.get(code);
+    if(!held) return void best.set(code, x);
+
+    const a = [rank(x),    versionNum(x.versionNumber),    Date.parse(x.changedDate || 0) || 0];
+    const b = [rank(held), versionNum(held.versionNumber), Date.parse(held.changedDate || 0) || 0];
+    for(let i = 0; i < 3; i++){
+      if(a[i] !== b[i]){ if(a[i] > b[i]) best.set(code, x); return; }
+    }
+  });
+
+  return [...best.values()];
+}
+
+function isRetired(s){ return /^retired|^withdrawn/i.test(String(s.status || '')); }
 
 /* The API is in public beta, so field names may move. Check several spellings
    rather than assuming one, and fall back rather than writing nonsense. */
@@ -235,7 +264,7 @@ function shape(x){
     level:   Number(pick('level', 'standardLevel')) || 0,
     months:  Number(pick('typicalDuration', 'duration', 'typicalDurationMonths')) || 0,
     funding: Number(pick('maxFunding', 'fundingBand', 'maximumFunding', 'fundingBandMaximum')) || 0,
-    version: String(pick('version', 'standardVersion') || '1.0'),
+    version: String(pick('versionNumber', 'version', 'standardVersion') || '1.0'),
     route:   slugRoute(pick('route', 'routeName', 'route.name')),
     status:  status,
     epa:     epaStatus(status, epao),
