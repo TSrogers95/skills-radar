@@ -94,7 +94,7 @@ module.exports = async function handler(req, res){
         months: r.months, funding: r.funding,
         route: r.route || guessRoute(r),
         epa: r.epa, status: r.status, version: r.version,
-        since: today(),
+        since: r.changedOn || today(),
         changed: 'New on the register',
         article: ''
       });
@@ -104,15 +104,22 @@ module.exports = async function handler(req, res){
     seen.add(existing.name);
     const diffs = compare(existing, r);
 
+    const base = {
+      ...existing,                        // keep common, article, route
+      level: r.level,
+      months: r.months || existing.months,
+      funding: r.funding || existing.funding,
+      epa: r.epa, status: r.status,
+      version: versionNum(r.version) === versionNum(existing.version)
+        ? existing.version : r.version
+    };
+
     if(diffs.length){
       updated.push({ name: r.name, code: r.code, diffs: diffs });
-      merged.push({
-        ...existing,                      // keep common, article, route
-        level: r.level, months: r.months, funding: r.funding,
-        epa: r.epa, status: r.status, version: r.version,
-        since: today(),
-        changed: diffs.join('. ')
-      });
+      merged.push({ ...base, since: r.changedOn || existing.since || today(), changed: diffs.join('. ') });
+    } else if((!existing.funding && r.funding) || (!existing.months && r.months)){
+      // a blank filled in: take the value, leave the feed alone
+      merged.push(base);
     } else {
       merged.push(existing);              // untouched, including its "changed" text
     }
@@ -219,7 +226,7 @@ function shape(x){
     return undefined;
   };
 
-  const status = String(pick('status', 'standardStatus', 'approvalStatus') || 'Approved');
+  const status = tidyStatus(pick('status', 'standardStatus', 'approvalStatus') || 'Approved');
   const epao   = pick('assessmentOrganisations', 'epaos', 'assessmentOrganisationCount');
 
   return {
@@ -231,8 +238,42 @@ function shape(x){
     version: String(pick('version', 'standardVersion') || '1.0'),
     route:   slugRoute(pick('route', 'routeName', 'route.name')),
     status:  status,
-    epa:     epaStatus(status, epao)
+    epa:     epaStatus(status, epao),
+    changedOn: changedOn(x)
   };
+}
+
+/* The register and the site word the same status differently. Without this
+   every standard reports a status change on the first run and the real ones
+   are buried. Same list as the importer uses. */
+function tidyStatus(s){
+  const t = String(s || '').trim();
+  if(/^approved for delivery/i.test(t)) return 'Approved';
+  if(/^standard in development|^in development/i.test(t)) return 'In development';
+  if(/^proposal/i.test(t)) return 'Proposal in development';
+  if(/paused/i.test(t)) return 'Paused for starts';
+  if(/retirement consultation/i.test(t)) return 'Retirement consultation';
+  if(/notice period/i.test(t)) return 'In development';
+  if(/defunded/i.test(t)) return 'Defunded from Sept 2026';
+  return t || 'Approved';
+}
+
+/* "2" and "2.0" are the same version. Comparing the strings reports a change
+   on every standard whose version the importer stored without a decimal. */
+function versionNum(v){
+  const m = String(v == null ? '' : v).match(/(\d+)(?:\.(\d+))?/);
+  return m ? (Number(m[1]) * 1000) + Number(m[2] || 0) : -1;
+}
+
+/* A change is dated when it happened, not when the sync noticed. On a weekly
+   run those are the same day; after an outage they are not, and dating a
+   month of changes today puts all of them in the feed at once. The register
+   carries 0001-01-01 placeholders, so anything implausible returns null and
+   the caller keeps whatever date the site already held. */
+function changedOn(x){
+  const d = String((x && (x.changedDate || x.lastUpdated)) || '').slice(0, 10);
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(d)) return null;
+  return (d >= '2012-01-01' && d <= today()) ? d : null;
 }
 
 function epaStatus(status, epao){
@@ -271,16 +312,19 @@ function compare(local, remote){
   const d = [];
   const gbp = n => '£' + Number(n).toLocaleString('en-GB');
 
-  if(remote.funding && remote.funding !== local.funding)
+  /* Only a figure the site already held can have changed. Filling a blank is
+     the register telling us something for the first time, which belongs in
+     the data but not in the feed. */
+  if(remote.funding && local.funding && remote.funding !== local.funding)
     d.push('Funding band changed from ' + gbp(local.funding) + ' to ' + gbp(remote.funding));
 
-  if(remote.months && remote.months !== local.months)
+  if(remote.months && local.months && remote.months !== local.months)
     d.push('Duration changed from ' + local.months + ' to ' + remote.months + ' months');
 
   if(remote.level && remote.level !== local.level)
     d.push('Level changed from ' + local.level + ' to ' + remote.level);
 
-  if(remote.version && remote.version !== local.version)
+  if(remote.version && versionNum(remote.version) !== versionNum(local.version))
     d.push('Updated to version ' + remote.version);
 
   if(remote.status && remote.status !== local.status)
