@@ -13,7 +13,7 @@
    automatically when it commits a change.
    ----------------------------------------------------------------------- */
 
-const DATA_UPDATED = "2026-10-24";
+const DATA_UPDATED = "2026-10-28";
 const DATA_SOURCE  = "hand";   // "hand" or "sync"
 
 /* ---------- 1. OCCUPATIONAL ROUTES -------------------------------------
@@ -138,12 +138,21 @@ const UPDATES = [
   },
   {
     date: "2026-10-28",
-    title: "Budget 2026: the skills decisions still outstanding",
-    tag: { label: "Watch this", tone: "warn" },
+    title: "Apprentices to be required on large government projects",
+    tag: { label: "New requirement", tone: "new" },
+    category: "funding-rules", route: "", standard: "", article: "apprentices-public-projects",
+    status: "upcoming", urgency: "medium", pinned: false,
+    summary: "Reported in the Budget: at least 3% of the workforce on large government construction and infrastructure projects must be apprentices. A National Procurement Policy Statement is to be laid before Parliament in March 2027 prioritising high quality jobs, fair pay and skills. It stacks with the social value weighting on contracts over \u00a35m, which already rose from 10% to 20%. Single-sourced at the time of writing, so check the Budget document before acting on the number.",
+    url: "https://www.fenews.co.uk/fe-voices/budget-2026-what-the-chancellor-announced-for-skills-apprenticeships-and-young-people/"
+  },
+  {
+    date: "2026-10-28",
+    title: "Budget 2026: no new funding rules, one real change",
+    tag: { label: "Budget", tone: "money" },
     category: "funding-rules", route: "", standard: "", article: "budget-2026",
-    status: "upcoming", urgency: "medium", pinned: true,
-    summary: "The Chancellor delivers the Budget on Wednesday 28 October. Government has already said that further detail on the mayoral apprenticeship brokerage pilots comes at the Budget, and the August changes to co-investment and the October hiring payment are both open-ended commitments that have not yet run for a full year. Three things worth watching: any further defunding, how the youth offer is paid for, and whether the twelve month expiry on levy funds survives its first year.",
-    url: "https://www.gov.uk/government/publications/chancellor-letter-to-the-treasury-select-committee-tsc-budget-2026-date"
+    status: "updated", urgency: "medium", pinned: true,
+    summary: "Nothing in the Budget changes what you can claim. The \u00a3100m for mayoral apprenticeship brokerage was confirmed rather than announced, spread across 2027/28 and 2028/29 and taking the pilots from 7 areas to all 14. The Union Learning Fund returns at \u00a315m a year from 2027/28 and the Jobs Guarantee extends to 22 to 24 year olds. T-Levels were not mentioned at all, and the DfE capital budget falls from \u00a38.1bn to \u00a37.5bn from 2027/28.",
+    url: "https://www.fenews.co.uk/fe-voices/budget-2026-what-the-chancellor-announced-for-skills-apprenticeships-and-young-people/"
   },
   {
     date: "2026-09-17",
@@ -500,24 +509,60 @@ const ARTICLES = [
   {
     id: "budget-2026",
     icon: "coin",
-    summary: "Three skills questions the Budget on 28 October has to answer, and why the levy mechanics are the one to watch.",
-    title: "Budget 2026: what to watch on 28 October",
+    summary: "Nothing you can claim changed. One genuinely new requirement, one confirmation, and a conspicuous silence on T-Levels.",
+    title: "Budget 2026: what actually landed for skills",
     date: "2026-10-28",
     route: "",
     tag: "Funding rules",
     urgency: "medium",
-    standfirst: "Nothing to do before the date. Plenty to have modelled before it.",
+    standfirst: "No new funding rules. Read it for what it signals rather than what it changes.",
     body: [
-      "The Budget is on Wednesday 28 October. For anyone running early careers programmes there are three open questions rather than one, and only one of them has been flagged in advance.",
-      "The flagged one is brokerage. Government confirmed on 7 October that the mayoral apprenticeship brokerage pilots expand to all 14 areas with directly elected mayors, with an extra £100 million, and said in terms that further detail follows at the Budget. So the spending is announced and the mechanism is not. What is worth knowing by the end of October is whether brokers route candidates to a training provider or straight to the employer, because that decides whether this is a recruitment channel or a competitor.",
-      "The second question is what the August and October changes cost over a full year. Co-investment was rewritten from 1 August so that government funds the whole cost for apprentices aged 16 to 24 at both levy and non-levy employers. The £2,000 hiring payment opened on 1 October. Both are open-ended commitments whose cost depends on employer behaviour that nobody has measured yet, because the behaviour has not happened. A first-year underspend invites expansion. A first-year overspend invites a cap, and caps in this system usually arrive as eligibility conditions rather than as a stated budget limit.",
-      "The third is whether anything else gets defunded. Sixteen standards went in September. Skills England has separately been reviewing standards to clarify which qualifications inside them are mandatory and which are not, and a review that produces one list has a habit of producing a second.",
-      "What it changed from: for the last two years the direction has been set at fiscal events and the detail has followed in the funding rules three to six months later. What follows: that pattern means nothing in the rules changes on the day, so there is no compliance action to take on 28 October.",
-      "The useful preparation is in the modelling. If you are costing 2027/28 provision now, build it so a co-investment rate, an age threshold and the twelve month expiry on levy funds are each a single input you can change, rather than assumptions baked through a spreadsheet. Every one of those three has moved once already in eighteen months."
+      "Start with the practical answer, because it is short. <b>Nothing in this Budget changes what you can claim, for whom, or when.</b> The funding rules are unchanged, co-investment is unchanged, the \u00a32,000 hiring payment is unchanged, and the twelve month expiry on levy funds survives its first year untouched. If you were waiting to see whether to re-model 2027/28, you can stop waiting.",
+
+      "<b class=\"psub\">The one genuinely new thing</b>A requirement that at least 3% of the workforce on large government construction and infrastructure projects must be apprentices, with a National Procurement Policy Statement to be laid before Parliament in March 2027 prioritising high quality jobs, fair pay and skills. That has its own entry here, because for anyone bidding for public work it is the most commercially significant apprenticeship measure in years.",
+
+      "<b class=\"psub\">What was confirmed rather than announced</b>The \u00a3100m for mayoral apprenticeship brokerage, trailed on 28 September and again in the October departmental update, is now funded: spread across 2027/28 and 2028/29, taking the pilots from 7 areas to all 14 Mayoral Strategic Authorities, with local apprenticeship services running across England from spring 2027. The government says it wants strategic authorities everywhere by the end of 2028. The money comes from savings found inside the Department for Work and Pensions.",
+
+      "The wider youth employment package was also confirmed rather than extended. The \u00a33,000 Youth Jobs Grant, the \u00a32,000 hiring payment for non-levy employers, and the Jobs Guarantee, which now reaches 22 to 24 year olds, all keep the terms they already had.",
+
+      "<b class=\"psub\">Two things worth noticing</b>The Union Learning Fund returns in England at \u00a315m a year from 2027/28, which is a small number attached to a notable change of direction. And the DfE capital budget falls from \u00a38.1bn in 2026/27 to \u00a37.5bn from 2027/28, which is the kind of line that shows up three years later as a college that did not get rebuilt.",
+
+      "<b class=\"psub\">The silence</b>T-Levels were not mentioned. Given that V Levels start in September 2027, Level 2 is being rebuilt around two new certificates from the same date, and large legacy qualifications start losing funding in July 2027, a Budget that says nothing about any of it is worth noting. The post-16 transition is the largest change to this sector in a decade and it got no money and no mention.",
+
+      "<b class=\"psub\">What follows</b>The government has said it will respond to Alan Milburn\u2019s final report on young people and work, and to the Timms Review, before the end of the year, with a White Paper early in 2027. On recent form that is where the actual rule changes will surface, three to six months after the direction is set. Nothing to action today; the White Paper is the date to hold."
     ],
     sources: [
-      { label: "Chancellor's letter to the Treasury Select Committee on the Budget 2026 date", url: "https://www.gov.uk/government/publications/chancellor-letter-to-the-treasury-select-committee-tsc-budget-2026-date" },
-      { label: "DfE update, further education, 7 October 2026", url: "https://www.gov.uk/government/publications/dfe-update-7-october-2026/dfe-update-further-education-7-october-2026" }
+      { label: "Budget 2026: what the Chancellor announced for skills, apprenticeships and young people, FE News, 28 October 2026", url: "https://www.fenews.co.uk/fe-voices/budget-2026-what-the-chancellor-announced-for-skills-apprenticeships-and-young-people/" },
+      { label: "Chancellor backs young people into work by supporting jobs, HM Treasury, 28 September 2026", url: "https://www.gov.uk/government/news/chancellor-backs-young-people-into-work-by-supporting-jobs" },
+      { label: "Autumn Budget 2026, House of Commons Library", url: "https://commonslibrary.parliament.uk/autumn-budget-2026/" }
+    ]
+  },
+  {
+    id: "apprentices-public-projects",
+    icon: "handshake",
+    summary: "At least 3% of the workforce on large government construction and infrastructure projects to be apprentices.",
+    title: "Apprentices become a condition of public work",
+    date: "2026-10-28",
+    route: "construction",
+    tag: "Funding rules",
+    urgency: "medium",
+    standfirst: "Not a funding rule. A procurement rule, which in this sector tends to bite harder.",
+    body: [
+      "The Budget introduced a requirement that at least 3% of the workforce on large government construction and infrastructure projects must be apprentices, alongside a National Procurement Policy Statement to be laid before Parliament in March 2027 prioritising high quality jobs, fair pay and skills, including pathways for young people.",
+
+      "<b class=\"psub\">Check this one before you act on it</b>At the time of writing this is reported by FE News from the Budget documents and has not yet appeared in a second source, and the House of Commons Library summary is not published until this evening. The direction is not in doubt. The precise figure and which projects count as large are, so read the Budget document before you put 3% in a bid.",
+
+      "<b class=\"psub\">Why it matters more than a funding change</b>A funding rule changes what a programme costs. A procurement rule changes whether you win the work. This sits on top of the social value weighting on public contracts over \u00a35m, which rose from 10% to 20% earlier this year with apprenticeships, T-Level placements and work experience named as ways to deliver it. Together they turn an apprenticeship programme from a cost centre into a bid requirement.",
+
+      "<b class=\"psub\">Who should care</b>Any employer bidding for government construction or infrastructure work, and any training provider whose employers do. The practical question is not whether you support apprenticeships, it is whether you can evidence a given headcount on a given site at a given time, which is a workforce planning problem rather than a compliance one.",
+
+      "<b class=\"psub\">What to do about it</b>If you bid for public work, find out now who in your organisation owns social value in bids, because this will land on them and they will come looking for apprenticeship numbers they do not currently hold. Get your current apprentice headcount as a percentage of site workforce, by project, before someone asks for it under time pressure. If you are a provider, this is the strongest commercial argument you will have in construction for some years, and it is worth a conversation with every employer bidding for public contracts.",
+
+      "March 2027 is the date for the procurement statement. That is one bidding cycle away, not three."
+    ],
+    sources: [
+      { label: "Budget 2026: what the Chancellor announced for skills, apprenticeships and young people, FE News, 28 October 2026", url: "https://www.fenews.co.uk/fe-voices/budget-2026-what-the-chancellor-announced-for-skills-apprenticeships-and-young-people/" },
+      { label: "Government puts jobs and skills at heart of public procurement, Construction Management", url: "https://constructionmanagement.co.uk/government-puts-jobs-and-skills-at-heart-of-public-procurement/" }
     ]
   },
   {

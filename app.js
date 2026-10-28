@@ -155,6 +155,9 @@ const ART_ICONS = {
     '<rect x="8" y="30" width="32" height="8" rx="1"/><rect x="10" y="20" width="28" height="8" rx="1" class="fade"/><rect x="12" y="10" width="24" height="8" rx="1" class="hg"/>',
   "foundation-year":
     '<line x1="24" y1="10" x2="24" y2="41"/><path d="M24 14h14l-4 5 4 5H24z" class="hg"/><path d="M24 28H10l4 4-4 4h14z" class="fade"/>',
+  "apprentices-public-projects":
+    '<rect x="8" y="26" width="9" height="15"/><rect x="20" y="18" width="9" height="23" class="hg"/><rect x="32" y="30" width="9" height="11" class="fade"/>' +
+    '<path d="M6 12h36" /><path d="M24 7l4 5h-8z" class="hg"/>',
   "budget-2026":
     '<rect x="8" y="16" width="32" height="24" rx="2" fill="none"/><line x1="8" y1="23" x2="40" y2="23"/><path d="M18 12h12v4H18z" class="hg"/>' +
     '<line x1="15" y1="31" x2="33" y2="31" class="fade"/><line x1="15" y1="36" x2="26" y2="36" class="fade"/>',
