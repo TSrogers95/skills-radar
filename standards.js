@@ -16,12 +16,12 @@
 /* When this register was last refreshed, and by what. The home page shows
    whichever is more recent, this or DATA_UPDATED in data.js, so an import
    moves the date even though it never touches data.js. */
-const STANDARDS_UPDATED = "2026-10-24";
+const STANDARDS_UPDATED = "2026-11-01";
 const STANDARDS_SOURCE  = "sync";        // "hand", "import" or "sync"
 
 /* STANDARDS:BEGIN — the importer and sync job rewrite everything between
    these two markers. Do not remove them.
-   Last synced 2026-10-24. */
+   Last synced 2026-11-01. */
 const STANDARDS = [
   { name:"Legal Technician — conveyancing or probate", code:"ST1312", level:4, months:24, funding:10000, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"2.0", since:"2024-01-03", changed:"Updated to version 2" },
   { name:"Game Programmer", code:"ST0953", level:7, months:24, funding:19000, route:"digital", epa:"Assigned", status:"Approved", version:"1.2", since:"2023-02-13", changed:"Version 1.1 retired" },
@@ -395,7 +395,7 @@ const STANDARDS = [
   { name:"Design and construction management (degree)", code:"ST0044", level:6, months:48, funding:18000, route:"construction", epa:"Assigned", status:"Approved", version:"1.0", since:"2023-02-16", changed:"New on the register" },
   { name:"Automotive glazing technician", code:"ST0031", level:3, months:18, funding:10000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.2", since:"2018-06-28", changed:"" },
   { name:"Digital and Technology Solutions Specialist (degree)", code:"ST0482", level:7, months:18, funding:21000, route:"digital", epa:"Assigned", status:"Approved", version:"1.0", since:"2018-08-07", changed:"Duration changed from 24 to 18 months. Updated to version 1", article:"level-7" },
-  { name:"Improvement technician", code:"ST0193", level:3, months:14, funding:4000, route:"business-administration", epa:"Assigned", status:"Approved", version:"1.2", since:"2018-02-27", changed:"" },
+  { name:"Improvement technician", code:"ST0193", level:3, months:14, funding:4000, route:"business-administration", epa:"Assigned", status:"Approved", version:"2.0", since:"2026-10-28", changed:"Updated to version 2.0" },
   { name:"Clinical trials specialist (degree)", code:"ST0609", level:6, months:60, funding:26000, route:"health-science", epa:"Assigned", status:"Approved", version:"1.1", since:"2018-06-28", changed:"" },
   { name:"Express delivery operative", code:"ST0103", level:2, months:12, funding:4000, route:"transport-logistics", epa:"Assigned", status:"Approved", version:"1.0", since:"2018-08-17", changed:"" },
   { name:"Passenger transport operations manager", code:"ST0337", level:4, months:18, funding:12000, route:"transport-logistics", epa:"Assigned", status:"Approved", version:"1.0", since:"2017-12-20", changed:"" },
@@ -432,7 +432,7 @@ const STANDARDS = [
   { name:"Advanced and Creative Hair Professional", code:"ST0214", level:3, months:12, funding:5000, route:"health-science", epa:"Assigned", status:"Approved", version:"1.0", since:"2024-02-14", changed:"Funding band changed from £9,000 to £8,000" },
   { name:"Library, information and archive services assistant", code:"ST0664", level:3, months:18, funding:6000, route:"business-administration", epa:"Assigned", status:"Approved", version:"1.1", since:"2018-12-21", changed:"" },
   { name:"Horticulture or landscaping supervisor", code:"ST0226", level:3, months:30, funding:10000, route:"agriculture", epa:"Assigned", status:"Approved", version:"1.2", since:"2018-12-12", changed:"" },
-  { name:"Digital Support Technician", code:"ST0120", level:3, months:15, funding:13000, route:"digital", epa:"Assigned", status:"Approved", version:"1.1", since:"2026-08-12", changed:"Funding band changed from £15,000 to £13,000" },
+  { name:"Digital Support Technician", code:"ST0120", level:3, months:15, funding:13000, route:"digital", epa:"Assigned", status:"Approved", version:"2.0", since:"2026-10-30", changed:"Updated to version 2.0" },
   { name:"Electrical power networks engineer", code:"ST0475", level:4, months:30, funding:27000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.0", since:"2017-12-20", changed:"" },
   { name:"Vehicle damage panel technician", code:"ST0403", level:3, months:36, funding:15000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.3", since:"2019-03-22", changed:"" },
   { name:"Learning and development practitioner", code:"ST0562", level:3, months:18, funding:6000, route:"business-administration", epa:"Assigned", status:"Approved", version:"1.0", since:"2018-08-08", changed:"" },
@@ -548,21 +548,25 @@ const STANDARDS = [
   { name:"Building control surveyor (integrated degree)", code:"ST0652", level:6, months:48, funding:24000, route:"construction", epa:"Assigned", status:"Approved", version:"1.0", since:"2019-05-02", changed:"" },
   { name:"Actuarial analyst", code:"ST1473", level:6, months:0, funding:0, route:"legal-finance-accounting", epa:"Pending — standard in development", status:"In development", version:"0.0", since:"2026-09-18", changed:"Assessment: pending — standard in development" },
   { name:"Assistant ecologist", code:"ST1474", level:4, months:0, funding:0, route:"agriculture", epa:"Pending — standard in development", status:"In development", version:"0.0", since:"2026-09-18", changed:"Assessment: pending — standard in development" },
+  { name:"Water Process Operative", code:"ST0876", level:2, months:18, funding:9000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.0", since:"2020-08-24", changed:"Updated to version 1" },
   { name:"Water operations manager", code:"ST1453", level:4, months:0, funding:0, route:"engineering-manufacturing", epa:"Pending — standard in development", status:"In development", version:"0.0", since:"2026-09-18", changed:"Assessment: pending — standard in development" },
   { name:"Quarrying and mining blasting operations technician", code:"ST1451", level:4, months:0, funding:0, route:"engineering-manufacturing", epa:"Pending — standard in development", status:"In development", version:"0.0", since:"2026-09-18", changed:"Assessment: pending — standard in development" },
   { name:"Systems engineer (integrated degree)", code:"ST1478", level:6, months:0, funding:0, route:"engineering-manufacturing", epa:"Pending — standard in development", status:"In development", version:"0.0", since:"2026-09-18", changed:"Assessment: pending — standard in development" },
   { name:"Insulation technician", code:"ST1396", level:3, months:0, funding:0, route:"construction", epa:"Pending — standard in development", status:"In development", version:"0.0", since:"2026-09-18", changed:"Assessment: pending — standard in development" },
   { name:"Assistant production accountant", code:"ST1436", level:3, months:0, funding:0, route:"creative-design", epa:"Pending — standard in development", status:"Proposal in development", version:"0.0", since:"2026-09-18", changed:"Assessment: pending — standard in development" },
+  { name:"Drainage Network Operative", code:"ST1348", level:2, months:18, funding:9000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.0", since:"2024-04-19", changed:"Updated to version 1" },
   { name:"Furniture Making Operative", code:"ST0982", level:2, months:18, funding:11000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.0", since:"2024-08-22", changed:"Updated to version 1" },
   { name:"Road surfacing operative", code:"ST0693", level:2, months:15, funding:14000, route:"construction", epa:"Assigned", status:"Approved", version:"1.1", since:"2019-07-03", changed:"" },
   { name:"Maritime Electrical Fitter", code:"ST1403", level:3, months:42, funding:26000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2025-05-29", changed:"Version 1.0 retired" },
   { name:"Digital Forensic Technician", code:"ST1343", level:4, months:24, funding:18000, route:"digital", epa:"Assigned", status:"Approved", version:"1.1", since:"2024-03-19", changed:"Version 1.0 retired" },
   { name:"Art market coordinator", code:"ST1450", level:3, months:18, funding:0, route:"creative-design", epa:"Pending — standard in development", status:"In development", version:"0.0", since:"2026-09-18", changed:"" },
   { name:"Musical instrument maintenance and repair technician", code:"ST1440", level:3, months:21, funding:0, route:"creative-design", epa:"Pending — standard in development", status:"In development", version:"0.0", since:"2026-09-18", changed:"" },
+  { name:"Facilities services operative", code:"ST0617", level:2, months:12, funding:3000, route:"construction", epa:"Assigned", status:"Approved", version:"1.0", since:"2019-04-11", changed:"" },
   { name:"Junior VFX Artist or Assistant Technical Director", code:"ST1325", level:4, months:18, funding:10000, route:"creative-design", epa:"Assigned", status:"Approved", version:"1.2", since:"2025-12-09", changed:"Version 1.1 retired" },
   { name:"Fire Safety Engineer", code:"ST0859", level:6, months:60, funding:27000, route:"construction", epa:"Assigned", status:"Approved", version:"1.2", since:"2025-12-09", changed:"Version 1.1 retired" },
   { name:"Construction design and build technician", code:"ST0043", level:4, months:36, funding:14000, route:"construction", epa:"Assigned", status:"Approved", version:"1.1", since:"2026-09-24", changed:"New on the register" },
   { name:"Train Driver", code:"ST0645", level:3, months:12, funding:21000, route:"transport-logistics", epa:"Assigned", status:"Approved", version:"1.0", since:"2026-09-29", changed:"Funding band changed from £9,000 to £17,000. Duration changed from 12 to 30 months. Updated to version 1.2" },
+  { name:"Power industry electrical systems engineer", code:"ST1499", level:4, months:30, funding:0, route:"engineering-manufacturing", epa:"Pending — standard in development", status:"In development", version:"0.0", since:"2026-10-28", changed:"New on the register" },
   { name:"Craft Plasterer", code:"ST1385", level:3, months:18, funding:13000, route:"construction", epa:"Assigned", status:"Approved", version:"1.0", since:"2024-07-17", changed:"Updated to version 1" },
   { name:"Jack-up barge master - non-propelled unit", code:"ST1336", level:4, months:0, funding:0, route:"transport-logistics", epa:"Pending — standard in development", status:"In development", version:"0.0", since:"2022-09-22", changed:"Assessment: pending — standard in development" },
   { name:"Barbering Professional", code:"ST1273", level:2, months:18, funding:9000, route:"hair-beauty", epa:"Assigned", status:"Approved", version:"1.0", since:"2023-05-22", changed:"Updated to version 1" },
@@ -720,7 +724,6 @@ const STANDARDS = [
   { name:"Surface Finisher", code:"ST0963", level:3, months:42, funding:24000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.0", since:"2023-03-23", changed:"Updated to version 1" },
   { name:"Outdoor Learning Specialist", code:"ST0945", level:5, months:24, funding:13000, route:"health-science", epa:"Assigned", status:"Approved", version:"1.0", since:"2022-02-02", changed:"Updated to version 1. Status changed from Defunded from Sept 2026 to Approved", article:"defunding-16" },
   { name:"Mortuary Technician", code:"ST0889", level:3, months:18, funding:13000, route:"health-science", epa:"Assigned", status:"Approved", version:"1.1", since:"2025-12-10", changed:"Version 1.0 retired" },
-  { name:"Facilities services operative", code:"ST0617", level:2, months:12, funding:3000, route:"construction", epa:"Assigned", status:"Approved", version:"1.0", since:"2019-04-11", changed:"" },
   { name:"Power and Propulsion Gas Turbine Engineer", code:"ST0790", level:7, months:36, funding:16000, route:"engineering-manufacturing", epa:"Assigned", status:"Retired", version:"1.0", since:"2024-12-17", changed:"" },
   { name:"Ordnance munitions explosives technician", code:"ST0833", level:4, months:30, funding:9000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2020-05-13", changed:"" },
   { name:"Lead Baker", code:"ST1349", level:3, months:24, funding:9000, route:"catering-hospitality", epa:"Assigned", status:"Approved", version:"1.0", since:"2023-11-07", changed:"Updated to version 1" },
@@ -762,7 +765,6 @@ const STANDARDS = [
   { name:"Storyboard artist", code:"ST0489", level:7, months:18, funding:15000, route:"creative-design", epa:"Assigned", status:"Approved", version:"1.1", since:"2025-12-09", changed:"New on the register" },
   { name:"Assistant puppet maker", code:"ST0476", level:3, months:18, funding:13000, route:"creative-design", epa:"Assigned", status:"Approved", version:"1.0", since:"2019-12-18", changed:"" },
   { name:"Model Maker", code:"ST1371", level:6, months:36, funding:26000, route:"creative-design", epa:"Assigned", status:"Approved", version:"1.0", since:"2024-07-23", changed:"Updated to version 1" },
-  { name:"Drainage Network Operative", code:"ST1348", level:2, months:18, funding:9000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.0", since:"2024-04-19", changed:"Updated to version 1" },
   { name:"Broadcast and media systems technician", code:"ST0425", level:5, months:24, funding:15000, route:"creative-design", epa:"Assigned", status:"Approved", version:"1.0", since:"2020-03-06", changed:"" },
   { name:"Sports Turf Technical Manager", code:"ST1410", level:5, months:36, funding:0, route:"agriculture", epa:"Pending — standard in development", status:"In development", version:"0.0", since:"2026-09-18", changed:"" },
   { name:"Engineering and Manufacturing Support Technician", code:"ST1395", level:3, months:42, funding:27000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.0", since:"2024-08-21", changed:"Updated to version 1" },
@@ -789,7 +791,6 @@ const STANDARDS = [
   { name:"Play Therapist", code:"ST0905", level:7, months:36, funding:20000, route:"care-services", epa:"Assigned", status:"Approved", version:"1.0", since:"2021-06-23", changed:"Updated to version 1" },
   { name:"Archivist and Records Manager", code:"ST0904", level:7, months:36, funding:12000, route:"creative-design", epa:"Assigned", status:"Approved", version:"1.0", since:"2021-11-12", changed:"Updated to version 1" },
   { name:"Veterinary nurse (RCVS)", code:"ST1508", level:3, months:33, funding:17000, route:"agriculture", epa:"Pending — standard in development", status:"In development", version:"0.0", since:"2026-09-29", changed:"New on the register" },
-  { name:"Water Process Operative", code:"ST0876", level:2, months:18, funding:9000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.0", since:"2020-08-24", changed:"Updated to version 1" },
   { name:"Veterinary Care Assistant", code:"ST1446", level:2, months:12, funding:0, route:"agriculture", epa:"Pending — standard in development", status:"In development", version:"0.0", since:"2026-09-18", changed:"" },
   { name:"Leisure industry technician", code:"ST1471", level:2, months:0, funding:0, route:"engineering-manufacturing", epa:"Pending — standard in development", status:"Proposal in development", version:"0.0", since:"2026-09-18", changed:"Assessment: pending — standard in development" },
   { name:"Port Agent", code:"ST0544", level:3, months:18, funding:13000, route:"transport-logistics", epa:"Assigned", status:"Retired", version:"1.0", since:"2025-02-18", changed:"Version retired and replaced" },
