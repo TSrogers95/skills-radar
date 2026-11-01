@@ -351,7 +351,12 @@ async function recordEvent(event, label, meta){
       label: label ? String(label).slice(0, 120) : null,
       meta: meta || null
     });
-  } catch(e){}
+  } catch(e){
+    /* This used to swallow the error completely, which is how a broken
+       analytics table went unnoticed for five weeks. Still never
+       interrupts the page; it just says so. */
+    console.warn('event not recorded (' + event + '):', e.message || e);
+  }
 }
 
 /* Searching is the single most useful thing to record: it is people telling
@@ -373,7 +378,9 @@ async function recordView(){
     const ref = document.referrer && document.referrer.indexOf(location.host) === -1
       ? new URL(document.referrer).hostname : null;
     await c.from('page_views').insert({ path: location.pathname, referrer: ref });
-  } catch(e){}
+  } catch(e){
+    console.warn('view not recorded:', e.message || e);
+  }
 }
 
 /* =========================================================================
