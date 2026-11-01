@@ -4,6 +4,10 @@
   "cleanUrls": true,
   "crons": [
     {
+      "path": "/api/keepalive",
+      "schedule": "17 4 * * *"
+    },
+    {
       "path": "/api/check-sources",
       "schedule": "0 7 * * 1"
     },

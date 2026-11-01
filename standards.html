@@ -377,6 +377,11 @@ wireSearch('search', 'clear', 'radar', q => {
      Vercel serves at /_vercel/insights/script.js instead. It only responds on
      a Vercel deployment, so it does nothing locally. No cookies, no
      identifiers, no consent banner needed. -->
+<!-- Record the view. Every other page does this; these five did not, so
+     the home page and the three main sections were missing from the site's
+     own traffic figures entirely. It also keeps the database from going
+     idle, which on the free tier gets the project paused. -->
+<script>if(typeof recordView === 'function') recordView();</script>
 <script defer src="/_vercel/insights/script.js"></script>
 </body>
 </html>
