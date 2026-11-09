@@ -30,6 +30,15 @@ const END   = '/* STANDARDS:END */';
    API changing shape than 200 standards moving overnight. */
 const SAFETY_LIMIT = 60;
 
+/* Pending switchovers are a separate population with a large standing
+   baseline: at the time of writing about 180 live standards already have a
+   successor version with a start date, so the first run that reads them
+   stamps all of them at once. They cannot share the limit above without
+   halting that backfill, and the limit above must not be raised, because its
+   whole job is to catch the register changing shape. So they get their own,
+   set well above the baseline but still low enough to catch a shape change. */
+const PENDING_LIMIT = 400;
+
 module.exports = async function handler(req, res){
   if(!authorised(req)) return res.status(401).json({ error: 'Unauthorised' });
 
@@ -74,8 +83,17 @@ module.exports = async function handler(req, res){
   local.forEach(s => { byName[norm(s.name)] = s; });
 
   const added = [], updated = [], missing = [];
+  const switchovers = [], undated = [], mismatched = [];
   const merged = [];
   const seen = new Set();
+
+  /* The pending stamp a standard should carry after this run. Undated
+     revisions are deliberately not written: without a date they cannot be
+     placed on the feed, so they go in the email instead. */
+  const pendingFields = r => {
+    const p = r.next && r.next.dated ? r.next : null;
+    return { pending: p ? p.text : '', pendingFrom: p ? p.from : '' };
+  };
 
   remote.forEach(r => {
     /* Names are not unique on the register: a retired standard and its live
@@ -99,13 +117,38 @@ module.exports = async function handler(req, res){
         epa: r.epa, status: r.status, version: r.version,
         since: r.changedOn || today(),
         changed: 'New on the register',
-        article: ''
+        article: '',
+        ...pendingFields(r)
       });
+      if(r.next && r.next.dated) switchovers.push({ name: r.name, code: r.code, from: r.next.from, text: r.next.text, was: '' });
+      if(r.next && !r.next.dated) undated.push({ name: r.name, code: r.code, text: r.next.text });
       return;
     }
 
     seen.add(existing.name);
+
+    /* Matched on code, but the register calls it something else entirely.
+       That is not a rename, it is the wrong code on the record, and every
+       run since has been writing another standard's level, duration and
+       funding band underneath the stored name. Reported, never corrected
+       automatically: the right code is a judgement call and changing one
+       changes the page address. */
+    if(existing.code && existing.code === r.code && !sameOccupation(existing.name, r.name)){
+      mismatched.push({ code: r.code, siteName: existing.name, registerName: r.name,
+                        level: r.level, months: r.months, funding: r.funding });
+    }
+
     const diffs = compare(existing, r);
+    const pf = pendingFields(r);
+
+    /* A switchover appearing, moving its date, or falling away once it has
+       taken effect is a change to the file in its own right, even when the
+       approved version itself has not moved. */
+    if((existing.pending || '') !== pf.pending || (existing.pendingFrom || '') !== pf.pendingFrom){
+      switchovers.push({ name: existing.name, code: r.code, from: pf.pendingFrom,
+                         text: pf.pending, was: existing.pending || '' });
+    }
+    if(r.next && !r.next.dated) undated.push({ name: existing.name, code: r.code, text: r.next.text });
 
     const base = {
       ...existing,                        // keep common, article, route
@@ -115,7 +158,8 @@ module.exports = async function handler(req, res){
       funding: r.funding || existing.funding,
       epa: r.epa, status: r.status,
       version: versionNum(r.version) === versionNum(existing.version)
-        ? existing.version : r.version
+        ? existing.version : r.version,
+      ...pf
     };
 
     if(diffs.length){
@@ -125,7 +169,7 @@ module.exports = async function handler(req, res){
       // a blank filled in: take the value, leave the feed alone
       merged.push(base);
     } else {
-      merged.push(existing);              // untouched, including its "changed" text
+      merged.push({ ...existing, ...pf });  // untouched, bar the pending stamp
     }
   });
 
@@ -139,8 +183,9 @@ module.exports = async function handler(req, res){
   });
 
   const total = added.length + updated.length;
+  const moves = switchovers.length;
 
-  if(total === 0){
+  if(total === 0 && moves === 0){
     return res.status(200).json({ ok: true, changes: 0, committed: false });
   }
 
@@ -153,8 +198,23 @@ module.exports = async function handler(req, res){
     return res.status(200).json({ ok: false, heldBack: total, committed: false });
   }
 
+  if(moves > PENDING_LIMIT){
+    await sendEmail('Skills Radar — register sync held back',
+      '<p><b>' + moves + ' pending switchovers moved in one run</b>, which is above the limit of ' +
+      PENDING_LIMIT + '. Nothing was committed.</p>' +
+      '<p>The approved versions themselves moved on ' + total + ' standards, which is normal, so this ' +
+      'is about the in-development records rather than the register proper. Most likely the API has ' +
+      'changed how it reports a version in development. Run the job with <code>?dry=1</code> first.</p>');
+    return res.status(200).json({ ok: false, heldBackPending: moves, committed: false });
+  }
+
   if(dryRun){
-    return res.status(200).json({ ok: true, dryRun: true, added, updated, missing: missing.map(m => m.name) });
+    return res.status(200).json({
+      ok: true, dryRun: true, added, updated,
+      switchovers: switchovers, undatedRevisions: undated,
+      mismatched: mismatched,
+      missing: missing.map(m => m.name)
+    });
   }
 
   /* ---- 4. Write it back ---- */
@@ -181,15 +241,20 @@ module.exports = async function handler(req, res){
   // The review stamp lives in data.js, which the sync never writes, so it is
   // updated separately rather than as part of the register rewrite.
   await writeFile(PATH, rebuilt, file.sha,
-    'Register sync ' + today() + ' — ' + added.length + ' new, ' + updated.length + ' updated');
+    'Register sync ' + today() + ' — ' + added.length + ' new, ' + updated.length + ' updated' +
+    (moves ? ', ' + moves + ' pending switchover' + (moves === 1 ? '' : 's') : ''));
 
-  await sendEmail(
-    'Skills Radar — ' + total + ' standard' + (total === 1 ? '' : 's') + ' updated from the register',
-    report(added, updated, missing)
-  );
+  const headline = total
+    ? total + ' standard' + (total === 1 ? '' : 's') + ' updated from the register'
+    : moves + ' pending switchover' + (moves === 1 ? '' : 's') + ' recorded';
+
+  await sendEmail('Skills Radar — ' + headline,
+    report(added, updated, missing, switchovers, undated, mismatched));
 
   return res.status(200).json({
     ok: true, added: added.length, updated: updated.length,
+    switchovers: moves, undatedRevisions: undated.length,
+    mismatched: mismatched.length,
     missing: missing.length, committed: true
   });
 };
@@ -208,7 +273,117 @@ async function fetchAll(){
   const rows = Array.isArray(json) ? json : (json.standards || json.items || json.data || []);
   if(!rows.length) throw new Error('Register API returned no records');
 
-  return pickCurrent(rows).map(shape);
+  /* Every record for a code, not just the chosen one, so the version in
+     development can be read alongside the version being delivered now. */
+  const group = {};
+  rows.forEach(x => {
+    const code = String(x.referenceNumber || '').trim();
+    if(code) (group[code] = group[code] || []).push(x);
+  });
+
+  return pickCurrent(rows).map(x => {
+    const s = shape(x);
+    s.next = pendingFor(group[String(x.referenceNumber || '').trim()], x);
+    return s;
+  });
+}
+
+/* ---------- Pending switchovers ----------
+
+   The register carries the NEXT version of a standard as its own record,
+   status "In development", sitting alongside the approved one. pickCurrent
+   throws those away, and rightly so: they are not what a provider starts
+   someone on today. They are, though, the only advance warning the register
+   gives. A band move or a duration change is visible here weeks or months
+   before it takes effect, which is exactly the lead time a funding decision
+   needs. So the sibling is read separately and the delta recorded against
+   the standard rather than folded into "changed", which describes what has
+   already happened.
+
+   Only a dated switchover is written to the file. A revision with no start
+   date cannot go on a calendar, so those are reported in the email instead. */
+
+function isPending(s){ return /development|proposal/i.test(String(s.status || '')); }
+
+function num(x, ...keys){
+  for(const k of keys){
+    const v = x[k];
+    if(v !== undefined && v !== null && v !== '') return Number(v) || 0;
+  }
+  return 0;
+}
+
+function date10(v){
+  const d = String(v || '').slice(0, 10);
+  return (/^\d{4}-\d{2}-\d{2}$/.test(d) && d >= '2012-01-01') ? d : '';
+}
+
+function addDay(d){
+  const t = Date.parse(d + 'T00:00:00Z');
+  if(!t) return '';
+  return new Date(t + 86400000).toISOString().slice(0, 10);
+}
+
+/* The delta between the version being delivered now and the one that
+   replaces it, or null when the register is not holding a successor. */
+function pendingFor(group, currentRaw){
+  if(!group || !group.length) return null;
+
+  const devs = group.filter(isPending);
+  if(!devs.length) return null;
+
+  /* More than one open revision is rare. Prefer one that carries a start
+     date, then the most recently touched. */
+  devs.sort((a, b) =>
+    ((date10(b.earliestStartDate) ? 1 : 0) - (date10(a.earliestStartDate) ? 1 : 0)) ||
+    String(b.changedDate || '').localeCompare(String(a.changedDate || '')));
+  const dev = devs[0];
+
+  /* The successor's own earliest start is the register saying the date
+     outright. Failing that, the day after the current version closes to new
+     starts says the same thing by implication. */
+  const closes = date10(currentRaw.latestStartDate);
+  let   from   = date10(dev.earliestStartDate) || (closes ? addDay(closes) : '');
+
+  /* A date already behind us is not pending. The register does carry a few,
+     either stale or a switchover that has since happened, and writing one
+     would leave a permanent "upcoming" item that never arrives. Dropping it
+     also means the stamp clears itself the week a switchover takes effect. */
+  if(from && from <= today()) from = '';
+
+  const curFund = num(currentRaw, 'maxFunding', 'fundingBandMaximum', 'maximumFunding');
+  const devFund = num(dev,        'maxFunding', 'fundingBandMaximum', 'maximumFunding');
+  const curMon  = num(currentRaw, 'typicalDuration', 'duration', 'typicalDurationMonths');
+  const devMon  = num(dev,        'typicalDuration', 'duration', 'typicalDurationMonths');
+  const curLvl  = num(currentRaw, 'level', 'standardLevel');
+  const devLvl  = num(dev,        'level', 'standardLevel');
+
+  const gbp = n => '\u00a3' + Number(n).toLocaleString('en-GB');
+  const d = [];
+
+  /* A successor carrying no band is not a free apprenticeship, it is a band
+     nobody has agreed yet. That is the most useful line on this list: the
+     figure can land late and move the business case after planning is done. */
+  if(curFund && !devFund)
+    d.push('Funding band not yet agreed for the new version, currently ' + gbp(curFund));
+  else if(curFund && devFund && devFund !== curFund)
+    d.push('Funding band ' + (devFund > curFund ? 'rising' : 'falling') +
+           ' from ' + gbp(curFund) + ' to ' + gbp(devFund));
+
+  if(curMon && devMon && devMon !== curMon)
+    d.push('Duration ' + (devMon > curMon ? 'rising' : 'falling') +
+           ' from ' + curMon + ' to ' + devMon + ' months');
+
+  if(curLvl && devLvl && devLvl !== curLvl)
+    d.push('Level moving from ' + curLvl + ' to ' + devLvl);
+
+  /* No delta is still worth saying. Under the assessment reforms most of
+     these carry a revised assessment plan and nothing else, and starts
+     either side of the date cannot be moved between plans. */
+  if(!d.length)
+    d.push('New version replaces this one for new starts, same level, duration and funding band');
+
+  return { from: from, text: d.join('. '), dated: !!from };
 }
 
 /* The register carries one record per VERSION, so roughly 2,000 records
@@ -392,7 +567,9 @@ function parseLocal(block){
       version: get('version', true),
       since:   get('since', true),
       changed: get('changed', true),
-      article: get('article', true)
+      article: get('article', true),
+      pending:     get('pending', true),
+      pendingFrom: get('pendingFrom', true)
     });
   }
   return out;
@@ -409,19 +586,108 @@ function render(s){
     ', status:' + q(s.status || 'Approved') + ', version:' + q(s.version || '1.0') +
     ', since:' + q(s.since || today()) + ', changed:' + q(s.changed || '') +
     (s.article ? ', article:' + q(s.article) : '') +
+    (s.pending && s.pendingFrom
+      ? ', pending:' + q(s.pending) + ', pendingFrom:' + q(s.pendingFrom) : '') +
   ' },';
 }
 
 function norm(s){ return String(s || '').toLowerCase().replace(/[^a-z0-9]/g, ''); }
+
+/* Do two titles describe the same occupation? The register restyles names
+   constantly (sentence case, hyphens for dashes, abbreviations spelled out),
+   so an exact test is useless. Shared words are the signal: at least half of
+   the shorter title's words appearing in the longer one means a rename, and
+   much less than that means the code and the name have come apart. */
+function sameOccupation(a, b){
+  const words = s => new Set(String(s || '').toLowerCase().split(/[^a-z0-9]+/).filter(Boolean));
+  const x = words(a), y = words(b);
+  if(!x.size || !y.size) return true;
+  const [small, big] = x.size <= y.size ? [x, y] : [y, x];
+  let hit = 0;
+  small.forEach(w => { if(big.has(w)) hit++; });
+  return (hit / small.size) >= 0.5;
+}
 function esc(s){ return String(s).replace(/</g, '&lt;'); }
 
 /* ---------- The email ---------- */
 
-function report(added, updated, missing){
+function report(added, updated, missing, switchovers, undated, mismatched){
+  switchovers = switchovers || [];
+  undated     = undated || [];
+  mismatched  = mismatched || [];
+
+  /* Lead time first. A band move four months out is more actionable than a
+     version number that changed this morning, so it goes at the top. */
+  const material = switchovers.filter(s => s.text && !/^New version replaces/i.test(s.text));
+  const routine  = switchovers.filter(s => s.text && /^New version replaces/i.test(s.text));
+  const lapsed   = switchovers.filter(s => !s.text);
+
   return '<div style="font-family:system-ui,sans-serif;max-width:640px;color:#152023">' +
     '<h2 style="font-size:20px;margin:0 0 6px">Register sync</h2>' +
     '<p style="color:#57676A;font-size:14px;margin:0 0 20px">' + today() +
     ' · the site has been updated and redeployed</p>' +
+
+    (mismatched.length
+      ? '<div style="border:2px solid #B4341F;padding:12px 14px;margin:0 0 22px">' +
+        '<h3 style="font-size:15px;margin:0 0 4px;color:#B4341F">' + mismatched.length +
+        ' standard' + (mismatched.length === 1 ? '' : 's') + ' where the name and the code disagree</h3>' +
+        '<p style="font-size:13px;color:#57676A;margin:0 0 10px">The register holds a different ' +
+        'occupation under this code, so the level, duration and funding band on the page belong to ' +
+        'that one, not to the name above it. Nothing has been corrected: the right code is a ' +
+        'judgement call and changing it changes the page address. Fix these by hand.</p>' +
+        '<ul style="font-size:14px;color:#57676A;padding-left:18px;margin:0">' +
+        mismatched.map(m => '<li><b>' + esc(m.siteName) + '</b> is on ' + esc(m.code) +
+          ', which the register calls <b>' + esc(m.registerName) + '</b>' +
+          ' (level ' + m.level + ', ' + m.months + ' months, \u00a3' +
+          Number(m.funding || 0).toLocaleString('en-GB') + ')</li>').join('') +
+        '</ul></div>'
+      : '') +
+
+    (material.length
+      ? '<h3 style="font-size:15px;margin:0 0 4px">' + material.length +
+        ' pending switchover' + (material.length === 1 ? '' : 's') + ' worth lead time</h3>' +
+        '<p style="color:#57676A;font-size:13px;margin:0 0 10px">Taken from the version in ' +
+        'development, so these have not happened yet.</p>' +
+        '<table style="width:100%;border-collapse:collapse;border:1px solid #E4E0D6">' +
+        material.sort((a, b) => String(a.from).localeCompare(String(b.from))).map(s =>
+          '<tr><td style="padding:9px 12px;border-bottom:1px solid #E4E0D6">' +
+          '<b>' + esc(s.name) + '</b>' + (s.code ? ' <span style="color:#8A9698">' + s.code + '</span>' : '') +
+          ' <span style="color:#8A9698">from ' + esc(s.from) + '</span>' +
+          '<div style="font-size:13px;color:#57676A;margin-top:3px">' + esc(s.text) + '</div>' +
+          (s.was ? '<div style="font-size:12px;color:#8A9698;margin-top:2px">previously: ' + esc(s.was) + '</div>' : '') +
+          '</td></tr>').join('') + '</table>'
+      : '') +
+
+    (routine.length
+      ? '<h3 style="font-size:15px;margin:26px 0 6px">' + routine.length +
+        ' version switchover' + (routine.length === 1 ? '' : 's') + ' with no change to the figures</h3>' +
+        '<p style="font-size:13px;color:#8A9698;margin:0 0 10px">Revised assessment plan only. The ' +
+        'compliance point is that starts either side of the date sit on different plans.</p>' +
+        '<ul style="font-size:14px;color:#57676A;padding-left:18px">' +
+        routine.sort((a, b) => String(a.from).localeCompare(String(b.from)))
+          .map(s => '<li>' + esc(s.from) + ' — ' + esc(s.name) +
+            (s.code ? ' (' + s.code + ')' : '') + '</li>').join('') + '</ul>'
+      : '') +
+
+    (lapsed.length
+      ? '<h3 style="font-size:15px;margin:26px 0 10px">' + lapsed.length +
+        ' switchover' + (lapsed.length === 1 ? '' : 's') + ' now taken effect</h3>' +
+        '<p style="font-size:13px;color:#8A9698">The pending note has been cleared from these. ' +
+        'If the new version changed anything, it will show in the updated list below.</p>' +
+        '<ul style="font-size:14px;color:#57676A;padding-left:18px">' +
+        lapsed.map(s => '<li>' + esc(s.name) + (s.code ? ' (' + s.code + ')' : '') + '</li>').join('') + '</ul>'
+      : '') +
+
+    (undated.length
+      ? '<h3 style="font-size:15px;margin:26px 0 6px">' + undated.length +
+        ' revision open with no start date</h3>' +
+        '<p style="font-size:13px;color:#8A9698;margin:0 0 10px">Not written to the site, because ' +
+        'there is no date to put on it. These are the ones to watch: a band that has not been agreed ' +
+        'tends to land late.</p>' +
+        '<ul style="font-size:14px;color:#57676A;padding-left:18px">' +
+        undated.map(u => '<li><b>' + esc(u.name) + '</b>' + (u.code ? ' (' + u.code + ')' : '') +
+          '<br><span style="font-size:13px">' + esc(u.text) + '</span></li>').join('') + '</ul>'
+      : '') +
 
     (updated.length
       ? '<h3 style="font-size:15px;margin:0 0 10px">' + updated.length + ' updated</h3>' +

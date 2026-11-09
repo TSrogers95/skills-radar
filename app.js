@@ -308,6 +308,104 @@ function shortLine(s, defunded, dev){
   return 'Now version ' + s.version;
 }
 
+/* =========================================================================
+   PENDING SWITCHOVERS
+
+   The register publishes the next version of a standard as its own record
+   before it takes effect, and the sync job records the delta on the standard
+   as "pending", with the date it applies from. Those are the only changes
+   anyone gets advance warning of, so each one becomes its own dated item and
+   lands in the feed ahead of time rather than on the morning it bites.
+
+   A past date is not shown. The sync stops writing one once the date passes,
+   but the file can be a week behind the calendar, so the date is checked here
+   too rather than trusted.
+   ========================================================================= */
+
+function derivePending(){
+  return STANDARDS
+    .filter(s => s.pending && s.pendingFrom && isFuture(s.pendingFrom))
+    .map(s => {
+      const dur = s.months === 0 ? 'delivered as a unit' : s.months + ' months';
+      const noBand = /not yet agreed/i.test(s.pending);
+
+      /* A band nobody has agreed yet is the one to chase, because the figure
+         can land after planning is done. A band moving by a fifth or more is
+         next. Duration and level belong here too: duration decides how long
+         the same money has to stretch, and level decides whether the age
+         restriction on level 7 applies at all. A revised assessment plan on
+         its own is real but it is not a planning problem, so it stays low. */
+      let urgency = 'low';
+      if(noBand) urgency = 'medium';
+      else if(pendingSwing(s.pending) >= 20) urgency = 'medium';
+      else if(/duration (rising|falling)|level moving/i.test(s.pending)) urgency = 'medium';
+
+      return {
+        date: s.pendingFrom,
+        title: 'L' + s.level + ' ' + s.name,
+        short: pendingShort(s),
+        level: s.level,
+        months: s.months,
+        funding: s.funding,
+        epa: s.epa,
+        code: s.code,
+        category: 'standard',
+        route: s.route,
+        standard: s.name + (s.code ? ', Level ' + s.level + ' (' + s.code + ')' : ', Level ' + s.level),
+        article: s.article || (/funding band/i.test(s.pending) ? 'funding-bands' : 'standards-in-review'),
+        status: 'upcoming',
+        urgency: urgency,
+        pinned: false,
+        derived: true,
+        pending: true,
+        changeText: s.pending,
+        rawStatus: s.status,
+        summary: s.pending + ', from ' + fmtLong(s.pendingFrom) + '. Currently level ' + s.level +
+          ', ' + dur + ', maximum funding ' + money(s.funding) + '. A start before that date sits on ' +
+          'the current version and its assessment plan, and cannot be moved onto the new one.',
+        url: standardURL(s)
+      };
+    });
+}
+
+/* How far a pending band move goes, as a percentage, or 0 when the pending
+   note is not about money. Used only to decide whether it needs attention. */
+function pendingSwing(text){
+  const m = String(text || '').match(/funding band (?:rising|falling) from £([\d,]+) to £([\d,]+)/i);
+  if(!m) return 0;
+  const from = parseInt(m[1].replace(/,/g, ''), 10);
+  const to   = parseInt(m[2].replace(/,/g, ''), 10);
+  if(!from) return 0;
+  return Math.abs(Math.round(((to - from) / from) * 100));
+}
+
+/* One glanceable line, same job as shortLine but for a change that has not
+   happened yet, so it always carries the date it applies from. */
+function pendingShort(s){
+  const c = String(s.pending || '');
+  const on = ' from ' + fmtShort(s.pendingFrom);
+
+  const band = c.match(/funding band (rising|falling) from £([\d,]+) to £([\d,]+)/i);
+  if(band){
+    const from = parseInt(band[2].replace(/,/g, ''), 10);
+    const to   = parseInt(band[3].replace(/,/g, ''), 10);
+    const pct  = from ? Math.round(((to - from) / from) * 100) : 0;
+    return (to > from ? 'Band up ' : 'Band down ') + money(from) + ' to ' + money(to) +
+           (Math.abs(pct) >= 5 ? ' (' + (pct > 0 ? '+' : '') + pct + '%)' : '') + on;
+  }
+
+  if(/not yet agreed/i.test(c)) return 'New version' + on + ', funding band not agreed yet';
+
+  const dur = c.match(/duration (rising|falling) from (\d+) to (\d+) months/i);
+  if(dur) return (dur[1].toLowerCase() === 'falling' ? 'Cut from ' : 'Extended from ') +
+                 dur[2] + ' to ' + dur[3] + ' months' + on;
+
+  const lvl = c.match(/level moving from (\d+) to (\d+)/i);
+  if(lvl) return 'Moving from Level ' + lvl[1] + ' to Level ' + lvl[2] + on;
+
+  return 'New version for new starts' + on + ', revised assessment plan';
+}
+
 /* Trim a summary down to its first clause, for the board cards. */
 function firstClause(text, max){
   max = max || 76;
@@ -365,7 +463,11 @@ function allUpdatesUnfiltered(){
   const curated = UPDATES.slice();
   const seen = new Set(curated.map(u => (u.standard || '').split(',')[0].trim()).filter(Boolean));
   const derived = deriveUpdates().filter(d => !seen.has(d.standard.split(',')[0].trim()));
-  return curated.concat(derived);
+  /* Pending items go last. A hand-written update on the same standard still
+     wins, and anything looking up one item per article keeps finding the same
+     one it found before these existed. */
+  const pending = derivePending().filter(d => !seen.has(d.standard.split(',')[0].trim()));
+  return curated.concat(derived, pending);
 }
 
 /* A stored status can go stale, an item written as "upcoming" months ago
