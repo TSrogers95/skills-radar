@@ -1210,6 +1210,16 @@ function findStandard(entry){
   const exact = STANDARDS.find(s => norm(s.name) === n);
   if(exact) return exact;
 
+  /* 2b. A name the register has since changed, or one the site used to carry
+         as a record of its own. The old name is kept on the standard that
+         replaced it, in "also", so a cohort saved years ago still resolves
+         to the right standard rather than falling through to a fuzzy match
+         or failing outright. Checked before the fuzzy steps on purpose: an
+         exact former name beats a partial match on a current one. */
+  const aliased = STANDARDS.find(s => s.also &&
+    String(s.also).split('|').some(a => norm(a) === n));
+  if(aliased) return aliased;
+
   // 3. the register name with a qualifier on the end, at the same level
   //    "Project Manager" -> "Project Manager (integrated degree)"
   const prefixed = STANDARDS.filter(s => norm(s.name).startsWith(n));
@@ -1248,7 +1258,7 @@ function suggestStandards(entry, limit){
 
   return STANDARDS
     .map(s => {
-      let score = scoreMatch(q, { name: s.name, code: s.code, extra: '' });
+      let score = scoreMatch(q, { name: s.name, code: s.code, extra: String(s.also || '').replace(/\|/g, ' ') });
       if(entry.level && s.level === entry.level) score += 120;
       return { s: s, score: score };
     })
@@ -1262,7 +1272,8 @@ function suggestStandards(entry, limit){
 function unmatchedNote(entry){
   const norm = s => String(s).toLowerCase().replace(/[^a-z0-9]/g, '');
   const near = STANDARDS
-    .filter(s => norm(s.name).includes(norm(entry.name)) || norm(entry.name).includes(norm(s.name)))
+    .filter(s => norm(s.name).includes(norm(entry.name)) || norm(entry.name).includes(norm(s.name)) ||
+      (s.also && String(s.also).split('|').some(a => norm(a) === norm(entry.name))))
     .slice(0, 2);
   return near.length
     ? 'Not matched, did you mean ' + near.map(s => 'L' + s.level + ' ' + s.name).join(' or ') + '?'

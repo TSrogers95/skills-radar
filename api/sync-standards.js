@@ -7,7 +7,7 @@
 
    What it will and will not touch
      overwrites  level, duration, funding band, version, status, dates
-     preserves   common, article, route — anything decided by a person
+     preserves   common, article, also, route — anything decided by a person
      generates   a plain "changed" line describing what actually moved
      never       deletes a standard. Removals are reported, not applied.
 
@@ -568,6 +568,7 @@ function parseLocal(block){
       since:   get('since', true),
       changed: get('changed', true),
       article: get('article', true),
+      also:    get('also', true),
       pending:     get('pending', true),
       pendingFrom: get('pendingFrom', true)
     });
@@ -586,6 +587,7 @@ function render(s){
     ', status:' + q(s.status || 'Approved') + ', version:' + q(s.version || '1.0') +
     ', since:' + q(s.since || today()) + ', changed:' + q(s.changed || '') +
     (s.article ? ', article:' + q(s.article) : '') +
+    (s.also ? ', also:' + q(s.also) : '') +
     (s.pending && s.pendingFrom
       ? ', pending:' + q(s.pending) + ', pendingFrom:' + q(s.pendingFrom) : '') +
   ' },';
