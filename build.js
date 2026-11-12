@@ -49,7 +49,12 @@ const strip = s => String(s == null ? '' : s).replace(/<[^>]+>/g, '').replace(/\
 /* ---------- One article page ---------- */
 
 function page(a, api){
-  const url = SITE + '/' + OUT + '/' + a.id + '.html';
+  /* No .html. cleanUrls is on in vercel.json, so /a/<id>.html 308-redirects
+     to /a/<id>. Advertising the .html address in the canonical and the
+     sitemap pointed Google at a redirect, and the canonical on the clean
+     address pointed back at the redirecting one. The file on disk keeps its
+     .html name; only the address we publish changes. */
+  const url = SITE + '/' + OUT + '/' + a.id;
   const route = a.route && api.ROUTES[a.route] ? api.ROUTES[a.route] : null;
 
   const standard = (a.standardCode || a.standardName)
@@ -92,7 +97,7 @@ function page(a, api){
     '@type': 'BreadcrumbList',
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Skills Radar', item: SITE + '/' },
-      { '@type': 'ListItem', position: 2, name: 'Articles', item: SITE + '/articles.html' },
+      { '@type': 'ListItem', position: 2, name: 'Articles', item: SITE + '/articles' },
       { '@type': 'ListItem', position: 3, name: strip(a.title), item: url }
     ]
   };
@@ -293,13 +298,12 @@ function truncate(s, n){
 function sitemap(articles, guides){
   const pages = [
     { loc: '/', pri: '1.0', freq: 'daily' },
-    { loc: '/articles.html', pri: '0.9', freq: 'daily' },
-    { loc: '/standards.html', pri: '0.9', freq: 'weekly' },
-    { loc: '/rules.html', pri: '0.8', freq: 'weekly' },
+    { loc: '/articles', pri: '0.9', freq: 'daily' },
+    { loc: '/standards', pri: '0.9', freq: 'weekly' },
+    { loc: '/rules', pri: '0.8', freq: 'weekly' },
     { loc: '/guides/', pri: '0.9', freq: 'monthly' },
-    { loc: '/members.html', pri: '0.5', freq: 'monthly' },
-    { loc: '/privacy.html', pri: '0.3', freq: 'yearly' },
-    { loc: '/terms.html', pri: '0.3', freq: 'yearly' }
+    { loc: '/privacy', pri: '0.3', freq: 'yearly' },
+    { loc: '/terms', pri: '0.3', freq: 'yearly' }
   ];
 
   const today = new Date().toISOString().slice(0, 10);
@@ -308,12 +312,12 @@ function sitemap(articles, guides){
     `  <url><loc>${SITE}${p.loc}</loc><lastmod>${today}</lastmod>` +
     `<changefreq>${p.freq}</changefreq><priority>${p.pri}</priority></url>`
   ).concat(articles.map(a =>
-    `  <url><loc>${SITE}/${OUT}/${a.id}.html</loc><lastmod>${a.date}</lastmod>` +
+    `  <url><loc>${SITE}/${OUT}/${a.id}</loc><lastmod>${a.date}</lastmod>` +
     `<changefreq>monthly</changefreq><priority>${a.compiled ? '0.6' : '0.8'}</priority></url>`
   )).concat((guides || []).map(g =>
     /* The pillar outranks everything but the home page: it is the page the
        whole cluster points at. */
-    `  <url><loc>${SITE}/guides/${g.slug}.html</loc><lastmod>${g.updated}</lastmod>` +
+    `  <url><loc>${SITE}/guides/${g.slug}</loc><lastmod>${g.updated}</lastmod>` +
     `<changefreq>monthly</changefreq><priority>${g.pillar ? '1.0' : '0.9'}</priority></url>`
   ));
 
@@ -323,8 +327,9 @@ function sitemap(articles, guides){
 function robots(){
   return `User-agent: *
 Allow: /
+Disallow: /admin
 Disallow: /admin.html
-Disallow: /account.html
+Disallow: /demo
 Disallow: /demo.html
 
 Sitemap: ${SITE}/sitemap.xml
@@ -342,13 +347,13 @@ Sitemap: ${SITE}/sitemap.xml
 
 const PAGES = [
   { file: 'index.html',     loc: '/' },
-  { file: 'articles.html',  loc: '/articles.html' },
-  { file: 'standards.html', loc: '/standards.html' },
-  { file: 'rules.html',     loc: '/rules.html' },
-  { file: 'members.html',   loc: '/members.html' },
-  { file: 'account.html',   loc: '/account.html' },
-  { file: 'privacy.html',   loc: '/privacy.html' },
-  { file: 'terms.html',     loc: '/terms.html' }
+  { file: 'articles.html',  loc: '/articles' },
+  { file: 'standards.html', loc: '/standards' },
+  { file: 'rules.html',     loc: '/rules' },
+  { file: 'members.html',   loc: '/members' },
+  { file: 'account.html',   loc: '/account' },
+  { file: 'privacy.html',   loc: '/privacy' },
+  { file: 'terms.html',     loc: '/terms' }
 ];
 
 const START = '<!-- generated:meta -->';
@@ -432,7 +437,7 @@ function monthOf(iso){
 }
 
 function guidePage(g, all, fmtLong, api){
-  const url = SITE + '/guides/' + g.slug + '.html';
+  const url = SITE + '/guides/' + g.slug;
   const pillar = all.find(x => x.pillar);
   const related = (g.related || []).map(s => all.find(x => x.slug === s)).filter(Boolean);
 
