@@ -62,8 +62,15 @@ function page(a, api){
     : null;
 
   /* A description under 160 characters, because anything longer is cut off
-     in results and the tail is wasted. */
-  const desc = truncate(strip(a.summary || a.standfirst), 155);
+     in results and the tail is wasted.
+
+     Summaries are generated per change type, so many pages legitimately say
+     the same thing: 33 of them read "A revision is in progress." A
+     description that describes 33 pages describes none of them, and gives a
+     search engine nothing to tell them apart. Where one repeats, the page's
+     own subject goes in front of it. Titles are unique, so the subject is
+     almost always enough, and the full title is there as a fallback. */
+  const desc = uniqueDesc(a);
 
   /* Structured data. Google uses this to understand what the page is and
      can show a richer result for it. */
@@ -107,7 +114,7 @@ function page(a, api){
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${esc(truncate(strip(a.title), 65))}, Skills Radar</title>
+<title>${esc(headTitle(a.title))}</title>
 <meta name="description" content="${esc(desc)}">
 <link rel="canonical" href="${url}">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
@@ -291,6 +298,34 @@ function truncate(s, n){
   s = String(s || '');
   if(s.length <= n) return s;
   return s.slice(0, n - 1).replace(/\s+\S*$/, '') + '…';
+}
+
+/* A search result cuts the title at roughly 60 characters. The brand suffix
+   used to be appended after a 65-character truncation, so the string could
+   reach 79 and 170 of 230 pages were losing their ending in results. The
+   budget now covers the whole title. The brand is added only when it fits,
+   because a headline that reads to the end is worth more than repeating the
+   site name on a result that already shows the domain. */
+const DESC_USED = new Set();
+
+function uniqueDesc(a){
+  const base = truncate(strip(a.summary || a.standfirst), 155);
+  if(!DESC_USED.has(base)){ DESC_USED.add(base); return base; }
+
+  const title   = strip(a.title);
+  const subject = title.split(':')[0].trim();
+
+  for(const prefix of [subject, title]){
+    const tryDesc = truncate(prefix + '. ' + base, 155);
+    if(!DESC_USED.has(tryDesc)){ DESC_USED.add(tryDesc); return tryDesc; }
+  }
+  return base;
+}
+
+function headTitle(raw){
+  const BRAND = ', Skills Radar';
+  const t = strip(raw);
+  return (t.length + BRAND.length <= 60) ? t + BRAND : truncate(t, 60);
 }
 
 /* ---------- Sitemap and robots ---------- */

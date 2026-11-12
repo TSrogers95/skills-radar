@@ -981,9 +981,16 @@ function compiledArticle(s){
 
     urgency = 'medium'; icon = 'coin';
     title = s.name + ': funding band ' + (up ? 'raised' : 'changed') + ' to ' + gbp(to);
+    /* These lines become the page's meta description, so two standards that
+       moved by the same percentage used to ship the same sentence. The
+       figure it moved to, and the standard's name where there are no
+       figures, make each one describe its own page. */
     summary = up
-      ? 'Up' + (pct ? ' ' + pct + '%' : '') + ' from ' + gbp(from) + ', which changes whether this is viable to deliver.'
-      : 'The maximum you can draw for this standard has moved.';
+      ? 'Up' + (pct ? ' ' + pct + '%' : '') + ' from ' + gbp(from) + ' to ' + gbp(to) +
+        ', which changes whether this is viable to deliver.'
+      : (from !== null
+          ? gbp(from) + ' down to ' + gbp(to) + ', which changes whether this is viable to deliver.'
+          : 'The maximum you can draw for ' + s.name + ' is now ' + gbp(to) + '.');
     standfirst = 'Band reviews are quiet, infrequent and financially significant.';
     body.push(
       'The funding band for ' + s.name + ' at ' + level + ' has moved' +

@@ -30,7 +30,12 @@
 
 <div class="masthead">
 <div class="wrap">
-    <div class="collapsing" id="heroblock"></div>
+    <!-- The h1 is written here as well as by titleBlockHTML, because a
+         crawler reads this file before it runs any JavaScript and the home
+         page was serving no h1 at all. The script replaces this block with
+         the same heading and the same words, so the served page and the
+         rendered page agree. Keep this text identical to HERO in ui.js. -->
+    <div class="collapsing" id="heroblock"><h1 class="hero">Apprenticeship funding rules, cut down to the changes that affect you.</h1></div>
   </div>
 </div>
 

@@ -91,9 +91,11 @@ function wordmarkHTML(){
       '</svg>' +
     '</a>';
 
-  return isHomePage()
-    ? '<h1 class="wordmark">' + inner + '</h1>'
-    : '<p class="wordmark">' + inner + '</p>';
+  /* Always a paragraph. The wordmark used to be the h1 on the home page,
+     which spent the single strongest heading on the site's own name. The
+     hero line below carries the words people actually search for, so it
+     takes the h1 instead. Styling is by class, so nothing moves. */
+  return '<p class="wordmark">' + inner + '</p>';
 }
 
 function ctaHTML(){
@@ -145,7 +147,13 @@ function titleBlockHTML(stampHTML, withCta){
     '<div class="brandrow">' +
       '<div class="brandmain">' +
         wordmarkHTML() +
-        '<p class="hero">' + HERO + '</p>' +
+        /* On the home page this is the h1. It is the most prominent line on
+           the page and it contains the terms the site is trying to rank for.
+           Every other page carries its own h1 in the markup, so there it
+           stays a paragraph and does not compete. */
+        (isHomePage()
+          ? '<h1 class="hero">' + HERO + '</h1>'
+          : '<p class="hero">' + HERO + '</p>') +
         /* The sub line is dropped wherever the call to action runs, which in
            practice means the home page. Two paragraphs and a button before
            anyone has seen a single change is the main reason a first visit
