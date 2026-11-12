@@ -1,9 +1,18 @@
 /* =========================================================================
    GUIDES
 
-   The search-intent cluster. One pillar page and eleven supporting pages,
+   The search-intent cluster. One pillar page and ten supporting pages,
    each written for a phrase people actually type, and each answering it
    properly rather than circling it.
+
+   One page per intent, deliberately. There used to be separate pages for
+   "compliance" and "compliance checklist", and for "audit" and "audit
+   checklist". Each pair was chasing one intent with two pages, so a search
+   engine had to pick a winner and the loser diluted it. They were merged
+   into the broader page of each pair, which now carries the checklist as a
+   section, and the old URLs are permanently redirected in vercel.json.
+   Before adding a guide, check it is not a second page for an intent
+   something here already serves.
 
    Why these are separate from ARTICLES: an article is news, dated, and drops
    out of the feed. A guide is a standing answer that should still be right
@@ -87,13 +96,13 @@ const GUIDES = [
 /* ---------- COMPLIANCE ---------- */
 {
   slug: "apprenticeship-funding-compliance",
-  watch: ["otj-hours-change", "defunding-16"],
-  title: "Apprenticeship Funding Compliance: 2026/27 Requirements",
+  watch: ["otj-hours-change", "defunding-16", "rpl-requirement"],
+  title: "Apprenticeship Funding Compliance and Checklist 2026/27",
   h1: "Apprenticeship funding compliance",
-  description: "What funding compliance actually requires in 2026/27, where providers and employers most often fall short, and how to check your position before an auditor does.",
-  intent: "Usually a provider, often after an audit has been announced or a colleague has raised a concern. They want to know what good looks like and where they are exposed.",
-  updated: "2026-09-26",
-  reading: 7,
+  description: "What funding compliance requires in 2026/27, where providers and employers most often fall short, and a stage by stage checklist from before the start to the final claim.",
+  intent: "Usually a provider, often after an audit has been announced or a colleague has raised a concern. They want to know what good looks like, where they are exposed, and what to check at each stage.",
+  updated: "2026-11-12",
+  reading: 13,
   body: [
     { h: "What compliance means here",
       p: [
@@ -105,10 +114,42 @@ const GUIDES = [
         "Eligibility, meaning residency, age, employment status and prior qualifications, evidenced before the start date rather than after it. Off-the-job training, recorded against the published minimum for the specific standard. Prior learning, assessed for every apprentice and reflected in a reduced price where it applies.",
         "Then the training plan, which must match what was actually delivered and be signed by all three parties. Subcontracting, which must be declared and managed. And the funding claim itself, which must reconcile to the individualised learner record."
       ] },
+    { h: "What changed for 2026/27, and what it exposes",
+      p: [
+        "Four changes this year create compliance exposure that did not exist before, and each one catches people who are running last year's process unchanged.",
+        "Levy funds now expire after twelve months rather than twenty-four, and the ten per cent top-up has gone. Co-investment once a levy balance is exhausted is twenty-five per cent for apprentices aged 25 and over, up from five, and nothing for those aged 16 to 24. Employers who do not pay the levy contribute five per cent for those aged 25 and over and nothing for 16 to 24 year olds. Level 7 is closed to new starters aged 22 and over. Sixteen standards have been withdrawn from funding.",
+        "The compliance point is that three of those four turn on the apprentice's age or the start date, which means your records have to carry both accurately and your price has to have been set against the rules in force on the day the apprentice started. A cohort enrolled across a rule change is the one an auditor will look at first."
+      ] },
+    { h: "Before the apprentice starts",
+      p: [
+        "Right to work and residency evidence on file, dated before the start. Age confirmed, which now carries funding consequences in three separate places. Prior learning assessed and documented, with the price reduced where it applies.",
+        "Initial assessment completed, including English and maths. A contract of employment covering at least the minimum duration. An apprenticeship agreement signed. The standard confirmed as still funded on the intended start date, which is not a formality in a year when sixteen have been withdrawn."
+      ] },
+    { h: "At the start",
+      p: [
+        "A training plan signed by apprentice, employer and provider, setting out what will be delivered, when, and how off-the-job hours will be met. The planned off-the-job hours must be at or above the published minimum for that specific standard, less any recognised prior learning, and never below 187 hours.",
+        "The price agreed and recorded, within the funding band in force at the start date. The reservation made where the employer does not pay the levy."
+      ] },
+    { h: "During delivery",
+      p: [
+        "Off-the-job training recorded as it happens, with enough detail to show what was delivered and that it was within working hours. Progress reviews at least every twelve weeks with all three parties. Any break in learning recorded properly rather than left as a gap.",
+        "Changes to the employer, the standard version or the price documented at the time, not reconstructed later. A standard that moves to a new version mid-programme is a particular trap: the apprentice stays on the version they started, and your records need to show which one that was."
+      ] },
+    { h: "At the end",
+      p: [
+        "Gateway evidence showing the apprentice met the requirements. English and maths where required. The end-point assessment organisation engaged and the assessment completed. The final claim reconciling to what was delivered."
+      ] },
+    { h: "Who holds what, and why that matters",
+      p: [
+        "The provider makes the claim and carries the liability, but a good deal of the evidence sits with the employer: the contract of employment, the working hours that off-the-job is measured against, the apprentice's actual release to train, and the signature on the training plan.",
+        "That split is where most late discoveries happen. A provider can be entirely diligent and still fail an audit because an employer cannot produce a document nobody asked them for at the time. The practical fix is to collect employer-held evidence at the point of enrolment rather than relying on being able to get it later, and to check it exists rather than assuming the employer has it.",
+        "If you are the employer rather than the provider, the same logic runs in reverse. Your provider's compliance failure becomes your disrupted programme, and the evidence they need from you is cheapest to supply on day one."
+      ] },
     { h: "Doing a check yourself",
       p: [
         "Take ten apprentices at random across different standards and start dates. For each, try to produce the eligibility evidence, the signed training plan, the off-the-job record against the published minimum, and the prior learning assessment. Time how long it takes.",
-        "If you cannot find all four for eight of the ten within an hour, you have a compliance problem rather than a filing problem, and it is better to know now."
+        "If you cannot find all four for eight of the ten within an hour, you have a compliance problem rather than a filing problem, and it is better to know now.",
+        "Weight the sample rather than taking it purely at random. Apprentices who started either side of a rule change, anyone on a standard whose funding band moved, prior learning reductions, and anything subcontracted are where errors concentrate, so a sample that avoids them will tell you less than it appears to."
       ] }
   ],
   faq: [
@@ -117,62 +158,26 @@ const GUIDES = [
     { q: "How far back can funding be recovered?",
       a: "Auditors typically sample the current and preceding funding years, but a systemic issue can prompt a wider review going back further." },
     { q: "Does poor compliance affect Ofsted?",
-      a: "Indirectly. Ofsted does not audit funding, but weak record keeping around off-the-job training and training plans tends to show up in the quality of education judgement as well." }
+      a: "Indirectly. Ofsted does not audit funding, but weak record keeping around off-the-job training and training plans tends to show up in the quality of education judgement as well." },
+    { q: "How often should we run a compliance check?",
+      a: "Monthly on new starts, when the evidence is easiest to fix, and a full sample quarterly. Annually is too late to correct anything, because by then the apprentices with gaps have usually completed and the evidence window has closed." },
+    { q: "What is the single most common compliance failure?",
+      a: "Off-the-job training recorded as a running total rather than against the published minimum for that specific standard. It looks compliant on a dashboard until someone checks the figure that actually applies to that standard." }
   ],
-  related: ["apprenticeship-funding-compliance-checklist", "apprenticeship-funding-audit",
-            "apprenticeship-funding-evidence-requirements", "apprenticeship-funding-rules"]
-},
-
-{
-  slug: "apprenticeship-funding-compliance-checklist",
-  watch: ["otj-hours-change", "rpl-requirement"],
-  title: "Apprenticeship Funding Compliance Checklist 2026/27",
-  h1: "Apprenticeship funding compliance checklist",
-  description: "A practical checklist covering eligibility, evidence, off-the-job training, prior learning and the funding claim, with what an auditor looks for at each point.",
-  intent: "Someone who wants to work through their position methodically, often preparing for an audit or taking over a compliance role.",
-  updated: "2026-09-26",
-  reading: 8,
-  body: [
-    { h: "Before the apprentice starts",
-      p: [
-        "Right to work and residency evidence on file, dated before the start. Age confirmed, which now matters more because funding differs for 16 to 24 year olds at non-levy employers and Level 7 is closed to new starters aged 22 and over. Prior learning assessed and documented, with the price reduced where it applies.",
-        "Initial assessment completed, including English and maths. A contract of employment covering at least the minimum duration. An apprenticeship agreement signed. The standard confirmed as still funded on the intended start date, which is not a formality in a year when sixteen have been withdrawn."
-      ] },
-    { h: "At the start",
-      p: [
-        "A training plan signed by apprentice, employer and provider, setting out what will be delivered, when, and how off-the-job hours will be met. The planned off-the-job hours must be at or above the published minimum for that specific standard, less any recognised prior learning, and never below 187 hours.",
-        "The price agreed and recorded, within the funding band. The reservation made where the employer does not pay the levy."
-      ] },
-    { h: "During delivery",
-      p: [
-        "Off-the-job training recorded as it happens, with enough detail to show what was delivered and that it was within working hours. Progress reviews at least every twelve weeks with all three parties. Any break in learning recorded properly rather than left as a gap.",
-        "Changes to the employer, the standard version or the price documented at the time, not reconstructed later."
-      ] },
-    { h: "At the end",
-      p: [
-        "Gateway evidence showing the apprentice met the requirements. English and maths where required. The end-point assessment organisation engaged and the assessment completed. The final claim reconciling to what was delivered."
-      ] }
-  ],
-  faq: [
-    { q: "How often should we run this check?",
-      a: "Monthly on new starts, when the evidence is easiest to fix, and a full sample quarterly. Annually is too late to correct anything." },
-    { q: "What is the single most common failure?",
-      a: "Off-the-job training recorded as a running total rather than against the published minimum for that standard. It looks compliant until someone checks the figure for that particular standard." }
-  ],
-  related: ["apprenticeship-funding-audit-checklist", "apprenticeship-funding-evidence-requirements",
-            "apprenticeship-funding-off-the-job-training", "apprenticeship-funding-compliance"]
+  related: ["apprenticeship-funding-audit", "apprenticeship-funding-evidence-requirements",
+            "apprenticeship-funding-off-the-job-training", "apprenticeship-funding-rules"]
 },
 
 /* ---------- AUDIT ---------- */
 {
   slug: "apprenticeship-funding-audit",
   watch: ["otj-hours-change"],
-  title: "Apprenticeship Funding Audit: What to Expect in 2026/27",
-  h1: "Apprenticeship funding audit",
-  description: "How a funding audit works, what auditors sample and ask for, what triggers a review, and what happens when evidence cannot be produced.",
-  intent: "A provider who has been notified of an audit, or who wants to understand the exposure before one happens.",
-  updated: "2026-09-26",
-  reading: 7,
+  title: "Apprenticeship Funding Audit and Checklist 2026/27",
+  h1: "Apprenticeship funding audit, and how to prepare for one",
+  description: "How a funding audit works, what auditors sample, what triggers a review, and a sequenced checklist for the weeks between the notification and the visit.",
+  intent: "A provider who has been notified of an audit, or who wants to understand the exposure before one happens. They need to know how the exercise works and what to do with the time they have.",
+  updated: "2026-11-12",
+  reading: 12,
   body: [
     { h: "What an audit is testing",
       p: [
@@ -192,6 +197,35 @@ const GUIDES = [
       p: [
         "Funding is recovered for the affected apprentices. If the failure looks systemic rather than isolated, recovery can be extrapolated across the population, which is how a handful of missing files becomes a six-figure clawback.",
         "The practical defence is not argument at the time. It is having collected the evidence at the point it existed."
+      ] },
+    { h: "Extrapolation, worked through",
+      p: [
+        "The arithmetic is worth seeing once, because it explains why a small problem is not a small problem.",
+        "Take a provider drawing two million pounds a year across four hundred apprentices. The auditor samples twenty and finds three where the off-the-job record cannot be produced. That is an error rate of fifteen per cent. The three files that actually failed might be worth forty-five thousand between them. Fifteen per cent of two million is three hundred thousand.",
+        "The difference between those two figures is not a penalty. It is the assumption that what the sample found is true of the population, and the only way to displace it is to show the failures were confined to something specific: one employer, one cohort, one period, one member of staff who has since left. That argument is far easier to make if you already know where your own gaps are, which is the whole case for sampling yourself first."
+      ] },
+    { h: "Audit your own sample first",
+      p: [
+        "Before the auditor picks a sample, pick one yourself, and pick it the way they will: spread across standards, start dates and employers, weighted towards anything unusual. Twenty files is enough to know where you stand.",
+        "For each, assemble the eligibility evidence, the signed training plan, the off-the-job record, the prior learning assessment, the progress reviews and the price agreement. Note what is missing and how long each took to find.",
+        "Record the result as a rate, not a list. Three failures in twenty is the number that matters, because that is the number the auditor will be working with, and knowing it before they do is the difference between a negotiation and a surprise."
+      ] },
+    { h: "What can still be fixed",
+      p: [
+        "Evidence that exists but is disorganised can be assembled. Records held by the employer rather than you can be requested. Data that does not reconcile can be corrected and explained.",
+        "What cannot be fixed is evidence that was never created. Backdating a training plan is worse than not having one, and auditors are practised at spotting it. A document signed in a hand that does not match, dated to a day the apprentice was not employed, or produced in a format the organisation did not use at the time, turns a funding finding into a question about the organisation's integrity, and that is a different and much worse conversation.",
+        "If something is missing, the better position is to identify it yourself and say so."
+      ] },
+    { h: "On the day",
+      p: [
+        "Have one person responsible for producing files and one point of contact. Answer what is asked rather than volunteering context. Where a document does not exist, say so plainly rather than promising to find it later.",
+        "Keep a record of everything provided and every question asked, because you will need it when the draft findings arrive."
+      ] },
+    { h: "After the draft findings",
+      p: [
+        "Draft findings usually arrive several weeks later, with a window to respond. That window is the last point at which the figure moves, and most of the movement available comes from two things.",
+        "The first is evidence that was held but not produced on the day, which happens more often than people expect when files sit with an employer or a departed colleague. The second is the basis of any extrapolation. If the failures cluster, say so and show it, because a finding described as systemic and a finding described as confined to one cohort produce very different numbers from the same sample.",
+        "Argue from documents. A response that explains how good the training was, without records, does not change a funding finding, and spending the window on that argument means not spending it on the one that works."
       ] }
   ],
   faq: [
@@ -200,45 +234,14 @@ const GUIDES = [
     { q: "Can findings be appealed?",
       a: "Findings can be challenged where you can produce evidence that was overlooked, or show the interpretation was wrong. Challenging on the basis that the training genuinely happened, without records, rarely succeeds." },
     { q: "What is extrapolation?",
-      a: "Applying an error rate found in a sample across the whole population. It is why a small sample failure can produce a large recovery figure." }
-  ],
-  related: ["apprenticeship-funding-audit-checklist", "apprenticeship-funding-clawback",
-            "apprenticeship-funding-evidence-requirements", "apprenticeship-funding-compliance"]
-},
-
-{
-  slug: "apprenticeship-funding-audit-checklist",
-  title: "Apprenticeship Funding Audit Checklist and Preparation",
-  h1: "Preparing for an apprenticeship funding audit",
-  description: "What to gather before a funding audit, how to sample your own files first, and the gaps worth closing while there is still time to close them.",
-  intent: "A provider with an audit scheduled. Practical, sequenced, and honest about what can and cannot be fixed at this stage.",
-  updated: "2026-09-26",
-  reading: 6,
-  body: [
-    { h: "Audit your own sample first",
-      p: [
-        "Before the auditor picks a sample, pick one yourself, and pick it the way they will: spread across standards, start dates and employers, weighted towards anything unusual. Twenty files is enough to know where you stand.",
-        "For each, assemble the eligibility evidence, the signed training plan, the off-the-job record, the prior learning assessment, the progress reviews and the price agreement. Note what is missing and how long each took to find."
-      ] },
-    { h: "What can still be fixed",
-      p: [
-        "Evidence that exists but is disorganised can be assembled. Records held by the employer rather than you can be requested. Data that does not reconcile can be corrected and explained.",
-        "What cannot be fixed is evidence that was never created. Backdating a training plan is worse than not having one, and auditors are practised at spotting it. If something is missing, the better position is to identify it yourself and say so."
-      ] },
-    { h: "On the day",
-      p: [
-        "Have one person responsible for producing files and one point of contact. Answer what is asked rather than volunteering context. Where a document does not exist, say so plainly rather than promising to find it later.",
-        "Keep a record of everything provided and every question asked, because you will need it when the draft findings arrive."
-      ] }
-  ],
-  faq: [
+      a: "Applying an error rate found in a sample across the whole population. It is why a small sample failure can produce a large recovery figure." },
     { q: "How long does a funding audit take?",
       a: "A few days on site or remotely, then several weeks to draft findings. The period between the notification and the visit is where the work is." },
     { q: "Should we bring in external support?",
       a: "It depends on whether your own sample turns up isolated gaps or a pattern. A pattern is worth external eyes before the auditor arrives rather than after." }
   ],
-  related: ["apprenticeship-funding-audit", "apprenticeship-funding-compliance-checklist",
-            "apprenticeship-funding-evidence-requirements"]
+  related: ["apprenticeship-funding-compliance", "apprenticeship-funding-clawback",
+            "apprenticeship-funding-evidence-requirements", "apprenticeship-funding-rules"]
 },
 
 /* ---------- EVIDENCE ---------- */
@@ -279,7 +282,7 @@ const GUIDES = [
     { q: "Does the employer need to hold copies?",
       a: "The employer should hold the apprenticeship agreement, the contract of employment and evidence that the apprentice had time to train. The provider needs access to all of it." }
   ],
-  related: ["apprenticeship-funding-compliance-checklist", "apprenticeship-funding-audit",
+  related: ["apprenticeship-funding-compliance", "apprenticeship-funding-audit",
             "apprenticeship-funding-eligibility", "apprenticeship-funding-off-the-job-training"]
 },
 
@@ -324,7 +327,7 @@ const GUIDES = [
       a: "The apprentice must have been ordinarily resident in the UK, EEA or certain other territories for at least three years before the start, subject to exceptions for some visa categories and for refugees." }
   ],
   related: ["apprenticeship-funding-evidence-requirements", "apprenticeship-funding-rules",
-            "apprenticeship-funding-rules-for-employers", "apprenticeship-funding-compliance-checklist"]
+            "apprenticeship-funding-rules-for-employers", "apprenticeship-funding-compliance"]
 },
 
 /* ---------- AUDIENCE PAGES ---------- */
@@ -440,7 +443,7 @@ const GUIDES = [
     { q: "What is the minimum number of off-the-job hours?",
       a: "It depends on the standard, and each has a published figure. No apprenticeship can go below 187 hours whatever prior learning applies." }
   ],
-  related: ["apprenticeship-funding-evidence-requirements", "apprenticeship-funding-compliance-checklist",
+  related: ["apprenticeship-funding-evidence-requirements", "apprenticeship-funding-compliance",
             "apprenticeship-funding-rules-for-employers", "apprenticeship-funding-rules"]
 },
 

@@ -2,6 +2,28 @@
   "buildCommand": "node build.js",
   "outputDirectory": ".",
   "cleanUrls": true,
+  "redirects": [
+    {
+      "source": "/guides/apprenticeship-funding-audit-checklist",
+      "destination": "/guides/apprenticeship-funding-audit",
+      "permanent": true
+    },
+    {
+      "source": "/guides/apprenticeship-funding-audit-checklist.html",
+      "destination": "/guides/apprenticeship-funding-audit",
+      "permanent": true
+    },
+    {
+      "source": "/guides/apprenticeship-funding-compliance-checklist",
+      "destination": "/guides/apprenticeship-funding-compliance",
+      "permanent": true
+    },
+    {
+      "source": "/guides/apprenticeship-funding-compliance-checklist.html",
+      "destination": "/guides/apprenticeship-funding-compliance",
+      "permanent": true
+    }
+  ],
   "crons": [
     {
       "path": "/api/keepalive",
