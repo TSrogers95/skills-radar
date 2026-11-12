@@ -44,7 +44,7 @@ const GUIDES = [
   h1: "Apprenticeship funding rules 2026 to 2027",
   description: "What changed in the 2026/27 apprenticeship funding rules, what it means for employers and training providers, and where each requirement sits in the guidance.",
   intent: "Someone looking for the current rules, usually because something has changed or they have been asked to confirm compliance. They want the substance, not a link to a PDF.",
-  updated: "2026-09-26",
+  updated: "2026-11-12",
   reading: 9,
   body: [
     { h: "What the 2026/27 rules are",
@@ -56,7 +56,7 @@ const GUIDES = [
     { h: "What changed this year",
       p: [
         "Levy funds now expire twelve months after they enter the account, rather than twenty-four. The ten per cent government top-up has gone. Together these mean an employer who used to have two years to plan now has one, and unspent money is lost rather than accumulated.",
-        "Co-investment was removed for apprentices aged 16 to 24 at employers who do not pay the levy. Those apprenticeships are now fully funded. For everyone else the co-investment rate is five per cent.",
+        "Co-investment now turns on the apprentice's age as well as the employer's levy status. Apprentices aged 16 to 24 are fully funded either way, with nothing to contribute. For those aged 25 and over, an employer who does not pay the levy contributes five per cent, and a levy payer who has exhausted their balance contributes twenty-five per cent. That twenty-five rose from five, and it is the figure most often missed in a budget built on last year's numbers.",
         "Level 7 apprenticeships are no longer funded for new starters aged 22 and over. Apprenticeship units, which are short modular blocks, and foundation apprenticeships of around eight months became fundable in April 2026."
       ] },
     { h: "Who the rules apply to",
@@ -335,7 +335,7 @@ const GUIDES = [
   h1: "Apprenticeship funding rules for employers",
   description: "What the 2026/27 rules require of employers: the agreement, time to train, wages, evidence you must hold, and what changed with the Growth and Skills Levy.",
   intent: "An employer, often in HR or early careers, who has been told about a rule change or is starting a programme.",
-  updated: "2026-09-26",
+  updated: "2026-11-12",
   reading: 6,
   body: [
     { h: "Your responsibilities",
@@ -345,7 +345,7 @@ const GUIDES = [
       ] },
     { h: "What changed for you this year",
       p: [
-        "If you pay the levy, funds now expire after twelve months rather than twenty-four, and the ten per cent top-up has gone. Money not spent is lost. If you do not pay the levy, apprentices aged 16 to 24 are now fully funded with no co-investment.",
+        "If you pay the levy, funds now expire after twelve months rather than twenty-four, and the ten per cent top-up has gone. Money not spent is lost. Once your balance is exhausted you contribute twenty-five per cent towards apprentices aged 25 and over, up from five per cent, and nothing for those aged 16 to 24. If you do not pay the levy, apprentices aged 16 to 24 are fully funded with no co-investment, and those aged 25 and over cost you five per cent.",
         "A hiring payment of £2,000 is available for smaller employers taking on apprentices aged 16 to 24 from October 2026."
       ] },
     { h: "What you need to hold",
@@ -492,7 +492,7 @@ const GUIDES = [
   h1: "Apprenticeship levy funding rules",
   description: "How the Growth and Skills Levy works in 2026/27: the twelve-month expiry, the removal of the top-up, co-investment, transfers, and what it means for planning.",
   intent: "An employer or finance team working out what they can spend, by when, and what happens to what they do not.",
-  updated: "2026-09-26",
+  updated: "2026-11-12",
   reading: 6,
   body: [
     { h: "What the levy is now",
@@ -507,7 +507,8 @@ const GUIDES = [
       ] },
     { h: "Co-investment and transfers",
       p: [
-        "Where levy funds run out, employers co-invest five per cent, with government paying the rest. Apprentices aged 16 to 24 at non-levy employers are fully funded with no co-investment.",
+        "Where levy funds run out, what you pay depends on the apprentice's age. For those aged 25 and over it is twenty-five per cent of the remaining training cost, with government paying the other seventy-five. For those aged 16 to 24 it is nothing. The twenty-five per cent replaced a flat five per cent, so an employer modelling on the old rate will understate the cost of an older cohort fivefold.",
+        "Employers who do not pay the levy are on different rates again: nothing for apprentices aged 16 to 24, and five per cent for those aged 25 and over.",
         "Levy-paying employers can transfer up to 25 per cent of their annual funds to other employers, which is a route worth considering where a surplus would otherwise expire."
       ] }
   ],
@@ -517,7 +518,11 @@ const GUIDES = [
     { q: "Is there still a 10 per cent top-up?",
       a: "No. The government top-up was removed when the Growth and Skills Levy replaced the Apprenticeship Levy." },
     { q: "What can levy funds be spent on?",
-      a: "Apprenticeship training and end-point assessment. Not wages, travel, equipment or work placement costs." }
+      a: "Apprenticeship training and end-point assessment. Not wages, travel, equipment or work placement costs." },
+    { q: "What do I pay when my levy funds run out?",
+      a: "Twenty-five per cent of the remaining training and assessment cost for apprentices aged 25 and over, with government paying seventy-five. Nothing for apprentices aged 16 to 24. The twenty-five per cent rate replaced a flat five per cent under version 3 of the 2026/27 rules." },
+    { q: "How much is co-investment for a non-levy employer?",
+      a: "Five per cent for apprentices aged 25 and over. Apprentices aged 16 to 24 at employers who do not pay the levy are fully funded, with no employer contribution." }
   ],
   related: ["apprenticeship-funding-rules-for-employers", "apprenticeship-funding-rules",
             "apprenticeship-funding-eligibility"]
