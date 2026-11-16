@@ -183,7 +183,8 @@
 const LAST = lastUpdated();
 
 document.getElementById('heroblock').innerHTML = titleBlockHTML(
-  '<strong>Updated ' + (LAST.date ? fmtLong(LAST.date) : 'unknown') + '</strong>',
+  '<strong>Updated ' + (LAST.date ? fmtLong(LAST.date) : 'unknown') +
+    infoDotHTML('sourcenote', SOURCE_NOTE) + '</strong>',
   true
 );
 document.getElementById('navslot').innerHTML = navHTML('index.html');

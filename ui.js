@@ -11,6 +11,12 @@
 const HERO = "Apprenticeship funding rules, cut down to the changes that affect you.";
 const HERO_SUB = "Track funding rules, standards and T-Levels in one place, and spend the time you save building better early careers programmes.";
 
+/* Where the figures come from. Anyone deciding whether to trust a site that
+   claims to track funding rules asks this first, and the honest answer is
+   short enough to sit behind an icon next to the date. Edit it here: it is
+   rendered in one place. */
+const SOURCE_NOTE = "Standards are pulled from Skills England's public register API, with manual pulls alongside, and funding follows the published 2026/27 rules. AI runs the pull and compares it against the previous dataset to identify what changed. Manual checks are carried out on what it finds.";
+
 const PAGES = [
   { file: "index.html",      label: "Feed" },
   { file: "articles.html",   label: "Articles" },
@@ -166,6 +172,29 @@ function titleBlockHTML(stampHTML, withCta){
     '</div>' +
     cta +
   '</div>';
+}
+
+/* An information control for the "Updated" stamp.
+
+   A button rather than a span, so it can be reached by keyboard and tapped
+   on a phone. The note shows on hover for a mouse and on focus for
+   everything else, which covers tap as well, so none of this needs
+   JavaScript. aria-describedby ties the two together for a screen reader.
+
+   The masthead sets overflow:hidden, so the note opens downward from the
+   icon and stays inside that box rather than spilling out of it. */
+function infoDotHTML(id, note){
+  return '<span class="infowrap">' +
+      '<button type="button" class="infodot" aria-describedby="' + id + '" ' +
+              'aria-label="Where this data comes from">' +
+        '<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">' +
+          '<circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.4"/>' +
+          '<circle cx="8" cy="4.7" r="0.95" fill="currentColor"/>' +
+          '<path d="M8 7.2v4.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>' +
+        '</svg>' +
+      '</button>' +
+      '<span class="infotip" role="tooltip" id="' + id + '">' + note + '</span>' +
+    '</span>';
 }
 
 /* ---------- Article icons ----------

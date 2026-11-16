@@ -1750,6 +1750,68 @@ table.std .ctag{ display:inline-block; }
 }
 .stamp strong{ color:#E6EFEC; font-weight:500; display:block; font-size:13.5px; }
 
+/* ---------- Source note behind the Updated stamp ----------
+
+   Shown on hover for a mouse and on focus for keyboard and touch, so it
+   needs no JavaScript. The masthead clips its overflow, so the panel opens
+   downward over the navigation rather than out of the banner, and it is
+   held to a width that fits a phone. */
+
+.infowrap{ position:relative; display:inline-block; vertical-align:middle; margin-left:6px; }
+
+.infodot{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:17px; height:17px; padding:0; margin:0; border:0; border-radius:50%;
+  background:none; color:#7FA79F; cursor:pointer; line-height:0;
+  transition:color .14s ease;
+}
+.infodot svg{ width:15px; height:15px; display:block; }
+.infodot:hover{ color:#E6EFEC; }
+.infodot:focus{ outline:none; color:#E6EFEC; }
+.infodot:focus-visible{ outline:2px solid #6FD7C2; outline-offset:2px; }
+
+/* Opens upward. The masthead clips its overflow and the stamp sits close to
+   the bottom of it, so a panel dropping downward loses its last line. There
+   is plenty of banner above the stamp and nothing on that side to cover. */
+.infotip{
+  position:absolute; bottom:calc(100% + 9px); right:0; z-index:40;
+  width:min(310px, 74vw);
+  padding:11px 13px;
+  background:#0E2B28; border:1px solid #2F574F; border-radius:9px;
+  box-shadow:0 10px 26px rgba(0,0,0,.38);
+  color:#CFE2DD; font-size:12px; font-weight:400; line-height:1.55;
+  text-align:left; white-space:normal;
+  opacity:0; visibility:hidden; transform:translateY(-4px); pointer-events:none;
+  transition:opacity .14s ease, transform .14s ease, visibility .14s;
+}
+.infodot:hover + .infotip,
+.infodot:focus + .infotip{ opacity:1; visibility:visible; transform:translateY(0); }
+
+/* On a phone the icon sits too near the right edge for a panel of any useful
+   width to hang off it, and aligning the other way runs it off the left
+   instead. Dropping the wrapper out of the positioning chain hands the panel
+   to the brand row, which spans the content width, so it can simply run the
+   full width underneath and stay on screen whatever the icon is next to. */
+@media (max-width:720px){
+  .infowrap{ position:static; }
+  /* The brand row and the call to action both sit at z-index 2, and the call
+     to action comes later, so it was painting straight over the open panel.
+     The two never overlap except when the panel is open, so lifting the row
+     one step costs nothing elsewhere. */
+  .brandrow{ z-index:3; }
+  .infotip{
+    top:calc(100% + 10px); bottom:auto; left:0; right:0; width:auto;
+    transform:translateY(-4px);
+  }
+  .infodot:hover + .infotip,
+  .infodot:focus + .infotip{ transform:translateY(0); }
+}
+
+@media (prefers-reduced-motion:reduce){
+  .infodot, .infotip{ transition:none; }
+  .infotip{ transform:none; }
+}
+
 /* ---------- Navigation ---------- */
 
 .nav{ position:relative; z-index:2; margin-top:32px; gap:0; }
