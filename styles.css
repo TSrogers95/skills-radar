@@ -2410,6 +2410,20 @@ a.arow:hover .go{ opacity:1; }
 .factbox dl{ display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px 20px; margin:0 0 14px; }
 .factbox dt{ font-size:11.5px; color:var(--text-3); margin-bottom:2px; }
 .factbox dd{ margin:0; font-size:14.5px; color:var(--text); font-weight:500; }
+
+/* The superseded figure, shown in front of the current one so a change is
+   visible without reading a sentence about it. */
+.factbox .was{
+  color:#B3261E; text-decoration:line-through; text-decoration-thickness:1.5px;
+  font-weight:400; margin-right:6px;
+}
+
+/* Read aloud, never shown. */
+.vh{
+  position:absolute; width:1px; height:1px; margin:-1px; padding:0;
+  overflow:hidden; clip:rect(0 0 0 0); clip-path:inset(50%);
+  white-space:nowrap; border:0;
+}
 .fbextra{ font-size:13px; color:var(--text-2); line-height:1.55; padding-top:11px; border-top:1px solid var(--line); margin-top:4px; }
 .fbextra b{ display:block; font-size:11.5px; color:var(--text-3); font-weight:400; margin-bottom:3px; }
 .fblink{ display:inline-block; margin-top:13px; font-size:13px; color:var(--ink-3); font-weight:500; text-decoration:none; border-bottom:1px solid var(--ink-3); }

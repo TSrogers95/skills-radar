@@ -234,28 +234,76 @@ document.getElementById('heroblock').innerHTML = titleBlockHTML('').replace(/hre
 </html>`;
 }
 
+/* What the standard looked like before this change.
+
+   The register records what moved as a sentence, "Funding band changed from
+   £15,000 to £27,000", rather than as a pair of fields, so the earlier value
+   has to be read back out of it. Only what is actually stated is recovered.
+   A version bump records what it moved to and not what it moved from, so
+   version is left alone rather than guessed at. */
+function previousValues(s){
+  const c = String(s.changed || '');
+  const out = {};
+  let m;
+  if((m = c.match(/funding band changed from £([\d,]+) to £[\d,]+/i)))
+    out.funding = parseInt(m[1].replace(/,/g, ''), 10);
+  if((m = c.match(/duration changed from (\d+) to \d+\s*months/i)))
+    out.months = parseInt(m[1], 10);
+  if((m = c.match(/level changed from (\d+) to \d+/i)))
+    out.level = parseInt(m[1], 10);
+  return out;
+}
+
 function factBox(s, api){
   const otj = api.otjMinimum ? api.otjMinimum(s) : null;
+  const was = previousValues(s);
+
+  /* A value is escaped unless html is set. api.band returns markup of its
+     own when no band has been published, and it was being escaped with
+     everything else, so 32 pages were printing a span tag as text where the
+     figure belonged. */
   const facts = [
-    ['Level', s.level],
-    ['Duration', s.months ? s.months + ' months' : 'delivered as a unit'],
-    ['Maximum funding', api.band(s.funding)],
-    ['Reference', s.code || null],
-    ['Version', s.version],
-    ['Status', s.status],
-    ['Assessment', s.epa === 'Assigned'
+    { label: 'Level', value: s.level, was: was.level },
+    { label: 'Duration',
+      value: s.months ? s.months + ' months' : 'delivered as a unit',
+      was: was.months != null ? was.months + ' months' : null },
+    { label: 'Maximum funding', value: api.band(s.funding), html: true,
+      was: was.funding != null ? api.band(was.funding) : null, wasHtml: true },
+    { label: 'Reference', value: s.code || null },
+    { label: 'Version', value: s.version },
+    { label: 'Status', value: s.status },
+    { label: 'Assessment', value: s.epa === 'Assigned'
       ? 'Assigned, an assessment organisation is in place'
-      : (s.epa || null)]
+      : (s.epa || null) }
   ];
-  if(otj) facts.push(['Off-the-job minimum', otj + ' hours']);
+  if(otj) facts.push({ label: 'Off-the-job minimum', value: otj + ' hours' });
 
   const path = api.pathwaysFor ? api.pathwaysFor(s) : [];
   const jobs = api.jobTitlesFor ? api.jobTitlesFor(s) : [];
 
+  const show = (v, raw) => raw ? v : esc(v);
+
+  /* Where a figure moved, the old one is struck through in front of the new
+     one. Colour and a line through it carry the meaning for anyone looking,
+     and the hidden "was" and "now" carry the same thing for a screen reader,
+     which would otherwise hear two numbers and no relationship. */
+  const row = f => {
+    /* A recorded change can disagree with the record it sits on, usually
+       because the standard moved again afterwards and the sentence was not
+       rewritten. That produced "was 12 months, now 12 months", which reads
+       like a fault rather than a change, so a previous value only shows when
+       it actually differs from the current one. */
+    const same = f.was !== null && f.was !== undefined &&
+                 String(f.was) === String(f.value);
+    const prev = (f.was === null || f.was === undefined || same) ? '' :
+      `<s class="was"><span class="vh">was </span>${show(f.was, f.wasHtml)}</s> <span class="vh">now </span>`;
+    return `<div><dt>${esc(f.label)}</dt><dd>${prev}${show(f.value, f.html)}</dd></div>`;
+  };
+
   return `<aside class="factbox">
       <h2>${esc(s.name)}</h2>
-      <dl>${facts.filter(f => f[1] !== null && f[1] !== undefined && f[1] !== '')
-        .map(f => `<div><dt>${esc(f[0])}</dt><dd>${esc(f[1])}</dd></div>`).join('')}</dl>
+      <dl>${facts.filter(f => f.value !== null && f.value !== undefined && f.value !== '')
+        .map(row).join('')}</dl>
       ${path.length ? `<div class="fbextra"><b>Pathway</b> ${esc(path.join(' · '))}</div>` : ''}
       ${jobs.length ? `<div class="fbextra"><b>Typical job titles</b> ${esc(jobs.slice(0,8).join(', '))}</div>` : ''}
       <a class="fblink" href="${esc(api.standardVersionURL ? api.standardVersionURL(s) : api.standardURL(s))}" target="_blank" rel="noopener">${esc(s.name)} on the Skills England register &nearr;</a>
