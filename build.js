@@ -177,9 +177,9 @@ function page(a, api){
       ${a.body.map(p => '<p>' + p + '</p>').join('\n      ')}
     </div>
 
-    ${a.compiled ? `<div class="notice">The figures in the box above come from this standard&rsquo;s
-      record on the Skills England register. The context and guidance below are ours, and are general to
-      this kind of change rather than specific to your provision.</div>` : ''}
+    ${a.compiled ? `<div class="notice">The figures above come from this standard&rsquo;s record on the
+      Skills England register. Why it matters and what to do are ours, and are general to this kind of
+      change rather than specific to your provision.</div>` : ''}
 
     ${a.onRoute && a.onRoute.length ? routeList(a) : ''}
 
