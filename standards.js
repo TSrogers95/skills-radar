@@ -16,18 +16,18 @@
 /* When this register was last refreshed, and by what. The home page shows
    whichever is more recent, this or DATA_UPDATED in data.js, so an import
    moves the date even though it never touches data.js. */
-const STANDARDS_UPDATED = "2026-11-09";
+const STANDARDS_UPDATED = "2026-11-16";
 const STANDARDS_SOURCE  = "sync";        // "hand", "import" or "sync"
 
 /* STANDARDS:BEGIN — the importer and sync job rewrite everything between
    these two markers. Do not remove them.
-   Last synced 2026-11-09. */
+   Last synced 2026-11-16. */
 const STANDARDS = [
   { name:"Legal Technician — conveyancing or probate", code:"ST1312", level:4, months:24, funding:10000, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"2.0", since:"2024-01-03", changed:"Updated to version 2" },
   { name:"Game Programmer", code:"ST0953", level:7, months:24, funding:19000, route:"digital", epa:"Assigned", status:"Approved", version:"1.2", since:"2023-02-13", changed:"Version 1.1 retired" },
   { name:"Water network operative", code:"ST0898", level:2, months:18, funding:13000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.2", since:"2020-06-17", changed:"", pending:"New version replaces this one for new starts, same level, duration and funding band", pendingFrom:"2027-04-27" },
   { name:"Food industry technologist", code:"ST0198", level:3, months:24, funding:18000, route:"health-science", epa:"Assigned", status:"Approved", version:"1.2", since:"2026-08-12", changed:"New on the register", pending:"New version replaces this one for new starts, same level, duration and funding band", pendingFrom:"2027-02-25" },
-  { name:"Pharmacy Services Assistant", code:"ST0299", level:2, months:12, funding:5000, route:"health-science", epa:"Assigned", status:"Approved", version:"1.1", since:"2025-12-08", changed:"", pending:"New version replaces this one for new starts, same level, duration and funding band", pendingFrom:"2026-11-11" },
+  { name:"Pharmacy Services Assistant", code:"ST0299", level:2, months:12, funding:5000, route:"health-science", epa:"Assigned", status:"Approved", version:"2.0", since:"2026-11-11", changed:"Updated to version 2.0" },
   { name:"Consumer financial services professional", code:"ST1464", level:6, months:36, funding:0, route:"legal-finance-accounting", epa:"Pending — standard in development", status:"In development", version:"0.0", since:"2026-09-18", changed:"" },
   { name:"Low Carbon Heating Technician", code:"ST1020", level:3, months:36, funding:22000, route:"construction", epa:"Assigned", status:"Approved", version:"1.2", since:"2026-05-05", changed:"Version 1.1 retired; 1.2 current", article:"low-carbon-heating" },
   { name:"Underkeeper", code:"ST0412", level:2, months:18, funding:7000, route:"agriculture", epa:"Assigned", status:"Approved", version:"1.4", since:"2020-07-10", changed:"Updated to version 1.4" },
@@ -82,7 +82,7 @@ const STANDARDS = [
   { name:"Welder", code:"ST0349", level:2, months:18, funding:13000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.4", since:"2016-04-27", changed:"", also:"General Welder", pending:"New version replaces this one for new starts, same level, duration and funding band", pendingFrom:"2026-12-18" },
   { name:"Footwear manufacturer", code:"ST0202", level:2, months:15, funding:8000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.2", since:"2018-06-21", changed:"" },
   { name:"Food and drink engineer", code:"ST0624", level:5, months:36, funding:18000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2019-05-10", changed:"" },
-  { name:"Financial services administrator", code:"ST0177", level:3, months:12, funding:10000, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"1.3", since:"2014-11-12", changed:"", pending:"New version replaces this one for new starts, same level, duration and funding band", pendingFrom:"2026-11-12" },
+  { name:"Financial services administrator", code:"ST0177", level:3, months:12, funding:10000, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"2.0", since:"2026-11-12", changed:"Updated to version 2.0" },
   { name:"Fire emergency and security systems technician", code:"ST0189", level:3, months:36, funding:19000, route:"construction", epa:"Assigned", status:"Approved", version:"1.2", since:"2016-08-19", changed:"" },
   { name:"Transport planning technician", code:"ST0336", level:3, months:30, funding:13000, route:"construction", epa:"Assigned", status:"Approved", version:"1.2", since:"2016-05-11", changed:"" },
   { name:"Space Engineering Technician", code:"ST0855", level:4, months:48, funding:19000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2020-08-24", changed:"Status changed from Paused for starts to Approved" },
@@ -186,7 +186,7 @@ const STANDARDS = [
   { name:"Painter and Decorator", code:"ST0295", level:2, months:24, funding:10000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.3", since:"2024-10-16", changed:"Funding band changed from £12,000 to £10,000. Duration changed from 33 to 24 months. Level changed from 3 to 2. Updated to version 1.3" },
   { name:"Social Worker (integrated degree)", code:"ST0510", level:6, months:36, funding:24000, route:"care-services", epa:"Assigned", status:"Approved", version:"2.0", since:"2026-03-25", changed:"Funding band changed from £25,000 to £24,000" },
   { name:"HR Support", code:"ST0239", level:3, months:18, funding:4500, route:"business-administration", epa:"Assigned", status:"Approved", version:"1.1", since:"2017-08-25", changed:"Updated to version 1.1", pending:"New version replaces this one for new starts, same level, duration and funding band", pendingFrom:"2027-03-11" },
-  { name:"Insurance practitioner", code:"ST0240", level:3, months:12, funding:8000, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"1.4", since:"2026-05-19", changed:"New on the register", pending:"New version replaces this one for new starts, same level, duration and funding band", pendingFrom:"2026-11-12" },
+  { name:"Insurance practitioner", code:"ST0240", level:3, months:12, funding:8000, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"2.0", since:"2026-11-12", changed:"Updated to version 2.0" },
   { name:"Gas engineering operative", code:"ST0155", level:3, months:18, funding:23000, route:"construction", epa:"Assigned", status:"Approved", version:"1.3", since:"2016-02-05", changed:"" },
   { common:true, name:"Digital Marketer", code:"ST0122", level:3, months:18, funding:11000, route:"sales-marketing-procurement", epa:"Assigned", status:"Retired", version:"1.1", since:"2024-05-01", changed:"" },
   { name:"Retail Manager", code:"ST0325", level:4, months:12, funding:5000, route:"sales-marketing-procurement", epa:"Assigned", status:"Approved", version:"1.2", since:"2023-05-17", changed:"Funding band changed from £6,000 to £5,000" },
@@ -303,7 +303,7 @@ const STANDARDS = [
   { name:"Healthcare science practitioner (integrated degree)", code:"ST0413", level:6, months:36, funding:27000, route:"health-science", epa:"Assigned", status:"Approved", version:"1.1", since:"2017-03-31", changed:"", pending:"New version replaces this one for new starts, same level, duration and funding band", pendingFrom:"2027-09-13" },
   { name:"Baker", code:"ST0191", level:2, months:18, funding:9000, route:"catering-hospitality", epa:"Assigned", status:"Approved", version:"1.1", since:"2026-09-14", changed:"Funding band changed from £6,000 to £9,000", pending:"New version replaces this one for new starts, same level, duration and funding band", pendingFrom:"2027-03-15" },
   { name:"Procurement and Supply Chain Practitioner", code:"ST0313", level:4, months:18, funding:10000, route:"sales-marketing-procurement", epa:"Assigned", status:"Approved", version:"2.3", since:"2025-12-08", changed:"Funding band changed from £9,000 to £10,000" },
-  { name:"Senior compliance and risk specialist", code:"ST0363", level:6, months:36, funding:23000, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"1.1", since:"2016-09-19", changed:"", pending:"New version replaces this one for new starts, same level, duration and funding band", pendingFrom:"2026-11-12" },
+  { name:"Senior compliance and risk specialist", code:"ST0363", level:6, months:36, funding:23000, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"2.0", since:"2026-11-12", changed:"Updated to version 2.0" },
   { name:"Nuclear welding inspection technician", code:"ST0292", level:4, months:48, funding:27000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2025-08-04", changed:"New on the register" },
   { name:"Steel fixer", code:"ST0271", level:2, months:18, funding:18000, route:"construction", epa:"Assigned", status:"Approved", version:"1.3", since:"2017-05-16", changed:"" },
   { name:"Boatbuilder", code:"ST0059", level:3, months:42, funding:27000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.3", since:"2016-02-25", changed:"" },
