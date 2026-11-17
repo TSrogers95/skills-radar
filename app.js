@@ -123,6 +123,9 @@ function wireSearch(inputId, clearId, radarId, callback){
    photographed so they stay legible small and never look stocky. */
 
 const ART_ICONS = {
+  "milburn-review":
+    '<line x1="16" y1="7" x2="16" y2="42"/><line x1="32" y1="7" x2="32" y2="42"/>' +
+    '<line x1="16" y1="14" x2="32" y2="14" class="fade"/><line x1="16" y1="23" x2="32" y2="23" class="fade"/><line x1="16" y1="33" x2="32" y2="33" class="hg"/>',
   "defunding-16":
     '<rect x="8" y="14" width="30" height="7" rx="1"/><rect x="8" y="25" width="30" height="7" rx="1"/><rect x="8" y="36" width="30" height="7" rx="1" class="fade"/>' +
     '<line x1="4" y1="45" x2="44" y2="10" class="slash"/>',
