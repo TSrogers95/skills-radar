@@ -13,7 +13,7 @@
    automatically when it commits a change.
    ----------------------------------------------------------------------- */
 
-const DATA_UPDATED = "2026-10-28";
+const DATA_UPDATED = "2026-11-17";
 const DATA_SOURCE  = "hand";   // "hand" or "sync"
 
 /* ---------- 1. OCCUPATIONAL ROUTES -------------------------------------
@@ -109,6 +109,33 @@ const ROUTES = {
    ----------------------------------------------------------------------- */
 
 const UPDATES = [
+  {
+    date: "2026-11-17",
+    title: "Milburn review puts apprenticeships at the centre of the NEET plan",
+    tag: { label: "Review", tone: "new" },
+    category: "funding-rules", route: "", standard: "", article: "milburn-review",
+    status: "updated", urgency: "high", pinned: true,
+    summary: "Alan Milburn's final review wants the NEET rate down from about 1 in 8 to around 5% by 2036, and names apprenticeships the biggest education and skills priority. Under-25 starts would rise from about 172,000 to 270,000 a year by 2036/37. These are recommendations to government, so no funding rule changes today.",
+    url: "https://www.gov.uk/government/publications/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation"
+  },
+  {
+    date: "2026-11-17",
+    title: "Proposed: every pound of Levy on apprenticeships, over-25s cut by a quarter",
+    tag: { label: "Proposal", tone: "warn" },
+    category: "levy", route: "", standard: "", article: "milburn-review",
+    status: "in-review", urgency: "high", pinned: false,
+    summary: "Milburn wants the apprenticeship budget set at the full value of Levy receipts, with the Treasury topslice of about £460m removed. Under-25s would be fully funded from the Levy whatever the employer size. Government funding for apprentices aged 25 and over would be cut by 25%, possibly to a 50% contribution by 2031/32.",
+    url: "https://www.gov.uk/government/publications/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation"
+  },
+  {
+    date: "2026-11-17",
+    title: "Proposed: £2,500 hiring payment, open to levy payers",
+    tag: { label: "Proposal", tone: "money" },
+    category: "funding-rules", route: "", standard: "", article: "milburn-review",
+    status: "in-review", urgency: "medium", pinned: false,
+    summary: "The £2,000 payment for hiring a 16 to 24 year-old apprentice would rise to £2,500 and open to levy payers, with a new £2,000 incentive for providers. A separate £3,000 is proposed for hiring a young person NEET for six months. None of it is confirmed, so the current £2,000 rules still apply.",
+    url: "https://www.gov.uk/government/publications/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation"
+  },
   {
     date: "2026-10-19",
     title: "Industry commits to tens of thousands of apprenticeships a year",
@@ -431,6 +458,52 @@ const UPDATES = [
    ----------------------------------------------------------------------- */
 
 const ARTICLES = [
+  {
+    id: "milburn-review",
+    icon: "signpost",
+    summary: "Every pound of Levy spent on apprenticeships, under-25s fully funded, over-25s cut by a quarter, and a £2,500 hiring payment open to levy payers.",
+    title: "Milburn review: what it proposes for apprenticeships and the Levy",
+    date: "2026-11-17",
+    route: "",
+    tag: "Levy",
+    urgency: "high",
+    standfirst: "Recommendations, not rules. But they set the direction for the White Paper due early next year.",
+    body: [
+      "Alan Milburn's final review into young people not in education, employment or training was published by DWP on 17 November. It wants the NEET rate down from about 1 in 8 to around 5% by 2036, and it names apprenticeships as the largest education and skills priority in the whole report. <b>Nothing in it changes a funding rule today.</b> It is an independent review, and government decides what to take forward.",
+
+      "<b class=\"psub\">Why apprenticeships</b>Under-19 starts fell from around 130,000 in 2014/15 to about 75,000 in 2024/25, and the review says the Levy system is partly driving that fall. Its answer is to double the number of young people achieving an apprenticeship over the decade. Under-25 starts would rise from about 172,000 to 270,000 a year by 2036/37, and achievement rates from about 65% to 80%.",
+
+      "<b class=\"psub\">Where the money comes from</b>The apprenticeship budget would be set at the full value of Levy receipts, with the HM Treasury topslice removed. The review puts that gap at about £460m in 2026/27. Youth apprenticeships would be funded 100% from Levy proceeds whatever the size of the employer, and notional Levy balances and transfers would be replaced over time by a direct funding model.",
+
+      "Under-25 training is already fully funded in most cases, so the headline changes less on day one than it sounds. The real shift is the plumbing. If balances and transfers go, the way levy payers budget and the way transfers reach smaller employers both change with them.",
+
+      "<b class=\"psub\">The catch for over-25s</b>To pay for it, government funding for apprentices aged 25 and over would be cut by 25%. The review says government should be ready to take its contribution down to 50% by 2031/32, depending on progress. It would be phased, with regulated and priority occupations such as health and care protected first. Coming on top of the 25% employer co-investment for over-25s introduced in August, this is the proposal most likely to change what adult upskilling programmes cost.",
+
+      "<b class=\"psub\">Payments</b>The <a class=\"stdlink\" href=\"/a/hiring-payment\">hiring payment</a> for 16 to 24 year-old apprentices would rise from £2,000 to £2,500 and, for the first time, open to levy payers. Providers would get a new £2,000 incentive of their own.",
+
+      "Separately, employers would get £3,000 for hiring a young person who has been NEET for six months, plus £2,000 for firms under 50 staff and £2,000 more where the young person faces bigger barriers. That sounds a lot like the existing <a class=\"stdlink\" href=\"/a/youth-jobs-grant\">£3,000 Youth Jobs Grant</a>, which needs six months on Universal Credit. Whether the new payment replaces it, extends it or sits beside it is not yet clear, so do not promise it to anyone.",
+
+      "<b class=\"psub\">Pre-apprenticeships, English and maths, local control</b>The review wants 25,000 pre-apprenticeship places to start, built on level 1 provision and the new <a class=\"stdlink\" href=\"/a/level-2-certificates\">level 2 Occupational Certificates</a>, with colleges as the main provider for 16 to 18 year-olds. Young apprentices without level 2 English and maths would keep studying them, but passing would stop being an exit requirement, in line with the <a class=\"stdlink\" href=\"/a/english-maths\">change made for adults in February 2025</a>. An initial 10% of the apprenticeship budget would go each year to mayoral and strategic authorities, building on the <a class=\"stdlink\" href=\"/a/mayoral-brokerage\">brokerage pilots</a>.",
+
+      "Foundation Apprenticeships get a nod, but the review calls them modest because they do not fix employer demand or training capacity.",
+
+      "<b class=\"psub\">Employers and public contracts</b>First Chance is the employer pledge: more first jobs, youth apprenticeships and work experience. Large employers would publish their contribution, ideally with 10% of entry-level vacancies going to young people who are NEET or at risk. It is voluntary, and the review rules out a private sector quota on apprenticeships.",
+
+      "Procurement is where it gets teeth. Youth employment would become a mandatory social value criterion on central government projects over £5m. Youth hiring commitments would be mandatory over £50m and on major defence, energy and infrastructure contracts. That stacks on the <a class=\"stdlink\" href=\"/a/apprentices-public-projects\">3% apprentice requirement</a> announced at the Budget.",
+
+      "<b class=\"psub\">Schools and colleges</b>Work experience would become a statutory duty on schools, with a ready-for-work standard and new destination measures from 2028. Careers guidance would sit under a new Youth Opportunity Service, in every part of England by 2029, with Careers Hubs brokering placements. Colleges would take an extra 150,000 18 to 24 year-olds a year.",
+
+      "<b class=\"psub\">What follows</b>Government has said it will respond to the review before the end of the year, with a White Paper early in 2027. The review's own timeline puts £500m of first money in 2027/28 and the apprenticeship and FE funding reforms in 2028. Nothing to action in your compliance position today.",
+
+      "Two things worth doing now. If you use Levy funding for staff aged 25 and over, model what a 25% cut would do to next year's programme. If you bid for public contracts, start recording youth hiring numbers before someone asks for them under time pressure.",
+
+      "<b class=\"psub\">A note on the Equality Act</b>The youth hiring targets here are policy proposals. If you act on them, frame commitments around widening access, such as guaranteed interviews for NEET applicants who meet essential criteria, and check any age-based targeting against the Equality Act 2010 before you advertise."
+    ],
+    sources: [
+      { label: "From a Welfare State to a Working State: a new settlement for the next generation, DWP, 17 November 2026", url: "https://www.gov.uk/government/publications/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation" },
+      { label: "Full report (HTML), apprenticeships at paragraphs 460 to 477", url: "https://www.gov.uk/government/publications/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation/from-a-welfare-state-to-a-working-state-a-new-settlement-for-the-next-generation" }
+    ]
+  },
   {
     id: "jobs-plans",
     icon: "handshake",
@@ -1017,6 +1090,14 @@ const ARTICLES = [
    ----------------------------------------------------------------------- */
 
 const HORIZON = [
+  {
+    window: "December 2026 to early 2027",
+    title: "Government response to the Milburn review",
+    confidence: "signalled",
+    risk: "high",
+    detail: "Government has said it will respond to the review before the end of the year, with a White Paper early in 2027. The review proposes spending every pound of Levy on apprenticeships, full funding for under-25s through a direct funding model, and a 25% cut to government funding for over-25s, with apprenticeship and FE funding reforms timed for 2028.",
+    watch: "Which funding proposals the response accepts, and whether the 25% cut for over-25s survives. That is the one that changes what adult upskilling programmes cost."
+  },
   {
     window: "Now to September 2026",
     title: "Enrolment cliff on the 16 defunded standards",
