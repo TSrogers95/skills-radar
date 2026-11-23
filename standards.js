@@ -16,12 +16,12 @@
 /* When this register was last refreshed, and by what. The home page shows
    whichever is more recent, this or DATA_UPDATED in data.js, so an import
    moves the date even though it never touches data.js. */
-const STANDARDS_UPDATED = "2026-11-16";
+const STANDARDS_UPDATED = "2026-11-23";
 const STANDARDS_SOURCE  = "sync";        // "hand", "import" or "sync"
 
 /* STANDARDS:BEGIN — the importer and sync job rewrite everything between
    these two markers. Do not remove them.
-   Last synced 2026-11-16. */
+   Last synced 2026-11-23. */
 const STANDARDS = [
   { name:"Legal Technician — conveyancing or probate", code:"ST1312", level:4, months:24, funding:10000, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"2.0", since:"2024-01-03", changed:"Updated to version 2" },
   { name:"Game Programmer", code:"ST0953", level:7, months:24, funding:19000, route:"digital", epa:"Assigned", status:"Approved", version:"1.2", since:"2023-02-13", changed:"Version 1.1 retired" },
@@ -87,7 +87,7 @@ const STANDARDS = [
   { name:"Transport planning technician", code:"ST0336", level:3, months:30, funding:13000, route:"construction", epa:"Assigned", status:"Approved", version:"1.2", since:"2016-05-11", changed:"" },
   { name:"Space Engineering Technician", code:"ST0855", level:4, months:48, funding:19000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2020-08-24", changed:"Status changed from Paused for starts to Approved" },
   { name:"Boatmaster", code:"ST0621", level:3, months:24, funding:25000, route:"transport-logistics", epa:"Assigned", status:"Approved", version:"1.2", since:"2019-11-04", changed:"" },
-  { name:"Chartered tax advisor", code:"ST1459", level:7, months:36, funding:26000, route:"legal-finance-accounting", epa:"Pending — standard in development", status:"In development", version:"2.0", since:"2026-09-18", changed:"", pending:"New version replaces this one for new starts, same level, duration and funding band", pendingFrom:"2026-12-18" },
+  { name:"Chartered tax advisor", code:"ST1459", level:7, months:36, funding:26000, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"2.0", since:"2026-11-19", changed:"Status changed from In development to Approved. Assessment: assigned" },
   { name:"Professional Taxation Technician", code:"ST1458", level:4, months:24, funding:15000, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"2.0", since:"2025-05-08", changed:"Updated to version 2" },
   { name:"Officer of the Watch (near coastal)", code:"ST0842", level:3, months:36, funding:15000, route:"transport-logistics", epa:"Assigned", status:"Approved", version:"1.2", since:"2021-11-12", changed:"Status changed from Retirement consultation to Approved" },
   { name:"Professional Accounting or Taxation Technician", code:"ST0003", level:4, months:18, funding:12000, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"2.0", since:"2026-07-27", changed:"Funding band changed from £8,000 to £12,000" },
@@ -361,7 +361,7 @@ const STANDARDS = [
   { name:"Community fire safety advisor", code:"ST0593", level:3, months:12, funding:7000, route:"protective-services", epa:"Assigned", status:"Approved", version:"1.2", since:"2019-03-22", changed:"" },
   { name:"Corporate Responsibility and Sustainability Practitioner", code:"ST0934", level:4, months:36, funding:14000, route:"business-administration", epa:"Assigned", status:"Approved", version:"2.0", since:"2026-03-20", changed:"Updated to version 2.0" },
   { name:"Mobile Transport Refrigeration Technician", code:"ST1327", level:3, months:36, funding:16000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.1", since:"2024-07-01", changed:"Version 1.0 retired" },
-  { name:"Professional Arboriculturist (integrated degree)", code:"ST0922", level:6, months:48, funding:22000, route:"agriculture", epa:"Assigned", status:"Approved", version:"1.1", since:"2026-10-13", changed:"Duration changed from 36 to 48 months. Updated to version 1.1" },
+  { name:"Professional Arboriculturist (integrated degree)", code:"ST0922", level:6, months:48, funding:22000, route:"agriculture", epa:"Assigned", status:"Approved", version:"1.1", since:"2026-10-13", changed:"Duration changed from 36 to 48 months. Updated to version 1.1", pending:"New version replaces this one for new starts, same level, duration and funding band", pendingFrom:"2027-01-04" },
   { name:"Engineering fitter", code:"ST0432", level:3, months:42, funding:21000, route:"engineering-manufacturing", epa:"Assigned", status:"Approved", version:"1.4", since:"2018-11-20", changed:"" },
   { name:"Spatial Data Specialist", code:"ST0957", level:7, months:24, funding:18000, route:"digital", epa:"Assigned", status:"Approved", version:"1.1", since:"2024-09-30", changed:"Version 1.0 retired" },
   { name:"Geospatial mapping and science specialist (degree)", code:"ST0492", level:6, months:60, funding:27000, route:"construction", epa:"Assigned", status:"Approved", version:"1.0", since:"2018-03-27", changed:"" },
@@ -688,6 +688,7 @@ const STANDARDS = [
   { name:"Landscape technician", code:"ST0741", level:3, months:24, funding:9000, route:"construction", epa:"Assigned", status:"Approved", version:"1.1", since:"2020-06-04", changed:"" },
   { name:"Senior professional economist", code:"ST0796", level:7, months:24, funding:11000, route:"legal-finance-accounting", epa:"Assigned", status:"Approved", version:"2.0", since:"2019-12-20", changed:"" },
   { name:"Curator", code:"ST0782", level:7, months:36, funding:12000, route:"creative-design", epa:"Assigned", status:"Approved", version:"1.2", since:"2020-04-27", changed:"" },
+  { name:"Emergency gas responder", code:"ST1489", level:3, months:18, funding:0, route:"engineering-manufacturing", epa:"Pending — standard in development", status:"In development", version:"0.0", since:"2026-11-19", changed:"New on the register" },
   { name:"Audiovisual Technician", code:"ST0940", level:5, months:24, funding:18000, route:"creative-design", epa:"Assigned", status:"Approved", version:"1.0", since:"2022-09-13", changed:"Updated to version 1" },
   { name:"Agriculture or Horticulture Professional Adviser", code:"ST0761", level:6, months:30, funding:14000, route:"agriculture", epa:"Assigned", status:"Retired", version:"1.0", since:"2025-07-24", changed:"Version retired and replaced" },
   { name:"Garment maker", code:"ST0846", level:3, months:24, funding:10000, route:"creative-design", epa:"Assigned", status:"Approved", version:"1.1", since:"2019-09-27", changed:"" },
